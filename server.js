@@ -236,6 +236,31 @@ app.patch("/api/books/:id", upload.single("cover"), (req, res) => {
   }
 });
 
+app.delete("/api/books/:id", (req, res) => {
+  try {
+    const bookId = Number(req.params.id);
+    if (!Number.isInteger(bookId) || bookId < 1) {
+      res.status(400).json({ error: "Invalid book id" });
+      return;
+    }
+
+    const payload = readPayload();
+    const bookIndex = payload.books.findIndex((entry) => entry.id === bookId);
+    if (bookIndex === -1) {
+      res.status(404).json({ error: "Book not found" });
+      return;
+    }
+
+    const [book] = payload.books.splice(bookIndex, 1);
+    removeLocalCovers(book);
+    writePayload(payload);
+
+    res.json({ id: bookId, deleted: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 app.use(express.static(ROOT));
 
 app.get("/", (_req, res) => {

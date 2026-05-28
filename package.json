@@ -9,6 +9,9 @@
     "crawl:test": "node my_script.js --limit 5",
     "sync-collection": "node my_script.js --sync-collection",
     "reconcile-covers": "node my_script.js --reconcile-covers",
+    "fill-covers": "node my_script.js --fill-covers",
+    "fill-covers:dry-run": "node my_script.js --fill-covers --dry-run",
+    "build": "node build.js",
     "serve": "node server.js"
   },
   "dependencies": {

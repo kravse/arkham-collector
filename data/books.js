@@ -9,10 +9,10 @@ window.BOOKS = [
     "coverArtist": null,
     "publicationDate": "2010",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Arkham_Sampler",
-    "coverImageUrl": null,
-    "coverImageFile": null,
+    "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/f/fe/Arkham_sampler.jpg",
+    "coverImageFile": "covers/the-arkham-sampler-1.jpg",
     "error": null,
-    "hidden": false
+    "hidden": true
   },
   {
     "id": 2,
@@ -24,9 +24,10 @@ window.BOOKS = [
     "coverArtist": null,
     "publicationDate": "2010",
     "wikipediaUrl": null,
-    "coverImageUrl": null,
-    "coverImageFile": null,
-    "error": null
+    "coverImageUrl": "https://covers.openlibrary.org/b/id/13272185-L.jpg",
+    "coverImageFile": "covers/baker-street-irregular-2.jpg",
+    "error": null,
+    "hidden": true
   },
   {
     "id": 3,
@@ -40,7 +41,8 @@ window.BOOKS = [
     "wikipediaUrl": null,
     "coverImageUrl": null,
     "coverImageFile": null,
-    "error": null
+    "error": null,
+    "hidden": true
   },
   {
     "id": 4,
@@ -54,7 +56,8 @@ window.BOOKS = [
     "wikipediaUrl": null,
     "coverImageUrl": null,
     "coverImageFile": null,
-    "error": null
+    "error": null,
+    "hidden": true
   },
   {
     "id": 5,
@@ -68,7 +71,8 @@ window.BOOKS = [
     "wikipediaUrl": null,
     "coverImageUrl": null,
     "coverImageFile": null,
-    "error": null
+    "error": null,
+    "hidden": true
   },
   {
     "id": 6,
@@ -80,9 +84,10 @@ window.BOOKS = [
     "coverArtist": null,
     "publicationDate": "2009",
     "wikipediaUrl": null,
-    "coverImageUrl": null,
-    "coverImageFile": null,
-    "error": null
+    "coverImageUrl": "https://covers.openlibrary.org/b/id/10205936-L.jpg",
+    "coverImageFile": "covers/that-is-not-dead-6.jpg",
+    "error": null,
+    "hidden": true
   },
   {
     "id": 7,
@@ -94,9 +99,10 @@ window.BOOKS = [
     "coverArtist": null,
     "publicationDate": "2009",
     "wikipediaUrl": null,
-    "coverImageUrl": null,
-    "coverImageFile": null,
-    "error": null
+    "coverImageUrl": "https://covers.openlibrary.org/b/id/10473220-L.jpg",
+    "coverImageFile": "covers/august-derleths-eerie-creatures-7.jpg",
+    "error": null,
+    "hidden": true
   },
   {
     "id": 8,
@@ -110,7 +116,8 @@ window.BOOKS = [
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Shunned_House",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/commons/2/26/The_Shunned_House.jpg",
     "coverImageFile": "covers/the-shunned-house-8.jpg",
-    "error": null
+    "error": null,
+    "hidden": true
   },
   {
     "id": 9,
@@ -813,20 +820,6 @@ window.BOOKS = [
     "error": null
   },
   {
-    "id": 59,
-    "decade": "1980s",
-    "listTitle": "New Tales of the Cthulhu Mythos",
-    "listAuthor": "edited by Ramsey Campbell (1980)",
-    "title": "Tales of the Cthulhu Mythos",
-    "author": "H. P. Lovecraft and others",
-    "coverArtist": "Lee Brown Coye",
-    "publicationDate": "1969",
-    "wikipediaUrl": "https://en.wikipedia.org/wiki/New_Tales_of_the_Cthulhu_Mythos",
-    "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/7/7e/Tales_of_the_Cthulhu_Mythos.jpg",
-    "coverImageFile": "covers/tales-of-the-cthulhu-mythos-golden-anniversary-anthology-35.jpg",
-    "error": null
-  },
-  {
     "id": 60,
     "decade": "1980s",
     "listTitle": "Necropolis",
@@ -1056,9 +1049,9 @@ window.BOOKS = [
     "listTitle": "The Purcell Papers",
     "listAuthor": ": four stories from the original collection (The Purcell Papers), along with nine other Le Fanu short stories and a pastiche of Le Fanu, \"The Churchyard Yew,\" written by August Derleth using Le Fanu's name as a pseudonym.",
     "title": "The Purcell Papers",
-    "author": null,
-    "coverArtist": null,
-    "publicationDate": null,
+    "author": "J. Sheridan Le Fanu",
+    "coverArtist": "Frank Utpatel",
+    "publicationDate": "1975",
     "wikipediaUrl": null,
     "coverImageUrl": null,
     "coverImageFile": "covers/the-purcell-papers-76.webp",
@@ -1131,7 +1124,7 @@ window.BOOKS = [
     "publicationDate": "1975",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Howard_Phillips_Lovecraft%3A_Dreamer_on_the_Nightside",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/commons/4/4a/Frank_Belknap_Long_at_the_Craft_of_the_Horror_Writer_Panel%2C_18_August_1990_%28cropped%29.jpg",
-    "coverImageFile": "covers/howard-phillips-lovecraft-dreamer-on-the-nightside-81.jpg",
+    "coverImageFile": "covers/howard-phillips-lovecraft-dreamer-on-the-nightside-81.webp",
     "error": null
   },
   {
@@ -1312,9 +1305,10 @@ window.BOOKS = [
     "coverArtist": null,
     "publicationDate": null,
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Arkham_Collector",
-    "coverImageUrl": null,
-    "coverImageFile": null,
-    "error": null
+    "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/b/bc/Arkham_collector_1.jpg",
+    "coverImageFile": "covers/the-arkham-collector-94.jpg",
+    "error": null,
+    "hidden": true
   },
   {
     "id": 95,
@@ -1354,9 +1348,10 @@ window.BOOKS = [
     "coverArtist": null,
     "publicationDate": null,
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Arkham_Collector",
-    "coverImageUrl": null,
-    "coverImageFile": null,
-    "error": null
+    "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/b/bc/Arkham_collector_1.jpg",
+    "coverImageFile": "covers/the-arkham-collector-94.jpg",
+    "error": null,
+    "hidden": true
   },
   {
     "id": 98,
@@ -1396,23 +1391,10 @@ window.BOOKS = [
     "coverArtist": null,
     "publicationDate": null,
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Arkham_Collector",
-    "coverImageUrl": null,
-    "coverImageFile": null,
-    "error": null
-  },
-  {
-    "id": 101,
-    "decade": "1970s",
-    "listTitle": "The Horror in the Museum and Other Revisions",
-    "listAuthor": "by H. P. Lovecraft (1970)",
-    "title": "The Horror in the Museum and Other Revisions",
-    "author": "H. P. Lovecraft",
-    "coverArtist": "Gahan Wilson (original), Raymond Bayless (revised)",
-    "publicationDate": "1970 (original), 1989 (revised)",
-    "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Horror_in_the_Museum_and_Other_Revisions",
-    "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/8/82/Horror_in_the_museum.jpg",
-    "coverImageFile": "covers/the-horror-in-the-museum-and-other-revisions-37.jpg",
-    "error": null
+    "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/b/bc/Arkham_collector_1.jpg",
+    "coverImageFile": "covers/the-arkham-collector-94.jpg",
+    "error": null,
+    "hidden": true
   },
   {
     "id": 102,
@@ -1424,9 +1406,10 @@ window.BOOKS = [
     "coverArtist": null,
     "publicationDate": null,
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Arkham_Collector",
-    "coverImageUrl": null,
-    "coverImageFile": null,
-    "error": null
+    "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/b/bc/Arkham_collector_1.jpg",
+    "coverImageFile": "covers/the-arkham-collector-94.jpg",
+    "error": null,
+    "hidden": true
   },
   {
     "id": 103,
@@ -1480,9 +1463,10 @@ window.BOOKS = [
     "coverArtist": null,
     "publicationDate": null,
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Arkham_Collector",
-    "coverImageUrl": null,
-    "coverImageFile": null,
-    "error": null
+    "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/b/bc/Arkham_collector_1.jpg",
+    "coverImageFile": "covers/the-arkham-collector-94.jpg",
+    "error": null,
+    "hidden": true
   },
   {
     "id": 107,
@@ -1503,13 +1487,13 @@ window.BOOKS = [
     "decade": "1960s",
     "listTitle": "Tales of the Cthulhu Mythos",
     "listAuthor": "by H. P. Lovecraft and Others (1969)",
-    "title": "Tales of the Cthulhu Mythos",
-    "author": "H. P. Lovecraft and others",
-    "coverArtist": "Lee Brown Coye",
-    "publicationDate": "1969",
-    "wikipediaUrl": "https://en.wikipedia.org/wiki/Tales_of_the_Cthulhu_Mythos",
+    "title": "New Tales of the Cthulhu Mythos",
+    "author": "Ramsey Campbell",
+    "coverArtist": "Jason Van Hollander",
+    "publicationDate": "1980",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Cthulhu_Mythos_anthology#New_Tales_of_the_Cthulhu_Mythos",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/7/7e/Tales_of_the_Cthulhu_Mythos.jpg",
-    "coverImageFile": "covers/tales-of-the-cthulhu-mythos-golden-anniversary-anthology-35.jpg",
+    "coverImageFile": "covers/cthulhu-mythos-anthology-108.jpg",
     "error": null
   },
   {
@@ -1522,9 +1506,10 @@ window.BOOKS = [
     "coverArtist": null,
     "publicationDate": null,
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Arkham_Collector",
-    "coverImageUrl": null,
-    "coverImageFile": null,
-    "error": null
+    "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/b/bc/Arkham_collector_1.jpg",
+    "coverImageFile": "covers/the-arkham-collector-94.jpg",
+    "error": null,
+    "hidden": true
   },
   {
     "id": 110,
@@ -1536,9 +1521,10 @@ window.BOOKS = [
     "coverArtist": null,
     "publicationDate": null,
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Arkham_Collector",
-    "coverImageUrl": null,
-    "coverImageFile": null,
-    "error": null
+    "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/b/bc/Arkham_collector_1.jpg",
+    "coverImageFile": "covers/the-arkham-collector-94.jpg",
+    "error": null,
+    "hidden": true
   },
   {
     "id": 111,
@@ -1550,9 +1536,10 @@ window.BOOKS = [
     "coverArtist": null,
     "publicationDate": null,
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Arkham_Collector",
-    "coverImageUrl": null,
-    "coverImageFile": null,
-    "error": null
+    "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/b/bc/Arkham_collector_1.jpg",
+    "coverImageFile": "covers/the-arkham-collector-94.jpg",
+    "error": null,
+    "hidden": true
   },
   {
     "id": 112,
@@ -1606,9 +1593,10 @@ window.BOOKS = [
     "coverArtist": null,
     "publicationDate": null,
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Arkham_Collector",
-    "coverImageUrl": null,
-    "coverImageFile": null,
-    "error": null
+    "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/b/bc/Arkham_collector_1.jpg",
+    "coverImageFile": "covers/the-arkham-collector-94.jpg",
+    "error": null,
+    "hidden": true
   },
   {
     "id": 116,
@@ -1662,9 +1650,10 @@ window.BOOKS = [
     "coverArtist": null,
     "publicationDate": null,
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Arkham_Collector",
-    "coverImageUrl": null,
-    "coverImageFile": null,
-    "error": null
+    "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/b/bc/Arkham_collector_1.jpg",
+    "coverImageFile": "covers/the-arkham-collector-94.jpg",
+    "error": null,
+    "hidden": true
   },
   {
     "id": 120,
@@ -1779,20 +1768,6 @@ window.BOOKS = [
     "error": null
   },
   {
-    "id": 128,
-    "decade": "1960s",
-    "listTitle": "Dagon and Other Macabre Tales",
-    "listAuthor": "by H. P. Lovecraft (1965)",
-    "title": "Dagon and Other Macabre Tales",
-    "author": "H. P. Lovecraft",
-    "coverArtist": "Lee Brown Coye",
-    "publicationDate": "1965",
-    "wikipediaUrl": "https://en.wikipedia.org/wiki/Dagon_and_Other_Macabre_Tales",
-    "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/8/8f/Dagon_first.jpg",
-    "coverImageFile": "covers/dagon-and-other-macabre-tales-44.jpg",
-    "error": null
-  },
-  {
     "id": 129,
     "decade": "1960s",
     "listTitle": "Poems in Prose",
@@ -1860,20 +1835,6 @@ window.BOOKS = [
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Portraits_in_Moonlight",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/d/dc/Portraits_in_moonlight.jpg",
     "coverImageFile": "covers/portraits-in-moonlight-133.jpg",
-    "error": null
-  },
-  {
-    "id": 134,
-    "decade": "1960s",
-    "listTitle": "At the Mountains of Madness and Other Novels",
-    "listAuthor": "by H. P. Lovecraft (1964)",
-    "title": "At the Mountains of Madness and Other Novels",
-    "author": "H. P. Lovecraft",
-    "coverArtist": "Lee Brown Coye",
-    "publicationDate": "1964",
-    "wikipediaUrl": "https://en.wikipedia.org/wiki/At_the_Mountains_of_Madness_and_Other_Novels",
-    "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/a/a0/At_the_mountains_of_madness.jpg",
-    "coverImageFile": "covers/at-the-mountains-of-madness-and-other-novels-45.jpg",
     "error": null
   },
   {
@@ -1972,21 +1933,8 @@ window.BOOKS = [
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Autobiography%3A_Some_Notes_on_a_Nonentity",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/9/9e/Nonentity.jpg",
     "coverImageFile": "covers/autobiography-some-notes-on-a-nonentity-141.jpg",
-    "error": null
-  },
-  {
-    "id": 142,
-    "decade": "1960s",
-    "listTitle": "The Dunwich Horror and Others",
-    "listAuthor": "by H. P. Lovecraft (1963)",
-    "title": "The Dunwich Horror and Others",
-    "author": "H. P. Lovecraft",
-    "coverArtist": "Lee Brown Coye",
-    "publicationDate": "1963",
-    "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Dunwich_Horror_and_Others",
-    "coverImageUrl": "https://upload.wikimedia.org/wikipedia/commons/6/63/Dunwich_Horror_and_Others_dust_jacket.jpg",
-    "coverImageFile": "covers/the-dunwich-horror-and-others-46.jpg",
-    "error": null
+    "error": null,
+    "hidden": true
   },
   {
     "id": 143,
@@ -2098,7 +2046,8 @@ window.BOOKS = [
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Shunned_House",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/commons/2/26/The_Shunned_House.jpg",
     "coverImageFile": "covers/the-shunned-house-8.jpg",
-    "error": null
+    "error": null,
+    "hidden": true
   },
   {
     "id": 151,
@@ -2210,7 +2159,8 @@ window.BOOKS = [
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Arkham_House%3A_The_First_20_Years",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/4/4f/Arkham_House_%28logo%29.png",
     "coverImageFile": "covers/arkham-house-the-first-20-years-158.png",
-    "error": null
+    "error": null,
+    "hidden": true
   },
   {
     "id": 159,
@@ -2390,9 +2340,10 @@ window.BOOKS = [
     "coverArtist": null,
     "publicationDate": null,
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Arkham_Sampler",
-    "coverImageUrl": null,
-    "coverImageFile": null,
-    "error": null
+    "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/f/fe/Arkham_sampler.jpg",
+    "coverImageFile": "covers/the-arkham-sampler-1.jpg",
+    "error": null,
+    "hidden": true
   },
   {
     "id": 172,
@@ -2404,9 +2355,10 @@ window.BOOKS = [
     "coverArtist": null,
     "publicationDate": null,
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Arkham_Sampler",
-    "coverImageUrl": null,
-    "coverImageFile": null,
-    "error": null
+    "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/f/fe/Arkham_sampler.jpg",
+    "coverImageFile": "covers/the-arkham-sampler-1.jpg",
+    "error": null,
+    "hidden": true
   },
   {
     "id": 173,
@@ -2418,9 +2370,10 @@ window.BOOKS = [
     "coverArtist": null,
     "publicationDate": null,
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Arkham_Sampler",
-    "coverImageUrl": null,
-    "coverImageFile": null,
-    "error": null
+    "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/f/fe/Arkham_sampler.jpg",
+    "coverImageFile": "covers/the-arkham-sampler-1.jpg",
+    "error": null,
+    "hidden": true
   },
   {
     "id": 174,
@@ -2432,9 +2385,10 @@ window.BOOKS = [
     "coverArtist": null,
     "publicationDate": null,
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Arkham_Sampler",
-    "coverImageUrl": null,
-    "coverImageFile": null,
-    "error": null
+    "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/f/fe/Arkham_sampler.jpg",
+    "coverImageFile": "covers/the-arkham-sampler-1.jpg",
+    "error": null,
+    "hidden": true
   },
   {
     "id": 175,
@@ -2488,9 +2442,10 @@ window.BOOKS = [
     "coverArtist": null,
     "publicationDate": null,
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Arkham_Sampler",
-    "coverImageUrl": null,
-    "coverImageFile": null,
-    "error": null
+    "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/f/fe/Arkham_sampler.jpg",
+    "coverImageFile": "covers/the-arkham-sampler-1.jpg",
+    "error": null,
+    "hidden": true
   },
   {
     "id": 179,
@@ -2502,9 +2457,10 @@ window.BOOKS = [
     "coverArtist": null,
     "publicationDate": null,
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Arkham_Sampler",
-    "coverImageUrl": null,
-    "coverImageFile": null,
-    "error": null
+    "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/f/fe/Arkham_sampler.jpg",
+    "coverImageFile": "covers/the-arkham-sampler-1.jpg",
+    "error": null,
+    "hidden": true
   },
   {
     "id": 180,
@@ -2516,9 +2472,10 @@ window.BOOKS = [
     "coverArtist": null,
     "publicationDate": null,
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Arkham_Sampler",
-    "coverImageUrl": null,
-    "coverImageFile": null,
-    "error": null
+    "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/f/fe/Arkham_sampler.jpg",
+    "coverImageFile": "covers/the-arkham-sampler-1.jpg",
+    "error": null,
+    "hidden": true
   },
   {
     "id": 181,
@@ -2530,9 +2487,10 @@ window.BOOKS = [
     "coverArtist": null,
     "publicationDate": null,
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Arkham_Sampler",
-    "coverImageUrl": null,
-    "coverImageFile": null,
-    "error": null
+    "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/f/fe/Arkham_sampler.jpg",
+    "coverImageFile": "covers/the-arkham-sampler-1.jpg",
+    "error": null,
+    "hidden": true
   },
   {
     "id": 182,
@@ -2556,7 +2514,7 @@ window.BOOKS = [
     "title": "The Fourth Book of Jorkens",
     "author": "Lord Dunsany",
     "coverArtist": null,
-    "publicationDate": "1947",
+    "publicationDate": "1948",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Fourth_Book_of_Jorkens",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/e/e7/Fourth_book_of_jorkens_first.jpg",
     "coverImageFile": "covers/the-fourth-book-of-jorkens-183.jpg",
