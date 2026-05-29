@@ -1381,7 +1381,7 @@ window.BOOKS = [
   },
   {
     "id": 108,
-    "decade": "1960s",
+    "decade": "1980s",
     "listTitle": "Tales of the Cthulhu Mythos",
     "listAuthor": "by H. P. Lovecraft and Others (1969)",
     "title": "New Tales of the Cthulhu Mythos",

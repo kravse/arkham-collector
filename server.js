@@ -179,6 +179,25 @@ function optionalText(value) {
   return trimmed || null;
 }
 
+function parseYear(value) {
+  if (!value) {
+    return null;
+  }
+  const match = String(value).match(/\d{4}/);
+  return match ? match[0] : null;
+}
+
+function decadeFromYear(year) {
+  const value = parseInt(year, 10);
+  if (!value) {
+    return null;
+  }
+  if (value < 1940) {
+    return String(value);
+  }
+  return `${Math.floor(value / 10) * 10}s`;
+}
+
 app.patch("/api/books/:id", upload.single("cover"), (req, res) => {
   try {
     const bookId = Number(req.params.id);
@@ -204,6 +223,7 @@ app.patch("/api/books/:id", upload.single("cover"), (req, res) => {
     book.author = optionalText(req.body.author);
     book.coverArtist = optionalText(req.body.coverArtist);
     book.publicationDate = optionalText(req.body.publicationDate);
+    book.decade = decadeFromYear(parseYear(book.publicationDate));
     book.wikipediaUrl = optionalText(req.body.wikipediaUrl);
 
     if (req.file) {
@@ -228,6 +248,7 @@ app.patch("/api/books/:id", upload.single("cover"), (req, res) => {
       author: book.author,
       coverArtist: book.coverArtist,
       publicationDate: book.publicationDate,
+      decade: book.decade,
       wikipediaUrl: book.wikipediaUrl,
       coverImageFile: book.coverImageFile,
     });
