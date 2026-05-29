@@ -4,29 +4,23 @@ A personal gallery of books published by [Arkham House](https://en.wikipedia.org
 
 **Your collection:** The repo includes a sample [`my_collection/my_collection.csv`](my_collection/my_collection.csv) (title, author, year, status). Replace it with your own list, then run `npm run sync-collection` to regenerate `my_collection/collection.js` before `npm run serve` or `npm run build` so the COLLECTION filter and badges reflect your copies.
 
-<p>
-  <strong>Homepage</strong><br />
-  Search, sort, and browse the full bibliography as a cover grid with collection, Mycroft &amp; Moran, and want-list filters.
-</p>
-<p>
-  <img src="images/example-homepage.png" alt="Homepage — search, sort, and cover grid" width="680" />
-</p>
+### Homepage
 
-<p>
-  <strong>Book detail overlay</strong><br />
-  Tap a card to see the cover, title with year, author and cover artist, a scrollable Wikipedia description, and quick links to Wikipedia, Goodreads, and your want list.
-</p>
-<p>
-  <img src="images/example-overlay.png" alt="Book detail overlay with cover, metadata, and description" width="680" />
-</p>
+Search, sort, and browse the full bibliography as a cover grid with collection, Mycroft & Moran, and want-list filters.
 
-<p>
-  <strong>Want list &amp; collection</strong><br />
-  Filter to titles you own or are hunting for, with COLLECTION and WANTED badges on each card.
-</p>
-<p>
-  <img src="images/example-want-collection.png" alt="Want list and collection filters on cards" width="680" />
-</p>
+<img src="images/example-homepage.png" alt="Homepage — search, sort, and cover grid" width="680" />
+
+### Book detail overlay
+
+Tap a card to see the cover, title with year, author and cover artist, a scrollable Wikipedia description, and quick links to Wikipedia, Goodreads, and your want list.
+
+<img src="images/example-overlay.png" alt="Book detail overlay with cover, metadata, and description" width="680" />
+
+### Want list & collection
+
+Filter to titles you own or are hunting for, with COLLECTION and WANTED badges on each card.
+
+<img src="images/example-want-collection.png" alt="Want list and collection filters on cards" width="680" />
 
 ## Quick start
 
