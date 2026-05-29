@@ -1,0 +1,82 @@
+---
+description: Arkham bibliography project layout, CSS/JS structure, and workflow conventions
+alwaysApply: true
+---
+
+# Arkham House project conventions
+
+Personal Wikipedia bibliography gallery. Keep changes small, match existing patterns, and prefer plain Node/HTML/CSS over new libraries or bundlers.
+
+## Layout
+
+| Path | Role |
+|------|------|
+| `viewer.html` | Source UI (HTML + inline app JS). Not the deploy artifact. |
+| `css/` | All viewer styles — **no inline `<style>` in viewer.html** |
+| `scripts/` | Wikipedia crawler and data-sync CLI (CommonJS modules) |
+| `data/books.json`, `data/books.js` | Canonical book data (`window.BOOKS` in JS file) |
+| `my_collection/` | Owned-books CSV + generated `collection.js` |
+| `covers/` | Downloaded cover images |
+| `examples/` | Saved Wikipedia HTML for `--local` crawls |
+| `build.js` → `build/` | Static site output (`npm run build`) |
+| `server.js` | Dev server with PATCH/upload (`npm run serve`, port 8742) |
+| `my_script.js` | Thin wrapper → `scripts/index.js` (backward compat only) |
+
+## CSS
+
+Styles live in `css/`, linked from `viewer.html` in this order (load order matters):
+
+1. `variables.css` — `:root` custom properties
+2. `base.css` — reset, body, filter-mode themes
+3. `header.css` — header, search, sort, stats
+4. `cards.css` — grid, cards, badges, card content
+5. `edit-dialog.css` — edit modal
+6. `book-detail.css` — detail overlay + desktop `@media (min-width: 641px)`
+7. `mobile.css` — `@media (max-width: 640px)` overrides
+
+When adding styles: put them in the most specific file above; add a new file only for a distinct UI surface. After CSS changes, ensure `build.js` still copies `css/` (via `copyDirectory("css")`).
+
+## Crawler / scripts JavaScript
+
+Use **CommonJS** (`require` / `module.exports`). No bundler, no TypeScript, no new frameworks.
+
+```
+scripts/
+  index.js       CLI entry — init state, warnings, dispatch tasks
+  config.js      Paths, IMPRINTS, Wikipedia constants
+  cli.js         parseArgs, getScriptMode, scrape warnings
+  state.js       Shared runtime: args, caches, request counters
+  lib/           Reusable domain logic (one concern per file)
+  tasks/         One file per npm command / operation mode
+```
+
+Guidelines:
+- New CLI modes → add flag in `cli.js`, handler in `tasks/`, wire in `index.js`, add npm script in `package.json`
+- Shared mutable state goes in `state.js`, not new globals
+- Constants and paths go in `config.js`
+- Wikipedia parsing → `lib/wiki-*.js`; cover logic → `lib/covers-*.js`; merge I/O → `lib/books.js`
+- Preserve on merge (`mergeBooks`): `hidden`, `description`, local cover fields
+- Scrape modes that overwrite data show a warning unless `--yes`
+
+Entry point for all npm crawl/sync scripts: `node scripts/index.js`
+
+## Viewer app JavaScript
+
+App logic remains inline in `viewer.html` for now. Follow existing patterns there: vanilla JS, `localStorage` for want-list, `getVisibleBooks()` for filtered order, read-only descriptions in overlay.
+
+If extracting viewer JS later, mirror the CSS approach: separate files under e.g. `js/`, linked from `viewer.html`, copied in `build.js`.
+
+## Data and build workflow
+
+- Edit books in browser via `npm run serve`, or run targeted syncs (`sync-authors`, `reconcile-covers`) rather than full crawls when possible
+- Full crawls / `sync-descriptions` / `sync-publication-dates` can overwrite hand-edited fields
+- After data or viewer changes for deploy: `npm run build` → serve or deploy `build/`
+- Do not hand-edit `build/` or generated `data/books.js` — edit source and rebuild/re-crawl
+- Do not modify generated SDK files unless explicitly asked
+
+## General editing principles
+
+- Minimize diff scope; don't refactor unrelated code
+- Match naming, formatting, and abstractions of surrounding files
+- Comments only for non-obvious logic
+- Add tests only when requested or clearly valuable

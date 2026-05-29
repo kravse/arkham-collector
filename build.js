@@ -30,6 +30,27 @@ function collectCoverPaths(books) {
   return files;
 }
 
+function copyDirectory(relativeDir) {
+  const srcDir = path.join(ROOT, relativeDir);
+  if (!fs.existsSync(srcDir)) {
+    return 0;
+  }
+
+  let copied = 0;
+  for (const entry of fs.readdirSync(srcDir, { withFileTypes: true })) {
+    const relativePath = path.join(relativeDir, entry.name);
+    const src = path.join(ROOT, relativePath);
+    const dest = path.join(BUILD_DIR, relativePath);
+    if (entry.isDirectory()) {
+      copied += copyDirectory(relativePath);
+    } else {
+      copyFile(src, dest);
+      copied += 1;
+    }
+  }
+  return copied;
+}
+
 function buildStaticSite() {
   if (!fs.existsSync(BOOKS_JSON)) {
     throw new Error("Missing data/books.json. Run the crawler first.");
@@ -78,6 +99,7 @@ function buildStaticSite() {
   }
 
   let copiedAssets = 0;
+  copiedAssets += copyDirectory("css");
   for (const relativePath of STATIC_ASSETS) {
     const src = path.join(ROOT, relativePath);
     const dest = path.join(BUILD_DIR, relativePath);
