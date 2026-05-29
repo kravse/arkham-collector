@@ -13,6 +13,7 @@ const EDITABLE_FIELDS = new Set([
   "publicationDate",
   "decade",
   "wikipediaUrl",
+  "goodreadsUrl",
   "coverImageFile",
   "description",
   "hidden",
@@ -57,6 +58,11 @@ function hasCoverEdit(editsById, bookId) {
 function hasDescriptionEdit(editsById, bookId) {
   const edit = getEditForBook(editsById, bookId);
   return edit != null && Object.prototype.hasOwnProperty.call(edit, "description");
+}
+
+function hasGoodreadsEdit(editsById, bookId) {
+  const edit = getEditForBook(editsById, bookId);
+  return edit != null && Object.prototype.hasOwnProperty.call(edit, "goodreadsUrl");
 }
 
 function isBookDeleted(book) {
@@ -164,6 +170,7 @@ module.exports = {
   getEditForBook,
   hasCoverEdit,
   hasDescriptionEdit,
+  hasGoodreadsEdit,
   isBookDeleted,
   filterActiveBooks,
   migrateLegacyHiddenFromBooks,

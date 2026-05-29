@@ -61,7 +61,17 @@ function replaceScrapedBooks(existingBooks, incomingBooks, imprint) {
     const key = scrapedMatchKey(incoming);
     const existing = indexByKey.get(key);
     if (existing) {
-      replaced.push({ ...incoming, id: existing.id, imprint: imprintKey });
+      replaced.push({
+        ...incoming,
+        id: existing.id,
+        imprint: imprintKey,
+        ...(incoming.goodreadsUrl == null && existing.goodreadsUrl
+          ? { goodreadsUrl: existing.goodreadsUrl }
+          : {}),
+        ...(incoming.description == null && existing.description
+          ? { description: existing.description }
+          : {}),
+      });
     } else {
       nextId += 1;
       replaced.push({ ...incoming, id: nextId, imprint: imprintKey });

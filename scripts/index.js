@@ -9,6 +9,8 @@ const { crawlMycroftOnly } = require("./tasks/crawl-mycroft");
 const { syncPublicationDates } = require("./tasks/sync-publication-dates");
 const { syncAuthors } = require("./tasks/sync-authors");
 const { syncDescriptions } = require("./tasks/sync-descriptions");
+const { syncGoodreads } = require("./tasks/sync-goodreads");
+const { importGoodreadsShelf } = require("./tasks/import-goodreads-shelf");
 const { dedupeBookIds } = require("./tasks/dedupe-book-ids");
 const { main } = require("./tasks/crawl");
 
@@ -50,6 +52,14 @@ if (state.args.syncCollection) {
   }
 } else if (state.args.syncDescriptions) {
   syncDescriptions().catch(fail);
+} else if (state.args.syncGoodreads) {
+  syncGoodreads().catch(fail);
+} else if (state.args.importGoodreadsShelf) {
+  try {
+    importGoodreadsShelf();
+  } catch (error) {
+    fail(error);
+  }
 } else if (state.args.dedupeBookIds) {
   try {
     dedupeBookIds();

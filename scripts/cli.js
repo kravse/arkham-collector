@@ -12,6 +12,10 @@ function parseArgs(argv) {
     syncPublicationDates: false,
     syncAuthors: false,
     syncDescriptions: false,
+    syncGoodreads: false,
+    syncGoodreadsMissing: false,
+    forceGoodreads: false,
+    importGoodreadsShelf: false,
     dedupeBookIds: false,
     yes: false,
   };
@@ -30,6 +34,15 @@ function parseArgs(argv) {
       options.syncAuthors = true;
     } else if (arg === "--sync-descriptions") {
       options.syncDescriptions = true;
+    } else if (arg === "--sync-goodreads") {
+      options.syncGoodreads = true;
+    } else if (arg === "--sync-goodreads-missing") {
+      options.syncGoodreads = true;
+      options.syncGoodreadsMissing = true;
+    } else if (arg === "--force-goodreads") {
+      options.forceGoodreads = true;
+    } else if (arg === "--import-goodreads-shelf") {
+      options.importGoodreadsShelf = true;
     } else if (arg === "--dedupe-book-ids") {
       options.dedupeBookIds = true;
     } else if (arg === "--skip-download") {
@@ -78,6 +91,12 @@ function getScriptMode(args) {
   }
   if (args.syncDescriptions) {
     return "syncDescriptions";
+  }
+  if (args.syncGoodreads) {
+    return "syncGoodreads";
+  }
+  if (args.importGoodreadsShelf) {
+    return "importGoodreadsShelf";
   }
   if (args.syncAuthors) {
     return "syncAuthors";

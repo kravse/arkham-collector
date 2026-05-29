@@ -198,6 +198,22 @@ function optionalText(value, sanitize = sanitizeSingleLineText) {
   return trimmed || null;
 }
 
+function parseGoodreadsUrl(value) {
+  const url = optionalText(value, sanitizeUrlInput);
+  if (!url) {
+    return null;
+  }
+  try {
+    const host = new URL(url).hostname.toLowerCase();
+    if (!host.endsWith("goodreads.com")) {
+      return { error: "Goodreads URL must be on goodreads.com" };
+    }
+    return { url };
+  } catch {
+    return { error: "Invalid Goodreads URL" };
+  }
+}
+
 function parseYear(value) {
   if (!value) {
     return null;
@@ -239,6 +255,12 @@ app.patch("/api/books/:id", upload.single("cover"), (req, res) => {
     }
 
     const publicationDate = optionalText(req.body.publicationDate);
+    const goodreadsParsed = parseGoodreadsUrl(req.body.goodreadsUrl);
+    if (goodreadsParsed?.error) {
+      res.status(400).json({ error: goodreadsParsed.error });
+      return;
+    }
+
     const patch = {
       title,
       author: optionalText(req.body.author),
@@ -246,6 +268,7 @@ app.patch("/api/books/:id", upload.single("cover"), (req, res) => {
       publicationDate,
       decade: decadeFromYear(parseYear(publicationDate)),
       wikipediaUrl: optionalText(req.body.wikipediaUrl, sanitizeUrlInput),
+      goodreadsUrl: goodreadsParsed?.url ?? null,
     };
 
     if (Object.prototype.hasOwnProperty.call(req.body, "description")) {
@@ -279,6 +302,7 @@ app.patch("/api/books/:id", upload.single("cover"), (req, res) => {
       publicationDate: merged.publicationDate,
       decade: merged.decade,
       wikipediaUrl: merged.wikipediaUrl,
+      goodreadsUrl: merged.goodreadsUrl,
       description: merged.description,
       coverImageFile: merged.coverImageFile,
     });

@@ -7,6 +7,21 @@ alwaysApply: true
 
 Personal Wikipedia bibliography gallery. Keep changes small, match existing patterns, and prefer plain Node/HTML/CSS over new libraries or bundlers.
 
+## README (required maintenance)
+
+The canonical project overview and **npm script reference** is [`README.md`](../../README.md) at the repo root.
+
+**Whenever you change** any of the following, you MUST update `README.md` in the same work (same PR / same task) so it stays accurate:
+
+- `package.json` scripts or CLI flags in `scripts/cli.js`
+- New or removed crawl/sync tasks under `scripts/tasks/`
+- Data model fields in `books.json` / `edits.json` or edit-dialog / API behavior
+- Build or deploy workflow (`build.js`, `server.js`, `build/` output)
+- Major viewer features (filters, overlays, external links, read-only vs serve mode)
+- Project layout (new top-level dirs or moved entry points)
+
+Do not edit the plan files in `.cursor/plans/` for this — only `README.md`. Keep the script tables and “How it works” section in sync; a one-line mention in the README is not enough if a whole command or workflow changed.
+
 ## Layout
 
 | Path | Role |
@@ -15,7 +30,7 @@ Personal Wikipedia bibliography gallery. Keep changes small, match existing patt
 | `css/` | All viewer styles — **no inline `<style>` in viewer.html** |
 | `scripts/` | Wikipedia crawler and data-sync CLI (CommonJS modules) |
 | `data/books.json`, `data/books.js` | Scraped book data only (`window.BOOKS`) |
-| `data/edits.json`, `data/edits.js` | Manual edits keyed by book id (`window.BOOK_EDITS`); written only by `server.js` — includes `hidden`, `deleted` (soft delete), dates, covers, descriptions, etc. |
+| `data/edits.json`, `data/edits.js` | Manual edits keyed by book id (`window.BOOK_EDITS`); written only by `server.js` — includes `hidden`, `deleted` (soft delete), dates, covers, descriptions, `wikipediaUrl`, `goodreadsUrl`, etc. |
 | `my_collection/` | Owned-books CSV + generated `collection.js` |
 | `covers/` | Downloaded cover images |
 | `examples/` | Saved Wikipedia HTML for `--local` crawls |
@@ -52,7 +67,7 @@ scripts/
 ```
 
 Guidelines:
-- New CLI modes → add flag in `cli.js`, handler in `tasks/`, wire in `index.js`, add npm script in `package.json`
+- New CLI modes → add flag in `cli.js`, handler in `tasks/`, wire in `index.js`, add npm script in `package.json`, **update `README.md`**
 - Shared mutable state goes in `state.js`, not new globals
 - Constants and paths go in `config.js`
 - Wikipedia parsing → `lib/wiki-*.js`; cover logic → `lib/covers-*.js`; scrape I/O → `lib/books.js`; user edits → `lib/edits.js`
