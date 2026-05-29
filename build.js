@@ -54,6 +54,8 @@ function copyDirectory(relativeDir) {
   return copied;
 }
 
+const localCollection = process.argv.includes("--local-collection");
+
 function buildStaticSite() {
   if (!fs.existsSync(BOOKS_JSON)) {
     throw new Error("Missing data/books.json. Run the crawler first.");
@@ -78,10 +80,18 @@ function buildStaticSite() {
   fs.mkdirSync(BUILD_DIR, { recursive: true });
 
   let html = fs.readFileSync(VIEWER_HTML, "utf8");
-  html = html.replace(
-    '<script src="my_collection/collection.js"></script>',
-    '<script>window.READ_ONLY = true;</script>\n  <script src="my_collection/collection.js"></script>'
-  );
+  const collectionScript =
+    '<script src="my_collection/collection.js"></script>';
+  if (localCollection) {
+    const inject =
+      '<script>window.READ_ONLY = true; window.COLLECTION_LOCAL = true;</script>';
+    html = html.replace(collectionScript, inject);
+  } else {
+    html = html.replace(
+      collectionScript,
+      '<script>window.READ_ONLY = true;</script>\n  <script src="my_collection/collection.js"></script>',
+    );
+  }
   fs.writeFileSync(path.join(BUILD_DIR, "index.html"), html);
 
   fs.mkdirSync(path.join(BUILD_DIR, "data"), { recursive: true });
@@ -111,11 +121,13 @@ function buildStaticSite() {
     );
   }
 
-  if (fs.existsSync(COLLECTION_JS)) {
-    copyFile(COLLECTION_JS, path.join(BUILD_DIR, "my_collection", "collection.js"));
-  }
-  if (fs.existsSync(COLLECTION_CSV)) {
-    copyFile(COLLECTION_CSV, path.join(BUILD_DIR, "my_collection", "my_collection.csv"));
+  if (!localCollection) {
+    if (fs.existsSync(COLLECTION_JS)) {
+      copyFile(COLLECTION_JS, path.join(BUILD_DIR, "my_collection", "collection.js"));
+    }
+    if (fs.existsSync(COLLECTION_CSV)) {
+      copyFile(COLLECTION_CSV, path.join(BUILD_DIR, "my_collection", "my_collection.csv"));
+    }
   }
 
   let copiedAssets = 0;
@@ -157,6 +169,11 @@ function buildStaticSite() {
   if (missingCovers) {
     console.log(`Covers missing on disk: ${missingCovers}`);
   }
+  console.log(
+    localCollection
+      ? "Collection: localStorage (public build; no my_collection/ copied)"
+      : "Collection: CSV (my_collection/)",
+  );
   console.log("Open build/index.html or deploy the build/ folder to any static host.");
 }
 

@@ -2,7 +2,9 @@
 
 A personal gallery of books published by [Arkham House](https://en.wikipedia.org/wiki/Arkham_House) and the Mycroft & Moran imprint, scraped from Wikipedia bibliographies. Browse covers, search and sort the catalog, track your collection, and curate metadata in a local dev server.
 
-**Your collection:** The repo includes a sample [`my_collection/my_collection.csv`](my_collection/my_collection.csv) (title, author, year, status). Replace it with your own list, then run `npm run sync-collection` to regenerate `my_collection/collection.js` before `npm run serve` or `npm run build` so the COLLECTION filter and badges reflect your copies.
+**Your collection (local dev):** The repo includes a sample [`my_collection/my_collection.csv`](my_collection/my_collection.csv) (title, author, year, status). Replace it with your own list, then run `npm run sync-collection` to regenerate `my_collection/collection.js` before `npm run serve` or a default `npm run build` so the COLLECTION filter and badges reflect your copies.
+
+**Public deploy:** `npm run build -- --local-collection` omits `my_collection/` and lets each visitor mark their own collection in the browser (`localStorage` key `arkham-collection`), similar to the want list (`arkham-want-list`). Localhost and default builds without the flag keep the CSV workflow.
 
 ### Homepage
 
@@ -54,12 +56,12 @@ Stable book `id` values come from imprint + Wikipedia URL + list year (see `scri
 - Styles in [`css/`](css/) (load order matters; see project conventions).
 - Grid of cards; click a card for the detail overlay (Wikipedia **W**, Goodreads **G**, want-list, collection badges).
 - **Goodreads:** uses `goodreadsUrl` from data/edits when set; otherwise **G** opens a [Goodreads book search](https://www.goodreads.com/search) (title + author last name).
-- Want-list stored in `localStorage`.
+- Want-list and (on public builds) personal collection stored in `localStorage`.
 - **localhost only:** hover cover → edit / hide; edit dialog and API require `npm run serve`.
 
 ### Build (`npm run build`)
 
-[`build.js`](build.js) copies `viewer.html` → `build/index.html`, sets `window.READ_ONLY = true`, copies CSS/JS/covers/collection, and writes public `data/books.js` (full scraped set). Hidden and deleted books are excluded from copied covers but remain in shipped data unless you filter elsewhere.
+[`build.js`](build.js) copies `viewer.html` → `build/index.html`, sets `window.READ_ONLY = true`, copies CSS/JS/covers, and writes public `data/books.js` (full scraped set). By default it also copies `my_collection/` for your CSV-backed collection. Pass `--local-collection` to skip that folder and set `window.COLLECTION_LOCAL = true` so visitors toggle collection per book in `localStorage`. Hidden and deleted books are excluded from copied covers but remain in shipped data unless you filter elsewhere.
 
 Do not hand-edit `build/` or generated `data/*.js` — change source and rebuild.
 
@@ -139,7 +141,8 @@ All npm scripts below run through `node scripts/index.js` with flags parsed in [
 | Script | Command | What it does |
 |--------|---------|----------------|
 | `serve` | `node server.js` | Local editor + API on port 8742. |
-| `build` | `node build.js` | Production static output in `build/`. |
+| `build` | `node build.js` | Production static output in `build/` (includes your CSV collection). |
+| | `node build.js --local-collection` | Public build: no `my_collection/`; browser-local collection toggles. |
 
 ---
 

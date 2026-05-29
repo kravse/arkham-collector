@@ -31,10 +31,10 @@ Do not edit the plan files in `.cursor/plans/` for this — only `README.md`. Ke
 | `scripts/` | Wikipedia crawler and data-sync CLI (CommonJS modules) |
 | `data/books.json`, `data/books.js` | Scraped book data only (`window.BOOKS`) |
 | `data/edits.json`, `data/edits.js` | Manual edits keyed by book id (`window.BOOK_EDITS`); written only by `server.js` — only fields differing from scraped `books.json` (plus `hidden`, `deleted`); `npm run compact-edits` prunes redundant rows |
-| `my_collection/` | Owned-books CSV + generated `collection.js` |
+| `my_collection/` | Owned-books CSV + generated `collection.js` (dev/default build); `build.js --local-collection` omits this and uses `localStorage` collection toggles |
 | `covers/` | Downloaded cover images |
 | `examples/` | Saved Wikipedia HTML for `--local` crawls |
-| `build.js` → `build/` | Static site output (`npm run build`) |
+| `build.js` → `build/` | Static site output (`npm run build`; optional `--local-collection` for public deploy) |
 | `server.js` | Dev server with PATCH/upload (`npm run serve`, port 8742) |
 | `my_script.js` | Thin wrapper → `scripts/index.js` (backward compat only) |
 
