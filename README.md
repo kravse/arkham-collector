@@ -2,6 +2,8 @@
 
 A personal gallery of books published by [Arkham House](https://en.wikipedia.org/wiki/Arkham_House) and the Mycroft & Moran imprint, scraped from Wikipedia bibliographies. Browse covers, search and sort the catalog, track your collection, and curate metadata in a local dev server.
 
+**Live site:** [arkham-house.netlify.app](https://arkham-house.netlify.app) — public build with browser-local collection and want list.
+
 **Your collection (local dev):** The repo includes a sample [`my_collection/my_collection.csv`](my_collection/my_collection.csv) (title, author, year, status). Replace it with your own list, then run `npm run sync-collection` to regenerate `my_collection/collection.js` before `npm run serve` or a default `npm run build` so the COLLECTION filter and badges reflect your copies.
 
 **Public deploy:** `npm run build -- --local-collection` omits `my_collection/` and lets each visitor mark their own collection in the browser (`localStorage` key `arkham-collection`), similar to the want list (`arkham-want-list`). Localhost and default builds without the flag keep the CSV workflow.
