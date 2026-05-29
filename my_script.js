@@ -63,6 +63,7 @@ function parseArgs(argv) {
     mycroftOnly: false,
     syncPublicationDates: false,
     syncAuthors: false,
+    syncDescriptions: false,
     yes: false,
   };
 
@@ -78,6 +79,8 @@ function parseArgs(argv) {
       options.syncPublicationDates = true;
     } else if (arg === "--sync-authors") {
       options.syncAuthors = true;
+    } else if (arg === "--sync-descriptions") {
+      options.syncDescriptions = true;
     } else if (arg === "--skip-download") {
       options.skipDownload = true;
     } else if (arg === "--sync-collection") {
@@ -231,6 +234,18 @@ function wikiTitleFromHref(href) {
     return null;
   }
   return decodeURIComponent(match[1].replace(/\+/g, " "));
+}
+
+function wikiFragmentFromHref(href) {
+  if (!href) {
+    return null;
+  }
+  const hashIndex = href.indexOf("#");
+  if (hashIndex === -1) {
+    return null;
+  }
+  const fragment = href.slice(hashIndex + 1);
+  return fragment ? decodeURIComponent(fragment.replace(/\+/g, " ")) : null;
 }
 
 function wikiUrlFromTitle(title) {
@@ -476,6 +491,91 @@ function resolveImageUrl(src, srcset) {
     return normalizeWikimediaImageUrl(`${WIKI_BASE}${src}`);
   }
   return normalizeWikimediaImageUrl(src);
+}
+
+function cleanParagraphText($, paragraph) {
+  const clone = paragraph.clone();
+  clone.find(".reference, .mw-editsection, sup").remove();
+  return normalizeLabel(clone.text());
+}
+
+function isSectionBoundary($, element) {
+  const tag = element.prop("tagName")?.toLowerCase();
+  if (tag === "h2" || tag === "h3") {
+    return true;
+  }
+  if (tag === "div" && element.hasClass("mw-heading")) {
+    return true;
+  }
+  return false;
+}
+
+function collectParagraphsFromSiblings($, startNode, stopAtSameLevelHeadings = true) {
+  const paragraphs = [];
+  let node = startNode.next();
+  while (node.length) {
+    if (stopAtSameLevelHeadings && isSectionBoundary($, node)) {
+      break;
+    }
+    if (node.prop("tagName")?.toLowerCase() === "p") {
+      const text = cleanParagraphText($, node);
+      if (text) {
+        paragraphs.push(text);
+      }
+    }
+    node = node.next();
+  }
+  return paragraphs;
+}
+
+function extractSectionAfterHeading($, root, fragmentId) {
+  const normalizedId = fragmentId.replace(/ /g, "_");
+  const heading = root
+    .find(`[id="${normalizedId}"], [id="${fragmentId}"]`)
+    .first();
+  if (!heading.length) {
+    return null;
+  }
+
+  const headingEl = heading.closest("h2, h3, .mw-heading").first();
+  const startNode = headingEl.length ? headingEl : heading;
+  const paragraphs = collectParagraphsFromSiblings($, startNode, true);
+  return paragraphs.length ? paragraphs.join("\n\n") : null;
+}
+
+function extractLeadFromRoot($, root) {
+  const paragraphs = [];
+  for (const el of root.children().toArray()) {
+    const $el = $(el);
+    if (isSectionBoundary($, $el)) {
+      break;
+    }
+    if ($el.prop("tagName")?.toLowerCase() === "p") {
+      const text = cleanParagraphText($, $el);
+      if (text) {
+        paragraphs.push(text);
+      }
+    }
+  }
+  return paragraphs.length ? paragraphs.join("\n\n") : null;
+}
+
+function extractLeadDescription(html, options = {}) {
+  const { fragmentId = null } = options;
+  const $ = cheerio.load(html);
+  const root = $(".mw-parser-output").first();
+  if (!root.length) {
+    return null;
+  }
+
+  if (fragmentId) {
+    const sectionText = extractSectionAfterHeading($, root, fragmentId);
+    if (sectionText) {
+      return sectionText;
+    }
+  }
+
+  return extractLeadFromRoot($, root);
 }
 
 function parseBookPage(html, options = {}) {
@@ -734,6 +834,7 @@ function mergeBooks(existingBooks, incomingBooks) {
         ...incoming,
         id: existing.id,
         hidden: existing.hidden,
+        description: existing.description ?? null,
         ...preserveCoverFields(existing, incoming),
       };
     } else {
@@ -940,6 +1041,141 @@ function syncAuthors() {
   console.log(`Still missing author: ${stillMissing}`);
   console.log(`JSON: ${jsonPath}`);
   console.log(`JS:   ${jsPath}`);
+}
+
+const descriptionHtmlCache = new Map();
+
+async function fetchWikiHtmlForDescription(wikipediaTitle) {
+  if (descriptionHtmlCache.has(wikipediaTitle)) {
+    return descriptionHtmlCache.get(wikipediaTitle);
+  }
+
+  if (args.local) {
+    if (
+      wikipediaTitle === "The_Dark_Brotherhood_and_Other_Pieces" &&
+      fs.existsSync(SAMPLE_BOOK_LOCAL)
+    ) {
+      const html = readLocalHtml(SAMPLE_BOOK_LOCAL);
+      descriptionHtmlCache.set(wikipediaTitle, html);
+      return html;
+    }
+    descriptionHtmlCache.set(wikipediaTitle, null);
+    return null;
+  }
+
+  const html = await fetchParseHtml(wikipediaTitle);
+  descriptionHtmlCache.set(wikipediaTitle, html);
+  return html;
+}
+
+async function syncDescriptions() {
+  const payload = loadExistingPayload();
+  const booksWithUrl = payload.books.filter((book) => book.wikipediaUrl);
+  const uniqueTitles = [
+    ...new Set(
+      booksWithUrl
+        .map((book) => wikiTitleFromHref(book.wikipediaUrl))
+        .filter(Boolean),
+    ),
+  ];
+  const titlesToFetch = uniqueTitles.slice(0, args.limit);
+
+  console.log(
+    args.local
+      ? "Syncing descriptions in local mode"
+      : "Syncing descriptions from live Wikipedia",
+  );
+  console.log(
+    `Books with Wikipedia URLs: ${booksWithUrl.length}; fetching ${titlesToFetch.length} unique pages`,
+  );
+  console.log(`Request delay: ${delayMs}ms`);
+
+  const startedAt = Date.now();
+  const failures = [];
+
+  for (let index = 0; index < titlesToFetch.length; index += 1) {
+    const title = titlesToFetch[index];
+    const progress = `[${index + 1}/${titlesToFetch.length}]`;
+    const eta = formatEta(index, titlesToFetch.length, startedAt);
+    console.log(`${progress} Fetching ${title} (~${eta} remaining)`);
+
+    try {
+      await fetchWikiHtmlForDescription(title);
+    } catch (error) {
+      failures.push({ title, error: error.message });
+      console.log(`  Failed: ${error.message}`);
+    }
+  }
+
+  let filled = 0;
+  let cleared = 0;
+  let skipped = 0;
+  const fetchedTitles = new Set(titlesToFetch);
+  const limitActive = Number.isFinite(args.limit) && args.limit < uniqueTitles.length;
+
+  for (const book of payload.books) {
+    const pageTitle = wikiTitleFromHref(book.wikipediaUrl);
+    if (!pageTitle) {
+      if (!limitActive) {
+        if (book.description) {
+          cleared += 1;
+        }
+        book.description = null;
+      } else {
+        skipped += 1;
+      }
+      continue;
+    }
+
+    if (limitActive && !fetchedTitles.has(pageTitle)) {
+      skipped += 1;
+      continue;
+    }
+
+    if (!descriptionHtmlCache.has(pageTitle)) {
+      if (book.description) {
+        cleared += 1;
+      }
+      book.description = null;
+      continue;
+    }
+
+    const html = descriptionHtmlCache.get(pageTitle);
+    if (!html) {
+      if (book.description) {
+        cleared += 1;
+      }
+      book.description = null;
+      continue;
+    }
+
+    const fragmentId = wikiFragmentFromHref(book.wikipediaUrl);
+    book.description = extractLeadDescription(html, { fragmentId });
+    if (book.description) {
+      filled += 1;
+    } else {
+      cleared += 1;
+    }
+  }
+
+  const { jsonPath, jsPath } = writeOutput(payload);
+
+  console.log("");
+  console.log(
+    `Done. ${filled} books with descriptions, ${cleared} cleared or empty${limitActive ? `, ${skipped} skipped (--limit)` : ""}.`,
+  );
+  console.log(`JSON: ${jsonPath}`);
+  console.log(`JS:   ${jsPath}`);
+  console.log(`HTTP requests made: ${requestCount}`);
+  if (failures.length) {
+    console.log(`Fetch failures (${failures.length}):`);
+    failures.slice(0, 10).forEach((failure) => {
+      console.log(`  - ${failure.title}: ${failure.error}`);
+    });
+    if (failures.length > 10) {
+      console.log(`  ... and ${failures.length - 10} more`);
+    }
+  }
 }
 
 function syncCollectionFromCsv() {
@@ -1620,6 +1856,7 @@ const SCRAPE_MODES = new Set([
   "crawl",
   "mycroftCrawl",
   "syncPublicationDates",
+  "syncDescriptions",
   "fillCovers",
 ]);
 
@@ -1639,6 +1876,9 @@ function getScriptMode() {
   if (args.syncPublicationDates) {
     return "syncPublicationDates";
   }
+  if (args.syncDescriptions) {
+    return "syncDescriptions";
+  }
   if (args.syncAuthors) {
     return "syncAuthors";
   }
@@ -1651,6 +1891,8 @@ function scrapeModeLabel(mode) {
     mycroftCrawl: "Mycroft & Moran bibliography crawl (npm run crawl:mycroft)",
     syncPublicationDates:
       "sync publication dates from Wikipedia (npm run sync-publication-dates)",
+    syncDescriptions:
+      "sync Wikipedia lead descriptions (npm run sync-descriptions)",
     fillCovers:
       "fill missing covers from Wikipedia/Open Library (npm run fill-covers)",
   };
@@ -1675,6 +1917,7 @@ function printCustomDataWarning(mode) {
     "",
     "  Usually preserved: hidden flag, local cover files already on disk.",
     "  sync-publication-dates overwrites publicationDate from bibliography text.",
+    "  sync-descriptions overwrites description from Wikipedia lead sections.",
     "",
     "  Safer: npm run serve (edit in the browser), npm run sync-authors,",
     "  npm run reconcile-covers, npm run fill-covers:dry-run (preview only).",
@@ -1727,6 +1970,11 @@ if (args.syncCollection) {
     console.error(error);
     process.exit(1);
   }
+} else if (args.syncDescriptions) {
+  syncDescriptions().catch((error) => {
+    console.error(error);
+    process.exit(1);
+  });
 } else {
   main().catch((error) => {
     console.error(error);

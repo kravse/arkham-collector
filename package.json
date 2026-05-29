@@ -12,6 +12,8 @@
     "sync-collection": "node my_script.js --sync-collection",
     "sync-publication-dates": "node my_script.js --sync-publication-dates --local",
     "sync-authors": "node my_script.js --sync-authors",
+    "sync-descriptions": "node my_script.js --sync-descriptions",
+    "sync-descriptions:local": "node my_script.js --sync-descriptions --local",
     "reconcile-covers": "node my_script.js --reconcile-covers",
     "fill-covers": "node my_script.js --fill-covers",
     "fill-covers:dry-run": "node my_script.js --fill-covers --dry-run",

@@ -506,6 +506,7 @@
         overflow: hidden;
         display: flex;
         flex-direction: column;
+        cursor: pointer;
       }
 
       .card.owned {
@@ -891,12 +892,6 @@
         display: none;
       }
 
-      @media (min-width: 641px) {
-        .book-detail-dialog {
-          display: none !important;
-        }
-      }
-
       .book-detail-backdrop {
         position: absolute;
         inset: 0;
@@ -955,6 +950,53 @@
         width: 1.1rem;
         height: 1.1rem;
         display: block;
+      }
+
+      .book-detail-nav {
+        position: absolute;
+        top: 50%;
+        z-index: 2;
+        width: 3.25rem;
+        height: 3.25rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 999px;
+        background: rgba(15, 17, 21, 0.92);
+        color: #f3efe4;
+        cursor: pointer;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+        transform: translateY(-50%);
+        transition:
+          background 0.15s ease,
+          border-color 0.15s ease,
+          color 0.15s ease;
+      }
+
+      .book-detail-nav[hidden] {
+        display: none;
+      }
+
+      .book-detail-nav:hover {
+        background: rgba(28, 32, 40, 0.96);
+        border-color: rgba(210, 178, 128, 0.35);
+        color: #fff3d6;
+      }
+
+      .book-detail-nav svg {
+        width: 1.35rem;
+        height: 1.35rem;
+        display: block;
+      }
+
+      .book-detail-nav-prev {
+        left: max(0.65rem, env(safe-area-inset-left, 0px));
+      }
+
+      .book-detail-nav-next {
+        right: max(0.65rem, env(safe-area-inset-right, 0px));
       }
 
       .book-detail-cover {
@@ -1020,6 +1062,24 @@
         flex-direction: column;
         gap: 0.35rem;
         width: 100%;
+      }
+
+      .book-detail-description {
+        width: 100%;
+        max-height: min(12rem, 32vh);
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        margin: 0.15rem 0 0;
+        padding: 0.65rem 0.75rem;
+        border-radius: 8px;
+        border: 1px solid rgba(154, 163, 178, 0.18);
+        background: rgba(23, 26, 33, 0.72);
+        font-family: ui-sans-serif, system-ui, sans-serif;
+        font-size: 0.82rem;
+        line-height: 1.55;
+        color: #c5ccd8;
+        text-align: left;
+        white-space: pre-wrap;
       }
 
       .book-detail-body .card-footer {
@@ -1096,6 +1156,64 @@
 
       body.book-detail-open {
         overflow: hidden;
+      }
+
+      @media (min-width: 641px) {
+        .book-detail-dialog {
+          padding: 2rem;
+        }
+
+        .book-detail-panel {
+          width: min(100%, 56rem);
+          height: auto;
+          max-height: min(90vh, 900px);
+          border-radius: 14px;
+          border: 1px solid var(--border);
+          background: var(--panel);
+          box-shadow: 0 24px 64px rgba(0, 0, 0, 0.55);
+        }
+
+        .book-detail-scroll {
+          flex-direction: row;
+          align-items: flex-start;
+          justify-content: center;
+          padding: 0.5rem 1.5rem 1.5rem;
+          gap: 1.5rem;
+        }
+
+        .book-detail-cover {
+          width: min(14rem, 38%);
+          flex-shrink: 0;
+        }
+
+        .book-detail-body {
+          flex: 1;
+          width: auto;
+          max-width: none;
+          min-width: 0;
+          text-align: left;
+        }
+
+        .book-detail-body .title {
+          font-size: 1.35rem;
+        }
+
+        .book-detail-description {
+          max-height: min(11rem, 30vh);
+        }
+
+        .book-detail-nav {
+          width: 3.5rem;
+          height: 3.5rem;
+        }
+
+        .book-detail-nav-prev {
+          left: max(1.25rem, env(safe-area-inset-left, 0px));
+        }
+
+        .book-detail-nav-next {
+          right: max(1.25rem, env(safe-area-inset-right, 0px));
+        }
       }
 
       .card.hidden-book {
@@ -1441,10 +1559,6 @@
           width: 0.7rem;
           height: 0.7rem;
         }
-
-        .card {
-          cursor: pointer;
-        }
       }
     </style>
   </head>
@@ -1657,6 +1771,23 @@
 
     <div id="book-detail-dialog" class="book-detail-dialog" hidden>
       <div class="book-detail-backdrop" data-close-detail></div>
+      <button
+        type="button"
+        id="book-detail-prev"
+        class="book-detail-nav book-detail-nav-prev"
+        aria-label="Previous book"
+        hidden
+      >
+        <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+          <path
+            d="M12 5 7 10l5 5"
+            stroke="currentColor"
+            stroke-width="1.85"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+      </button>
       <div
         class="book-detail-panel"
         role="dialog"
@@ -1680,11 +1811,28 @@
             </svg>
           </button>
         </div>
-        <div class="book-detail-scroll">
+        <div class="book-detail-scroll" id="book-detail-scroll">
           <div class="book-detail-cover" id="book-detail-cover"></div>
           <div class="book-detail-body" id="book-detail-body"></div>
         </div>
       </div>
+      <button
+        type="button"
+        id="book-detail-next"
+        class="book-detail-nav book-detail-nav-next"
+        aria-label="Next book"
+        hidden
+      >
+        <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+          <path
+            d="M8 5l5 5-5 5"
+            stroke="currentColor"
+            stroke-width="1.85"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+      </button>
     </div>
 
     <script src="my_collection/collection.js"></script>
@@ -1712,8 +1860,11 @@
       const editCoverFileInput = document.getElementById("edit-cover-file");
       const bookDetailDialog = document.getElementById("book-detail-dialog");
       const bookDetailCloseBtn = document.getElementById("book-detail-close");
+      const bookDetailPrevBtn = document.getElementById("book-detail-prev");
+      const bookDetailNextBtn = document.getElementById("book-detail-next");
       const bookDetailCover = document.getElementById("book-detail-cover");
       const bookDetailBody = document.getElementById("book-detail-body");
+      const bookDetailScroll = document.getElementById("book-detail-scroll");
       const serveHelpBtn = document.getElementById("serve-help-btn");
       const serveHelpPopover = document.getElementById("serve-help-popover");
       const serveHelpUrl = document.getElementById("serve-help-url");
@@ -1739,6 +1890,7 @@
       let wantOnly = false;
       let wantIds = new Set();
       let headerFiltersExpanded = true;
+      let detailBookId = null;
 
       books.forEach((book) => {
         if (book.hidden === undefined) {
@@ -1971,8 +2123,8 @@
         }
         saveWantList();
         render();
-        if (!bookDetailDialog.hidden && isMobileViewport()) {
-          openBookDetail(id);
+        if (!bookDetailDialog.hidden) {
+          openBookDetail(detailBookId);
         }
       }
 
@@ -2210,6 +2362,21 @@
         return lines.join("");
       }
 
+      function escapeHtml(value) {
+        return String(value || "")
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;");
+      }
+
+      function renderBookDescriptionHtml(book) {
+        if (!book.description?.trim()) {
+          return "";
+        }
+        return `<div class="book-detail-description">${escapeHtml(book.description)}</div>`;
+      }
+
       const unhideIcon = `
       <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
         <path d="M3.5 10s2.2-4.5 6.5-4.5S16.5 10 16.5 10s-2.2 4.5-6.5 4.5S3.5 10 3.5 10Z" stroke="currentColor" stroke-width="1.5"/>
@@ -2399,10 +2566,48 @@
               : "Your want list is empty — click Want on a book to add it.";
           }
           grid.innerHTML = `<div class="empty">${message}</div>`;
+          if (!bookDetailDialog.hidden && detailBookId) {
+            updateDetailNav();
+          }
           return;
         }
 
         grid.innerHTML = visible.map(renderCard).join("");
+
+        if (!bookDetailDialog.hidden && detailBookId) {
+          updateDetailNav();
+        }
+      }
+
+      function getDetailNavigation() {
+        const visible = getVisibleBooks();
+        const index = visible.findIndex((book) => book.id === detailBookId);
+        return {
+          index,
+          prevId: index > 0 ? visible[index - 1].id : null,
+          nextId:
+            index >= 0 && index < visible.length - 1
+              ? visible[index + 1].id
+              : null,
+        };
+      }
+
+      function updateDetailNav() {
+        const { prevId, nextId } = getDetailNavigation();
+        if (bookDetailPrevBtn) {
+          bookDetailPrevBtn.hidden = !prevId;
+        }
+        if (bookDetailNextBtn) {
+          bookDetailNextBtn.hidden = !nextId;
+        }
+      }
+
+      function navigateDetail(direction) {
+        const { prevId, nextId } = getDetailNavigation();
+        const targetId = direction < 0 ? prevId : nextId;
+        if (targetId) {
+          openBookDetail(targetId);
+        }
       }
 
       async function checkServeSupport() {
@@ -2428,14 +2633,12 @@
       }
 
       function openBookDetail(bookId) {
-        if (!isMobileViewport()) {
-          return;
-        }
-
         const book = books.find((entry) => entry.id === bookId);
         if (!book) {
           return;
         }
+
+        detailBookId = bookId;
 
         bookDetailCover.innerHTML = renderCover(book, book.coverCacheKey);
         const owned = findCollectionMatch(book);
@@ -2457,17 +2660,29 @@
         <h2 class="title" id="book-detail-title">${book.title || "Untitled"}</h2>
         ${book.publicationDate ? `<div class="date">${book.publicationDate}</div>` : ""}
         <div class="book-detail-meta">${renderBookMetaHtml(book)}</div>
+        ${renderBookDescriptionHtml(book)}
         ${bottomRow}
       `;
 
         bookDetailDialog.hidden = false;
         document.body.classList.add("book-detail-open");
+        if (bookDetailScroll) {
+          bookDetailScroll.scrollTop = 0;
+        }
+        updateDetailNav();
       }
 
       function closeBookDetail() {
+        detailBookId = null;
         bookDetailDialog.hidden = true;
         bookDetailCover.innerHTML = "";
         bookDetailBody.innerHTML = "";
+        if (bookDetailPrevBtn) {
+          bookDetailPrevBtn.hidden = true;
+        }
+        if (bookDetailNextBtn) {
+          bookDetailNextBtn.hidden = true;
+        }
         document.body.classList.remove("book-detail-open");
       }
 
@@ -2659,12 +2874,20 @@
         }
 
         const card = event.target.closest(".card");
-        if (card && isMobileViewport()) {
+        if (card) {
           openBookDetail(Number(card.dataset.bookId));
         }
       });
 
       bookDetailCloseBtn.addEventListener("click", closeBookDetail);
+      bookDetailPrevBtn.addEventListener("click", (event) => {
+        event.stopPropagation();
+        navigateDetail(-1);
+      });
+      bookDetailNextBtn.addEventListener("click", (event) => {
+        event.stopPropagation();
+        navigateDetail(1);
+      });
       bookDetailDialog.addEventListener("click", (event) => {
         const wantButton = event.target.closest(".want-btn");
         if (!wantButton) {
@@ -2711,6 +2934,18 @@
         if (event.key === "Escape" && !bookDetailDialog.hidden) {
           closeBookDetail();
           return;
+        }
+        if (!bookDetailDialog.hidden) {
+          if (event.key === "ArrowLeft") {
+            event.preventDefault();
+            navigateDetail(-1);
+            return;
+          }
+          if (event.key === "ArrowRight") {
+            event.preventDefault();
+            navigateDetail(1);
+            return;
+          }
         }
         if (event.key === "Escape" && !editDialog.hidden) {
           closeEditDialog();
