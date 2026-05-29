@@ -1,3 +1,46 @@
+body {
+  padding-bottom: calc(1.65rem + env(safe-area-inset-bottom, 0px));
+}
+
+.attribution-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.75rem calc(0.3rem + env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid var(--border);
+  background: rgba(15, 17, 21, 0.94);
+  backdrop-filter: blur(6px);
+  font-family: ui-sans-serif, system-ui, sans-serif;
+}
+
+.attribution-bar-note {
+  margin: 0;
+  font-size: 0.62rem;
+  line-height: 1.35;
+  color: rgba(232, 234, 237, 0.52);
+  text-align: center;
+}
+
+.attribution-bar .attribution-anchor {
+  flex-shrink: 0;
+}
+
+.attribution-bar .attribution-btn {
+  width: 1.15rem;
+  height: 1.15rem;
+}
+
+.attribution-bar .attribution-btn svg {
+  width: 0.62rem;
+  height: 0.62rem;
+}
+
 .attribution-dialog {
   position: fixed;
   inset: 0;
@@ -141,6 +184,5 @@
 }
 
 .attribution-anchor {
-  position: relative;
   flex-shrink: 0;
 }

@@ -74,34 +74,6 @@
               <circle cx="9" cy="14" r="1.35" fill="currentColor" />
             </svg>
           </button>
-          <div class="attribution-anchor">
-            <button
-              id="attribution-btn"
-              class="attribution-btn"
-              type="button"
-              aria-label="Wikipedia attribution and data sources"
-              aria-expanded="false"
-              aria-controls="attribution-dialog"
-              title="Wikipedia attribution"
-            >
-              <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
-                <circle
-                  cx="10"
-                  cy="10"
-                  r="7.25"
-                  stroke="currentColor"
-                  stroke-width="1.5"
-                />
-                <path
-                  d="M10 9.1V14"
-                  stroke="currentColor"
-                  stroke-width="1.5"
-                  stroke-linecap="round"
-                />
-                <circle cx="10" cy="6.35" r="0.85" fill="currentColor" />
-              </svg>
-            </button>
-          </div>
         </div>
       </div>
       <div class="controls">
@@ -140,6 +112,41 @@
       </div>
       <div class="stats" id="stats"></div>
     </header>
+
+    <footer class="attribution-bar" aria-label="Wikipedia attribution">
+      <p class="attribution-bar-note">
+        Bibliography and descriptions excerpted from English Wikipedia (CC
+        BY-SA 4.0).
+      </p>
+      <div class="attribution-anchor">
+        <button
+          id="attribution-btn"
+          class="attribution-btn"
+          type="button"
+          aria-label="Wikipedia attribution and data sources"
+          aria-expanded="false"
+          aria-controls="attribution-dialog"
+          title="Wikipedia attribution"
+        >
+          <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+            <circle
+              cx="10"
+              cy="10"
+              r="7.25"
+              stroke="currentColor"
+              stroke-width="1.5"
+            />
+            <path
+              d="M10 9.1V14"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"
+            />
+            <circle cx="10" cy="6.35" r="0.85" fill="currentColor" />
+          </svg>
+        </button>
+      </div>
+    </footer>
 
     <div id="attribution-dialog" class="attribution-dialog" hidden>
       <div class="attribution-dialog-backdrop" data-close-attribution></div>
