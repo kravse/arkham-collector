@@ -363,6 +363,7 @@
       const SORT_MODES = new Set(["default", "date-desc", "date-asc", "title"]);
       let collection = [];
       let serveEnabled = false;
+      let serveEditDeltas = false;
       let editingBookId = null;
       let collectionOnly = false;
       let hiddenOnly = false;
@@ -1333,8 +1334,15 @@
         try {
           const response = await fetch("/api/health");
           serveEnabled = response.ok;
+          if (serveEnabled) {
+            const payload = await response.json();
+            serveEditDeltas = payload.editDeltas === true;
+          } else {
+            serveEditDeltas = false;
+          }
         } catch (_) {
           serveEnabled = false;
+          serveEditDeltas = false;
         }
 
         if (!serveEnabled) {
@@ -1499,14 +1507,6 @@
         }
       }
 
-      function syncEditField(edit, field, value) {
-        if (value) {
-          edit[field] = value;
-        } else {
-          delete edit[field];
-        }
-      }
-
       function applyEditResponseToBook(bookId, payload) {
         const book = books.find((entry) => entry.id === bookId);
         if (!book) {
@@ -1531,21 +1531,12 @@
         }
 
         const key = String(bookId);
-        const edit = { ...(window.BOOK_EDITS[key] || {}) };
-        edit.title = payload.title;
-        syncEditField(edit, "author", payload.author);
-        syncEditField(edit, "coverArtist", payload.coverArtist);
-        syncEditField(edit, "publicationDate", payload.publicationDate);
-        syncEditField(edit, "decade", book.decade);
-        syncEditField(edit, "wikipediaUrl", payload.wikipediaUrl);
-        syncEditField(edit, "goodreadsUrl", payload.goodreadsUrl);
-        if (Object.prototype.hasOwnProperty.call(payload, "description")) {
-          syncEditField(edit, "description", payload.description);
+        const storedEdit = payload.edit || {};
+        if (Object.keys(storedEdit).length) {
+          window.BOOK_EDITS[key] = { ...storedEdit };
+        } else {
+          delete window.BOOK_EDITS[key];
         }
-        if (payload.coverImageFile) {
-          edit.coverImageFile = payload.coverImageFile;
-        }
-        window.BOOK_EDITS[key] = edit;
       }
 
       async function saveBookEdits(event) {
@@ -1555,6 +1546,14 @@
         }
 
         editSaveBtn.disabled = true;
+
+        if (serveEnabled && !serveEditDeltas) {
+          window.alert(
+            "Restart npm run serve so edits save only changed fields (not the whole form).",
+          );
+          editSaveBtn.disabled = false;
+          return;
+        }
 
         try {
           const formData = new FormData();
@@ -1628,10 +1627,7 @@
             throw new Error(payload.error || "Could not update book");
           }
 
-          const book = books.find((entry) => entry.id === bookId);
-          if (book) {
-            book.hidden = payload.hidden;
-          }
+          applyEditResponseToBook(bookId, payload);
           render();
         } catch (error) {
           console.error(error);

@@ -21,6 +21,7 @@
     "import-goodreads-shelf": "node scripts/index.js --import-goodreads-shelf",
     "reconcile-covers": "node scripts/index.js --reconcile-covers",
     "dedupe-book-ids": "node scripts/index.js --dedupe-book-ids",
+    "compact-edits": "node scripts/index.js --compact-edits",
     "fill-covers": "node scripts/index.js --fill-covers",
     "fill-covers:dry-run": "node scripts/index.js --fill-covers --dry-run",
     "build": "node build.js",

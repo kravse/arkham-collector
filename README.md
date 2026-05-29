@@ -20,9 +20,11 @@ Open `build/index.html` or deploy the `build/` folder to any static host. The bu
 | Layer | Files | Written by | Purpose |
 |-------|--------|------------|---------|
 | **Scraped** | `data/books.json`, `data/books.js` | Crawler & sync scripts | Wikipedia bibliography rows: title, author, dates, cover files, descriptions, `goodreadsUrl`, etc. |
-| **Edits** | `data/edits.json`, `data/edits.js` | `npm run serve` only | Overrides keyed by book `id`: custom title/author, cover path, Wikipedia/Goodreads URLs, description, `hidden`, `deleted` |
+| **Edits** | `data/edits.json`, `data/edits.js` | `npm run serve` only | Overrides keyed by book `id`: only fields that differ from scraped `books.json` (plus `hidden` / `deleted` flags) |
 
-At load time, [`js/book-edits.js`](js/book-edits.js) merges scraped books with edits (`{ ...book, ...edit }`). **Edits win** for any field present in `edits.json`.
+At load time, [`js/book-edits.js`](js/book-edits.js) merges scraped books with edits (`{ ...book, ...edit }`). **Edits win** for any field present in `edits.json`. Saving in the edit dialog compares each value to the scraped row and stores only differences, so a later crawl or sync can update fields you did not change.
+
+`npm run compact-edits` — one-time cleanup: drop edit fields that now match scraped data (e.g. after importing Goodreads URLs into `books.json`).
 
 Stable book `id` values come from imprint + Wikipedia URL + list year (see `scripts/lib/book-ids.js`). Full bibliography crawls replace scraped rows by that key but keep the same `id` when the line matches.
 
@@ -110,6 +112,7 @@ All npm scripts below run through `node scripts/index.js` with flags parsed in [
 |--------|---------|----------------|
 | `sync-collection` | `... --sync-collection` | Regenerate `my_collection/collection.js` from `my_collection/my_collection.csv`. |
 | `dedupe-book-ids` | `... --dedupe-book-ids` | Split duplicate stable ids; move shared `hidden` edits to reprint ids. |
+| `compact-edits` | `... --compact-edits` | Remove edit fields that match scraped `books.json` (safe to re-run). |
 
 ### Site
 

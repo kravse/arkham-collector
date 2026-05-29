@@ -122,30 +122,153 @@ function stripScrapedHidden(books) {
   });
 }
 
-function setBookEdit(bookId, patch) {
+function normalizeTypographicText(value) {
+  return String(value || "")
+    .replace(/\u00a0/g, " ")
+    .replace(/\r\n/g, "\n")
+    .replace(/[\u2018\u2019]/g, "'")
+    .replace(/[\u201C\u201D]/g, '"');
+}
+
+function normalizeEditFieldValue(field, value) {
+  if (field === "hidden" || field === "deleted") {
+    return value === true;
+  }
+  if (value === null || value === undefined) {
+    return "";
+  }
+  const text = normalizeTypographicText(value);
+  if (field === "description") {
+    return text.trim();
+  }
+  return text.trim();
+}
+
+function editFieldMatchesScraped(scraped, field, editValue) {
+  if (!scraped) {
+    return false;
+  }
+  return (
+    normalizeEditFieldValue(field, editValue) ===
+    normalizeEditFieldValue(field, scraped[field])
+  );
+}
+
+function compactEditAgainstScraped(edit, scraped) {
+  if (!scraped || !edit) {
+    return edit;
+  }
+
+  for (const field of EDITABLE_FIELDS) {
+    if (field === "hidden" || field === "deleted") {
+      continue;
+    }
+    if (!Object.prototype.hasOwnProperty.call(edit, field)) {
+      continue;
+    }
+    if (editFieldMatchesScraped(scraped, field, edit[field])) {
+      delete edit[field];
+    }
+  }
+
+  return edit;
+}
+
+function compactAllEdits(books) {
+  const payload = loadEdits();
+  let prunedBooks = 0;
+  let removedFields = 0;
+
+  for (const [key, edit] of Object.entries(payload.edits)) {
+    const scraped = books.find((book) => String(book.id) === key);
+    if (!scraped) {
+      continue;
+    }
+
+    const beforeKeys = Object.keys(edit).length;
+    compactEditAgainstScraped(edit, scraped);
+    const afterKeys = Object.keys(edit).length;
+    if (afterKeys < beforeKeys) {
+      prunedBooks += 1;
+      removedFields += beforeKeys - afterKeys;
+    }
+
+    if (afterKeys === 0) {
+      delete payload.edits[key];
+    }
+  }
+
+  if (prunedBooks > 0) {
+    saveEdits(payload);
+  }
+
+  return {
+    prunedBooks,
+    removedFields,
+    remainingBooks: Object.keys(payload.edits).length,
+  };
+}
+
+function applyPatchField(edit, scraped, field, value) {
+  if (field === "hidden") {
+    if (value === true) {
+      edit.hidden = true;
+    } else {
+      delete edit.hidden;
+    }
+    return;
+  }
+  if (field === "deleted") {
+    if (value === true) {
+      edit.deleted = true;
+    } else {
+      delete edit.deleted;
+    }
+    return;
+  }
+  if (value === null || value === undefined) {
+    delete edit[field];
+    return;
+  }
+  if (scraped && editFieldMatchesScraped(scraped, field, value)) {
+    delete edit[field];
+    return;
+  }
+  edit[field] = value;
+}
+
+function setBookEdit(bookId, patch, scraped = null) {
   const payload = loadEdits();
   const key = String(bookId);
-  const current = { ...(payload.edits[key] || {}) };
+  const next = { ...(payload.edits[key] || {}) };
 
   for (const [field, value] of Object.entries(patch)) {
     if (!EDITABLE_FIELDS.has(field)) {
       continue;
     }
+    if (scraped) {
+      applyPatchField(next, scraped, field, value);
+      continue;
+    }
     if (value === null || value === undefined) {
-      delete current[field];
+      delete next[field];
     } else if (field === "hidden" && value === false) {
-      delete current.hidden;
+      delete next.hidden;
     } else if (field === "deleted" && value === false) {
-      delete current.deleted;
+      delete next.deleted;
     } else {
-      current[field] = value;
+      next[field] = value;
     }
   }
 
-  if (Object.keys(current).length === 0) {
+  if (scraped) {
+    compactEditAgainstScraped(next, scraped);
+  }
+
+  if (Object.keys(next).length === 0) {
     delete payload.edits[key];
   } else {
-    payload.edits[key] = current;
+    payload.edits[key] = next;
   }
 
   return saveEdits(payload);
@@ -175,4 +298,7 @@ module.exports = {
   filterActiveBooks,
   migrateLegacyHiddenFromBooks,
   stripScrapedHidden,
+  compactEditAgainstScraped,
+  compactAllEdits,
+  editFieldMatchesScraped,
 };

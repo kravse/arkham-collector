@@ -17,6 +17,7 @@ function parseArgs(argv) {
     forceGoodreads: false,
     importGoodreadsShelf: false,
     dedupeBookIds: false,
+    compactEdits: false,
     yes: false,
   };
 
@@ -45,6 +46,8 @@ function parseArgs(argv) {
       options.importGoodreadsShelf = true;
     } else if (arg === "--dedupe-book-ids") {
       options.dedupeBookIds = true;
+    } else if (arg === "--compact-edits") {
+      options.compactEdits = true;
     } else if (arg === "--skip-download") {
       options.skipDownload = true;
     } else if (arg === "--sync-collection") {
@@ -103,6 +106,9 @@ function getScriptMode(args) {
   }
   if (args.dedupeBookIds) {
     return "dedupeBookIds";
+  }
+  if (args.compactEdits) {
+    return "compactEdits";
   }
   return "crawl";
 }

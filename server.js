@@ -7,6 +7,7 @@ const path = require("path");
 const {
   loadEdits,
   applyEditsToBook,
+  getEditForBook,
   setBookEdit,
 } = require("./scripts/lib/edits");
 const {
@@ -67,12 +68,24 @@ function writePayload(payload) {
   fs.writeFileSync(BOOKS_JS, `window.BOOKS = ${JSON.stringify(payload.books, null, 2)};\n`);
 }
 
+function getScrapedBook(payload, bookId) {
+  return payload.books.find((entry) => entry.id === bookId) || null;
+}
+
 function getMergedBook(payload, bookId) {
-  const scraped = payload.books.find((entry) => entry.id === bookId);
+  const scraped = getScrapedBook(payload, bookId);
   if (!scraped) {
     return null;
   }
   return applyEditsToBook(scraped, loadEdits().edits);
+}
+
+function bookEditResponse(payload, bookId, merged) {
+  const edit = getEditForBook(loadEdits().edits, bookId);
+  return {
+    ...merged,
+    edit: edit ? { ...edit } : {},
+  };
 }
 
 function removeLocalCovers(book) {
@@ -119,7 +132,7 @@ const app = express();
 app.use(express.json());
 
 app.get("/api/health", (_req, res) => {
-  res.json({ ok: true });
+  res.json({ ok: true, editDeltas: true });
 });
 
 app.post("/api/books/:id/cover", upload.single("cover"), (req, res) => {
@@ -136,12 +149,13 @@ app.post("/api/books/:id/cover", upload.single("cover"), (req, res) => {
     }
 
     const payload = readPayload();
-    const book = getMergedBook(payload, bookId);
-    if (!book) {
+    const scraped = getScrapedBook(payload, bookId);
+    if (!scraped) {
       res.status(404).json({ error: "Book not found" });
       return;
     }
 
+    const book = getMergedBook(payload, bookId);
     removeLocalCovers(book);
 
     const slugBase = slugify(
@@ -154,10 +168,10 @@ app.post("/api/books/:id/cover", upload.single("cover"), (req, res) => {
     fs.mkdirSync(COVERS_DIR, { recursive: true });
     fs.writeFileSync(fullPath, req.file.buffer);
 
-    setBookEdit(bookId, { coverImageFile: relativePath });
+    setBookEdit(bookId, { coverImageFile: relativePath }, scraped);
     const merged = getMergedBook(payload, bookId);
 
-    res.json({ coverImageFile: merged.coverImageFile });
+    res.json(bookEditResponse(payload, bookId, merged));
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -177,17 +191,22 @@ app.patch("/api/books/:id/hidden", (req, res) => {
     }
 
     const payload = readPayload();
-    if (!payload.books.find((entry) => entry.id === bookId)) {
+    const scraped = getScrapedBook(payload, bookId);
+    if (!scraped) {
       res.status(404).json({ error: "Book not found" });
       return;
     }
 
-    setBookEdit(bookId, {
-      hidden: req.body.hidden ? true : null,
-    });
+    setBookEdit(
+      bookId,
+      {
+        hidden: req.body.hidden ? true : null,
+      },
+      scraped,
+    );
     const merged = getMergedBook(payload, bookId);
 
-    res.json({ hidden: merged.hidden });
+    res.json(bookEditResponse(payload, bookId, merged));
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -242,12 +261,13 @@ app.patch("/api/books/:id", upload.single("cover"), (req, res) => {
     }
 
     const payload = readPayload();
-    const book = getMergedBook(payload, bookId);
-    if (!book) {
+    const scraped = getScrapedBook(payload, bookId);
+    if (!scraped) {
       res.status(404).json({ error: "Book not found" });
       return;
     }
 
+    const book = getMergedBook(payload, bookId);
     const title = optionalText(req.body.title ?? book.title ?? "");
     if (!title) {
       res.status(400).json({ error: "Title is required" });
@@ -292,20 +312,10 @@ app.patch("/api/books/:id", upload.single("cover"), (req, res) => {
       patch.coverImageFile = relativePath;
     }
 
-    setBookEdit(bookId, patch);
+    setBookEdit(bookId, patch, scraped);
     const merged = getMergedBook(payload, bookId);
 
-    res.json({
-      title: merged.title,
-      author: merged.author,
-      coverArtist: merged.coverArtist,
-      publicationDate: merged.publicationDate,
-      decade: merged.decade,
-      wikipediaUrl: merged.wikipediaUrl,
-      goodreadsUrl: merged.goodreadsUrl,
-      description: merged.description,
-      coverImageFile: merged.coverImageFile,
-    });
+    res.json(bookEditResponse(payload, bookId, merged));
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -325,7 +335,8 @@ app.delete("/api/books/:id", (req, res) => {
       return;
     }
 
-    setBookEdit(bookId, { deleted: true });
+    const scraped = getScrapedBook(payload, bookId);
+    setBookEdit(bookId, { deleted: true }, scraped);
 
     res.json({ id: bookId, deleted: true });
   } catch (error) {
@@ -354,4 +365,5 @@ app.use((error, _req, res, _next) => {
 app.listen(PORT, () => {
   console.log(`Arkham viewer running at http://localhost:${PORT}`);
   console.log("Book editing, cover uploads, and hide/unhide are enabled.");
+  console.log("Edits persist only fields that differ from data/books.json.");
 });

@@ -12,6 +12,7 @@ const { syncDescriptions } = require("./tasks/sync-descriptions");
 const { syncGoodreads } = require("./tasks/sync-goodreads");
 const { importGoodreadsShelf } = require("./tasks/import-goodreads-shelf");
 const { dedupeBookIds } = require("./tasks/dedupe-book-ids");
+const { compactEdits } = require("./tasks/compact-edits");
 const { main } = require("./tasks/crawl");
 
 initState(process.argv.slice(2));
@@ -63,6 +64,12 @@ if (state.args.syncCollection) {
 } else if (state.args.dedupeBookIds) {
   try {
     dedupeBookIds();
+  } catch (error) {
+    fail(error);
+  }
+} else if (state.args.compactEdits) {
+  try {
+    compactEdits();
   } catch (error) {
     fail(error);
   }
