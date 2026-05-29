@@ -10,6 +10,10 @@ const BOOKS_JS = path.join(ROOT, "data", "books.js");
 const VIEWER_HTML = path.join(ROOT, "viewer.html");
 const COLLECTION_JS = path.join(ROOT, "my_collection", "collection.js");
 const COLLECTION_CSV = path.join(ROOT, "my_collection", "my_collection.csv");
+const STATIC_ASSETS = [
+  "images/arkham-house.jpg",
+  "images/Mycroft_moran.png",
+];
 
 function copyFile(src, dest) {
   fs.mkdirSync(path.dirname(dest), { recursive: true });
@@ -73,6 +77,18 @@ function buildStaticSite() {
     copyFile(COLLECTION_CSV, path.join(BUILD_DIR, "my_collection", "my_collection.csv"));
   }
 
+  let copiedAssets = 0;
+  for (const relativePath of STATIC_ASSETS) {
+    const src = path.join(ROOT, relativePath);
+    const dest = path.join(BUILD_DIR, relativePath);
+    if (fs.existsSync(src)) {
+      copyFile(src, dest);
+      copiedAssets += 1;
+    } else {
+      console.warn(`Missing static asset: ${relativePath}`);
+    }
+  }
+
   const coverPaths = collectCoverPaths(publicBooks);
   let copiedCovers = 0;
   let missingCovers = 0;
@@ -91,6 +107,7 @@ function buildStaticSite() {
 
   console.log(`Built static site in ${BUILD_DIR}`);
   console.log(`Books: ${publicBooks.length} (${payload.books.length - publicBooks.length} hidden excluded)`);
+  console.log(`Static assets copied: ${copiedAssets}`);
   console.log(`Covers copied: ${copiedCovers}`);
   if (missingCovers) {
     console.log(`Covers missing on disk: ${missingCovers}`);
