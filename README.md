@@ -8,7 +8,7 @@ A personal gallery of books published by [Arkham House](https://en.wikipedia.org
   <strong>Homepage</strong><br />
   Search, sort, and browse the full bibliography as a cover grid with collection, Mycroft &amp; Moran, and want-list filters.
 </p>
-<p align="center">
+<p>
   <img src="images/example-homepage.png" alt="Homepage — search, sort, and cover grid" width="680" />
 </p>
 
@@ -16,7 +16,7 @@ A personal gallery of books published by [Arkham House](https://en.wikipedia.org
   <strong>Book detail overlay</strong><br />
   Tap a card to see the cover, title with year, author and cover artist, a scrollable Wikipedia description, and quick links to Wikipedia, Goodreads, and your want list.
 </p>
-<p align="center">
+<p>
   <img src="images/example-overlay.png" alt="Book detail overlay with cover, metadata, and description" width="680" />
 </p>
 
@@ -24,7 +24,7 @@ A personal gallery of books published by [Arkham House](https://en.wikipedia.org
   <strong>Want list &amp; collection</strong><br />
   Filter to titles you own or are hunting for, with COLLECTION and WANTED badges on each card.
 </p>
-<p align="center">
+<p>
   <img src="images/example-want-collection.png" alt="Want list and collection filters on cards" width="680" />
 </p>
 
