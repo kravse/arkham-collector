@@ -7,27 +7,30 @@ const {
   SAMPLE_BOOK_LOCAL,
 } = require("../config");
 const { state } = require("../state");
-const { parseAuthorFromListLine, parseYearFromListLine, slugify } = require("./text");
+const {
+  parseAuthorFromListLine,
+  parseYearFromListLine,
+  resolveScrapedTitle,
+  slugify,
+} = require("./text");
 const { wikiTitleFromHref } = require("./wiki-urls");
 const { readLocalHtml, entryDecade } = require("./wiki-bibliography");
 const { parseBookPage } = require("./wiki-book-page");
 const { fetchParseHtml } = require("./http");
 const {
   findLocalCoverFile,
-  preserveCoverFields,
   reconcileCoverFiles,
   downloadCover,
 } = require("./covers-files");
-
-function bookMatchKey(book) {
-  const imprint = book.imprint || "arkham_house";
-  const year =
-    book.publicationDate || parseYearFromListLine(book.listAuthor || "") || "";
-  if (book.wikipediaUrl) {
-    return `${imprint}|${book.wikipediaUrl}|${year}`;
-  }
-  return `${imprint}|${book.listTitle || book.title}|${year}`;
-}
+const {
+  loadEdits,
+  getEditForBook,
+  migrateLegacyHiddenFromBooks,
+  stripScrapedHidden,
+} = require("./edits");
+const {
+  deduplicateBookIds,
+} = require("./book-ids");
 
 function migrateLegacyImprints(books) {
   return books.map((book) => ({
@@ -36,35 +39,36 @@ function migrateLegacyImprints(books) {
   }));
 }
 
-function mergeBooks(existingBooks, incomingBooks) {
-  const merged = migrateLegacyImprints([...existingBooks]);
+function replaceScrapedBooks(existingBooks, incomingBooks, imprint) {
+  const imprintKey = imprint || "arkham_house";
+  const migrated = migrateLegacyImprints(existingBooks);
+  const otherBooks = migrated.filter(
+    (book) => (book.imprint || "arkham_house") !== imprintKey,
+  );
+  const sameImprintExisting = migrated.filter(
+    (book) => (book.imprint || "arkham_house") === imprintKey,
+  );
+
   const indexByKey = new Map();
-  merged.forEach((book, index) => {
-    indexByKey.set(bookMatchKey(book), index);
+  sameImprintExisting.forEach((book) => {
+    indexByKey.set(scrapedMatchKey(book), book);
   });
 
-  let nextId = merged.reduce((max, book) => Math.max(max, book.id || 0), 0);
+  let nextId = migrated.reduce((max, book) => Math.max(max, book.id || 0), 0);
+  const replaced = [];
 
   for (const incoming of incomingBooks) {
-    const key = bookMatchKey(incoming);
-    const existingIndex = indexByKey.get(key);
-    if (existingIndex !== undefined) {
-      const existing = merged[existingIndex];
-      merged[existingIndex] = {
-        ...incoming,
-        id: existing.id,
-        hidden: existing.hidden,
-        description: existing.description ?? null,
-        ...preserveCoverFields(existing, incoming),
-      };
+    const key = scrapedMatchKey(incoming);
+    const existing = indexByKey.get(key);
+    if (existing) {
+      replaced.push({ ...incoming, id: existing.id, imprint: imprintKey });
     } else {
       nextId += 1;
-      merged.push({ ...incoming, id: nextId });
-      indexByKey.set(key, merged.length - 1);
+      replaced.push({ ...incoming, id: nextId, imprint: imprintKey });
     }
   }
 
-  return merged;
+  return [...otherBooks, ...replaced];
 }
 
 function loadExistingPayload() {
@@ -82,20 +86,7 @@ function loadExistingPayload() {
 
 function mergeCrawlResults(arkhamBooks) {
   const existing = loadExistingPayload().books;
-  if (!existing.length) {
-    return arkhamBooks;
-  }
-
-  const mycroftBooks = existing.filter(
-    (book) => book.imprint === "mycroft_moran",
-  );
-  const arkhamExisting = existing.filter(
-    (book) => (book.imprint || "arkham_house") === "arkham_house",
-  );
-  const mergedArkham = mergeBooks(arkhamExisting, arkhamBooks);
-  return mycroftBooks.length
-    ? mergeBooks(mergedArkham, mycroftBooks)
-    : mergedArkham;
+  return replaceScrapedBooks(existing, arkhamBooks, "arkham_house");
 }
 
 async function getBookMetadata(wikipediaTitle, options = {}) {
@@ -158,7 +149,17 @@ async function buildBookRecord(entry, imprint, id, progressLabel) {
       metadata.author = parseAuthorFromListLine(entry.listAuthor);
     }
 
-    if (!state.args.skipDownload && metadata.coverImageUrl && !state.args.local && id) {
+    const coverEdit = id
+      ? getEditForBook(loadEdits().edits, id)?.coverImageFile
+      : null;
+
+    if (
+      !coverEdit &&
+      !state.args.skipDownload &&
+      metadata.coverImageUrl &&
+      !state.args.local &&
+      id
+    ) {
       const tempBook = {
         id,
         wikipediaUrl: entry.wikipediaUrl,
@@ -189,14 +190,14 @@ async function buildBookRecord(entry, imprint, id, progressLabel) {
       decade: entryDecade(entry),
       listTitle: entry.listTitle,
       listAuthor: entry.listAuthor,
-      title: metadata.title || entry.listTitle,
+      listYear: entry.listYear || null,
+      title: resolveScrapedTitle(entry.listTitle, metadata.title),
       author: metadata.author,
       coverArtist: metadata.coverArtist,
       publicationDate: entry.listYear,
       wikipediaUrl: entry.wikipediaUrl,
       coverImageUrl: metadata.coverImageUrl,
       coverImageFile,
-      hidden: false,
       error,
     },
     failure: error ? { title: entry.listTitle, error } : null,
@@ -207,8 +208,28 @@ function writeOutput(payload) {
   fs.mkdirSync(DATA_DIR, { recursive: true });
   fs.mkdirSync(COVERS_DIR, { recursive: true });
 
-  const reconciledBooks = reconcileCoverFiles(payload.books);
-  const output = { ...payload, books: reconciledBooks };
+  const { books: dedupedBooks, splits, remapped } = deduplicateBookIds(
+    payload.books,
+  );
+  if (splits.length > 0) {
+    console.log(`Split ${splits.length} duplicate book id(s).`);
+  }
+  if (remapped > 0) {
+    console.log(
+      `Remapped edits for ${remapped} shared id(s) (hidden → reprints only).`,
+    );
+  }
+
+  const reconciledBooks = reconcileCoverFiles(
+    dedupedBooks,
+    loadEdits().edits,
+  );
+  const migratedHidden = migrateLegacyHiddenFromBooks(reconciledBooks);
+  if (migratedHidden > 0) {
+    console.log(`Migrated ${migratedHidden} hidden book(s) to data/edits.json`);
+  }
+  const scrapedBooks = stripScrapedHidden(reconciledBooks);
+  const output = { ...payload, books: scrapedBooks };
 
   const jsonPath = path.join(DATA_DIR, "books.json");
   const jsPath = path.join(DATA_DIR, "books.js");
@@ -216,16 +237,15 @@ function writeOutput(payload) {
   fs.writeFileSync(jsonPath, `${JSON.stringify(output, null, 2)}\n`);
   fs.writeFileSync(
     jsPath,
-    `window.BOOKS = ${JSON.stringify(reconciledBooks, null, 2)};\n`,
+    `window.BOOKS = ${JSON.stringify(scrapedBooks, null, 2)};\n`,
   );
 
   return { jsonPath, jsPath };
 }
 
 module.exports = {
-  bookMatchKey,
   migrateLegacyImprints,
-  mergeBooks,
+  replaceScrapedBooks,
   loadExistingPayload,
   mergeCrawlResults,
   getBookMetadata,

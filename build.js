@@ -2,11 +2,14 @@
 
 const fs = require("fs");
 const path = require("path");
+const { loadEdits, applyEditsToBooks } = require("./scripts/lib/edits");
 
 const ROOT = __dirname;
 const BUILD_DIR = path.join(ROOT, "build");
 const BOOKS_JSON = path.join(ROOT, "data", "books.json");
 const BOOKS_JS = path.join(ROOT, "data", "books.js");
+const EDITS_JSON = path.join(ROOT, "data", "edits.json");
+const EDITS_JS = path.join(ROOT, "data", "edits.js");
 const VIEWER_HTML = path.join(ROOT, "viewer.html");
 const COLLECTION_JS = path.join(ROOT, "my_collection", "collection.js");
 const COLLECTION_CSV = path.join(ROOT, "my_collection", "my_collection.csv");
@@ -63,11 +66,11 @@ function buildStaticSite() {
   }
 
   const payload = JSON.parse(fs.readFileSync(BOOKS_JSON, "utf8"));
-  const publicBooks = payload.books.filter((book) => !book.hidden);
-  const publicPayload = {
-    ...payload,
-    books: publicBooks,
-  };
+  const edits = loadEdits().edits;
+  const mergedBooks = applyEditsToBooks(payload.books, edits);
+  const publicBooks = mergedBooks.filter(
+    (book) => !book.hidden && !book.deleted,
+  );
 
   if (fs.existsSync(BUILD_DIR)) {
     fs.rmSync(BUILD_DIR, { recursive: true, force: true });
@@ -84,12 +87,29 @@ function buildStaticSite() {
   fs.mkdirSync(path.join(BUILD_DIR, "data"), { recursive: true });
   fs.writeFileSync(
     path.join(BUILD_DIR, "data", "books.json"),
-    `${JSON.stringify(publicPayload, null, 2)}\n`
+    `${JSON.stringify({ ...payload, books: payload.books }, null, 2)}\n`
   );
   fs.writeFileSync(
     path.join(BUILD_DIR, "data", "books.js"),
-    `window.BOOKS = ${JSON.stringify(publicBooks, null, 2)};\n`
+    `window.BOOKS = ${JSON.stringify(payload.books, null, 2)};\n`
   );
+
+  if (fs.existsSync(EDITS_JSON)) {
+    copyFile(EDITS_JSON, path.join(BUILD_DIR, "data", "edits.json"));
+  } else {
+    fs.writeFileSync(
+      path.join(BUILD_DIR, "data", "edits.json"),
+      `${JSON.stringify({ edits: {} }, null, 2)}\n`
+    );
+  }
+  if (fs.existsSync(EDITS_JS)) {
+    copyFile(EDITS_JS, path.join(BUILD_DIR, "data", "edits.js"));
+  } else {
+    fs.writeFileSync(
+      path.join(BUILD_DIR, "data", "edits.js"),
+      "window.BOOK_EDITS = {};\n"
+    );
+  }
 
   if (fs.existsSync(COLLECTION_JS)) {
     copyFile(COLLECTION_JS, path.join(BUILD_DIR, "my_collection", "collection.js"));
@@ -100,6 +120,7 @@ function buildStaticSite() {
 
   let copiedAssets = 0;
   copiedAssets += copyDirectory("css");
+  copiedAssets += copyDirectory("js");
   for (const relativePath of STATIC_ASSETS) {
     const src = path.join(ROOT, relativePath);
     const dest = path.join(BUILD_DIR, relativePath);
@@ -128,7 +149,9 @@ function buildStaticSite() {
   }
 
   console.log(`Built static site in ${BUILD_DIR}`);
-  console.log(`Books: ${publicBooks.length} (${payload.books.length - publicBooks.length} hidden excluded)`);
+  console.log(
+    `Books: ${publicBooks.length} visible (${mergedBooks.length - publicBooks.length} hidden excluded from covers)`
+  );
   console.log(`Static assets copied: ${copiedAssets}`);
   console.log(`Covers copied: ${copiedCovers}`);
   if (missingCovers) {

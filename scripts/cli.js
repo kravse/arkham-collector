@@ -12,6 +12,7 @@ function parseArgs(argv) {
     syncPublicationDates: false,
     syncAuthors: false,
     syncDescriptions: false,
+    dedupeBookIds: false,
     yes: false,
   };
 
@@ -29,6 +30,8 @@ function parseArgs(argv) {
       options.syncAuthors = true;
     } else if (arg === "--sync-descriptions") {
       options.syncDescriptions = true;
+    } else if (arg === "--dedupe-book-ids") {
+      options.dedupeBookIds = true;
     } else if (arg === "--skip-download") {
       options.skipDownload = true;
     } else if (arg === "--sync-collection") {
@@ -79,6 +82,9 @@ function getScriptMode(args) {
   if (args.syncAuthors) {
     return "syncAuthors";
   }
+  if (args.dedupeBookIds) {
+    return "dedupeBookIds";
+  }
   return "crawl";
 }
 
@@ -102,19 +108,18 @@ function printCustomDataWarning(mode) {
   const lines = [
     "",
     divider,
-    "  WARNING: Wikipedia scrape — customized book data may be overwritten",
+    "  WARNING: Wikipedia scrape — scraped book data in books.json will be overwritten",
     divider,
     "",
     `  About to run: ${label}`,
     "",
-    "  This writes to data/books.json and data/books.js.",
-    "  Manual UI edits and hand-tuned fields (titles, authors, publication",
-    "  dates, decades, Wikipedia URLs, etc.) can be reset when books are",
-    "  re-merged from Wikipedia.",
+    "  This writes to data/books.json and data/books.js (scraped fields only).",
+    "  Manual edits saved via npm run serve live in data/edits.json and are",
+    "  not modified by crawlers or sync scripts.",
     "",
-    "  Usually preserved: hidden flag, local cover files already on disk.",
-    "  sync-publication-dates overwrites publicationDate from bibliography text.",
-    "  sync-descriptions overwrites description from Wikipedia lead sections.",
+    "  Scraped fields (title, author, dates, descriptions, cover URLs, etc.)",
+    "  are fully replaced on crawl or sync-publication-dates / sync-descriptions.",
+    "  Editable overrides in edits.json still win in the viewer at display time.",
     "",
     "  Safer: npm run serve (edit in the browser), npm run sync-authors,",
     "  npm run reconcile-covers, npm run fill-covers:dry-run (preview only).",

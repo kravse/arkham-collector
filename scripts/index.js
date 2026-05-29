@@ -9,6 +9,7 @@ const { crawlMycroftOnly } = require("./tasks/crawl-mycroft");
 const { syncPublicationDates } = require("./tasks/sync-publication-dates");
 const { syncAuthors } = require("./tasks/sync-authors");
 const { syncDescriptions } = require("./tasks/sync-descriptions");
+const { dedupeBookIds } = require("./tasks/dedupe-book-ids");
 const { main } = require("./tasks/crawl");
 
 initState(process.argv.slice(2));
@@ -49,6 +50,12 @@ if (state.args.syncCollection) {
   }
 } else if (state.args.syncDescriptions) {
   syncDescriptions().catch(fail);
+} else if (state.args.dedupeBookIds) {
+  try {
+    dedupeBookIds();
+  } catch (error) {
+    fail(error);
+  }
 } else {
   main().catch(fail);
 }

@@ -5,6 +5,7 @@ const { fetchParseHtml } = require("../lib/http");
 const { readLocalHtml } = require("../lib/wiki-bibliography");
 const { extractLeadDescription } = require("../lib/wiki-descriptions");
 const { loadExistingPayload, writeOutput } = require("../lib/books");
+const { loadEdits, hasDescriptionEdit } = require("../lib/edits");
 const { EXAMPLES_DIR, SAMPLE_BOOK_LOCAL } = require("../config");
 const fs = require("fs");
 
@@ -73,10 +74,17 @@ async function syncDescriptions() {
   let filled = 0;
   let cleared = 0;
   let skipped = 0;
+  let preserved = 0;
+  const edits = loadEdits().edits;
   const fetchedTitles = new Set(titlesToFetch);
   const limitActive = Number.isFinite(state.args.limit) && state.args.limit < uniqueTitles.length;
 
   for (const book of payload.books) {
+    if (hasDescriptionEdit(edits, book.id)) {
+      preserved += 1;
+      continue;
+    }
+
     const pageTitle = wikiTitleFromHref(book.wikipediaUrl);
     if (!pageTitle) {
       if (!limitActive) {
@@ -125,7 +133,7 @@ async function syncDescriptions() {
 
   console.log("");
   console.log(
-    `Done. ${filled} books with descriptions, ${cleared} cleared or empty${limitActive ? `, ${skipped} skipped (--limit)` : ""}.`,
+    `Done. ${filled} books with descriptions, ${cleared} cleared or empty${preserved ? `, ${preserved} preserved (custom edits)` : ""}${limitActive ? `, ${skipped} skipped (--limit)` : ""}.`,
   );
   console.log(`JSON: ${jsonPath}`);
   console.log(`JS:   ${jsPath}`);

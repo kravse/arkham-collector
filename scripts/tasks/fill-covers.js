@@ -7,6 +7,7 @@ const { wikiTitleFromHref } = require("../lib/wiki-urls");
 const { reconcileCoverFiles, bookHasCover, bookHasLocalCover, downloadCover } = require("../lib/covers-files");
 const { findCoverForBook } = require("../lib/covers-search");
 const { writeOutput } = require("../lib/books");
+const { loadEdits, hasCoverEdit } = require("../lib/edits");
 
 async function fillMissingCovers() {
   const jsonPath = path.join(DATA_DIR, "books.json");
@@ -15,9 +16,12 @@ async function fillMissingCovers() {
   }
 
   const payload = JSON.parse(fs.readFileSync(jsonPath, "utf8"));
-  payload.books = reconcileCoverFiles(payload.books);
+  const edits = loadEdits().edits;
+  payload.books = reconcileCoverFiles(payload.books, edits);
 
-  const missing = payload.books.filter((book) => !bookHasCover(book));
+  const missing = payload.books.filter(
+    (book) => !hasCoverEdit(edits, book.id) && !bookHasCover(book),
+  );
   const toProcess = missing.slice(0, state.args.limit);
 
   console.log(
@@ -58,7 +62,7 @@ async function fillMissingCovers() {
     }
 
     const currentBook = payload.books[bookIndex];
-    if (bookHasLocalCover(currentBook)) {
+    if (hasCoverEdit(edits, book.id) || bookHasLocalCover(currentBook)) {
       console.log("  Skipped — local cover already on disk");
       continue;
     }

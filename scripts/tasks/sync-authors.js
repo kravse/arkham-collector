@@ -6,10 +6,6 @@ function syncAuthors() {
   let updated = 0;
 
   for (const book of payload.books) {
-    if (book.author) {
-      continue;
-    }
-
     const author = parseAuthorFromListLine(book.listAuthor);
     if (!author) {
       continue;

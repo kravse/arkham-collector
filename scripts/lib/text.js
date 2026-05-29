@@ -2,6 +2,8 @@ function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+const cheerio = require("cheerio");
+
 function normalizeLabel(text) {
   return text
     .replace(/\u00a0/g, " ")
@@ -68,6 +70,19 @@ function titlesMatch(a, b) {
   return left === right || left.includes(right) || right.includes(left);
 }
 
+function resolveScrapedTitle(listTitle, wikiTitle) {
+  if (!wikiTitle) {
+    return listTitle || null;
+  }
+  if (!listTitle) {
+    return wikiTitle;
+  }
+  if (titlesMatch(listTitle, wikiTitle)) {
+    return listTitle.length >= wikiTitle.length ? listTitle : wikiTitle;
+  }
+  return listTitle;
+}
+
 function formatEta(processed, total, startedAt) {
   if (processed === 0) {
     return "?";
@@ -116,6 +131,75 @@ function parseCsvLine(line) {
   return values;
 }
 
+function looksLikeHtml(value) {
+  return /<[a-z][\s\S]*>/i.test(String(value || ""));
+}
+
+function htmlToPlainText(value) {
+  const input = String(value ?? "");
+  if (!input) {
+    return "";
+  }
+  if (!looksLikeHtml(input)) {
+    return input.replace(/\u00a0/g, " ").replace(/\r\n/g, "\n");
+  }
+
+  const blockBreakTags = new Set([
+    "p",
+    "div",
+    "li",
+    "tr",
+    "blockquote",
+    "section",
+    "article",
+    "h1",
+    "h2",
+    "h3",
+    "h4",
+    "h5",
+    "h6",
+  ]);
+  const $ = cheerio.load(input, { decodeEntities: true }, false);
+
+  $("script, style, noscript").remove();
+  $("br").replaceWith("\n");
+  blockBreakTags.forEach((tag) => {
+    $(tag).each((_, element) => {
+      $(element).append("\n");
+    });
+  });
+
+  return $.root()
+    .text()
+    .replace(/\u00a0/g, " ")
+    .replace(/\r\n/g, "\n")
+    .replace(/[ \t]+\n/g, "\n")
+    .replace(/\n[ \t]+/g, "\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}
+
+function sanitizeSingleLineText(value) {
+  return htmlToPlainText(value).replace(/\s+/g, " ").trim();
+}
+
+function sanitizeUrlInput(value) {
+  const input = String(value ?? "").trim();
+  if (!input) {
+    return "";
+  }
+  if (!looksLikeHtml(input)) {
+    return input;
+  }
+
+  const $ = cheerio.load(input, { decodeEntities: true }, false);
+  const href = $("a").attr("href");
+  if (href) {
+    return href.trim();
+  }
+  return sanitizeSingleLineText(input);
+}
+
 module.exports = {
   sleep,
   normalizeLabel,
@@ -125,7 +209,12 @@ module.exports = {
   slugify,
   normalizeForMatch,
   titlesMatch,
+  resolveScrapedTitle,
   formatEta,
   parseYear,
   parseCsvLine,
+  looksLikeHtml,
+  htmlToPlainText,
+  sanitizeSingleLineText,
+  sanitizeUrlInput,
 };

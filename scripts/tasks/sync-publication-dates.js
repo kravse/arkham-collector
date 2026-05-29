@@ -2,7 +2,11 @@ const fs = require("fs");
 const path = require("path");
 const { EXAMPLES_DIR, IMPRINTS } = require("../config");
 const { state } = require("../state");
-const { extractBibliography, readLocalHtml } = require("../lib/wiki-bibliography");
+const {
+  extractBibliography,
+  readLocalHtml,
+  decadeFromYear,
+} = require("../lib/wiki-bibliography");
 const { fetchParseHtml } = require("../lib/http");
 const { parseYearFromListLine } = require("../lib/text");
 const { loadExistingPayload, writeOutput } = require("../lib/books");
@@ -62,6 +66,7 @@ async function syncPublicationDates() {
     }
     if (listYear && book.publicationDate !== listYear) {
       book.publicationDate = listYear;
+      book.decade = decadeFromYear(listYear);
       updated += 1;
     }
   }

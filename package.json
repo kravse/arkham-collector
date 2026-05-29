@@ -15,6 +15,7 @@
     "sync-descriptions": "node scripts/index.js --sync-descriptions",
     "sync-descriptions:local": "node scripts/index.js --sync-descriptions --local",
     "reconcile-covers": "node scripts/index.js --reconcile-covers",
+    "dedupe-book-ids": "node scripts/index.js --dedupe-book-ids",
     "fill-covers": "node scripts/index.js --fill-covers",
     "fill-covers:dry-run": "node scripts/index.js --fill-covers --dry-run",
     "build": "node build.js",

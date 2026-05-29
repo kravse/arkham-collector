@@ -4,6 +4,16 @@ const express = require("express");
 const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
+const {
+  loadEdits,
+  applyEditsToBook,
+  setBookEdit,
+} = require("./scripts/lib/edits");
+const {
+  htmlToPlainText,
+  sanitizeSingleLineText,
+  sanitizeUrlInput,
+} = require("./scripts/lib/text");
 
 const ROOT = __dirname;
 const DATA_DIR = path.join(ROOT, "data");
@@ -55,6 +65,14 @@ function writePayload(payload) {
   fs.mkdirSync(DATA_DIR, { recursive: true });
   fs.writeFileSync(BOOKS_JSON, `${JSON.stringify(payload, null, 2)}\n`);
   fs.writeFileSync(BOOKS_JS, `window.BOOKS = ${JSON.stringify(payload.books, null, 2)};\n`);
+}
+
+function getMergedBook(payload, bookId) {
+  const scraped = payload.books.find((entry) => entry.id === bookId);
+  if (!scraped) {
+    return null;
+  }
+  return applyEditsToBook(scraped, loadEdits().edits);
 }
 
 function removeLocalCovers(book) {
@@ -118,7 +136,7 @@ app.post("/api/books/:id/cover", upload.single("cover"), (req, res) => {
     }
 
     const payload = readPayload();
-    const book = payload.books.find((entry) => entry.id === bookId);
+    const book = getMergedBook(payload, bookId);
     if (!book) {
       res.status(404).json({ error: "Book not found" });
       return;
@@ -136,10 +154,10 @@ app.post("/api/books/:id/cover", upload.single("cover"), (req, res) => {
     fs.mkdirSync(COVERS_DIR, { recursive: true });
     fs.writeFileSync(fullPath, req.file.buffer);
 
-    book.coverImageFile = relativePath;
-    writePayload(payload);
+    setBookEdit(bookId, { coverImageFile: relativePath });
+    const merged = getMergedBook(payload, bookId);
 
-    res.json({ coverImageFile: relativePath });
+    res.json({ coverImageFile: merged.coverImageFile });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -159,23 +177,24 @@ app.patch("/api/books/:id/hidden", (req, res) => {
     }
 
     const payload = readPayload();
-    const book = payload.books.find((entry) => entry.id === bookId);
-    if (!book) {
+    if (!payload.books.find((entry) => entry.id === bookId)) {
       res.status(404).json({ error: "Book not found" });
       return;
     }
 
-    book.hidden = req.body.hidden;
-    writePayload(payload);
+    setBookEdit(bookId, {
+      hidden: req.body.hidden ? true : null,
+    });
+    const merged = getMergedBook(payload, bookId);
 
-    res.json({ hidden: book.hidden });
+    res.json({ hidden: merged.hidden });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
-function optionalText(value) {
-  const trimmed = String(value ?? "").trim();
+function optionalText(value, sanitize = sanitizeSingleLineText) {
+  const trimmed = sanitize(value);
   return trimmed || null;
 }
 
@@ -207,30 +226,39 @@ app.patch("/api/books/:id", upload.single("cover"), (req, res) => {
     }
 
     const payload = readPayload();
-    const book = payload.books.find((entry) => entry.id === bookId);
+    const book = getMergedBook(payload, bookId);
     if (!book) {
       res.status(404).json({ error: "Book not found" });
       return;
     }
 
-    const title = String(req.body.title ?? book.title ?? "").trim();
+    const title = optionalText(req.body.title ?? book.title ?? "");
     if (!title) {
       res.status(400).json({ error: "Title is required" });
       return;
     }
 
-    book.title = title;
-    book.author = optionalText(req.body.author);
-    book.coverArtist = optionalText(req.body.coverArtist);
-    book.publicationDate = optionalText(req.body.publicationDate);
-    book.decade = decadeFromYear(parseYear(book.publicationDate));
-    book.wikipediaUrl = optionalText(req.body.wikipediaUrl);
+    const publicationDate = optionalText(req.body.publicationDate);
+    const patch = {
+      title,
+      author: optionalText(req.body.author),
+      coverArtist: optionalText(req.body.coverArtist),
+      publicationDate,
+      decade: decadeFromYear(parseYear(publicationDate)),
+      wikipediaUrl: optionalText(req.body.wikipediaUrl, sanitizeUrlInput),
+    };
+
+    if (Object.prototype.hasOwnProperty.call(req.body, "description")) {
+      patch.description = optionalText(req.body.description, htmlToPlainText);
+    }
 
     if (req.file) {
       removeLocalCovers(book);
 
       const slugBase = slugify(
-        wikiTitleFromHref(book.wikipediaUrl) || book.listTitle || book.title
+        wikiTitleFromHref(patch.wikipediaUrl || book.wikipediaUrl) ||
+          book.listTitle ||
+          book.title
       );
       const extension = extensionFromMime(req.file.mimetype);
       const relativePath = `covers/${slugBase}-${bookId}${extension}`;
@@ -238,19 +266,21 @@ app.patch("/api/books/:id", upload.single("cover"), (req, res) => {
 
       fs.mkdirSync(COVERS_DIR, { recursive: true });
       fs.writeFileSync(fullPath, req.file.buffer);
-      book.coverImageFile = relativePath;
+      patch.coverImageFile = relativePath;
     }
 
-    writePayload(payload);
+    setBookEdit(bookId, patch);
+    const merged = getMergedBook(payload, bookId);
 
     res.json({
-      title: book.title,
-      author: book.author,
-      coverArtist: book.coverArtist,
-      publicationDate: book.publicationDate,
-      decade: book.decade,
-      wikipediaUrl: book.wikipediaUrl,
-      coverImageFile: book.coverImageFile,
+      title: merged.title,
+      author: merged.author,
+      coverArtist: merged.coverArtist,
+      publicationDate: merged.publicationDate,
+      decade: merged.decade,
+      wikipediaUrl: merged.wikipediaUrl,
+      description: merged.description,
+      coverImageFile: merged.coverImageFile,
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -266,15 +296,12 @@ app.delete("/api/books/:id", (req, res) => {
     }
 
     const payload = readPayload();
-    const bookIndex = payload.books.findIndex((entry) => entry.id === bookId);
-    if (bookIndex === -1) {
+    if (!payload.books.find((entry) => entry.id === bookId)) {
       res.status(404).json({ error: "Book not found" });
       return;
     }
 
-    const [book] = payload.books.splice(bookIndex, 1);
-    removeLocalCovers(book);
-    writePayload(payload);
+    setBookEdit(bookId, { deleted: true });
 
     res.json({ id: bookId, deleted: true });
   } catch (error) {
@@ -282,7 +309,15 @@ app.delete("/api/books/:id", (req, res) => {
   }
 });
 
-app.use(express.static(ROOT));
+app.use(
+  express.static(ROOT, {
+    setHeaders(res, filePath) {
+      if (filePath.includes(`${path.sep}data${path.sep}edits.js`)) {
+        res.setHeader("Cache-Control", "no-store");
+      }
+    },
+  }),
+);
 
 app.get("/", (_req, res) => {
   res.sendFile(path.join(ROOT, "viewer.html"));

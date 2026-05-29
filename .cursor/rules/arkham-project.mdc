@@ -14,7 +14,8 @@ Personal Wikipedia bibliography gallery. Keep changes small, match existing patt
 | `viewer.html` | Source UI (HTML + inline app JS). Not the deploy artifact. |
 | `css/` | All viewer styles — **no inline `<style>` in viewer.html** |
 | `scripts/` | Wikipedia crawler and data-sync CLI (CommonJS modules) |
-| `data/books.json`, `data/books.js` | Canonical book data (`window.BOOKS` in JS file) |
+| `data/books.json`, `data/books.js` | Scraped book data only (`window.BOOKS`) |
+| `data/edits.json`, `data/edits.js` | Manual edits keyed by book id (`window.BOOK_EDITS`); written only by `server.js` — includes `hidden`, `deleted` (soft delete), dates, covers, descriptions, etc. |
 | `my_collection/` | Owned-books CSV + generated `collection.js` |
 | `covers/` | Downloaded cover images |
 | `examples/` | Saved Wikipedia HTML for `--local` crawls |
@@ -54,24 +55,30 @@ Guidelines:
 - New CLI modes → add flag in `cli.js`, handler in `tasks/`, wire in `index.js`, add npm script in `package.json`
 - Shared mutable state goes in `state.js`, not new globals
 - Constants and paths go in `config.js`
-- Wikipedia parsing → `lib/wiki-*.js`; cover logic → `lib/covers-*.js`; merge I/O → `lib/books.js`
-- Preserve on merge (`mergeBooks`): `hidden`, `description`, local cover fields
+- Wikipedia parsing → `lib/wiki-*.js`; cover logic → `lib/covers-*.js`; scrape I/O → `lib/books.js`; user edits → `lib/edits.js`
+- Scrapes use `replaceScrapedBooks`: stable `id` per bibliography line (`wikipediaUrl + listYear`); scripts never write `edits.json`
+- `npm run dedupe-book-ids` splits duplicate ids; shared `hidden` edits move to reprint ids only
+- Scripts may read `edits.json` read-only to skip cover download/reconcile when `coverImageFile` is set in edits, or skip description sync when `description` is set in edits
+- Viewer/build merge scraped books with edits at read time (`js/book-edits.js`)
 - Scrape modes that overwrite data show a warning unless `--yes`
 
 Entry point for all npm crawl/sync scripts: `node scripts/index.js`
 
 ## Viewer app JavaScript
 
-App logic remains inline in `viewer.html` for now. Follow existing patterns there: vanilla JS, `localStorage` for want-list, `getVisibleBooks()` for filtered order, read-only descriptions in overlay.
+App logic remains inline in `viewer.html` for now. Follow existing patterns there: vanilla JS, `localStorage` for want-list, `getVisibleBooks()` for filtered order, descriptions editable via the edit dialog (stored in `edits.json`).
 
-If extracting viewer JS later, mirror the CSS approach: separate files under e.g. `js/`, linked from `viewer.html`, copied in `build.js`.
+`js/book-edits.js` merges `window.BOOKS` with `window.BOOK_EDITS` at startup. Linked from `viewer.html`, copied in `build.js` via `copyDirectory("js")`.
 
 ## Data and build workflow
 
-- Edit books in browser via `npm run serve`, or run targeted syncs (`sync-authors`, `reconcile-covers`) rather than full crawls when possible
-- Full crawls / `sync-descriptions` / `sync-publication-dates` can overwrite hand-edited fields
+- Edit books in browser via `npm run serve` (writes `data/edits.json`, including `hidden`, `deleted`, etc.); run targeted syncs when possible
+- **Delete** in the edit dialog sets `deleted: true` in edits (removed from UI everywhere; scraped row stays in `books.json`)
+- **Hide** sets `hidden: true` in edits (still visible on localhost with “Show hidden”)
+- Full crawls / sync scripts overwrite scraped fields in `books.json` only; edits in `edits.json` (dates, covers, hidden, etc.) survive
+- Legacy `hidden` on scraped books is auto-migrated to `edits.json` when scripts write `books.json`
 - After data or viewer changes for deploy: `npm run build` → serve or deploy `build/`
-- Do not hand-edit `build/` or generated `data/books.js` — edit source and rebuild/re-crawl
+- Do not hand-edit `build/` or generated `data/books.js` / `data/edits.js` — edit source and rebuild/re-crawl
 - Do not modify generated SDK files unless explicitly asked
 
 ## General editing principles

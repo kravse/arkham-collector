@@ -63,8 +63,16 @@ function preserveCoverFields(existing, incoming) {
   };
 }
 
-function reconcileCoverFiles(books) {
+function reconcileCoverFiles(books, editsById) {
   return books.map((book) => {
+    if (editsById) {
+      const edit =
+        editsById[String(book.id)] || editsById[book.id] || null;
+      if (edit?.coverImageFile) {
+        return book;
+      }
+    }
+
     const localCover = findLocalCoverFile(book);
     if (!localCover) {
       return book;

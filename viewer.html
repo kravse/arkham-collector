@@ -197,6 +197,15 @@
             <input id="edit-wikipedia-url" name="wikipediaUrl" type="url" />
           </label>
           <label class="edit-field">
+            Description
+            <textarea
+              id="edit-description"
+              name="description"
+              rows="6"
+              spellcheck="true"
+            ></textarea>
+          </label>
+          <label class="edit-field">
             Cover image
             <input
               id="edit-cover-file"
@@ -289,8 +298,11 @@
 
     <script src="my_collection/collection.js"></script>
     <script src="data/books.js"></script>
+    <script src="data/edits.js"></script>
+    <script src="js/book-edits.js"></script>
+    <script src="js/sanitize-text.js"></script>
     <script>
-      const books = window.BOOKS || [];
+      const books = applyBookEdits(window.BOOKS || [], window.BOOK_EDITS || {});
       const grid = document.getElementById("grid");
       const stats = document.getElementById("stats");
       const searchInput = document.getElementById("search");
@@ -309,6 +321,7 @@
       );
       const editWikipediaUrlInput =
         document.getElementById("edit-wikipedia-url");
+      const editDescriptionInput = document.getElementById("edit-description");
       const editCoverFileInput = document.getElementById("edit-cover-file");
       const bookDetailDialog = document.getElementById("book-detail-dialog");
       const bookDetailCloseBtn = document.getElementById("book-detail-close");
@@ -351,6 +364,14 @@
           book.hidden = false;
         }
       });
+
+      function isDeleted(book) {
+        return book.deleted === true;
+      }
+
+      function getActiveBooks() {
+        return books.filter((book) => !isDeleted(book));
+      }
 
       function parseCsvLine(line) {
         const values = [];
@@ -435,20 +456,63 @@
         return false;
       }
 
-      function findCollectionMatch(book) {
+      function collectionItemsMatchingBook(book) {
         const bookYear = parseYear(book.publicationDate);
         const candidates = [book.title, book.listTitle].filter(Boolean);
+        return collection.filter((item) => {
+          if (!candidates.some((candidate) => titlesMatch(candidate, item.title))) {
+            return false;
+          }
+          if (item.year && bookYear) {
+            return item.year === bookYear;
+          }
+          return true;
+        });
+      }
 
-        return (
-          collection.find((item) => {
-            const titleMatch = candidates.some((candidate) =>
-              titlesMatch(candidate, item.title),
-            );
-            if (!titleMatch) return false;
-            if (item.year && bookYear) return item.year === bookYear;
-            return true;
-          }) || null
+      function findCollectionMatch(book) {
+        const matches = collectionItemsMatchingBook(book);
+        if (!matches.length) {
+          return null;
+        }
+
+        const bookYear = parseYear(book.publicationDate);
+        if (bookYear) {
+          const exact = matches.find((item) => item.year === bookYear);
+          if (exact) {
+            return exact;
+          }
+        }
+
+        if (matches.length === 1) {
+          return matches[0];
+        }
+
+        return null;
+      }
+
+      function bookCoversCollectionItem(book, item) {
+        const bookYear = parseYear(book.publicationDate);
+        const candidates = [book.title, book.listTitle].filter(Boolean);
+        if (!candidates.some((candidate) => titlesMatch(candidate, item.title))) {
+          return false;
+        }
+        if (item.year && bookYear && item.year === bookYear) {
+          return true;
+        }
+        const titleRows = collection.filter((row) =>
+          candidates.some((candidate) => titlesMatch(candidate, row.title)),
         );
+        return titleRows.length === 1;
+      }
+
+      function countCollectionRowsCovered(books, includeHidden) {
+        const eligible = books.filter(
+          (book) => !isDeleted(book) && (includeHidden || !book.hidden),
+        );
+        return collection.filter((item) =>
+          eligible.some((book) => bookCoversCollectionItem(book, item)),
+        ).length;
       }
 
       async function loadCollection() {
@@ -584,7 +648,7 @@
 
       function getWantCount() {
         const showHidden = showHiddenInput.checked;
-        return books.filter(
+        return getActiveBooks().filter(
           (book) => (showHidden || !book.hidden) && isWanted(book),
         ).length;
       }
@@ -632,13 +696,24 @@
 
       function getStatTotal(all) {
         const showHidden = showHiddenInput.checked;
+        if (collectionOnly) {
+          return collection.length;
+        }
         return all.filter((book) => showHidden || !book.hidden).length;
       }
 
       function renderStats(visible, all) {
-        const hiddenCount = all.filter((book) => book.hidden).length;
-        const total = getStatTotal(all);
-        const hasMycroft = all.some((book) => book.imprint === "mycroft_moran");
+        const activeBooks = all.filter((book) => !isDeleted(book));
+        const hiddenCount = activeBooks.filter((book) => book.hidden).length;
+        const showHidden = showHiddenInput.checked;
+        const query = searchInput.value.trim();
+        const total = getStatTotal(activeBooks);
+        const coveredRows = countCollectionRowsCovered(activeBooks, showHidden);
+        const showingCount =
+          collectionOnly && !query ? coveredRows : visible.length;
+        const hasMycroft = activeBooks.some(
+          (book) => book.imprint === "mycroft_moran",
+        );
         const wantCount = getWantCount();
         const wantLabel = wantCount ? `WANT (${wantCount})` : "WANT";
         const filters = [
@@ -655,7 +730,7 @@
           .join("");
 
         stats.innerHTML = `
-          <span class="stat-showing">Showing ${visible.length} of ${total}</span>
+          <span class="stat-showing">Showing ${showingCount} of ${total}</span>
           <div class="stats-filters${hasMycroft ? "" : " stats-filters--two"}">${filters}</div>
         `;
       }
@@ -663,7 +738,7 @@
       function getVisibleBooks() {
         const query = searchInput.value.trim();
         const showHidden = showHiddenInput.checked;
-        return sortBooks(books, sortSelect.value)
+        return sortBooks(getActiveBooks(), sortSelect.value)
           .filter((book) =>
             hiddenOnly ? book.hidden : showHidden || !book.hidden,
           )
@@ -691,6 +766,10 @@
       }
 
       function getCoverSources(book) {
+        if (book.coverEditPath) {
+          return [book.coverEditPath];
+        }
+
         const sources = [];
         if (book.coverImageFile) {
           sources.push(book.coverImageFile);
@@ -1002,7 +1081,7 @@
           }
         }
 
-        renderStats(visible, books);
+        renderStats(visible, getActiveBooks());
 
         if (!visible.length) {
           let message = "No books match your search.";
@@ -1051,6 +1130,12 @@
       }
 
       function updateDetailNav() {
+        const book = books.find((entry) => entry.id === detailBookId);
+        if (!book || isDeleted(book)) {
+          closeBookDetail();
+          return;
+        }
+
         const { prevId, nextId } = getDetailNavigation();
         if (bookDetailPrevBtn) {
           bookDetailPrevBtn.hidden = !prevId;
@@ -1092,7 +1177,7 @@
 
       function openBookDetail(bookId) {
         const book = books.find((entry) => entry.id === bookId);
-        if (!book) {
+        if (!book || isDeleted(book)) {
           return;
         }
 
@@ -1161,7 +1246,7 @@
 
       function openEditDialog(bookId) {
         const book = books.find((entry) => entry.id === bookId);
-        if (!book) {
+        if (!book || isDeleted(book)) {
           return;
         }
 
@@ -1171,6 +1256,7 @@
         editCoverArtistInput.value = book.coverArtist || "";
         editPublicationDateInput.value = book.publicationDate || "";
         editWikipediaUrlInput.value = book.wikipediaUrl || "";
+        editDescriptionInput.value = book.description || "";
         editCoverFileInput.value = "";
         editDialog.hidden = false;
         editTitleInput.focus();
@@ -1190,7 +1276,7 @@
         const book = books.find((entry) => entry.id === editingBookId);
         const title = book?.title || "this book";
         const confirmed = window.confirm(
-          `Delete "${title}" permanently? This removes it from books.json and deletes its local cover file.`,
+          `Remove "${title}" from the gallery? It will disappear everywhere, even with "Show hidden" on localhost. Scraped data is unchanged.`,
         );
         if (!confirmed) {
           return;
@@ -1208,11 +1294,12 @@
             throw new Error(payload.error || "Could not delete book");
           }
 
-          const bookIndex = books.findIndex(
-            (entry) => entry.id === editingBookId,
-          );
-          if (bookIndex !== -1) {
-            books.splice(bookIndex, 1);
+          if (book) {
+            book.deleted = true;
+          }
+
+          if (detailBookId === editingBookId) {
+            closeBookDetail();
           }
 
           closeEditDialog();
@@ -1226,6 +1313,53 @@
         }
       }
 
+      function syncEditField(edit, field, value) {
+        if (value) {
+          edit[field] = value;
+        } else {
+          delete edit[field];
+        }
+      }
+
+      function applyEditResponseToBook(bookId, payload) {
+        const book = books.find((entry) => entry.id === bookId);
+        if (!book) {
+          return;
+        }
+
+        book.title = payload.title;
+        book.author = payload.author;
+        book.coverArtist = payload.coverArtist;
+        book.publicationDate = payload.publicationDate;
+        book.decade =
+          payload.decade ?? decadeFromYear(parseYear(book.publicationDate));
+        book.wikipediaUrl = payload.wikipediaUrl;
+        if (Object.prototype.hasOwnProperty.call(payload, "description")) {
+          book.description = payload.description || null;
+        }
+        if (payload.coverImageFile) {
+          book.coverImageFile = payload.coverImageFile;
+          book.coverEditPath = payload.coverImageFile;
+          book.coverCacheKey = Date.now();
+        }
+
+        const key = String(bookId);
+        const edit = { ...(window.BOOK_EDITS[key] || {}) };
+        edit.title = payload.title;
+        syncEditField(edit, "author", payload.author);
+        syncEditField(edit, "coverArtist", payload.coverArtist);
+        syncEditField(edit, "publicationDate", payload.publicationDate);
+        syncEditField(edit, "decade", book.decade);
+        syncEditField(edit, "wikipediaUrl", payload.wikipediaUrl);
+        if (Object.prototype.hasOwnProperty.call(payload, "description")) {
+          syncEditField(edit, "description", payload.description);
+        }
+        if (payload.coverImageFile) {
+          edit.coverImageFile = payload.coverImageFile;
+        }
+        window.BOOK_EDITS[key] = edit;
+      }
+
       async function saveBookEdits(event) {
         event.preventDefault();
         if (!editingBookId) {
@@ -1236,14 +1370,24 @@
 
         try {
           const formData = new FormData();
-          formData.append("title", editTitleInput.value.trim());
-          formData.append("author", editAuthorInput.value.trim());
-          formData.append("coverArtist", editCoverArtistInput.value.trim());
+          formData.append("title", sanitizeSingleLineText(editTitleInput.value));
+          formData.append("author", sanitizeSingleLineText(editAuthorInput.value));
+          formData.append(
+            "coverArtist",
+            sanitizeSingleLineText(editCoverArtistInput.value),
+          );
           formData.append(
             "publicationDate",
-            editPublicationDateInput.value.trim(),
+            sanitizeSingleLineText(editPublicationDateInput.value),
           );
-          formData.append("wikipediaUrl", editWikipediaUrlInput.value.trim());
+          formData.append(
+            "wikipediaUrl",
+            sanitizeUrlInput(editWikipediaUrlInput.value),
+          );
+          formData.append(
+            "description",
+            htmlToPlainText(editDescriptionInput.value),
+          );
           if (editCoverFileInput.files?.[0]) {
             formData.append("cover", editCoverFileInput.files[0]);
           }
@@ -1257,22 +1401,14 @@
             throw new Error(payload.error || "Could not save book");
           }
 
-          const book = books.find((entry) => entry.id === editingBookId);
-          if (book) {
-            book.title = payload.title;
-            book.author = payload.author;
-            book.coverArtist = payload.coverArtist;
-            book.publicationDate = payload.publicationDate;
-            book.decade = payload.decade ?? decadeFromYear(parseYear(book.publicationDate));
-            book.wikipediaUrl = payload.wikipediaUrl;
-            if (payload.coverImageFile) {
-              book.coverImageFile = payload.coverImageFile;
-              book.coverCacheKey = Date.now();
-            }
-          }
+          applyEditResponseToBook(editingBookId, payload);
 
+          const savedBookId = editingBookId;
           closeEditDialog();
           render();
+          if (detailBookId === savedBookId) {
+            openBookDetail(savedBookId);
+          }
         } catch (error) {
           console.error(error);
           window.alert(`Could not save book: ${error.message}`);
@@ -1377,6 +1513,7 @@
         });
 
       editBookForm.addEventListener("submit", saveBookEdits);
+      bindEditFieldSanitizers(editBookForm);
       editDeleteBtn.addEventListener("click", deleteBook);
       editCancelBtn.addEventListener("click", closeEditDialog);
       editDialog.querySelectorAll("[data-close-edit]").forEach((element) => {

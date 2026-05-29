@@ -7,11 +7,12 @@ const { extractBibliography, readLocalHtml } = require("../lib/wiki-bibliography
 const { fetchParseHtml } = require("../lib/http");
 const {
   loadExistingPayload,
-  mergeBooks,
+  replaceScrapedBooks,
   buildBookRecord,
   writeOutput,
 } = require("../lib/books");
 const { bookHasLocalCover, downloadCover } = require("../lib/covers-files");
+const { loadEdits, hasCoverEdit } = require("../lib/edits");
 const { syncCollectionFromCsv } = require("../lib/collection");
 
 async function crawlMycroftOnly() {
@@ -65,12 +66,18 @@ async function crawlMycroftOnly() {
     }
   }
 
-  const mergedBooks = mergeBooks(existingBooks, incomingBooks);
+  const mergedBooks = replaceScrapedBooks(
+    existingBooks,
+    incomingBooks,
+    "mycroft_moran",
+  );
 
   if (!state.args.skipDownload && !state.args.local) {
+    const edits = loadEdits().edits;
     for (const book of mergedBooks) {
       if (
         book.imprint !== "mycroft_moran" ||
+        hasCoverEdit(edits, book.id) ||
         bookHasLocalCover(book) ||
         !book.coverImageUrl
       ) {
