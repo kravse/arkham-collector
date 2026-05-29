@@ -1464,7 +1464,9 @@
           if (collectionOnly) {
             message = searchInput.value.trim()
               ? "No books in your collection match your search."
-              : "No books in your collection to show (they may all be hidden).";
+              : COLLECTION_LOCAL
+                ? "Your collection is empty — open a book and tap Collect to add it."
+                : "No books in your collection to show.";
           } else if (hiddenOnly) {
             message = searchInput.value.trim()
               ? "No hidden books match your search."
