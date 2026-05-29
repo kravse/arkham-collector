@@ -549,7 +549,7 @@ window.BOOKS = [
   },
   {
     "id": 37,
-    "decade": "1980s",
+    "decade": "1970s",
     "listTitle": "The Horror in the Museum and Other Revisions",
     "listAuthor": "by H. P. Lovecraft (1989)",
     "title": "The Horror in the Museum and Other Revisions",
@@ -654,7 +654,7 @@ window.BOOKS = [
   },
   {
     "id": 44,
-    "decade": "1980s",
+    "decade": "1960s",
     "listTitle": "Dagon and Other Macabre Tales",
     "listAuthor": "by H. P. Lovecraft (1986)",
     "title": "Dagon and Other Macabre Tales",
@@ -669,7 +669,7 @@ window.BOOKS = [
   },
   {
     "id": 45,
-    "decade": "1980s",
+    "decade": "1960s",
     "listTitle": "At the Mountains of Madness and Other Novels",
     "listAuthor": "by H. P. Lovecraft (1985)",
     "title": "At the Mountains of Madness and Other Novels",
@@ -684,7 +684,7 @@ window.BOOKS = [
   },
   {
     "id": 46,
-    "decade": "1980s",
+    "decade": "1960s",
     "listTitle": "The Dunwich Horror and Others",
     "listAuthor": "by H. P. Lovecraft (1985)",
     "title": "The Dunwich Horror and Others",
@@ -2497,7 +2497,7 @@ window.BOOKS = [
   },
   {
     "id": 171,
-    "decade": "1940s",
+    "decade": "2010s",
     "listTitle": "The Arkham Sampler",
     "listAuthor": "Volume II, Number Four: Autumn, 1949",
     "title": "The Arkham Sampler",
@@ -2513,7 +2513,7 @@ window.BOOKS = [
   },
   {
     "id": 172,
-    "decade": "1940s",
+    "decade": "2010s",
     "listTitle": "The Arkham Sampler",
     "listAuthor": "Volume II, Number Three: Summer, 1949",
     "title": "The Arkham Sampler",
@@ -2529,7 +2529,7 @@ window.BOOKS = [
   },
   {
     "id": 173,
-    "decade": "1940s",
+    "decade": "2010s",
     "listTitle": "The Arkham Sampler",
     "listAuthor": "Volume II, Number Two: Spring, 1949",
     "title": "The Arkham Sampler",
@@ -2545,7 +2545,7 @@ window.BOOKS = [
   },
   {
     "id": 174,
-    "decade": "1940s",
+    "decade": "2010s",
     "listTitle": "The Arkham Sampler",
     "listAuthor": "Volume II, Number One: Winter, 1949",
     "title": "The Arkham Sampler",
@@ -2606,7 +2606,7 @@ window.BOOKS = [
   },
   {
     "id": 178,
-    "decade": "1940s",
+    "decade": "2010s",
     "listTitle": "The Arkham Sampler",
     "listAuthor": "Volume I, Number Four: Autumn, 1948",
     "title": "The Arkham Sampler",
@@ -2622,7 +2622,7 @@ window.BOOKS = [
   },
   {
     "id": 179,
-    "decade": "1940s",
+    "decade": "2010s",
     "listTitle": "The Arkham Sampler",
     "listAuthor": "Volume I, Number Three: Summer, 1948",
     "title": "The Arkham Sampler",
@@ -2638,7 +2638,7 @@ window.BOOKS = [
   },
   {
     "id": 180,
-    "decade": "1940s",
+    "decade": "2010s",
     "listTitle": "The Arkham Sampler",
     "listAuthor": "Volume I, Number Two: Spring, 1948",
     "title": "The Arkham Sampler",
@@ -2654,7 +2654,7 @@ window.BOOKS = [
   },
   {
     "id": 181,
-    "decade": "1940s",
+    "decade": "2010s",
     "listTitle": "The Arkham Sampler",
     "listAuthor": "Volume I, Number One: Winter, 1948",
     "title": "The Arkham Sampler",
