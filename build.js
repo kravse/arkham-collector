@@ -3,6 +3,10 @@
 const fs = require("fs");
 const path = require("path");
 const { loadEdits, applyEditsToBooks } = require("./scripts/lib/edits");
+const {
+  findLocalCoverForBook,
+  resolveCoverPathsInBooks,
+} = require("./scripts/lib/covers-files");
 
 const ROOT = __dirname;
 const localCollection = process.argv.includes("--local-collection");
@@ -27,8 +31,9 @@ function copyFile(src, dest) {
 function collectCoverPaths(books) {
   const files = new Set();
   for (const book of books) {
-    if (book.coverImageFile) {
-      files.add(book.coverImageFile.replace(/\\/g, "/"));
+    const resolved = findLocalCoverForBook(book, books);
+    if (resolved) {
+      files.add(resolved.replace(/\\/g, "/"));
     }
   }
   return files;
@@ -72,7 +77,9 @@ function buildStaticSite() {
 
   const payload = JSON.parse(fs.readFileSync(BOOKS_JSON, "utf8"));
   const edits = loadEdits().edits;
-  const mergedBooks = applyEditsToBooks(payload.books, edits);
+  const mergedBooks = resolveCoverPathsInBooks(
+    applyEditsToBooks(payload.books, edits),
+  );
   const publicBooks = mergedBooks.filter(
     (book) => !book.hidden && !book.deleted,
   );
@@ -106,7 +113,7 @@ function buildStaticSite() {
   );
   fs.writeFileSync(
     path.join(BUILD_DIR, "data", "books.js"),
-    `window.BOOKS = ${JSON.stringify(payload.books, null, 2)};\n`
+    `window.BOOKS = ${JSON.stringify(mergedBooks, null, 2)};\n`
   );
 
   if (fs.existsSync(EDITS_JSON)) {

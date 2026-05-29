@@ -2,7 +2,7 @@ const fs = require("fs");
 const path = require("path");
 const { ROOT, COVERS_DIR, USER_AGENT } = require("../config");
 const { state } = require("../state");
-const { slugify } = require("./text");
+const { slugify, titlesMatch, parseYear } = require("./text");
 const { wikiTitleFromHref } = require("./wiki-urls");
 const { throttle } = require("./http");
 
@@ -44,6 +44,68 @@ function findLocalCoverFile(book) {
   return null;
 }
 
+function booksMatchTitleAndYear(a, b) {
+  const yearA = parseYear(a.publicationDate || a.listYear);
+  const yearB = parseYear(b.publicationDate || b.listYear);
+  if (!yearA || !yearB || yearA !== yearB) {
+    return false;
+  }
+
+  const titlesA = [a.title, a.listTitle].filter(Boolean);
+  const titlesB = [b.title, b.listTitle].filter(Boolean);
+  if (!titlesA.length || !titlesB.length) {
+    return false;
+  }
+
+  return titlesA.some((left) =>
+    titlesB.some((right) => titlesMatch(left, right)),
+  );
+}
+
+function findLocalCoverForBook(book, books) {
+  const direct = findLocalCoverFile(book);
+  if (direct) {
+    return direct;
+  }
+
+  if (!Array.isArray(books)) {
+    return null;
+  }
+
+  for (const other of books) {
+    if (other.id === book.id || !booksMatchTitleAndYear(book, other)) {
+      continue;
+    }
+    const siblingCover = findLocalCoverFile(other);
+    if (siblingCover) {
+      return siblingCover;
+    }
+  }
+
+  return null;
+}
+
+function resolveCoverPathsInBooks(books) {
+  return books.map((book) => {
+    const resolved = findLocalCoverForBook(book, books);
+    if (resolved) {
+      if (resolved !== book.coverImageFile) {
+        return { ...book, coverImageFile: resolved };
+      }
+      return book;
+    }
+
+    if (book.coverImageFile) {
+      const filePath = path.join(ROOT, book.coverImageFile);
+      if (!fs.existsSync(filePath)) {
+        return { ...book, coverImageFile: null };
+      }
+    }
+
+    return book;
+  });
+}
+
 function bookHasLocalCover(book) {
   return Boolean(findLocalCoverFile(book));
 }
@@ -73,7 +135,7 @@ function reconcileCoverFiles(books, editsById) {
       }
     }
 
-    const localCover = findLocalCoverFile(book);
+    const localCover = findLocalCoverForBook(book, books);
     if (!localCover) {
       return book;
     }
@@ -145,6 +207,9 @@ function bookHasCover(book) {
 module.exports = {
   expectedCoverPaths,
   findLocalCoverFile,
+  booksMatchTitleAndYear,
+  findLocalCoverForBook,
+  resolveCoverPathsInBooks,
   bookHasLocalCover,
   preserveCoverFields,
   reconcileCoverFiles,
