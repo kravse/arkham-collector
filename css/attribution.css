@@ -1,5 +1,5 @@
 body {
-  padding-bottom: calc(1.65rem + env(safe-area-inset-bottom, 0px));
+  padding-bottom: calc(2.05rem + env(safe-area-inset-bottom, 0px));
 }
 
 .attribution-bar {
@@ -10,35 +10,61 @@ body {
   z-index: 8;
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 0.35rem;
-  padding: 0.3rem 0.75rem calc(0.3rem + env(safe-area-inset-bottom, 0px));
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.42rem 0.85rem calc(0.42rem + env(safe-area-inset-bottom, 0px));
   border-top: 1px solid var(--border);
   background: rgba(15, 17, 21, 0.94);
   backdrop-filter: blur(6px);
   font-family: ui-sans-serif, system-ui, sans-serif;
 }
 
+.attribution-bar-end {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.45rem;
+  min-width: 0;
+}
+
 .attribution-bar-note {
   margin: 0;
-  font-size: 0.62rem;
+  font-size: 0.64rem;
   line-height: 1.35;
   color: rgba(232, 234, 237, 0.52);
-  text-align: center;
+  text-align: right;
 }
 
-.attribution-bar .attribution-anchor {
+.bar-icon-btn {
   flex-shrink: 0;
+  width: 1.5rem;
+  height: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  background: rgba(23, 26, 33, 0.85);
+  color: rgba(232, 234, 237, 0.72);
+  cursor: pointer;
+  transition:
+    color 0.15s ease,
+    border-color 0.15s ease,
+    background 0.15s ease;
 }
 
-.attribution-bar .attribution-btn {
-  width: 1.15rem;
-  height: 1.15rem;
+.bar-icon-btn svg {
+  width: 0.85rem;
+  height: 0.85rem;
+  display: block;
 }
 
-.attribution-bar .attribution-btn svg {
-  width: 0.62rem;
-  height: 0.62rem;
+.bar-icon-btn:hover,
+.bar-icon-btn[aria-expanded="true"] {
+  color: #e8eaed;
+  border-color: rgba(210, 178, 128, 0.35);
+  background: rgba(28, 24, 18, 0.92);
 }
 
 .attribution-dialog {
@@ -152,37 +178,3 @@ body {
   background: rgba(28, 24, 18, 0.92);
 }
 
-.attribution-btn {
-  width: 1.75rem;
-  height: 1.75rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 999px;
-  background: rgba(23, 26, 33, 0.85);
-  color: rgba(232, 234, 237, 0.72);
-  cursor: pointer;
-  transition:
-    color 0.15s ease,
-    border-color 0.15s ease,
-    background 0.15s ease;
-}
-
-.attribution-btn svg {
-  width: 0.9rem;
-  height: 0.9rem;
-  display: block;
-}
-
-.attribution-btn:hover,
-.attribution-btn[aria-expanded="true"] {
-  color: #e8eaed;
-  border-color: rgba(210, 178, 128, 0.35);
-  background: rgba(28, 24, 18, 0.92);
-}
-
-.attribution-anchor {
-  flex-shrink: 0;
-}

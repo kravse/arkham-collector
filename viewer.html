@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="css/base.css" />
     <link rel="stylesheet" href="css/header.css" />
     <link rel="stylesheet" href="css/attribution.css" />
+    <link rel="stylesheet" href="css/settings.css" />
     <link rel="stylesheet" href="css/cards.css" />
     <link rel="stylesheet" href="css/edit-dialog.css" />
     <link rel="stylesheet" href="css/book-detail.css" />
@@ -98,10 +99,10 @@
           <div class="sort-control">
             <label class="sort-label" for="sort">Sort</label>
             <select id="sort" aria-label="Sort books">
-              <option value="default">Bibliography order</option>
-              <option value="date-desc">Newest first</option>
               <option value="date-asc" selected>Oldest first</option>
-              <option value="title">Title A–Z</option>
+              <option value="date-desc">Newest first</option>
+              <option value="title-asc">Title A–Z</option>
+              <option value="title-desc">Title Z–A</option>
             </select>
           </div>
           <label class="show-hidden-toggle" id="show-hidden-wrap" hidden>
@@ -113,15 +114,38 @@
       <div class="stats" id="stats"></div>
     </header>
 
-    <footer class="attribution-bar" aria-label="Wikipedia attribution">
-      <p class="attribution-bar-note">
-        Bibliography and descriptions excerpted from English Wikipedia (CC
-        BY-SA 4.0).
-      </p>
-      <div class="attribution-anchor">
+    <footer class="attribution-bar">
+      <button
+        id="settings-btn"
+        class="bar-icon-btn settings-btn"
+        type="button"
+        aria-label="Settings"
+        aria-expanded="false"
+        aria-controls="settings-dialog"
+        title="Settings"
+      >
+        <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+          <path
+            d="M10 12.2a2.2 2.2 0 1 0 0-4.4 2.2 2.2 0 0 0 0 4.4Z"
+            stroke="currentColor"
+            stroke-width="1.5"
+          />
+          <path
+            d="M10 3.6v1.55M10 14.85v1.55M4.95 5.45l1.1 1.1M13.95 13.45l1.1 1.1M3.65 10h1.55M14.8 10h1.55M5.45 14.95l1.1-1.1M13.45 6.95l1.1-1.1"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linecap="round"
+          />
+        </svg>
+      </button>
+      <div class="attribution-bar-end">
+        <p class="attribution-bar-note">
+          Bibliography and descriptions excerpted from English Wikipedia (CC
+          BY-SA 4.0).
+        </p>
         <button
           id="attribution-btn"
-          class="attribution-btn"
+          class="bar-icon-btn attribution-btn"
           type="button"
           aria-label="Wikipedia attribution and data sources"
           aria-expanded="false"
@@ -147,6 +171,51 @@
         </button>
       </div>
     </footer>
+
+    <div id="settings-dialog" class="settings-dialog" hidden>
+      <div class="settings-dialog-backdrop" data-close-settings></div>
+      <div
+        class="settings-dialog-panel"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="settings-dialog-title"
+      >
+        <button
+          type="button"
+          id="settings-close"
+          class="settings-close"
+          aria-label="Close settings"
+        >
+          &times;
+        </button>
+        <h2 id="settings-dialog-title">Settings</h2>
+        <fieldset class="settings-collection-options">
+          <legend class="visually-hidden">Collection source</legend>
+          <label class="settings-collection-option">
+            <input
+              type="radio"
+              name="collection-source"
+              id="collection-source-sample"
+              value="sample"
+            />
+            Use sample collection
+          </label>
+          <label class="settings-collection-option">
+            <input
+              type="radio"
+              name="collection-source"
+              id="collection-source-own"
+              value="own"
+            />
+            Use my own collection
+          </label>
+        </fieldset>
+        <p class="settings-collection-hint">
+          Your own collection is saved in this browser. Switching to the sample
+          does not erase it.
+        </p>
+      </div>
+    </div>
 
     <div id="attribution-dialog" class="attribution-dialog" hidden>
       <div class="attribution-dialog-backdrop" data-close-attribution></div>
@@ -432,6 +501,14 @@
         "book-detail-toolbar-start",
       );
       const bookDetailImprint = document.getElementById("book-detail-imprint");
+      const settingsBtn = document.getElementById("settings-btn");
+      const settingsDialog = document.getElementById("settings-dialog");
+      const settingsCloseBtn = document.getElementById("settings-close");
+      const collectionSourceSampleInput = document.getElementById(
+        "collection-source-sample",
+      );
+      const collectionSourceOwnInput =
+        document.getElementById("collection-source-own");
       const attributionBtn = document.getElementById("attribution-btn");
       const attributionDialog = document.getElementById("attribution-dialog");
       const attributionCloseBtn = document.getElementById("attribution-close");
@@ -442,14 +519,19 @@
       const headerLogo = document.getElementById("header-logo");
       const headerFiltersToggle = document.getElementById("header-filters-toggle");
       const readOnly = window.READ_ONLY === true;
-      const COLLECTION_LOCAL = window.COLLECTION_LOCAL === true;
       const LOGO_ARKHAM = "images/arkham-house.jpg";
       const LOGO_MYCROFT = "images/Mycroft_moran.png";
       const SORT_STORAGE_KEY = "arkham-sort";
       const WANT_STORAGE_KEY = "arkham-want-list";
       const COLLECTION_STORAGE_KEY = "arkham-collection";
+      const COLLECTION_SOURCE_KEY = "arkham-collection-source";
       const HEADER_FILTERS_STORAGE_KEY = "arkham-header-filters-expanded";
-      const SORT_MODES = new Set(["default", "date-desc", "date-asc", "title"]);
+      const SORT_MODES = new Set([
+        "date-desc",
+        "date-asc",
+        "title-asc",
+        "title-desc",
+      ]);
       let collection = [];
       let serveEnabled = false;
       let serveEditDeltas = false;
@@ -460,8 +542,51 @@
       let wantOnly = false;
       let wantIds = new Set();
       let collectionIds = new Set();
+      let collectionSource = "sample";
       let headerFiltersExpanded = true;
       let detailBookId = null;
+
+      function useOwnCollection() {
+        return collectionSource === "own";
+      }
+
+      function defaultCollectionSource() {
+        const fromBuild = window.DEFAULT_COLLECTION_SOURCE;
+        if (fromBuild === "own" || fromBuild === "sample") {
+          return fromBuild;
+        }
+        return readOnly ? "own" : "sample";
+      }
+
+      function restoreCollectionSourcePreference() {
+        try {
+          const saved = localStorage.getItem(COLLECTION_SOURCE_KEY);
+          if (saved === "sample" || saved === "own") {
+            collectionSource = saved;
+            return;
+          }
+        } catch (_) {
+          // localStorage unavailable
+        }
+        collectionSource = defaultCollectionSource();
+      }
+
+      function saveCollectionSourcePreference() {
+        try {
+          localStorage.setItem(COLLECTION_SOURCE_KEY, collectionSource);
+        } catch (_) {
+          // localStorage unavailable
+        }
+      }
+
+      function syncSettingsCollectionRadios() {
+        if (collectionSourceSampleInput) {
+          collectionSourceSampleInput.checked = collectionSource === "sample";
+        }
+        if (collectionSourceOwnInput) {
+          collectionSourceOwnInput.checked = collectionSource === "own";
+        }
+      }
 
       books.forEach((book) => {
         if (book.hidden === undefined) {
@@ -596,7 +721,7 @@
       }
 
       function getCollectionItem(book) {
-        if (COLLECTION_LOCAL) {
+        if (useOwnCollection()) {
           return collectionIds.has(book.id) ? { status: "shelf" } : null;
         }
         return findCollectionMatch(book);
@@ -625,7 +750,7 @@
         const eligible = books.filter(
           (book) => !isDeleted(book) && (includeHidden || !book.hidden),
         );
-        if (COLLECTION_LOCAL) {
+        if (useOwnCollection()) {
           return eligible.filter((book) => collectionIds.has(book.id)).length;
         }
         return collection.filter((item) =>
@@ -634,9 +759,8 @@
       }
 
       async function loadCollection() {
-        if (COLLECTION_LOCAL) {
+        if (useOwnCollection()) {
           collection = [];
-          loadCollectionIds();
           return;
         }
 
@@ -660,8 +784,15 @@
       function restoreSortPreference() {
         try {
           const saved = localStorage.getItem(SORT_STORAGE_KEY);
-          if (saved && SORT_MODES.has(saved)) {
-            sortSelect.value = saved;
+          const legacy = { default: "date-asc", title: "title-asc" };
+          const mode =
+            saved && SORT_MODES.has(saved)
+              ? saved
+              : saved && legacy[saved]
+                ? legacy[saved]
+                : null;
+          if (mode) {
+            sortSelect.value = mode;
           }
         } catch (_) {
           // localStorage unavailable
@@ -793,7 +924,7 @@
           wantIds.delete(id);
         } else {
           wantIds.add(id);
-          if (COLLECTION_LOCAL && collectionIds.has(id)) {
+          if (useOwnCollection() && collectionIds.has(id)) {
             collectionIds.delete(id);
             saveCollectionIds();
           }
@@ -806,6 +937,9 @@
       }
 
       function toggleCollection(bookId) {
+        if (!useOwnCollection()) {
+          return;
+        }
         const id = Number(bookId);
         if (!Number.isFinite(id)) {
           return;
@@ -845,9 +979,14 @@
 
       function sortBooks(list, mode) {
         const copy = [...list];
-        if (mode === "title") {
+        if (mode === "title-asc" || mode === "title") {
           return copy.sort((a, b) =>
             (a.title || "").localeCompare(b.title || ""),
+          );
+        }
+        if (mode === "title-desc") {
+          return copy.sort((a, b) =>
+            (b.title || "").localeCompare(a.title || ""),
           );
         }
         if (mode === "date-desc" || mode === "date-asc") {
@@ -860,7 +999,14 @@
             return mode === "date-desc" ? yearB - yearA : yearA - yearB;
           });
         }
-        return copy.sort((a, b) => a.id - b.id);
+        return copy.sort((a, b) => {
+          const yearA = parseSortYear(a.publicationDate);
+          const yearB = parseSortYear(b.publicationDate);
+          if (yearA == null && yearB == null) return 0;
+          if (yearA == null) return 1;
+          if (yearB == null) return -1;
+          return yearA - yearB;
+        });
       }
 
       function matchesSearch(book, query) {
@@ -882,7 +1028,7 @@
       function getStatTotal(all) {
         const showHidden = showHiddenInput.checked;
         if (collectionOnly) {
-          if (COLLECTION_LOCAL) {
+          if (useOwnCollection()) {
             return all.filter(
               (book) =>
                 !isDeleted(book) &&
@@ -909,7 +1055,7 @@
         );
         const wantCount = getWantCount();
         const wantLabel = wantCount ? `WANT (${wantCount})` : "WANT";
-        const collectionCount = COLLECTION_LOCAL ? getCollectionCount() : 0;
+        const collectionCount = useOwnCollection() ? getCollectionCount() : 0;
         const collectionLabel = collectionCount
           ? `COLLECTION (${collectionCount})`
           : "COLLECTION";
@@ -1268,7 +1414,7 @@
       }
 
       function renderCollectionButton(book) {
-        if (!COLLECTION_LOCAL) {
+        if (!useOwnCollection()) {
           return "";
         }
 
@@ -1464,7 +1610,7 @@
           if (collectionOnly) {
             message = searchInput.value.trim()
               ? "No books in your collection match your search."
-              : COLLECTION_LOCAL
+              : useOwnCollection()
                 ? "Your collection is empty — open a book and tap Collect to add it."
                 : "No books in your collection to show.";
           } else if (hiddenOnly) {
@@ -1587,7 +1733,7 @@
           .filter(Boolean)
           .join("");
         const wantButton = renderWantButton(book);
-        const collectionControl = COLLECTION_LOCAL
+        const collectionControl = useOwnCollection()
           ? renderCollectionButton(book)
           : renderOwnedBadge(book);
         const bottomRow = renderCardBottomRow(
@@ -1679,6 +1825,34 @@
         editingBookId = null;
         editDialog.hidden = true;
         editBookForm.reset();
+      }
+
+      function openSettingsDialog() {
+        syncSettingsCollectionRadios();
+        settingsDialog.hidden = false;
+        settingsBtn.setAttribute("aria-expanded", "true");
+        settingsCloseBtn.focus();
+      }
+
+      function closeSettingsDialog() {
+        settingsDialog.hidden = true;
+        settingsBtn.setAttribute("aria-expanded", "false");
+      }
+
+      async function onCollectionSourceChange(next) {
+        if (next !== "sample" && next !== "own") {
+          return;
+        }
+        if (collectionSource === next) {
+          return;
+        }
+        collectionSource = next;
+        saveCollectionSourcePreference();
+        await loadCollection();
+        render();
+        if (!bookDetailDialog.hidden && detailBookId) {
+          openBookDetail(detailBookId);
+        }
       }
 
       function openAttributionDialog() {
@@ -1949,6 +2123,31 @@
         element.addEventListener("click", closeEditDialog);
       });
 
+      settingsBtn.addEventListener("click", () => {
+        if (settingsDialog.hidden) {
+          openSettingsDialog();
+        } else {
+          closeSettingsDialog();
+        }
+      });
+
+      settingsCloseBtn.addEventListener("click", closeSettingsDialog);
+      settingsDialog.querySelectorAll("[data-close-settings]").forEach((element) => {
+        element.addEventListener("click", closeSettingsDialog);
+      });
+
+      collectionSourceSampleInput.addEventListener("change", () => {
+        if (collectionSourceSampleInput.checked) {
+          onCollectionSourceChange("sample");
+        }
+      });
+
+      collectionSourceOwnInput.addEventListener("change", () => {
+        if (collectionSourceOwnInput.checked) {
+          onCollectionSourceChange("own");
+        }
+      });
+
       attributionBtn.addEventListener("click", () => {
         if (attributionDialog.hidden) {
           openAttributionDialog();
@@ -1983,6 +2182,10 @@
           closeEditDialog();
           return;
         }
+        if (event.key === "Escape" && !settingsDialog.hidden) {
+          closeSettingsDialog();
+          return;
+        }
         if (event.key === "Escape" && !attributionDialog.hidden) {
           closeAttributionDialog();
         }
@@ -2010,6 +2213,8 @@
       showHiddenInput.addEventListener("change", render);
 
       loadWantList();
+      restoreCollectionSourcePreference();
+      loadCollectionIds();
       loadHeaderFiltersPreference();
       updateHeaderFiltersState();
       restoreSortPreference();

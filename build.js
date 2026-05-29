@@ -85,10 +85,10 @@ function buildStaticSite() {
   let html = fs.readFileSync(VIEWER_HTML, "utf8");
   const collectionScript =
     '<script src="my_collection/collection.js"></script>';
+  const defaultSource = localCollection ? "own" : "sample";
+  const inject = `<script>window.READ_ONLY = true; window.DEFAULT_COLLECTION_SOURCE = '${defaultSource}';</script>\n  ${collectionScript}`;
+  html = html.replace(collectionScript, inject);
   if (localCollection) {
-    const inject =
-      '<script>window.READ_ONLY = true; window.COLLECTION_LOCAL = true;</script>';
-    html = html.replace(collectionScript, inject);
     if (!html.includes('name="robots"')) {
       html = html.replace(
         "</head>",
@@ -96,11 +96,6 @@ function buildStaticSite() {
       );
     }
     fs.writeFileSync(path.join(BUILD_DIR, "robots.txt"), ROBOTS_NO_CRAWL);
-  } else {
-    html = html.replace(
-      collectionScript,
-      '<script>window.READ_ONLY = true;</script>\n  <script src="my_collection/collection.js"></script>',
-    );
   }
   fs.writeFileSync(path.join(BUILD_DIR, "index.html"), html);
 
@@ -131,13 +126,11 @@ function buildStaticSite() {
     );
   }
 
-  if (!localCollection) {
-    if (fs.existsSync(COLLECTION_JS)) {
-      copyFile(COLLECTION_JS, path.join(BUILD_DIR, "my_collection", "collection.js"));
-    }
-    if (fs.existsSync(COLLECTION_CSV)) {
-      copyFile(COLLECTION_CSV, path.join(BUILD_DIR, "my_collection", "my_collection.csv"));
-    }
+  if (fs.existsSync(COLLECTION_JS)) {
+    copyFile(COLLECTION_JS, path.join(BUILD_DIR, "my_collection", "collection.js"));
+  }
+  if (fs.existsSync(COLLECTION_CSV)) {
+    copyFile(COLLECTION_CSV, path.join(BUILD_DIR, "my_collection", "my_collection.csv"));
   }
 
   let copiedAssets = 0;
@@ -181,8 +174,8 @@ function buildStaticSite() {
   }
   console.log(
     localCollection
-      ? "Collection: localStorage (public build; no my_collection/ copied)"
-      : "Collection: CSV (my_collection/)",
+      ? "Collection: gear toggle (default own; sample CSV bundled)"
+      : "Collection: gear toggle (default sample CSV; own via localStorage)",
   );
   const openPath = path.join(BUILD_DIR, "index.html");
   console.log(`Open ${openPath} or deploy the ${BUILD_DIR}/ folder to your static host.`);
