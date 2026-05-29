@@ -6,7 +6,7 @@ A personal gallery of books published by [Arkham House](https://en.wikipedia.org
 
 **Your collection (local dev):** The repo includes a sample [`my_collection/my_collection.csv`](my_collection/my_collection.csv) (title, author, year, status). Replace it with your own list, then run `npm run sync-collection` to regenerate `my_collection/collection.js` before `npm run serve` or a default `npm run build` so the COLLECTION filter and badges reflect your copies.
 
-**Public deploy:** `npm run build -- --local-collection` omits `my_collection/` and lets each visitor mark their own collection in the browser (`localStorage` key `arkham-collection`), similar to the want list (`arkham-want-list`). Localhost and default builds without the flag keep the CSV workflow.
+**Public deploy:** `npm run build -- --local-collection` omits `my_collection/` and lets each visitor mark their own collection in the browser (`localStorage` key `arkham-collection`), similar to the want list (`arkham-want-list`). That build also writes `robots.txt` (disallow all) and a `noindex` meta tag so search engines do not crawl the public site. Localhost and default builds without the flag keep the CSV workflow.
 
 ### Homepage
 
@@ -32,10 +32,10 @@ Filter to titles you own or are hunting for, with COLLECTION and WANTED badges o
 npm install
 npm run crawl          # first-time: scrape Wikipedia → data/books.json (live network)
 npm run serve          # http://localhost:8742 — edit books, upload covers, hide titles
-npm run build          # static site in build/ for deployment
+npm run build          # personal static site in build-for-me/ (your CSV collection)
 ```
 
-Open `build/index.html` or deploy the `build/` folder to any static host. The built site is read-only (no edit UI).
+Open `build-for-me/index.html` for your private build. The built site is read-only (no edit UI).
 
 ## How it works
 
@@ -63,9 +63,13 @@ Stable book `id` values come from imprint + Wikipedia URL + list year (see `scri
 
 ### Build (`npm run build`)
 
-[`build.js`](build.js) copies `viewer.html` → `build/index.html`, sets `window.READ_ONLY = true`, copies CSS/JS/covers, and writes public `data/books.js` (full scraped set). By default it also copies `my_collection/` for your CSV-backed collection. Pass `--local-collection` to skip that folder and set `window.COLLECTION_LOCAL = true` so visitors toggle collection per book in `localStorage`. Hidden and deleted books are excluded from copied covers but remain in shipped data unless you filter elsewhere.
+[`build.js`](build.js) writes a static site under **`build-for-me/`** by default: `viewer.html` → `index.html`, `window.READ_ONLY = true`, your `my_collection/`, CSS/JS/covers, and public `data/books.js`. Use this for your own deployment.
 
-Do not hand-edit `build/` or generated `data/*.js` — change source and rebuild.
+**Public site:** `npm run build -- --local-collection` writes to **`build/`** instead: no `my_collection/`, `window.COLLECTION_LOCAL = true` (browser-local collection), plus `robots.txt` and a `noindex` meta tag. Deploy `build/` to [arkham-house.netlify.app](https://arkham-house.netlify.app).
+
+Hidden and deleted books are excluded from copied covers but remain in shipped data unless you filter elsewhere.
+
+Do not hand-edit `build/`, `build-for-me/`, or generated `data/*.js` — change source and rebuild.
 
 ### Dev server (`npm run serve`)
 
@@ -143,8 +147,8 @@ All npm scripts below run through `node scripts/index.js` with flags parsed in [
 | Script | Command | What it does |
 |--------|---------|----------------|
 | `serve` | `node server.js` | Local editor + API on port 8742. |
-| `build` | `node build.js` | Production static output in `build/` (includes your CSV collection). |
-| | `node build.js --local-collection` | Public build: no `my_collection/`; browser-local collection toggles. |
+| `build` | `node build.js` | Personal static output in `build-for-me/` (includes your CSV collection). |
+| | `node build.js --local-collection` | Public output in `build/`: no `my_collection/`; browser-local collection; `robots.txt`. |
 
 ---
 
@@ -155,7 +159,7 @@ All npm scripts below run through `node scripts/index.js` with flags parsed in [
 1. `npm run crawl` (or `crawl:local` for offline bibliography only)
 2. `npm run sync-descriptions` / `sync-goodreads` as needed
 3. `npm run serve` — fix titles, covers, links
-4. `npm run build` — deploy `build/`
+4. `npm run build` — open or deploy `build-for-me/` (or `npm run build -- --local-collection` → `build/` for the public site)
 
 **Ongoing curation**
 
@@ -186,7 +190,8 @@ All npm scripts below run through `node scripts/index.js` with flags parsed in [
 | `covers/` | Downloaded cover images |
 | `my_collection/` | Owned-books CSV + `collection.js` |
 | `examples/` | Saved Wikipedia HTML for `--local` |
-| `build/` | Generated static site — do not edit |
+| `build-for-me/` | Personal generated static site (`npm run build`) — do not edit |
+| `build/` | Public generated static site (`npm run build -- --local-collection`) — do not edit |
 | `server.js` | Dev server |
 | `my_script.js` | Legacy wrapper → `scripts/index.js` |
 

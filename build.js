@@ -5,7 +5,8 @@ const path = require("path");
 const { loadEdits, applyEditsToBooks } = require("./scripts/lib/edits");
 
 const ROOT = __dirname;
-const BUILD_DIR = path.join(ROOT, "build");
+const localCollection = process.argv.includes("--local-collection");
+const BUILD_DIR = path.join(ROOT, localCollection ? "build" : "build-for-me");
 const BOOKS_JSON = path.join(ROOT, "data", "books.json");
 const BOOKS_JS = path.join(ROOT, "data", "books.js");
 const EDITS_JSON = path.join(ROOT, "data", "edits.json");
@@ -54,7 +55,9 @@ function copyDirectory(relativeDir) {
   return copied;
 }
 
-const localCollection = process.argv.includes("--local-collection");
+const ROBOTS_NO_CRAWL = `User-agent: *
+Disallow: /
+`;
 
 function buildStaticSite() {
   if (!fs.existsSync(BOOKS_JSON)) {
@@ -86,6 +89,13 @@ function buildStaticSite() {
     const inject =
       '<script>window.READ_ONLY = true; window.COLLECTION_LOCAL = true;</script>';
     html = html.replace(collectionScript, inject);
+    if (!html.includes('name="robots"')) {
+      html = html.replace(
+        "</head>",
+        '  <meta name="robots" content="noindex, nofollow" />\n  </head>',
+      );
+    }
+    fs.writeFileSync(path.join(BUILD_DIR, "robots.txt"), ROBOTS_NO_CRAWL);
   } else {
     html = html.replace(
       collectionScript,
@@ -174,7 +184,8 @@ function buildStaticSite() {
       ? "Collection: localStorage (public build; no my_collection/ copied)"
       : "Collection: CSV (my_collection/)",
   );
-  console.log("Open build/index.html or deploy the build/ folder to any static host.");
+  const openPath = path.join(BUILD_DIR, "index.html");
+  console.log(`Open ${openPath} or deploy the ${BUILD_DIR}/ folder to your static host.`);
 }
 
 try {
