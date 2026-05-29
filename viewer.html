@@ -2589,7 +2589,11 @@
 
       stats.addEventListener("click", (event) => {
         if (event.target.closest("#collection-filter-toggle")) {
-          collectionOnly = !collectionOnly;
+          const next = !collectionOnly;
+          collectionOnly = next;
+          if (next) {
+            wantOnly = false;
+          }
           render();
           return;
         }
@@ -2604,7 +2608,11 @@
           return;
         }
         if (event.target.closest("#want-filter-toggle")) {
-          wantOnly = !wantOnly;
+          const next = !wantOnly;
+          wantOnly = next;
+          if (next) {
+            collectionOnly = false;
+          }
           render();
         }
       });
