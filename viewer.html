@@ -420,18 +420,58 @@
 
     .owned-badge {
       display: inline-block;
-      align-self: flex-start;
-      margin-bottom: 0.15rem;
-      padding: 0.2rem 0.5rem;
+      margin-bottom: 0;
+      padding: 0.14rem 0.38rem;
       border-radius: 999px;
       font-family: ui-sans-serif, system-ui, sans-serif;
-      font-size: 0.68rem;
+      font-size: 0.58rem;
       font-weight: 600;
-      letter-spacing: 0.04em;
+      letter-spacing: 0.03em;
       text-transform: uppercase;
       color: #e8d4a8;
       background: rgba(201, 162, 39, 0.18);
       border: 1px solid rgba(210, 178, 128, 0.25);
+    }
+
+    .card-bottom-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.35rem;
+      margin-top: auto;
+      padding-top: 0.35rem;
+    }
+
+    .card-bottom-left,
+    .card-bottom-right {
+      display: flex;
+      align-items: center;
+      min-height: 1.25rem;
+    }
+
+    .card-bottom-right {
+      margin-left: auto;
+    }
+
+    .card-wiki-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 1.5rem;
+      height: 1.5rem;
+      color: var(--accent);
+      font-family: "Times New Roman", Times, serif;
+      font-size: 0.95rem;
+      font-weight: 700;
+      line-height: 1;
+      text-decoration: none;
+      border-radius: 999px;
+      transition: color 0.15s ease, background 0.15s ease;
+    }
+
+    .card-wiki-btn:hover {
+      color: #e8d4a8;
+      background: rgba(201, 162, 39, 0.12);
     }
 
     .cover-wrap {
@@ -743,14 +783,16 @@
       align-items: center;
       justify-content: center;
       margin-top: 0.65rem;
-      padding: 0.65rem 1.1rem;
+      width: 2.25rem;
+      height: 2.25rem;
       border: 1px solid rgba(210, 178, 128, 0.35);
       border-radius: 999px;
       background: rgba(201, 162, 39, 0.16);
       color: #e8d4a8;
-      font-family: ui-sans-serif, system-ui, sans-serif;
-      font-size: 0.88rem;
-      font-weight: 600;
+      font-family: "Times New Roman", Times, serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+      line-height: 1;
       text-decoration: none;
       transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
     }
@@ -836,22 +878,6 @@
       font-family: ui-sans-serif, system-ui, sans-serif;
       font-size: 0.78rem;
       font-weight: 600;
-    }
-
-    .card-footer {
-      margin-top: auto;
-      padding-top: 0.5rem;
-    }
-
-    .card-footer a {
-      color: var(--accent);
-      font-family: ui-sans-serif, system-ui, sans-serif;
-      font-size: 0.78rem;
-      text-decoration: none;
-    }
-
-    .card-footer a:hover {
-      text-decoration: underline;
     }
 
     .empty {
@@ -990,15 +1016,24 @@
         font-size: 0.52rem;
       }
 
-      .meta,
-      .card-footer {
+      .meta {
         display: none;
+      }
+
+      .card-bottom-row {
+        padding-top: 0.15rem;
+      }
+
+      .card-wiki-btn {
+        width: 1.15rem;
+        height: 1.15rem;
+        font-size: 0.72rem;
       }
 
       .owned-badge,
       .hidden-badge {
-        font-size: 0.45rem;
-        padding: 0.1rem 0.25rem;
+        font-size: 0.42rem;
+        padding: 0.08rem 0.22rem;
         margin-bottom: 0.05rem;
       }
 
@@ -1455,6 +1490,23 @@
       </svg>
     `;
 
+    function renderWikiButton(url, className = "card-wiki-btn") {
+      if (!url) {
+        return "";
+      }
+
+      return `
+        <a
+          class="${className}"
+          href="${url}"
+          target="_blank"
+          rel="noopener"
+          aria-label="Open on Wikipedia"
+          title="Wikipedia"
+        >W</a>
+      `;
+    }
+
     const unhideIcon = `
       <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
         <path d="M3.5 10s2.2-4.5 6.5-4.5S16.5 10 16.5 10s-2.2 4.5-6.5 4.5S3.5 10 3.5 10Z" stroke="currentColor" stroke-width="1.5"/>
@@ -1477,6 +1529,19 @@
           aria-label="${isHidden ? "Unhide" : "Hide"} ${book.title || "this book"}"
           title="${isHidden ? "Unhide book" : "Hide book"}"
         >${isHidden ? unhideIcon : hideIcon}</button>
+      `;
+    }
+
+    function renderCardBottomRow(wikiButton, ownedBadge) {
+      if (!wikiButton && !ownedBadge) {
+        return "";
+      }
+
+      return `
+        <div class="card-bottom-row">
+          <div class="card-bottom-left">${wikiButton}</div>
+          <div class="card-bottom-right">${ownedBadge}</div>
+        </div>
       `;
     }
 
@@ -1505,13 +1570,11 @@
       const imageHtml = renderCover(book, book.coverCacheKey);
       const coverActions = renderCoverActions(book);
 
-      const wikiLink = book.wikipediaUrl
-        ? `<div class="card-footer"><a href="${book.wikipediaUrl}" target="_blank" rel="noopener">Wikipedia</a></div>`
-        : "";
-
+      const wikiButton = renderWikiButton(book.wikipediaUrl);
       const ownedBadge = owned
         ? `<span class="owned-badge">${owned.status === "order" ? "On order" : "In collection"}</span>`
         : "";
+      const bottomRow = renderCardBottomRow(wikiButton, ownedBadge);
 
       const hiddenBadge = book.hidden
         ? `<span class="hidden-badge">Hidden</span>`
@@ -1525,13 +1588,12 @@
           </div>
           <div class="card-body">
             ${hiddenBadge}
-            ${ownedBadge}
             <h2 class="title">${book.title || "Untitled"}</h2>
             ${book.publicationDate ? `<div class="date">${book.publicationDate}</div>` : ""}
             ${book.author ? `<p class="meta"><strong>Author:</strong> ${book.author}</p>` : ""}
             ${book.coverArtist ? `<p class="meta"><strong>Cover:</strong> ${book.coverArtist}</p>` : ""}
             ${book.decade ? `<p class="meta"><strong>Decade:</strong> ${book.decade}</p>` : ""}
-            ${wikiLink}
+            ${bottomRow}
           </div>
         </article>
       `;
@@ -1616,9 +1678,7 @@
         ? `<span class="owned-badge">${owned.status === "order" ? "On order" : "In collection"}</span>`
         : "";
       const hiddenBadge = book.hidden ? `<span class="hidden-badge">Hidden</span>` : "";
-      const wikiButton = book.wikipediaUrl
-        ? `<a class="book-detail-wiki-btn" href="${book.wikipediaUrl}" target="_blank" rel="noopener">Wikipedia</a>`
-        : "";
+      const wikiButton = renderWikiButton(book.wikipediaUrl, "book-detail-wiki-btn");
 
       bookDetailBody.innerHTML = `
         ${hiddenBadge}
@@ -1809,7 +1869,7 @@
         return;
       }
 
-      if (event.target.closest(".card-footer a")) {
+      if (event.target.closest(".card-wiki-btn, .book-detail-wiki-btn")) {
         return;
       }
 
