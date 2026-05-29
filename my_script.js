@@ -11,14 +11,35 @@ const COLLECTION_CSV = path.join(ROOT, "my_collection", "my_collection.csv");
 const COLLECTION_JS = path.join(ROOT, "my_collection", "collection.js");
 const EXAMPLES_DIR = path.join(ROOT, "examples");
 const ARKHAM_LOCAL = path.join(EXAMPLES_DIR, "Arkham House - Wikipedia.html");
+const MYCROFT_LOCAL = path.join(
+  EXAMPLES_DIR,
+  "Mycroft & Moran - Wikipedia.html",
+);
 const SAMPLE_BOOK_LOCAL = path.join(
   EXAMPLES_DIR,
-  "The Dark Brotherhood and Other Pieces - Wikipedia.html"
+  "The Dark Brotherhood and Other Pieces - Wikipedia.html",
 );
 
 const WIKI_API = "https://en.wikipedia.org/w/api.php";
 const WIKI_BASE = "https://en.wikipedia.org";
 const SOURCE_URL = `${WIKI_BASE}/wiki/Arkham_House`;
+
+const IMPRINTS = {
+  arkham_house: {
+    wikiPage: "Arkham_House",
+    sectionId: "Bibliography_of_works_published_by_Arkham_House",
+    localFile: "Arkham House - Wikipedia.html",
+    sourceUrl: `${WIKI_BASE}/wiki/Arkham_House`,
+    openLibraryPublisher: "Arkham House",
+  },
+  mycroft_moran: {
+    wikiPage: "Mycroft_&_Moran",
+    sectionId: "Works_published_by_Mycroft_&_Moran",
+    localFile: "Mycroft & Moran - Wikipedia.html",
+    sourceUrl: `${WIKI_BASE}/wiki/Mycroft_%26_Moran`,
+    openLibraryPublisher: "Mycroft & Moran",
+  },
+};
 const USER_AGENT =
   "ArkhamCoverCrawler/1.0 (personal project; https://github.com/)";
 
@@ -39,12 +60,21 @@ function parseArgs(argv) {
     reconcileCovers: false,
     fillCovers: false,
     dryRun: false,
+    mycroftOnly: false,
+    syncPublicationDates: false,
+    syncAuthors: false,
   };
 
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i];
     if (arg === "--local") {
       options.local = true;
+    } else if (arg === "--mycroft-only") {
+      options.mycroftOnly = true;
+    } else if (arg === "--sync-publication-dates") {
+      options.syncPublicationDates = true;
+    } else if (arg === "--sync-authors") {
+      options.syncAuthors = true;
     } else if (arg === "--skip-download") {
       options.skipDownload = true;
     } else if (arg === "--sync-collection") {
@@ -103,7 +133,10 @@ async function fetchWithRetry(url, options = {}, retries = 3) {
     const contentType = response.headers.get("content-type") || "";
     if (contentType.includes("application/json")) {
       const json = await response.json();
-      if (json.error && /maxlag|ratelimited/i.test(json.error.code || json.error.info || "")) {
+      if (
+        json.error &&
+        /maxlag|ratelimited/i.test(json.error.code || json.error.info || "")
+      ) {
         if (attempt < retries) {
           console.warn(`API rate limit: ${json.error.info}. Waiting 60s...`);
           await sleep(60000);
@@ -140,7 +173,10 @@ function readLocalHtml(filePath) {
 }
 
 function normalizeLabel(text) {
-  return text.replace(/\u00a0/g, " ").replace(/\s+/g, " ").trim();
+  return text
+    .replace(/\u00a0/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 function cellText($, cell) {
@@ -153,6 +189,25 @@ function parseYearFromListLine(text) {
     return null;
   }
   return matches[matches.length - 1][1];
+}
+
+function parseAuthorFromListLine(listAuthor) {
+  if (!listAuthor) {
+    return null;
+  }
+
+  let line = normalizeLabel(listAuthor).replace(/\s*\(\d{4}\)\s*$/, "").trim();
+  const editedMatch = line.match(/edited by\s+(.+)$/i);
+  if (editedMatch) {
+    return normalizeLabel(editedMatch[1]);
+  }
+
+  const byMatch = line.match(/(?:^|,\s*)by\s+(.+)$/i);
+  if (byMatch) {
+    return normalizeLabel(byMatch[1].split(/\s+vol\.\s+/i)[0]) || null;
+  }
+
+  return null;
 }
 
 function slugify(value) {
@@ -187,29 +242,70 @@ function expectedCoverPaths(book) {
     return [];
   }
   return [".jpg", ".jpeg", ".png", ".webp", ".gif"].map((ext) =>
-    path.join("covers", `${slugBase}-${id}${ext}`)
+    path.join("covers", `${slugBase}-${id}${ext}`),
   );
+}
+
+function findLocalCoverFile(book) {
+  if (book.coverImageFile) {
+    const filePath = path.join(ROOT, book.coverImageFile);
+    if (fs.existsSync(filePath)) {
+      return book.coverImageFile.replace(/\\/g, "/");
+    }
+  }
+
+  for (const relativePath of expectedCoverPaths(book)) {
+    if (fs.existsSync(path.join(ROOT, relativePath))) {
+      return relativePath.replace(/\\/g, "/");
+    }
+  }
+
+  if (book.id && fs.existsSync(COVERS_DIR)) {
+    const idSuffix = `-${book.id}.`;
+    for (const name of fs.readdirSync(COVERS_DIR)) {
+      if (name.includes(idSuffix)) {
+        return `covers/${name}`.replace(/\\/g, "/");
+      }
+    }
+  }
+
+  return null;
+}
+
+function bookHasLocalCover(book) {
+  return Boolean(findLocalCoverFile(book));
+}
+
+function preserveCoverFields(existing, incoming) {
+  const localCover = findLocalCoverFile(existing);
+  if (localCover) {
+    return {
+      coverImageFile: localCover,
+      coverImageUrl: existing.coverImageUrl ?? incoming.coverImageUrl ?? null,
+    };
+  }
+
+  return {
+    coverImageFile: existing.coverImageFile || incoming.coverImageFile,
+    coverImageUrl: existing.coverImageUrl || incoming.coverImageUrl,
+  };
 }
 
 function reconcileCoverFiles(books) {
   return books.map((book) => {
-    if (book.coverImageFile) {
-      const existing = path.join(ROOT, book.coverImageFile);
-      if (fs.existsSync(existing)) {
-        return book;
-      }
+    const localCover = findLocalCoverFile(book);
+    if (!localCover) {
+      return book;
     }
 
-    for (const relativePath of expectedCoverPaths(book)) {
-      if (fs.existsSync(path.join(ROOT, relativePath))) {
-        return {
-          ...book,
-          coverImageFile: relativePath.replace(/\\/g, "/"),
-        };
-      }
+    if (book.coverImageFile === localCover) {
+      return book;
     }
 
-    return book;
+    return {
+      ...book,
+      coverImageFile: localCover,
+    };
   });
 }
 
@@ -229,11 +325,29 @@ function isSectionStop(node) {
   return false;
 }
 
-function extractBibliography(html) {
+function decadeFromYear(year) {
+  const value = parseInt(year, 10);
+  if (!value) {
+    return null;
+  }
+  if (value < 1940) {
+    return String(value);
+  }
+  return `${Math.floor(value / 10) * 10}s`;
+}
+
+function entryDecade(entry) {
+  if (entry.decade) {
+    return entry.decade;
+  }
+  return decadeFromYear(entry.listYear);
+}
+
+function extractBibliography(html, { sectionId }) {
   const $ = cheerio.load(html);
-  const heading = $("#Bibliography_of_works_published_by_Arkham_House");
+  const heading = $(`[id="${sectionId}"]`);
   if (!heading.length) {
-    throw new Error("Bibliography section not found");
+    throw new Error(`Bibliography section not found: ${sectionId}`);
   }
 
   const entries = [];
@@ -248,7 +362,11 @@ function extractBibliography(html) {
     const tag = node.prop("tagName")?.toLowerCase();
     if (tag === "h3") {
       decade = headingText(node);
-    } else if (tag === "div" && node.hasClass("mw-heading") && node.find("h3").length) {
+    } else if (
+      tag === "div" &&
+      node.hasClass("mw-heading") &&
+      node.find("h3").length
+    ) {
       decade = headingText(node);
     } else if (tag === "ul") {
       collectListItems($, node, decade, entries);
@@ -302,7 +420,7 @@ function infoboxRowValue($, infobox, labelPattern) {
 
 function parseCoverArtistFromCaption(caption) {
   const match = caption.match(
-    /(?:dust\s*jacket\s*(?:illustration|art(?:work)?|design)\s*by|cover\s*(?:art(?:work)?|by))\s+(.+?)\.?$/i
+    /(?:dust\s*jacket\s*(?:illustration|art(?:work)?|design)\s*by|cover\s*(?:art(?:work)?|by))\s+(.+?)\.?$/i,
   );
   return match ? normalizeLabel(match[1]) : null;
 }
@@ -320,7 +438,7 @@ function normalizeWikimediaImageUrl(url) {
   normalized = normalized.split("?")[0];
 
   const thumbMatch = normalized.match(
-    /^(https:\/\/upload\.wikimedia\.org\/wikipedia\/[^/]+\/)thumb\/(.+\/)(?:\d+px-)?[^/]+$/
+    /^(https:\/\/upload\.wikimedia\.org\/wikipedia\/[^/]+\/)thumb\/(.+\/)(?:\d+px-)?[^/]+$/,
   );
   if (thumbMatch) {
     normalized = `${thumbMatch[1]}${thumbMatch[2].replace(/\/$/, "")}`;
@@ -372,7 +490,16 @@ function parseBookPage(html, options = {}) {
   let coverImageUrl = null;
 
   if (infobox.length) {
-    const infoboxTitle = normalizeLabel(infobox.find(".infobox-title").first().clone().children("span").remove().end().text());
+    const infoboxTitle = normalizeLabel(
+      infobox
+        .find(".infobox-title")
+        .first()
+        .clone()
+        .children("span")
+        .remove()
+        .end()
+        .text(),
+    );
     if (infoboxTitle) {
       title = infoboxTitle;
     }
@@ -389,7 +516,9 @@ function parseBookPage(html, options = {}) {
     coverImageUrl = resolveImageUrl(img.attr("src"), img.attr("srcset"));
 
     if (!coverArtist) {
-      coverArtist = parseCoverArtistFromCaption(cellText($, imageCell.find(".infobox-caption").first()));
+      coverArtist = parseCoverArtistFromCaption(
+        cellText($, imageCell.find(".infobox-caption").first()),
+      );
     }
   }
 
@@ -416,7 +545,10 @@ async function getBookMetadata(wikipediaTitle, options = {}) {
 
   let html;
   if (args.local) {
-    if (wikipediaTitle === "The_Dark_Brotherhood_and_Other_Pieces" && fs.existsSync(SAMPLE_BOOK_LOCAL)) {
+    if (
+      wikipediaTitle === "The_Dark_Brotherhood_and_Other_Pieces" &&
+      fs.existsSync(SAMPLE_BOOK_LOCAL)
+    ) {
       html = readLocalHtml(SAMPLE_BOOK_LOCAL);
     } else {
       const empty = {
@@ -557,6 +689,256 @@ function parseCollectionCsv(csvText) {
     });
 }
 
+function publisherNameForImprint(imprint) {
+  return (
+    IMPRINTS[imprint]?.openLibraryPublisher ||
+    IMPRINTS.arkham_house.openLibraryPublisher
+  );
+}
+
+function bookMatchKey(book) {
+  const imprint = book.imprint || "arkham_house";
+  const year =
+    book.publicationDate || parseYearFromListLine(book.listAuthor || "") || "";
+  if (book.wikipediaUrl) {
+    return `${imprint}|${book.wikipediaUrl}|${year}`;
+  }
+  return `${imprint}|${book.listTitle || book.title}|${year}`;
+}
+
+function migrateLegacyImprints(books) {
+  return books.map((book) => ({
+    ...book,
+    imprint: book.imprint || "arkham_house",
+  }));
+}
+
+function mergeBooks(existingBooks, incomingBooks) {
+  const merged = migrateLegacyImprints([...existingBooks]);
+  const indexByKey = new Map();
+  merged.forEach((book, index) => {
+    indexByKey.set(bookMatchKey(book), index);
+  });
+
+  let nextId = merged.reduce((max, book) => Math.max(max, book.id || 0), 0);
+
+  for (const incoming of incomingBooks) {
+    const key = bookMatchKey(incoming);
+    const existingIndex = indexByKey.get(key);
+    if (existingIndex !== undefined) {
+      const existing = merged[existingIndex];
+      merged[existingIndex] = {
+        ...incoming,
+        id: existing.id,
+        hidden: existing.hidden,
+        ...preserveCoverFields(existing, incoming),
+      };
+    } else {
+      nextId += 1;
+      merged.push({ ...incoming, id: nextId });
+      indexByKey.set(key, merged.length - 1);
+    }
+  }
+
+  return merged;
+}
+
+function loadExistingPayload() {
+  const jsonPath = path.join(DATA_DIR, "books.json");
+  if (!fs.existsSync(jsonPath)) {
+    return { books: [], sourceUrls: {} };
+  }
+  const payload = JSON.parse(fs.readFileSync(jsonPath, "utf8"));
+  return {
+    ...payload,
+    books: payload.books || [],
+    sourceUrls: payload.sourceUrls || {},
+  };
+}
+
+function mergeCrawlResults(arkhamBooks) {
+  const existing = loadExistingPayload().books;
+  if (!existing.length) {
+    return arkhamBooks;
+  }
+
+  const mycroftBooks = existing.filter(
+    (book) => book.imprint === "mycroft_moran",
+  );
+  const arkhamExisting = existing.filter(
+    (book) => (book.imprint || "arkham_house") === "arkham_house",
+  );
+  const mergedArkham = mergeBooks(arkhamExisting, arkhamBooks);
+  return mycroftBooks.length
+    ? mergeBooks(mergedArkham, mycroftBooks)
+    : mergedArkham;
+}
+
+async function buildBookRecord(entry, imprint, id, progressLabel) {
+  let metadata = {
+    title: entry.listTitle,
+    author: null,
+    coverArtist: null,
+    coverImageUrl: null,
+  };
+  let error = null;
+  let coverImageFile = null;
+
+  try {
+    if (entry.wikipediaTitle) {
+      console.log(`${progressLabel} Fetching ${entry.listTitle}`);
+      const pageData = await getBookMetadata(entry.wikipediaTitle);
+      metadata = {
+        title: pageData.title || entry.listTitle,
+        author: pageData.author,
+        coverArtist: pageData.coverArtist,
+        coverImageUrl: pageData.coverImageUrl,
+      };
+    } else {
+      console.log(`${progressLabel} No wiki link: ${entry.listTitle}`);
+    }
+
+    if (!metadata.author) {
+      metadata.author = parseAuthorFromListLine(entry.listAuthor);
+    }
+
+    if (!args.skipDownload && metadata.coverImageUrl && !args.local && id) {
+      const tempBook = {
+        id,
+        wikipediaUrl: entry.wikipediaUrl,
+        listTitle: entry.listTitle,
+        title: entry.listTitle,
+      };
+      const existingCover = findLocalCoverFile(tempBook);
+      if (existingCover) {
+        coverImageFile = existingCover;
+      } else {
+        const slugBase = slugify(entry.wikipediaTitle || entry.listTitle);
+        const slug = `${slugBase}-${id}`;
+        try {
+          coverImageFile = await downloadCover(metadata.coverImageUrl, slug);
+        } catch (downloadError) {
+          error = downloadError.message;
+        }
+      }
+    }
+  } catch (fetchError) {
+    error = fetchError.message;
+  }
+
+  return {
+    book: {
+      ...(id ? { id } : {}),
+      imprint,
+      decade: entryDecade(entry),
+      listTitle: entry.listTitle,
+      listAuthor: entry.listAuthor,
+      title: metadata.title || entry.listTitle,
+      author: metadata.author,
+      coverArtist: metadata.coverArtist,
+      publicationDate: entry.listYear,
+      wikipediaUrl: entry.wikipediaUrl,
+      coverImageUrl: metadata.coverImageUrl,
+      coverImageFile,
+      hidden: false,
+      error,
+    },
+    failure: error ? { title: entry.listTitle, error } : null,
+  };
+}
+
+async function syncPublicationDates() {
+  const payload = loadExistingPayload();
+  const dateByKey = new Map();
+
+  for (const [imprint, config] of Object.entries(IMPRINTS)) {
+    let html;
+    if (args.local) {
+      const localPath = path.join(EXAMPLES_DIR, config.localFile);
+      if (!fs.existsSync(localPath)) {
+        console.warn(`Skipping ${imprint}: missing ${localPath}`);
+        continue;
+      }
+      html = readLocalHtml(localPath);
+    } else {
+      console.log(`Fetching bibliography for ${imprint}...`);
+      html = await fetchParseHtml(config.wikiPage);
+    }
+
+    const entries = extractBibliography(html, { sectionId: config.sectionId });
+    for (const entry of entries) {
+      if (!entry.listYear) {
+        continue;
+      }
+      if (entry.wikipediaUrl) {
+        dateByKey.set(
+          `${imprint}|${entry.wikipediaUrl}|${entry.listYear}`,
+          entry.listYear,
+        );
+      }
+      dateByKey.set(
+        `${imprint}|title|${entry.listTitle}|${entry.listYear}`,
+        entry.listYear,
+      );
+    }
+  }
+
+  let updated = 0;
+  for (const book of payload.books) {
+    const imprint = book.imprint || "arkham_house";
+    const authorYear = parseYearFromListLine(book.listAuthor || "");
+    let listYear = null;
+    if (authorYear) {
+      if (book.wikipediaUrl) {
+        listYear = dateByKey.get(
+          `${imprint}|${book.wikipediaUrl}|${authorYear}`,
+        );
+      }
+      if (!listYear && book.listTitle) {
+        listYear = dateByKey.get(
+          `${imprint}|title|${book.listTitle}|${authorYear}`,
+        );
+      }
+    }
+    if (listYear && book.publicationDate !== listYear) {
+      book.publicationDate = listYear;
+      updated += 1;
+    }
+  }
+
+  const { jsonPath, jsPath } = writeOutput(payload);
+  console.log(`Updated publicationDate on ${updated} books`);
+  console.log(`JSON: ${jsonPath}`);
+  console.log(`JS:   ${jsPath}`);
+}
+
+function syncAuthors() {
+  const payload = loadExistingPayload();
+  let updated = 0;
+
+  for (const book of payload.books) {
+    if (book.author) {
+      continue;
+    }
+
+    const author = parseAuthorFromListLine(book.listAuthor);
+    if (!author) {
+      continue;
+    }
+
+    book.author = author;
+    updated += 1;
+  }
+
+  const { jsonPath, jsPath } = writeOutput(payload);
+  const stillMissing = payload.books.filter((book) => !book.author).length;
+
+  console.log(`Filled ${updated} authors from bibliography lines.`);
+  console.log(`Still missing author: ${stillMissing}`);
+  console.log(`JSON: ${jsonPath}`);
+  console.log(`JS:   ${jsPath}`);
+}
+
 function syncCollectionFromCsv() {
   if (!fs.existsSync(COLLECTION_CSV)) {
     throw new Error(`Missing collection CSV: ${COLLECTION_CSV}`);
@@ -566,7 +948,7 @@ function syncCollectionFromCsv() {
   fs.mkdirSync(path.dirname(COLLECTION_JS), { recursive: true });
   fs.writeFileSync(
     COLLECTION_JS,
-    `window.MY_COLLECTION = ${JSON.stringify(items, null, 2)};\n`
+    `window.MY_COLLECTION = ${JSON.stringify(items, null, 2)};\n`,
   );
   console.log(`Synced ${items.length} collection items to ${COLLECTION_JS}`);
 }
@@ -582,7 +964,10 @@ function writeOutput(payload) {
   const jsPath = path.join(DATA_DIR, "books.js");
 
   fs.writeFileSync(jsonPath, `${JSON.stringify(output, null, 2)}\n`);
-  fs.writeFileSync(jsPath, `window.BOOKS = ${JSON.stringify(reconciledBooks, null, 2)};\n`);
+  fs.writeFileSync(
+    jsPath,
+    `window.BOOKS = ${JSON.stringify(reconciledBooks, null, 2)};\n`,
+  );
 
   return { jsonPath, jsPath };
 }
@@ -597,10 +982,12 @@ function reconcileCoversFromDisk() {
   const before = payload.books.filter((book) => book.coverImageFile).length;
   const { jsonPath: outJson, jsPath } = writeOutput(payload);
   const after = JSON.parse(fs.readFileSync(outJson, "utf8")).books.filter(
-    (book) => book.coverImageFile
+    (book) => book.coverImageFile,
   ).length;
 
-  console.log(`Linked cover files: ${before} -> ${after} of ${payload.books.length} books`);
+  console.log(
+    `Linked cover files: ${before} -> ${after} of ${payload.books.length} books`,
+  );
   console.log(`JSON: ${outJson}`);
   console.log(`JS:   ${jsPath}`);
 }
@@ -625,23 +1012,15 @@ function titlesMatch(a, b) {
 }
 
 function bookHasCover(book) {
-  if (book.coverImageUrl) {
+  if (bookHasLocalCover(book)) {
     return true;
   }
 
-  if (book.coverImageFile) {
-    const existing = path.join(ROOT, book.coverImageFile);
-    if (fs.existsSync(existing)) {
-      return true;
-    }
-  }
-
-  return expectedCoverPaths(book).some((relativePath) =>
-    fs.existsSync(path.join(ROOT, relativePath))
-  );
+  return Boolean(book.coverImageUrl);
 }
 
-const WIKI_IMAGE_SKIP = /(?:\.svg$|commons-logo|ambox|edit-clear|question_book|wikimedia|open book|icon|logo|flag|map)/i;
+const WIKI_IMAGE_SKIP =
+  /(?:\.svg$|commons-logo|ambox|edit-clear|question_book|wikimedia|open book|icon|logo|flag|map)/i;
 
 async function fetchWikipediaFileUrl(fileTitle) {
   const params = new URLSearchParams({
@@ -726,7 +1105,13 @@ async function searchWikipediaTitle(book) {
   const params = new URLSearchParams({
     action: "query",
     list: "search",
-    srsearch: [book.title, book.publicationDate, "Arkham House"].filter(Boolean).join(" "),
+    srsearch: [
+      book.title,
+      book.publicationDate,
+      publisherNameForImprint(book.imprint),
+    ]
+      .filter(Boolean)
+      .join(" "),
     srlimit: "8",
     format: "json",
   });
@@ -734,7 +1119,10 @@ async function searchWikipediaTitle(book) {
   const results = json.query?.search || [];
 
   for (const result of results) {
-    if (titlesMatch(result.title, book.title) || titlesMatch(result.title, book.listTitle)) {
+    if (
+      titlesMatch(result.title, book.title) ||
+      titlesMatch(result.title, book.listTitle)
+    ) {
       return result.title;
     }
   }
@@ -749,10 +1137,15 @@ function scoreOpenLibraryMatch(doc, book) {
 
   let score = 0;
   const docTitle = doc.title || "";
-  if (titlesMatch(docTitle, book.title) || titlesMatch(docTitle, book.listTitle)) {
+  if (
+    titlesMatch(docTitle, book.title) ||
+    titlesMatch(docTitle, book.listTitle)
+  ) {
     score += 10;
   } else if (
-    normalizeForMatch(docTitle).includes(normalizeForMatch(book.title).slice(0, 12))
+    normalizeForMatch(docTitle).includes(
+      normalizeForMatch(book.title).slice(0, 12),
+    )
   ) {
     score += 4;
   } else {
@@ -764,7 +1157,17 @@ function scoreOpenLibraryMatch(doc, book) {
     score += 5;
   }
 
-  if (Array.isArray(doc.publisher) && doc.publisher.some((p) => /arkham house/i.test(p))) {
+  const publisherPattern = new RegExp(
+    publisherNameForImprint(book.imprint).replace(
+      /[.*+?^${}()|[\]\\]/g,
+      "\\$&",
+    ),
+    "i",
+  );
+  if (
+    Array.isArray(doc.publisher) &&
+    doc.publisher.some((p) => publisherPattern.test(p))
+  ) {
     score += 3;
   }
 
@@ -796,7 +1199,9 @@ async function searchOpenLibraryCover(book) {
       params.set("author", query.author);
     }
 
-    const json = await fetchWithRetry(`https://openlibrary.org/search.json?${params}`);
+    const json = await fetchWithRetry(
+      `https://openlibrary.org/search.json?${params}`,
+    );
     for (const doc of json.docs || []) {
       const score = scoreOpenLibraryMatch(doc, book);
       if (score > (best?.score || 0)) {
@@ -819,7 +1224,9 @@ async function findCoverForBook(book) {
 
   if (wikipediaTitle) {
     try {
-      const pageData = await getBookMetadata(wikipediaTitle, { allowOgImage: true });
+      const pageData = await getBookMetadata(wikipediaTitle, {
+        allowOgImage: true,
+      });
       if (pageData.coverImageUrl) {
         return {
           coverImageUrl: pageData.coverImageUrl,
@@ -833,7 +1240,11 @@ async function findCoverForBook(book) {
     }
 
     try {
-      const image = await pickBestWikipediaArticleImage(wikipediaTitle, book, 1);
+      const image = await pickBestWikipediaArticleImage(
+        wikipediaTitle,
+        book,
+        1,
+      );
       if (image) {
         return {
           coverImageUrl: image.coverImageUrl,
@@ -861,7 +1272,9 @@ async function findCoverForBook(book) {
     try {
       const foundTitle = await searchWikipediaTitle(book);
       if (foundTitle) {
-        const pageData = await getBookMetadata(foundTitle, { allowOgImage: false });
+        const pageData = await getBookMetadata(foundTitle, {
+          allowOgImage: false,
+        });
         if (pageData.coverImageUrl) {
           return {
             coverImageUrl: pageData.coverImageUrl,
@@ -904,7 +1317,9 @@ async function fillMissingCovers() {
   const missing = payload.books.filter((book) => !bookHasCover(book));
   const toProcess = missing.slice(0, args.limit);
 
-  console.log(`Found ${missing.length} books without covers; processing ${toProcess.length}`);
+  console.log(
+    `Found ${missing.length} books without covers; processing ${toProcess.length}`,
+  );
   if (args.dryRun) {
     console.log("Dry run — no files will be downloaded or written");
   }
@@ -939,7 +1354,15 @@ async function fillMissingCovers() {
       continue;
     }
 
-    const slugBase = slugify(wikiTitleFromHref(book.wikipediaUrl) || book.title);
+    const currentBook = payload.books[bookIndex];
+    if (bookHasLocalCover(currentBook)) {
+      console.log("  Skipped — local cover already on disk");
+      continue;
+    }
+
+    const slugBase = slugify(
+      wikiTitleFromHref(book.wikipediaUrl) || book.title,
+    );
     const slug = `${slugBase}-${book.id}`;
     let coverImageFile = null;
     let error = null;
@@ -957,7 +1380,8 @@ async function fillMissingCovers() {
       ...payload.books[bookIndex],
       coverImageUrl: result.coverImageUrl,
       coverImageFile,
-      wikipediaUrl: result.wikipediaUrl || payload.books[bookIndex].wikipediaUrl,
+      wikipediaUrl:
+        result.wikipediaUrl || payload.books[bookIndex].wikipediaUrl,
       error: error || payload.books[bookIndex].error,
     };
 
@@ -967,15 +1391,130 @@ async function fillMissingCovers() {
   }
 
   console.log("");
-  console.log(`Done. Filled ${filled}, still missing ${missing.length - filled}, failed ${failed}.`);
+  console.log(
+    `Done. Filled ${filled}, still missing ${missing.length - filled}, failed ${failed}.`,
+  );
   console.log(`HTTP requests made: ${requestCount}`);
+}
+
+async function crawlMycroftOnly() {
+  const imprintConfig = IMPRINTS.mycroft_moran;
+  const existingPayload = loadExistingPayload();
+  const existingBooks = existingPayload.books;
+
+  console.log(
+    args.local
+      ? "Running Mycroft & Moran crawl in local mode"
+      : "Running live Mycroft & Moran crawl (merge with existing data)",
+  );
+  console.log(`Request delay: ${delayMs}ms`);
+  console.log(`Existing books: ${existingBooks.length}`);
+
+  let html;
+  if (args.local) {
+    if (!fs.existsSync(MYCROFT_LOCAL)) {
+      throw new Error(`Missing local file: ${MYCROFT_LOCAL}`);
+    }
+    html = readLocalHtml(MYCROFT_LOCAL);
+  } else {
+    html = await fetchParseHtml(imprintConfig.wikiPage);
+  }
+
+  const bibliography = extractBibliography(html, {
+    sectionId: imprintConfig.sectionId,
+  });
+  const limited = bibliography.slice(0, args.limit);
+  console.log(
+    `Found ${bibliography.length} Mycroft & Moran entries; processing ${limited.length}`,
+  );
+
+  const incomingBooks = [];
+  const failures = [];
+  const startedAt = Date.now();
+
+  for (let index = 0; index < limited.length; index += 1) {
+    const entry = limited[index];
+    const progress = `[${index + 1}/${limited.length}]`;
+    const eta = formatEta(index, limited.length, startedAt);
+    const { book, failure } = await buildBookRecord(
+      entry,
+      "mycroft_moran",
+      null,
+      `${progress} (~${eta} remaining)`,
+    );
+    incomingBooks.push(book);
+    if (failure) {
+      failures.push(failure);
+    }
+  }
+
+  const mergedBooks = mergeBooks(existingBooks, incomingBooks);
+
+  if (!args.skipDownload && !args.local) {
+    for (const book of mergedBooks) {
+      if (
+        book.imprint !== "mycroft_moran" ||
+        bookHasLocalCover(book) ||
+        !book.coverImageUrl
+      ) {
+        continue;
+      }
+
+      const wikiTitle = wikiTitleFromHref(book.wikipediaUrl);
+      const slugBase = slugify(wikiTitle || book.listTitle || book.title);
+      const slug = `${slugBase}-${book.id}`;
+      try {
+        book.coverImageFile = await downloadCover(book.coverImageUrl, slug);
+      } catch (downloadError) {
+        book.error = downloadError.message;
+        failures.push({ title: book.title, error: downloadError.message });
+      }
+    }
+  }
+
+  const payload = {
+    scrapedAt: new Date().toISOString(),
+    sourceUrl: SOURCE_URL,
+    sourceUrls: {
+      arkham_house: SOURCE_URL,
+      ...existingPayload.sourceUrls,
+      mycroft_moran: imprintConfig.sourceUrl,
+    },
+    books: mergedBooks,
+  };
+
+  const { jsonPath, jsPath } = writeOutput(payload);
+
+  if (fs.existsSync(COLLECTION_CSV)) {
+    syncCollectionFromCsv();
+  }
+
+  const mycroftCount = mergedBooks.filter(
+    (book) => book.imprint === "mycroft_moran",
+  ).length;
+  console.log("");
+  console.log(
+    `Done. ${mergedBooks.length} total books (${mycroftCount} Mycroft & Moran).`,
+  );
+  console.log(`JSON: ${jsonPath}`);
+  console.log(`JS:   ${jsPath}`);
+  console.log(`HTTP requests made: ${requestCount}`);
+  if (failures.length) {
+    console.log(`Failures (${failures.length}):`);
+    failures.slice(0, 10).forEach((failure) => {
+      console.log(`  - ${failure.title}: ${failure.error}`);
+    });
+    if (failures.length > 10) {
+      console.log(`  ... and ${failures.length - 10} more`);
+    }
+  }
 }
 
 async function main() {
   console.log(
     args.local
       ? "Running in local mode (no live Wikipedia requests except optional cover downloads)"
-      : "Running live Wikipedia crawl"
+      : "Running live Wikipedia crawl",
   );
   console.log(`Request delay: ${delayMs}ms`);
 
@@ -989,16 +1528,22 @@ async function main() {
     arkhamHtml = await fetchParseHtml("Arkham_House");
   }
 
-  const bibliography = extractBibliography(arkhamHtml);
+  const bibliography = extractBibliography(arkhamHtml, {
+    sectionId: IMPRINTS.arkham_house.sectionId,
+  });
   const limited = bibliography.slice(0, args.limit);
-  console.log(`Found ${bibliography.length} bibliography entries; processing ${limited.length}`);
+  console.log(
+    `Found ${bibliography.length} bibliography entries; processing ${limited.length}`,
+  );
 
   const books = [];
   const failures = [];
   const startedAt = Date.now();
   const scrapedAt = new Date().toISOString();
   const uniquePages = new Set(
-    limited.filter((entry) => entry.wikipediaTitle).map((entry) => entry.wikipediaTitle)
+    limited
+      .filter((entry) => entry.wikipediaTitle)
+      .map((entry) => entry.wikipediaTitle),
   );
   const estimatedRequests =
     (args.local ? 0 : 1) +
@@ -1008,77 +1553,42 @@ async function main() {
   for (let index = 0; index < limited.length; index += 1) {
     const entry = limited[index];
     const progress = `[${index + 1}/${limited.length}]`;
-    const eta = formatEta(index, estimatedRequests || limited.length, startedAt);
-
-    let metadata = {
-      title: entry.listTitle,
-      author: null,
-      coverArtist: null,
-      publicationDate: entry.listYear,
-      coverImageUrl: null,
-    };
-    let error = null;
-    let coverImageFile = null;
-
-    try {
-      if (entry.wikipediaTitle) {
-        console.log(`${progress} Fetching ${entry.listTitle} (~${eta} remaining)`);
-        const pageData = await getBookMetadata(entry.wikipediaTitle);
-        metadata = {
-          title: pageData.title || entry.listTitle,
-          author: pageData.author,
-          coverArtist: pageData.coverArtist,
-          publicationDate: pageData.publicationDate || entry.listYear,
-          coverImageUrl: pageData.coverImageUrl,
-        };
-      } else {
-        console.log(`${progress} No wiki link: ${entry.listTitle}`);
-      }
-
-      if (!args.skipDownload && metadata.coverImageUrl && !args.local) {
-        const slugBase = slugify(entry.wikipediaTitle || entry.listTitle);
-        const slug = `${slugBase}-${index + 1}`;
-        try {
-          coverImageFile = await downloadCover(metadata.coverImageUrl, slug);
-        } catch (downloadError) {
-          error = downloadError.message;
-          failures.push({ title: entry.listTitle, error: downloadError.message });
-        }
-      }
-    } catch (fetchError) {
-      error = fetchError.message;
-      failures.push({ title: entry.listTitle, error: fetchError.message });
-      metadata.publicationDate = metadata.publicationDate || entry.listYear;
+    const eta = formatEta(
+      index,
+      estimatedRequests || limited.length,
+      startedAt,
+    );
+    const { book, failure } = await buildBookRecord(
+      entry,
+      "arkham_house",
+      index + 1,
+      `${progress} (~${eta} remaining)`,
+    );
+    if (failure) {
+      failures.push(failure);
     }
-
-    books.push({
-      id: index + 1,
-      decade: entry.decade,
-      listTitle: entry.listTitle,
-      listAuthor: entry.listAuthor,
-      title: metadata.title || entry.listTitle,
-      author: metadata.author,
-      coverArtist: metadata.coverArtist,
-      publicationDate: metadata.publicationDate,
-      wikipediaUrl: entry.wikipediaUrl,
-      coverImageUrl: metadata.coverImageUrl,
-      coverImageFile,
-      hidden: false,
-      error,
-    });
+    books.push(book);
 
     writeOutput({
       scrapedAt,
       sourceUrl: SOURCE_URL,
+      sourceUrls: {
+        arkham_house: SOURCE_URL,
+        ...(loadExistingPayload().sourceUrls || {}),
+      },
       inProgress: index < limited.length - 1,
-      books,
+      books: mergeCrawlResults(books),
     });
   }
 
   const payload = {
     scrapedAt: new Date().toISOString(),
     sourceUrl: SOURCE_URL,
-    books,
+    sourceUrls: {
+      arkham_house: SOURCE_URL,
+      ...(loadExistingPayload().sourceUrls || {}),
+    },
+    books: mergeCrawlResults(books),
   };
 
   const { jsonPath, jsPath } = writeOutput(payload);
@@ -1122,6 +1632,23 @@ if (args.syncCollection) {
     console.error(error);
     process.exit(1);
   });
+} else if (args.mycroftOnly) {
+  crawlMycroftOnly().catch((error) => {
+    console.error(error);
+    process.exit(1);
+  });
+} else if (args.syncPublicationDates) {
+  syncPublicationDates().catch((error) => {
+    console.error(error);
+    process.exit(1);
+  });
+} else if (args.syncAuthors) {
+  try {
+    syncAuthors();
+  } catch (error) {
+    console.error(error);
+    process.exit(1);
+  }
 } else {
   main().catch((error) => {
     console.error(error);

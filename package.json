@@ -6,8 +6,12 @@
   "scripts": {
     "crawl": "node my_script.js",
     "crawl:local": "node my_script.js --local",
+    "crawl:mycroft": "node my_script.js --mycroft-only",
+    "crawl:mycroft:local": "node my_script.js --mycroft-only --local",
     "crawl:test": "node my_script.js --limit 5",
     "sync-collection": "node my_script.js --sync-collection",
+    "sync-publication-dates": "node my_script.js --sync-publication-dates --local",
+    "sync-authors": "node my_script.js --sync-authors",
     "reconcile-covers": "node my_script.js --reconcile-covers",
     "fill-covers": "node my_script.js --fill-covers",
     "fill-covers:dry-run": "node my_script.js --fill-covers --dry-run",
