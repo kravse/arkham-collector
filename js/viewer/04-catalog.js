@@ -61,28 +61,19 @@ function matchesSearch(book, query) {
   return (book._searchHaystack || "").includes(query.toLowerCase());
 }
 
-function getStatTotal(all) {
+function getStatTotal(activeBooks) {
   const showHidden = showHiddenInput.checked;
-  if (collectionOnly) {
-    return all.filter(
-      (book) =>
-        !isDeleted(book) &&
-        (showHidden || !book.hidden) &&
-        isInCollection(book),
-    ).length;
+  if (hiddenOnly) {
+    return activeBooks.filter((book) => book.hidden).length;
   }
-  return all.filter((book) => showHidden || !book.hidden).length;
+  return activeBooks.filter((book) => showHidden || !book.hidden).length;
 }
 
 function renderStats(visible, all) {
   const activeBooks = all.filter((book) => !isDeleted(book));
   const hiddenCount = activeBooks.filter((book) => book.hidden).length;
-  const showHidden = showHiddenInput.checked;
-  const query = searchInput.value.trim();
   const total = getStatTotal(activeBooks);
-  const coveredRows = countCollectionRowsCovered(activeBooks, showHidden);
-  const showingCount =
-    collectionOnly && !query ? coveredRows : visible.length;
+  const showingCount = visible.length;
   const hasMycroft = activeBooks.some(
     (book) => book.imprint === "mycroft_moran",
   );
