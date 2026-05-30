@@ -2,7 +2,7 @@
 
 A personal gallery of books published by [Arkham House](https://en.wikipedia.org/wiki/Arkham_House) and the Mycroft & Moran imprint, scraped from Wikipedia bibliographies. Browse covers, search and sort the catalog, track your collection, and curate metadata in a local dev server.
 
-**Live site:** [arkham-house.netlify.app](https://arkham-house.netlify.app) — public build; collection defaults to your own list in the browser, with an optional sample CSV via the gear settings.
+**Live site:** [arkhamcollector.com](https://arkhamcollector.com) — public build; collection defaults to your own list in the browser, with an optional sample CSV via the gear settings.
 
 **Your collection (CSV):** The repo includes a sample [`my_collection/my_collection.csv`](my_collection/my_collection.csv) (title, author, year). Replace it with your own list, then run `npm run sync-collection` to regenerate `my_collection/collection.js` before `npm run serve` or `npm run build`. An optional fourth column in an existing CSV is ignored.
 
@@ -66,7 +66,7 @@ Stable book `id` values come from imprint + Wikipedia URL + list year (see `scri
 
 ### Build (`npm run build`)
 
-[`build.js`](build.js) writes a static site under **`build/`**: `viewer.html` → `index.html`, `window.READ_ONLY = true`, `my_collection/` for the sample toggle, bundled `css/viewer.css`, JS/covers, merged slim `data/books.js` + `data/descriptions.js`, plus `robots.txt` and a `noindex` meta tag. Deploy `build/` to [arkham-house.netlify.app](https://arkham-house.netlify.app) or any static host.
+[`build.js`](build.js) writes a static site under **`build/`**: `viewer.html` → `index.html`, `window.READ_ONLY = true`, `my_collection/` for the sample toggle, bundled `css/viewer.css`, JS/covers, merged slim `data/books.js` + `data/descriptions.js`, `images/` (logos + favicons), root-level favicon files for browsers that request `/favicon.ico`, `site.webmanifest`, plus `robots.txt` and a `noindex` meta tag. Deploy `build/` to [arkhamcollector.com](https://arkhamcollector.com) or any static host.
 
 Hidden and deleted books are excluded from copied covers but remain in shipped data unless you filter elsewhere.
 

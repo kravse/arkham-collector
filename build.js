@@ -20,9 +20,14 @@ const EDITS_JS = path.join(ROOT, "data", "edits.js");
 const VIEWER_HTML = path.join(ROOT, "viewer.html");
 const COLLECTION_JS = path.join(ROOT, "my_collection", "collection.js");
 const COLLECTION_CSV = path.join(ROOT, "my_collection", "my_collection.csv");
-const STATIC_ASSETS = [
-  "images/arkham-house.jpg",
-  "images/Mycroft_moran.png",
+const SITE_WEBMANIFEST = path.join(ROOT, "site.webmanifest");
+const FAVICON_FILES = [
+  "favicon.ico",
+  "favicon-16x16.png",
+  "favicon-32x32.png",
+  "apple-touch-icon.png",
+  "android-chrome-192x192.png",
+  "android-chrome-512x512.png",
 ];
 
 const VIEWER_CSS_FILES = [
@@ -102,6 +107,15 @@ function applyBuildHtmlTransforms(html) {
   const inject = `<script>window.READ_ONLY = true;</script>\n  ${collectionScript}`;
   next = next.replace(collectionScript, inject);
 
+  const shareImage = `${DEPLOY_ORIGIN}/images/share.png`;
+  next = next.replaceAll('content="images/share.png"', `content="${shareImage}"`);
+  if (!next.includes('property="og:url"')) {
+    next = next.replace(
+      '<meta property="og:type" content="website" />',
+      `<meta property="og:url" content="${DEPLOY_ORIGIN}/" />\n    <meta property="og:type" content="website" />`,
+    );
+  }
+
   if (!next.includes('name="robots"')) {
     next = next.replace(
       "</head>",
@@ -115,6 +129,9 @@ function applyBuildHtmlTransforms(html) {
 const ROBOTS_NO_CRAWL = `User-agent: *
 Disallow: /
 `;
+
+/** Canonical deploy origin for absolute Open Graph / Twitter image URLs. */
+const DEPLOY_ORIGIN = "https://arkhamcollector.com";
 
 function buildStaticSite() {
   bundleViewerJs();
@@ -176,15 +193,21 @@ function buildStaticSite() {
   concatViewerCss();
   copiedAssets += 1;
   copiedAssets += copyDirectory("js");
-  for (const relativePath of STATIC_ASSETS) {
-    const src = path.join(ROOT, relativePath);
-    const dest = path.join(BUILD_DIR, relativePath);
-    if (fs.existsSync(src)) {
-      copyFile(src, dest);
-      copiedAssets += 1;
-    } else {
-      console.warn(`Missing static asset: ${relativePath}`);
+  copiedAssets += copyDirectory("images");
+  if (fs.existsSync(SITE_WEBMANIFEST)) {
+    copyFile(SITE_WEBMANIFEST, path.join(BUILD_DIR, "site.webmanifest"));
+    copiedAssets += 1;
+  } else {
+    console.warn("Missing site.webmanifest");
+  }
+  for (const name of FAVICON_FILES) {
+    const src = path.join(ROOT, "images", name);
+    if (!fs.existsSync(src)) {
+      console.warn(`Missing favicon: images/${name}`);
+      continue;
     }
+    copyFile(src, path.join(BUILD_DIR, name));
+    copiedAssets += 1;
   }
 
   const coverPaths = collectCoverPaths(publicBooks);
