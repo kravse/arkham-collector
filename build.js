@@ -3,6 +3,7 @@
 const fs = require("fs");
 const path = require("path");
 const { loadEdits, applyEditsToBooks } = require("./scripts/lib/edits");
+const { writeViewerBookScripts } = require("./scripts/lib/books");
 const {
   findLocalCoverForBook,
   resolveCoverPathsInBooks,
@@ -13,6 +14,7 @@ const ROOT = __dirname;
 const BUILD_DIR = path.join(ROOT, "build");
 const BOOKS_JSON = path.join(ROOT, "data", "books.json");
 const BOOKS_JS = path.join(ROOT, "data", "books.js");
+const DESCRIPTIONS_JS = path.join(ROOT, "data", "descriptions.js");
 const EDITS_JSON = path.join(ROOT, "data", "edits.json");
 const EDITS_JS = path.join(ROOT, "data", "edits.js");
 const VIEWER_HTML = path.join(ROOT, "viewer.html");
@@ -21,6 +23,18 @@ const COLLECTION_CSV = path.join(ROOT, "my_collection", "my_collection.csv");
 const STATIC_ASSETS = [
   "images/arkham-house.jpg",
   "images/Mycroft_moran.png",
+];
+
+const VIEWER_CSS_FILES = [
+  "variables.css",
+  "base.css",
+  "header.css",
+  "attribution.css",
+  "settings.css",
+  "cards.css",
+  "edit-dialog.css",
+  "book-detail.css",
+  "mobile.css",
 ];
 
 function copyFile(src, dest) {
@@ -39,7 +53,8 @@ function collectCoverPaths(books) {
   return files;
 }
 
-function copyDirectory(relativeDir) {
+function copyDirectory(relativeDir, options = {}) {
+  const { excludeFiles = new Set() } = options;
   const srcDir = path.join(ROOT, relativeDir);
   if (!fs.existsSync(srcDir)) {
     return 0;
@@ -51,13 +66,50 @@ function copyDirectory(relativeDir) {
     const src = path.join(ROOT, relativePath);
     const dest = path.join(BUILD_DIR, relativePath);
     if (entry.isDirectory()) {
-      copied += copyDirectory(relativePath);
-    } else {
+      copied += copyDirectory(relativePath, options);
+    } else if (!excludeFiles.has(entry.name)) {
       copyFile(src, dest);
       copied += 1;
     }
   }
   return copied;
+}
+
+function concatViewerCss() {
+  const parts = VIEWER_CSS_FILES.map((file) => {
+    const filePath = path.join(ROOT, "css", file);
+    if (!fs.existsSync(filePath)) {
+      throw new Error(`Missing stylesheet: css/${file}`);
+    }
+    return fs.readFileSync(filePath, "utf8").trimEnd();
+  });
+  const destDir = path.join(BUILD_DIR, "css");
+  fs.mkdirSync(destDir, { recursive: true });
+  const destPath = path.join(destDir, "viewer.css");
+  fs.writeFileSync(destPath, `${parts.join("\n\n")}\n`);
+  return destPath;
+}
+
+function applyBuildHtmlTransforms(html) {
+  const stylesheetBlock = VIEWER_CSS_FILES.map(
+    (file) => `    <link rel="stylesheet" href="css/${file}" />`,
+  ).join("\n");
+  const bundledStylesheet = '    <link rel="stylesheet" href="css/viewer.css" />';
+  let next = html.replace(stylesheetBlock, bundledStylesheet);
+
+  const collectionScript =
+    '<script src="my_collection/collection.js"></script>';
+  const inject = `<script>window.READ_ONLY = true;</script>\n  ${collectionScript}`;
+  next = next.replace(collectionScript, inject);
+
+  if (!next.includes('name="robots"')) {
+    next = next.replace(
+      "</head>",
+      '  <meta name="robots" content="noindex, nofollow" />\n  </head>',
+    );
+  }
+
+  return next;
 }
 
 const ROBOTS_NO_CRAWL = `User-agent: *
@@ -72,6 +124,11 @@ function buildStaticSite() {
   }
   if (!fs.existsSync(BOOKS_JS)) {
     throw new Error("Missing data/books.js. Run the crawler first.");
+  }
+  if (!fs.existsSync(DESCRIPTIONS_JS)) {
+    throw new Error(
+      "Missing data/descriptions.js. Run a crawl/sync that writes books output.",
+    );
   }
   if (!fs.existsSync(VIEWER_HTML)) {
     throw new Error("Missing viewer.html.");
@@ -91,44 +148,20 @@ function buildStaticSite() {
   }
   fs.mkdirSync(BUILD_DIR, { recursive: true });
 
-  let html = fs.readFileSync(VIEWER_HTML, "utf8");
-  const collectionScript =
-    '<script src="my_collection/collection.js"></script>';
-  const inject = `<script>window.READ_ONLY = true;</script>\n  ${collectionScript}`;
-  html = html.replace(collectionScript, inject);
-  if (!html.includes('name="robots"')) {
-    html = html.replace(
-      "</head>",
-      '  <meta name="robots" content="noindex, nofollow" />\n  </head>',
-    );
-  }
+  const html = applyBuildHtmlTransforms(fs.readFileSync(VIEWER_HTML, "utf8"));
   fs.writeFileSync(path.join(BUILD_DIR, "robots.txt"), ROBOTS_NO_CRAWL);
   fs.writeFileSync(path.join(BUILD_DIR, "index.html"), html);
 
-  fs.mkdirSync(path.join(BUILD_DIR, "data"), { recursive: true });
-  fs.writeFileSync(
-    path.join(BUILD_DIR, "data", "books.json"),
-    `${JSON.stringify({ ...payload, books: payload.books }, null, 2)}\n`
-  );
-  fs.writeFileSync(
-    path.join(BUILD_DIR, "data", "books.js"),
-    `window.BOOKS = ${JSON.stringify(mergedBooks, null, 2)};\n`
-  );
+  const buildDataDir = path.join(BUILD_DIR, "data");
+  fs.mkdirSync(buildDataDir, { recursive: true });
+  writeViewerBookScripts(mergedBooks, buildDataDir);
 
-  if (fs.existsSync(EDITS_JSON)) {
-    copyFile(EDITS_JSON, path.join(BUILD_DIR, "data", "edits.json"));
-  } else {
-    fs.writeFileSync(
-      path.join(BUILD_DIR, "data", "edits.json"),
-      `${JSON.stringify({ edits: {} }, null, 2)}\n`
-    );
-  }
   if (fs.existsSync(EDITS_JS)) {
     copyFile(EDITS_JS, path.join(BUILD_DIR, "data", "edits.js"));
   } else {
     fs.writeFileSync(
       path.join(BUILD_DIR, "data", "edits.js"),
-      "window.BOOK_EDITS = {};\n"
+      "window.BOOK_EDITS = {};\n",
     );
   }
 
@@ -140,7 +173,8 @@ function buildStaticSite() {
   }
 
   let copiedAssets = 0;
-  copiedAssets += copyDirectory("css");
+  concatViewerCss();
+  copiedAssets += 1;
   copiedAssets += copyDirectory("js");
   for (const relativePath of STATIC_ASSETS) {
     const src = path.join(ROOT, relativePath);

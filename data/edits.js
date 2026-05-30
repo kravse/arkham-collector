@@ -87,6 +87,9 @@ window.BOOK_EDITS = {
     "author": "Frank Belknap Long",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Purcell_Papers"
   },
+  "320": {
+    "coverImageFile": "covers/the-arkham-collector-volume-i-320.jpg"
+  },
   "324": {
     "hidden": true
   },
@@ -119,14 +122,24 @@ window.BOOK_EDITS = {
   "378": {
     "goodreadsUrl": "https://www.goodreads.com/book/show/1512252.Always_Comes_Evening"
   },
+  "384": {
+    "coverImageFile": "covers/the-dark-chateau-384.png"
+  },
+  "385": {
+    "coverImageFile": "covers/a-hornbook-for-witches-385.png"
+  },
   "396": {
     "goodreadsUrl": "https://www.goodreads.com/book/show/1794059.Dark_Carnival"
   },
   "412": {
     "goodreadsUrl": "https://www.goodreads.com/book/show/5743058-marginalia"
   },
+  "417": {
+    "coverImageFile": "covers/out-of-space-and-time-417.jpg"
+  },
   "419": {
-    "goodreadsUrl": "https://www.goodreads.com/book/show/11399579-the-outsider-and-others"
+    "goodreadsUrl": "https://www.goodreads.com/book/show/11399579-the-outsider-and-others",
+    "coverImageFile": "covers/the-outsider-and-others-419.png"
   },
   "420": {
     "hidden": true

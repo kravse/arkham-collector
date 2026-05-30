@@ -4,7 +4,30 @@ books.forEach((book) => {
   if (book.hidden === undefined) {
     book.hidden = false;
   }
+  prepareBookSearchIndex(book);
 });
+
+function prepareBookSearchIndex(book) {
+  book._searchHaystack = [
+    book.title,
+    book.author,
+    book.coverArtist,
+    book.publicationDate,
+    book.decade,
+    book.listAuthor,
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+}
+
+function getBookDescription(book) {
+  if (book.description) {
+    return book.description;
+  }
+  const map = window.BOOK_DESCRIPTIONS || {};
+  return map[book.id] ?? map[String(book.id)] ?? null;
+}
 
 function isDeleted(book) {
   return book.deleted === true;

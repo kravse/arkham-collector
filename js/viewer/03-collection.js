@@ -1,6 +1,10 @@
 /* Sample and own collection, want list, localStorage */
 
 async function loadCollectionCsvItems() {
+  if (readOnly && window.MY_COLLECTION?.length) {
+    return window.MY_COLLECTION;
+  }
+
   try {
     const response = await fetch("my_collection/my_collection.csv");
     if (response.ok) {

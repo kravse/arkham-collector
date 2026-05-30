@@ -27,11 +27,12 @@ async function deleteBook() {
       throw new Error(payload.error || "Could not delete book");
     }
 
-    if (book) {
-      book.deleted = true;
-    }
+          if (book) {
+            book.deleted = true;
+          }
+          invalidateSortedCache();
 
-    if (detailBookId === editingBookId) {
+          if (detailBookId === editingBookId) {
       closeBookDetail();
     }
 
@@ -78,6 +79,9 @@ function applyEditResponseToBook(bookId, payload) {
   } else {
     delete window.BOOK_EDITS[key];
   }
+
+  prepareBookSearchIndex(book);
+  invalidateSortedCache();
 }
 
 async function saveBookEdits(event) {

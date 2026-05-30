@@ -100,8 +100,9 @@ function openBookDetail(bookId) {
   );
 
   const metaHtml = renderBookMetaHtml(book);
-  const descriptionHtml = book.description?.trim()
-    ? `<div class="book-detail-description">${escapeHtml(book.description)}</div>`
+  const description = getBookDescription(book);
+  const descriptionHtml = description?.trim()
+    ? `<div class="book-detail-description">${escapeHtml(description)}</div>`
     : `<div class="book-detail-description book-detail-description--empty" aria-hidden="true"></div>`;
 
   const detailDateHtml = book.publicationDate
@@ -171,7 +172,7 @@ function openEditDialog(bookId) {
   editPublicationDateInput.value = book.publicationDate || "";
   editWikipediaUrlInput.value = book.wikipediaUrl || "";
   editGoodreadsUrlInput.value = resolveGoodreadsUrl(book) || "";
-  editDescriptionInput.value = book.description || "";
+  editDescriptionInput.value = getBookDescription(book) || "";
   editCoverFileInput.value = "";
   editDialog.hidden = false;
   editTitleInput.focus();

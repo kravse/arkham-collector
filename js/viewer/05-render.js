@@ -274,10 +274,11 @@ function escapeHtml(value) {
 }
 
 function renderBookDescriptionHtml(book) {
-  if (!book.description?.trim()) {
+  const description = getBookDescription(book);
+  if (!description?.trim()) {
     return "";
   }
-  return `<div class="book-detail-description">${escapeHtml(book.description)}</div>`;
+  return `<div class="book-detail-description">${escapeHtml(description)}</div>`;
 }
 
 const unhideIcon = `
@@ -471,6 +472,7 @@ function updateHeaderLogo() {
 }
 
 function render() {
+  const activeBooks = getActiveBooks();
   const visible = getVisibleBooks();
 
   updateHeaderLogo();
@@ -508,7 +510,7 @@ function render() {
     }
   }
 
-  renderStats(visible, getActiveBooks());
+  renderStats(visible, activeBooks);
 
   if (!visible.length) {
     let message = "No books match your search.";

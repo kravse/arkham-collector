@@ -1,6 +1,25 @@
 /* Sort, search, filters, and visible book list */
 
+let sortedActiveCache = { mode: null, books: null };
+
+function invalidateSortedCache() {
+  sortedActiveCache.mode = null;
+  sortedActiveCache.books = null;
+}
+
+function getSortedActiveBooks() {
+  const mode = sortSelect.value;
+  if (sortedActiveCache.mode === mode && sortedActiveCache.books) {
+    return sortedActiveCache.books;
+  }
+  const sorted = sortBooks(getActiveBooks(), mode);
+  sortedActiveCache.mode = mode;
+  sortedActiveCache.books = sorted;
+  return sorted;
+}
+
 function onSortChange() {
+  invalidateSortedCache();
   saveSortPreference();
   render();
 }
@@ -39,18 +58,7 @@ function sortBooks(list, mode) {
 
 function matchesSearch(book, query) {
   if (!query) return true;
-  const haystack = [
-    book.title,
-    book.author,
-    book.coverArtist,
-    book.publicationDate,
-    book.decade,
-    book.listAuthor,
-  ]
-    .filter(Boolean)
-    .join(" ")
-    .toLowerCase();
-  return haystack.includes(query.toLowerCase());
+  return (book._searchHaystack || "").includes(query.toLowerCase());
 }
 
 function getStatTotal(all) {
@@ -106,7 +114,7 @@ function renderStats(visible, all) {
 function getVisibleBooks() {
   const query = searchInput.value.trim();
   const showHidden = showHiddenInput.checked;
-  return sortBooks(getActiveBooks(), sortSelect.value)
+  return getSortedActiveBooks()
     .filter((book) =>
       hiddenOnly ? book.hidden : showHidden || !book.hidden,
     )

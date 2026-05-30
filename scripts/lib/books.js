@@ -214,6 +214,30 @@ async function buildBookRecord(entry, imprint, id, progressLabel) {
   };
 }
 
+function splitBooksAndDescriptions(books) {
+  const descriptions = {};
+  const slim = books.map((book) => {
+    const { description, ...rest } = book;
+    if (description) {
+      descriptions[rest.id] = description;
+    }
+    return rest;
+  });
+  return { slim, descriptions };
+}
+
+function writeViewerBookScripts(books, dataDir) {
+  const { slim, descriptions } = splitBooksAndDescriptions(books);
+  const booksPath = path.join(dataDir, "books.js");
+  const descriptionsPath = path.join(dataDir, "descriptions.js");
+  fs.writeFileSync(booksPath, `window.BOOKS = ${JSON.stringify(slim, null, 2)};\n`);
+  fs.writeFileSync(
+    descriptionsPath,
+    `window.BOOK_DESCRIPTIONS = ${JSON.stringify(descriptions, null, 2)};\n`,
+  );
+  return { booksPath, descriptionsPath };
+}
+
 function writeOutput(payload) {
   fs.mkdirSync(DATA_DIR, { recursive: true });
   fs.mkdirSync(COVERS_DIR, { recursive: true });
@@ -242,15 +266,14 @@ function writeOutput(payload) {
   const output = { ...payload, books: scrapedBooks };
 
   const jsonPath = path.join(DATA_DIR, "books.json");
-  const jsPath = path.join(DATA_DIR, "books.js");
-
-  fs.writeFileSync(jsonPath, `${JSON.stringify(output, null, 2)}\n`);
-  fs.writeFileSync(
-    jsPath,
-    `window.BOOKS = ${JSON.stringify(scrapedBooks, null, 2)};\n`,
+  const { booksPath, descriptionsPath } = writeViewerBookScripts(
+    scrapedBooks,
+    DATA_DIR,
   );
 
-  return { jsonPath, jsPath };
+  fs.writeFileSync(jsonPath, `${JSON.stringify(output, null, 2)}\n`);
+
+  return { jsonPath, jsPath: booksPath, descriptionsPath };
 }
 
 module.exports = {
@@ -260,5 +283,7 @@ module.exports = {
   mergeCrawlResults,
   getBookMetadata,
   buildBookRecord,
+  splitBooksAndDescriptions,
+  writeViewerBookScripts,
   writeOutput,
 };

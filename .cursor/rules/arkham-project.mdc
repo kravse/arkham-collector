@@ -30,12 +30,12 @@ Do not edit the plan files in `.cursor/plans/` for this — only `README.md`. Ke
 | `js/viewer/` | Viewer app source modules; `npm run bundle-viewer` → `js/viewer-bundle.js` |
 | `css/` | All viewer styles — **no inline `<style>` in viewer.html** |
 | `scripts/` | Wikipedia crawler and data-sync CLI (CommonJS modules) |
-| `data/books.json`, `data/books.js` | Scraped book data only (`window.BOOKS`) |
+| `data/books.json`, `data/books.js`, `data/descriptions.js` | Scraped catalog: full JSON on disk; viewer loads slim `BOOKS` + `BOOK_DESCRIPTIONS` |
 | `data/edits.json`, `data/edits.js` | Manual edits keyed by book id (`window.BOOK_EDITS`); written only by `server.js` — only fields differing from scraped `books.json` (plus `hidden`, `deleted`); `npm run compact-edits` prunes redundant rows |
 | `my_collection/` | Sample owned-books CSV + `collection.js`; shipped in all builds; gear settings toggle sample (`arkham-sample-collection`) vs own (`arkham-collection`) |
 | `covers/` | Downloaded cover images |
 | `examples/` | Saved Wikipedia HTML for `--local` crawls |
-| `build.js` → `build/` | Static site (`npm run build`): read-only viewer, sample CSV bundled, collection via gear settings |
+| `build.js` → `build/` | Static site (`npm run build`): read-only viewer, `css/viewer.css`, slim books + descriptions JS, no `books.json` in deploy |
 | `server.js` | Dev server with PATCH/upload (`npm run serve`, port 8742) |
 | `my_script.js` | Thin wrapper → `scripts/index.js` (backward compat only) |
 

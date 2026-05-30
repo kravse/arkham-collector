@@ -45,7 +45,7 @@ Open `build/index.html` or deploy `build/`. The built site is read-only (no edit
 
 | Layer | Files | Written by | Purpose |
 |-------|--------|------------|---------|
-| **Scraped** | `data/books.json`, `data/books.js` | Crawler & sync scripts | Wikipedia bibliography rows: title, author, dates, cover files, descriptions, `goodreadsUrl`, etc. |
+| **Scraped** | `data/books.json`, `data/books.js`, `data/descriptions.js` | Crawler & sync scripts | Full JSON in `books.json`; viewer scripts split descriptions into `descriptions.js` for faster load |
 | **Edits** | `data/edits.json`, `data/edits.js` | `npm run serve` only | Overrides keyed by book `id`: only fields that differ from scraped `books.json` (plus `hidden` / `deleted` flags) |
 
 At load time, [`js/book-edits.js`](js/book-edits.js) merges scraped books with edits (`{ ...book, ...edit }`). **Edits win** for any field present in `edits.json`. Saving in the edit dialog compares each value to the scraped row and stores only differences, so a later crawl or sync can update fields you did not change.
@@ -57,6 +57,7 @@ Stable book `id` values come from imprint + Wikipedia URL + list year (see `scri
 ### Viewer (`viewer.html` + `js/viewer/`)
 
 - Vanilla HTML/CSS/JS — no bundler. UI markup in `viewer.html`; app code in `js/viewer/` (bundled to `js/viewer-bundle.js` via `npm run bundle-viewer`, also run automatically by `npm run build`).
+- Catalog loads from slim `data/books.js` plus `data/descriptions.js` (text loaded for the detail overlay). Production `build/` ships one `css/viewer.css` and does not include `data/books.json`.
 - Styles in [`css/`](css/) (load order matters; see project conventions).
 - Grid of cards; click a card for the detail overlay (Wikipedia **W**, Goodreads **G**, want-list, collection badges).
 - **Goodreads:** uses `goodreadsUrl` from data/edits when set; otherwise **G** opens a [Goodreads book search](https://www.goodreads.com/search) (title + author last name).
@@ -65,7 +66,7 @@ Stable book `id` values come from imprint + Wikipedia URL + list year (see `scri
 
 ### Build (`npm run build`)
 
-[`build.js`](build.js) writes a static site under **`build/`**: `viewer.html` → `index.html`, `window.READ_ONLY = true`, `my_collection/` for the sample toggle, CSS/JS/covers, merged `data/books.js`, plus `robots.txt` and a `noindex` meta tag. Deploy `build/` to [arkham-house.netlify.app](https://arkham-house.netlify.app) or any static host.
+[`build.js`](build.js) writes a static site under **`build/`**: `viewer.html` → `index.html`, `window.READ_ONLY = true`, `my_collection/` for the sample toggle, bundled `css/viewer.css`, JS/covers, merged slim `data/books.js` + `data/descriptions.js`, plus `robots.txt` and a `noindex` meta tag. Deploy `build/` to [arkham-house.netlify.app](https://arkham-house.netlify.app) or any static host.
 
 Hidden and deleted books are excluded from copied covers but remain in shipped data unless you filter elsewhere.
 
@@ -185,6 +186,7 @@ All npm scripts below run through `node scripts/index.js` with flags parsed in [
 | `css/` | All viewer styles |
 | `js/` | `book-edits.js`, `sanitize-text.js`, `viewer-bundle.js` |
 | `js/viewer/` | Viewer app source modules (see `npm run bundle-viewer`) |
+| `data/descriptions.js` | Scraped descriptions keyed by book id (`window.BOOK_DESCRIPTIONS`) |
 | `scripts/` | Crawler and sync CLI (`index.js`, `cli.js`, `config.js`, `lib/`, `tasks/`) |
 | `data/books.json` | Scraped catalog |
 | `data/edits.json` | Manual overrides |

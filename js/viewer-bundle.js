@@ -172,7 +172,30 @@ books.forEach((book) => {
   if (book.hidden === undefined) {
     book.hidden = false;
   }
+  prepareBookSearchIndex(book);
 });
+
+function prepareBookSearchIndex(book) {
+  book._searchHaystack = [
+    book.title,
+    book.author,
+    book.coverArtist,
+    book.publicationDate,
+    book.decade,
+    book.listAuthor,
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+}
+
+function getBookDescription(book) {
+  if (book.description) {
+    return book.description;
+  }
+  const map = window.BOOK_DESCRIPTIONS || {};
+  return map[book.id] ?? map[String(book.id)] ?? null;
+}
 
 function isDeleted(book) {
   return book.deleted === true;
@@ -335,6 +358,10 @@ function countCollectionRowsCovered(books, includeHidden) {
 /* Sample and own collection, want list, localStorage */
 
 async function loadCollectionCsvItems() {
+  if (readOnly && window.MY_COLLECTION?.length) {
+    return window.MY_COLLECTION;
+  }
+
   try {
     const response = await fetch("my_collection/my_collection.csv");
     if (response.ok) {
@@ -598,7 +625,26 @@ function getCollectionCount() {
 
 /* Sort, search, filters, and visible book list */
 
+let sortedActiveCache = { mode: null, books: null };
+
+function invalidateSortedCache() {
+  sortedActiveCache.mode = null;
+  sortedActiveCache.books = null;
+}
+
+function getSortedActiveBooks() {
+  const mode = sortSelect.value;
+  if (sortedActiveCache.mode === mode && sortedActiveCache.books) {
+    return sortedActiveCache.books;
+  }
+  const sorted = sortBooks(getActiveBooks(), mode);
+  sortedActiveCache.mode = mode;
+  sortedActiveCache.books = sorted;
+  return sorted;
+}
+
 function onSortChange() {
+  invalidateSortedCache();
   saveSortPreference();
   render();
 }
@@ -637,18 +683,7 @@ function sortBooks(list, mode) {
 
 function matchesSearch(book, query) {
   if (!query) return true;
-  const haystack = [
-    book.title,
-    book.author,
-    book.coverArtist,
-    book.publicationDate,
-    book.decade,
-    book.listAuthor,
-  ]
-    .filter(Boolean)
-    .join(" ")
-    .toLowerCase();
-  return haystack.includes(query.toLowerCase());
+  return (book._searchHaystack || "").includes(query.toLowerCase());
 }
 
 function getStatTotal(all) {
@@ -704,7 +739,7 @@ function renderStats(visible, all) {
 function getVisibleBooks() {
   const query = searchInput.value.trim();
   const showHidden = showHiddenInput.checked;
-  return sortBooks(getActiveBooks(), sortSelect.value)
+  return getSortedActiveBooks()
     .filter((book) =>
       hiddenOnly ? book.hidden : showHidden || !book.hidden,
     )
@@ -991,10 +1026,11 @@ function escapeHtml(value) {
 }
 
 function renderBookDescriptionHtml(book) {
-  if (!book.description?.trim()) {
+  const description = getBookDescription(book);
+  if (!description?.trim()) {
     return "";
   }
-  return `<div class="book-detail-description">${escapeHtml(book.description)}</div>`;
+  return `<div class="book-detail-description">${escapeHtml(description)}</div>`;
 }
 
 const unhideIcon = `
@@ -1188,6 +1224,7 @@ function updateHeaderLogo() {
 }
 
 function render() {
+  const activeBooks = getActiveBooks();
   const visible = getVisibleBooks();
 
   updateHeaderLogo();
@@ -1225,7 +1262,7 @@ function render() {
     }
   }
 
-  renderStats(visible, getActiveBooks());
+  renderStats(visible, activeBooks);
 
   if (!visible.length) {
     let message = "No books match your search.";
@@ -1365,8 +1402,9 @@ function openBookDetail(bookId) {
   );
 
   const metaHtml = renderBookMetaHtml(book);
-  const descriptionHtml = book.description?.trim()
-    ? `<div class="book-detail-description">${escapeHtml(book.description)}</div>`
+  const description = getBookDescription(book);
+  const descriptionHtml = description?.trim()
+    ? `<div class="book-detail-description">${escapeHtml(description)}</div>`
     : `<div class="book-detail-description book-detail-description--empty" aria-hidden="true"></div>`;
 
   const detailDateHtml = book.publicationDate
@@ -1436,7 +1474,7 @@ function openEditDialog(bookId) {
   editPublicationDateInput.value = book.publicationDate || "";
   editWikipediaUrlInput.value = book.wikipediaUrl || "";
   editGoodreadsUrlInput.value = resolveGoodreadsUrl(book) || "";
-  editDescriptionInput.value = book.description || "";
+  editDescriptionInput.value = getBookDescription(book) || "";
   editCoverFileInput.value = "";
   editDialog.hidden = false;
   editTitleInput.focus();
@@ -1597,11 +1635,12 @@ async function deleteBook() {
       throw new Error(payload.error || "Could not delete book");
     }
 
-    if (book) {
-      book.deleted = true;
-    }
+          if (book) {
+            book.deleted = true;
+          }
+          invalidateSortedCache();
 
-    if (detailBookId === editingBookId) {
+          if (detailBookId === editingBookId) {
       closeBookDetail();
     }
 
@@ -1648,6 +1687,9 @@ function applyEditResponseToBook(bookId, payload) {
   } else {
     delete window.BOOK_EDITS[key];
   }
+
+  prepareBookSearchIndex(book);
+  invalidateSortedCache();
 }
 
 async function saveBookEdits(event) {
@@ -1929,20 +1971,45 @@ function updateSearchClearVisibility() {
   searchClearBtn.hidden = !searchInput.value;
 }
 
-function onSearchChange() {
-  updateSearchClearVisibility();
+let searchRenderTimer = null;
+
+function renderNow() {
+  if (searchRenderTimer) {
+    clearTimeout(searchRenderTimer);
+    searchRenderTimer = null;
+  }
   render();
+}
+
+function debouncedRender() {
+  if (searchRenderTimer) {
+    clearTimeout(searchRenderTimer);
+  }
+  searchRenderTimer = setTimeout(() => {
+    searchRenderTimer = null;
+    render();
+  }, 200);
+}
+
+function onSearchInput() {
+  updateSearchClearVisibility();
+  debouncedRender();
+}
+
+function onSearchCommit() {
+  updateSearchClearVisibility();
+  renderNow();
 }
 
 searchClearBtn.addEventListener("click", () => {
   searchInput.value = "";
   searchInput.focus();
-  onSearchChange();
+  onSearchCommit();
 });
 
-searchInput.addEventListener("input", onSearchChange);
-searchInput.addEventListener("search", onSearchChange);
-searchInput.addEventListener("change", onSearchChange);
+searchInput.addEventListener("input", onSearchInput);
+searchInput.addEventListener("search", onSearchCommit);
+searchInput.addEventListener("change", onSearchCommit);
 sortSelect.addEventListener("change", onSortChange);
 showHiddenInput.addEventListener("change", render);
 
@@ -1993,9 +2060,13 @@ stats.addEventListener("click", (event) => {
   }
 });
 
-checkServeSupport()
-  .then(() => ensureSampleCollectionIds())
-  .then(render);
+if (readOnly) {
+  ensureSampleCollectionIds().then(render);
+} else {
+  checkServeSupport()
+    .then(() => ensureSampleCollectionIds())
+    .then(render);
+}
 
 })();
 

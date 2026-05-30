@@ -13,7 +13,7 @@ window.BOOKS = [
     "coverImageUrl": null,
     "coverImageFile": null,
     "error": null,
-    "description": "The Arkham Sampler was an American fantasy and horror fiction magazine first published in Winter 1948. The headquarters was in Sauk City, Wisconsin. The magazine, edited by August Derleth, was the first of two magazines published by Arkham House. It was published on a quarterly basis. The cover design was prepared by Ronald Clyne and was printed in alternating colors for the eight quarterly issues. Each issue had a print run of 1,200 copies with the exception of the Winter 1949 \"All Science-Fiction Issue\", of which 2,000 copies were printed. The Autumn 1949 issue was the last edition of the magazine.\n\nThe Arkham Sampler published fiction, poetry, reviews, letters, articles and bibliographic data. The magazine published original works by H. P. Lovecraft, Ray Bradbury, Robert E. Howard, Theodore Sturgeon, A. E. van Vogt, Robert Bloch and others. Other writers featured in the magazine include Anthony Boucher, Everett F. Bleiler, Martin Gardner, Carl Jacobi, David H. Keller, Fritz Leiber, Frank Belknap Long, E. Hoffmann Price, Vincent Starrett, Jules Verne and H. Russell Wakefield."
+    "hidden": true
   },
   {
     "id": 232,
@@ -29,7 +29,7 @@ window.BOOKS = [
     "coverImageUrl": null,
     "coverImageFile": null,
     "error": null,
-    "description": null
+    "hidden": true
   },
   {
     "id": 233,
@@ -45,7 +45,7 @@ window.BOOKS = [
     "coverImageUrl": null,
     "coverImageFile": null,
     "error": null,
-    "description": null
+    "hidden": true
   },
   {
     "id": 234,
@@ -61,7 +61,7 @@ window.BOOKS = [
     "coverImageUrl": null,
     "coverImageFile": null,
     "error": null,
-    "description": null
+    "hidden": true
   },
   {
     "id": 235,
@@ -77,7 +77,7 @@ window.BOOKS = [
     "coverImageUrl": null,
     "coverImageFile": null,
     "error": null,
-    "description": null
+    "hidden": true
   },
   {
     "id": 236,
@@ -93,7 +93,7 @@ window.BOOKS = [
     "coverImageUrl": null,
     "coverImageFile": null,
     "error": null,
-    "description": null
+    "hidden": true
   },
   {
     "id": 237,
@@ -109,7 +109,7 @@ window.BOOKS = [
     "coverImageUrl": null,
     "coverImageFile": null,
     "error": null,
-    "description": null
+    "hidden": true
   },
   {
     "id": 428,
@@ -125,7 +125,7 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/commons/2/26/The_Shunned_House.jpg",
     "coverImageFile": "covers/the-shunned-house-8.jpg",
     "error": null,
-    "description": "\"The Shunned House\" is a horror fiction novelette by American author H. P. Lovecraft, written on October 16–19, 1924. It was first published in the October 1937 issue of Weird Tales."
+    "hidden": true
   },
   {
     "id": 239,
@@ -141,7 +141,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/a/a4/Evermore_%28cover%29.jpg",
     "coverImageFile": "covers/evermore-anthology-9.jpg",
     "error": null,
-    "description": "Evermore is an anthology of short stories about or in honor of Edgar Allan Poe and edited by James Robert Smith and Stephen Mark Rainey. It was released in 2006 by Arkham House in an edition of approximately 2,000 copies.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/36505.Evermore"
   },
   {
@@ -158,7 +157,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/d/db/Other_worlds_than_ours.jpg",
     "coverImageFile": "covers/other-worlds-than-ours-10.jpg",
     "error": null,
-    "description": "Other Worlds Than Ours is a collection of science fiction short stories by Nelson Bond. It was released in 2005 by Arkham House in an edition of approximately 2,000 copies. It was the author's third book published by Arkham House following Nightmares and Daydreams (1968) and The Far Side of Nowhere (2002). The stories originally appeared in the magazines Astounding, Thrilling Wonder Stories, Planet Stories and Blue Book.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/64730.Other_Worlds_Than_Ours"
   },
   {
@@ -175,7 +173,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/0/04/Cave_of_a_thousand_tales.jpg",
     "coverImageFile": "covers/cave-of-a-thousand-tales-11.jpg",
     "error": null,
-    "description": "Cave of a Thousand Tales: The Life and Times of Pulp Author Hugh B. Cave is a biography of Hugh B. Cave written by Milt Thomas. It was released in 2004 by Arkham House in an edition of approximately 2,500 copies. It was Thomas' first book published by Arkham House. The book was nominated for an International Horror Guild Award in 2004.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/646434.Cave_of_a_Thousand_Tales"
   },
   {
@@ -192,7 +189,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/4/4b/Selected_letters_CAS.jpg",
     "coverImageFile": "covers/selected-letters-of-clark-ashton-smith-12.jpg",
     "error": null,
-    "description": "Selected Letters of Clark Ashton Smith is a book of letters by American writer Clark Ashton Smith. It was released in 2003 by Arkham House in an edition of approximately 3,000 copies. The collection was edited by David E. Schultz and Scott Conners.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/218440.Selected_Letters"
   },
   {
@@ -209,7 +205,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/f/f6/Cleansing_harvey.jpg",
     "coverImageFile": "covers/the-cleansing-novel-13.jpg",
     "error": null,
-    "description": "The Cleansing is a horror novel by author John D. Harvey. It was released in 2002 by Arkham House in an edition of approximately 2,500 copies.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/2717148-the-cleansing"
   },
   {
@@ -226,7 +221,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/0/06/Far_side_of_nowhere.jpg",
     "coverImageFile": "covers/the-far-side-of-nowhere-14.jpg",
     "error": null,
-    "description": "The Far Side of Nowhere is a collection of fantasy and horror stories by author Nelson Bond. It was released in 2002 and was the author's second book published by Arkham House. It was published in an edition of approximately 2,500 copies. The stories originally appeared in Amazing Stories, Blue Book, Fantastic Adventures, Weird Tales and other magazines.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/994129.The_Far_Side_of_Nowhere"
   },
   {
@@ -243,7 +237,7 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/c/cc/Book_of_the_dead_price.jpg",
     "coverImageFile": "covers/book-of-the-dead-memoir-15.jpg",
     "error": null,
-    "description": "Book of the Dead: Friends of Yesteryear: Fictioneers & Others is a collection of memoirs by author E. Hoffmann Price. It was published in 2001 by Arkham House in an edition of approximately 4,000 copies. The book contains memoirs of several writers of the pulp magazine era. Also included are several appreciations of Price by other authors."
+    "goodreadsUrl": "https://www.goodreads.com/book/show/370614.Book_of_the_Dead"
   },
   {
     "id": 246,
@@ -259,7 +253,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/3/3f/Arkham_masters_of_horror.jpg",
     "coverImageFile": "covers/arkhams-masters-of-horror-16.jpg",
     "error": null,
-    "description": "Arkham's Masters of Horror is an anthology of fantasy and horror stories edited by Peter Ruber. It was released by Arkham House in an edition of approximately 4,000 copies in 2000. The book includes an introductory essay by Ruber before each story and about its author.\n\nRuber drew criticism from the horror/fantasy community for the hostility with which he introduced some authors within the volume - for instance, his accusation that H.P. Lovecraft \"had a schizoid personality\" and could be labelled \"a genuine crackpot.\"\n\nThe book was translated into Spanish in 2010 as Maestros del horror de Arkham House (Valdemar).",
     "goodreadsUrl": "https://www.goodreads.com/book/show/1172348"
   },
   {
@@ -276,7 +269,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/3/34/In_the_stone_house.jpg",
     "coverImageFile": "covers/in-the-stone-house-17.jpg",
     "error": null,
-    "description": "In the Stone House is a collection of science fiction, fantasy and horror stories by American writer Barry N. Malzberg. It was released in 2000 and was the author's first book published by Arkham House. It was published in an edition of approximately 2,500 copies. The stories originally appeared in The Magazine of Fantasy and Science Fiction, Omni, Science Fiction Age and other magazines.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/3185726-in-the-stone-house"
   },
   {
@@ -293,7 +285,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/0/05/Sixty_years_of_arkham_house.jpg",
     "coverImageFile": "covers/sixty-years-of-arkham-house-18.jpg",
     "error": null,
-    "description": "Sixty Years of Arkham House is a bibliography of books published from 1939 to 1999 under the imprints of Arkham House, Mycroft & Moran and Stanton & Lee. It was released in 1999 by Arkham House in an edition of approximately 3,500 copies. The book updates Thirty Years of Arkham House, 1939-1969: A History and Bibliography adding extensive biographical and bibliographical notes.\n\nIt won the Locus Award for Best Non-fiction in 2000.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/1172349.Sixty_Years_of_Arkham_House"
   },
   {
@@ -310,7 +301,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/0/02/Dragonfly_durbin.jpg",
     "coverImageFile": "covers/dragonfly-durbin-novel-19.jpg",
     "error": null,
-    "description": "Dragonfly is a fantasy, horror novel by author Frederic S. Durbin. It was released in 1999 by Arkham House in an edition of 4,000 copies. It was the author's first novel.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/1579790.Dragonfly"
   },
   {
@@ -327,7 +317,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/3/32/New_horizons.jpg",
     "coverImageFile": "covers/new-horizons-book-20.jpg",
     "error": null,
-    "description": "New Horizons is an anthology of science fiction stories edited by American writer August Derleth. It was released posthumously by the specialty house publisher Arkham House in a hardcover edition of 2,917 copies. While the title page gives the date of publication as 1998, the book was not actually printed and released until 1999. The book is an anthology that Derleth had planned in the early 1960s, but never published.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/50254675-new-horizons"
   },
   {
@@ -344,7 +333,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/7/7f/Lovecraft_remembered.jpg",
     "coverImageFile": "covers/lovecraft-remembered-21.jpg",
     "error": null,
-    "description": "Lovecraft Remembered is a collection of memoirs about American writer H. P. Lovecraft, edited by Peter Cannon. It was released in 1998 by Arkham House in an edition of 3,579 copies. Nearly all the memoirs from previous Arkham publications of Lovecraft miscellany are included.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/100091.Lovecraft_Remembered"
   },
   {
@@ -361,7 +349,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/2/2c/Flowers_from_the_moon.jpg",
     "coverImageFile": "covers/flowers-from-the-moon-and-other-lunacies-22.jpg",
     "error": null,
-    "description": "Flowers from the Moon and Other Lunacies is a collection of horror and fantasy stories by American writer Robert Bloch. It was released in 1998 and was the author's third book published by Arkham House. It was published in an edition of 2,565 copies. The stories, selected by Robert M. Price, originally appeared in the magazines Weird Tales, Strange Stories, and Rogue. The collection includes some Cthulhu Mythos stories.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/730584.Flowers_from_the_Moon_and_Other_Lunacies"
   },
   {
@@ -378,7 +365,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/1/1e/Voyages_by_starlight.jpg",
     "coverImageFile": "covers/voyages-by-starlight-23.jpg",
     "error": null,
-    "description": "Voyages by Starlight is a collection of science fiction and horror stories by British writer Ian R. MacLeod. It was released in 1996 and was the author's first book. It was published by Arkham House in an edition of 2,542 copies. The stories originally appeared in Isaac Asimov's Science Fiction Magazine, The Magazine of Fantasy and Science Fiction and Weird Tales.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/440327.Voyages_by_Starlight"
   },
   {
@@ -395,7 +381,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/9/9c/Synthesis_and_other_virtual_realities.jpg",
     "coverImageFile": "covers/synthesis-other-virtual-realities-24.jpg",
     "error": null,
-    "description": "Synthesis & Other Virtual Realities is a collection of science fiction stories by American writer Mary Rosenblum. It was released in 1996 and was the author's first collection of stories. It was published by Arkham House in an edition of 3,515 copies. The stories originally appeared in Isaac Asimov's Science Fiction Magazine.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/1463014"
   },
   {
@@ -412,7 +397,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/f/fc/Cthulhu_2000.jpg",
     "coverImageFile": "covers/cthulhu-2000-25.jpg",
     "error": null,
-    "description": "Cthulhu 2000: A Lovecraftian Anthology was edited by Jim Turner, first published by Arkham House in 1995 in an edition of 4,927 copies. As in his earlier collection, Turner criticizes the \"latter-day Mythos pastiche\" as simply \"a banal modern horror story, preceded by the inevitable Necronomicon epigraph and indiscriminately interspersed with sesquipedalian deities, ichor-oozing tentacles, sundry eldritch abominations, and then the whole sorry mess rounded off with a cachinnating chorus of \"Iä! Iä!\"-chanting frogs.\" He declares that \"the works collected in the present volume are not great Lovecraft stories; they rather are great stories in some way inspired by Lovecraft.\"",
     "goodreadsUrl": "https://www.goodreads.com/book/show/620486.Cthulhu_2000"
   },
   {
@@ -429,7 +413,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/f/fe/Miscellaneous_writings.jpg",
     "coverImageFile": "covers/miscellaneous-writings-26.jpg",
     "error": null,
-    "description": "Miscellaneous Writings is a collection of short stories, essays and letters by author H. P. Lovecraft. It was released in 1995 by Arkham House in an edition of 4,959 copies. The volume was originally conceived by August Derleth and ultimately edited by S.T. Joshi with input from James Turner.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/102590.Miscellaneous_Writings"
   },
   {
@@ -446,7 +429,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/f/fe/Breath_of_suspension.jpg",
     "coverImageFile": "covers/the-breath-of-suspension-27.jpg",
     "error": null,
-    "description": "The Breath of Suspension is a collection of science fiction stories by American writer Alexander Jablokov. It was released in 1994. It was the author's first book published by Arkham House. It was published in an edition of 3,496 copies. The stories originally appeared in Isaac Asimov's Science Fiction Magazine.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/1680715.The_Breath_of_Suspension"
   },
   {
@@ -463,7 +445,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/1/1a/Aliens_of_earth.jpg",
     "coverImageFile": "covers/the-aliens-of-earth-28.jpg",
     "error": null,
-    "description": "The Aliens of Earth is a collection of science fiction stories by American writer Nancy Kress. It was released in 1993 and was the author's first book published by Arkham House. It was published in an edition of 3,520 copies. Most of the stories originally appeared in Isaac Asimov's Science Fiction Magazine.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/632673.The_Aliens_of_Earth"
   },
   {
@@ -480,7 +461,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/c/c3/Alone_with_the_horrors.jpg",
     "coverImageFile": "covers/alone-with-the-horrors-the-great-short-fiction-of-ramsey-campbell-1961-1991-29.jpg",
     "error": null,
-    "description": "Alone with the Horrors: The Great Short Fiction of Ramsey Campbell 1961–1991 is a collection of fantasy and horror stories by British author Ramsey Campbell. Released in 1993 in an edition of 3,834 copies, it was the author's fourth collection of stories to be published by Arkham House. The contents consist of 39 of Campbell's previously uncollected tales along with a selection of works drawn from each of Campbell's Arkham collections as well as the mass-market collections Dark Companions (1982), Scared Stiff (1986) and Waking Nightmares (1991).\n\nA mass-market edition was issued by Tor Books in 2005. It has a different introduction, and \"The Room in the Castle\" was replaced with \"The Tower from Yuggoth\", a first-draft (but published) version of \"The Mine on Yuggoth\", which appeared in The Inhabitant of the Lake and Less Welcome Tenants. The Tor edition also omits \"Stages\" and \"Loveman's Comeback\" from the Arkham House edition, for a total of 37 stories rather than 39.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/1093602"
   },
   {
@@ -497,7 +477,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/6/63/Meeting_in_infinity.jpg",
     "coverImageFile": "covers/meeting-in-infinity-30.jpg",
     "error": null,
-    "description": "Meeting in Infinity is a collection of science fiction stories by American writer John Kessel. It was released in 1992 and was the author's first book published by Arkham House. It was published in an edition of 3,547 copies. Most of the stories originally appeared in Isaac Asimov's Science Fiction Magazine and The Magazine of Fantasy and Science Fiction. \"Another Orphan\" won a Nebula Award in 1982.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/1138866.Meeting_in_Infinity"
   },
   {
@@ -514,7 +493,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/0/07/Lord_kelvins_machine.jpg",
     "coverImageFile": "covers/lord-kelvins-machine-31.jpg",
     "error": null,
-    "description": "Lord Kelvin's Machine is a science fiction novel by American writer James P. Blaylock. It was released in 1992 by Arkham House in an edition of 4,015 copies. The author's first book published by Arkham House, the novel is the third in Blaylock's Steampunk series, following The Digging Leviathan (1984) and Homunculus (1986). The first part of the book was formed of an earlier novelette of the same name, which first appeared in the Mid-December 1985 issue of Isaac Asimov's Science Fiction Magazine.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/421038.Lord_Kelvin_s_Machine"
   },
   {
@@ -531,7 +509,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/e/e8/Gravitys_angels.jpg",
     "coverImageFile": "covers/gravitys-angels-32.jpg",
     "error": null,
-    "description": "Gravity's Angels is a collection of science fiction stories by American writer Michael Swanwick. It was released in 1991, and was the author's first book published by Arkham House. It was published in an edition of 4,119 copies. The stories originally appeared in Isaac Asimov's Science Fiction Magazine, Omni, and other magazines.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/243855.Gravity_s_Angels"
   },
   {
@@ -548,7 +525,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/5/5c/The_Ends_of_the_Earth_%28anthology%29_coverart.jpg",
     "coverImageFile": "covers/the-ends-of-the-earth-science-fiction-stories-33.jpg",
     "error": null,
-    "description": "The Ends of the Earth is a collection of science fiction and horror stories by American writer Lucius Shepard. It was released in 1991 and was the author's second book published by Arkham House. It was published in an edition of 4,655 copies. The stories originally appeared in Isaac Asimov's Science Fiction Magazine, The Magazine of Fantasy and Science Fiction and other magazines.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/505175.The_Ends_Of_The_Earth"
   },
   {
@@ -565,25 +541,24 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/6/62/Her_smoke_rose_up_forever.jpg",
     "coverImageFile": "covers/her-smoke-rose-up-forever-34.jpg",
     "error": null,
-    "description": "Her Smoke Rose Up Forever is a collection of science fiction and fantasy stories by American author James Tiptree, Jr. It was originally released in 1990 by Arkham House, in an edition of 4,108 copies and was the author's second book published by Arkham House. It was later released to a wider audience in paperback form in 2004 from Tachyon Publications.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/27059.Her_Smoke_Rose_Up_Forever"
   },
   {
     "id": 265,
     "imprint": "arkham_house",
-    "decade": "1980s",
+    "decade": "1990s",
     "listTitle": "Tales of the Cthulhu Mythos",
     "listAuthor": "by H. P. Lovecraft and Divers Hands (1989)",
     "title": "Tales of the Cthulhu Mythos",
     "author": "H. P. Lovecraft and others",
     "coverArtist": "Lee Brown Coye",
-    "publicationDate": "1989",
-    "wikipediaUrl": "https://en.wikipedia.org/wiki/Tales_of_the_Cthulhu_Mythos%3A_Golden_Anniversary_Anthology",
+    "publicationDate": "1990",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Cthulhu_Mythos_anthology#Tales_of_the_Cthulhu_Mythos:_Golden_Anniversary_Anthology",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/7/7e/Tales_of_the_Cthulhu_Mythos.jpg",
-    "coverImageFile": "covers/tales-of-the-cthulhu-mythos-golden-anniversary-anthology-35.jpg",
+    "coverImageFile": "covers/tales-of-the-cthulhu-mythos-golden-anniversary-anthology-265.jpg",
     "error": null,
-    "description": "A Cthulhu Mythos anthology is a type of short story collection that contains stories written in, or related to, the Cthulhu Mythos genre of horror fiction launched by H. P. Lovecraft. Such anthologies have helped to define and popularize the genre.",
-    "goodreadsUrl": "https://www.goodreads.com/book/show/36320.Tales_of_the_Cthulhu_Mythos"
+    "goodreadsUrl": "https://www.goodreads.com/book/show/36320.Tales_of_the_Cthulhu_Mythos",
+    "coverEditPath": "covers/tales-of-the-cthulhu-mythos-golden-anniversary-anthology-265.jpg"
   },
   {
     "id": 266,
@@ -599,7 +574,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/a/a0/Crystal_express.jpg",
     "coverImageFile": "covers/crystal-express-36.jpg",
     "error": null,
-    "description": "Crystal Express is a collection of science fiction and fantasy stories by American author Bruce Sterling. It was released in 1989 by Arkham House. It was initially published in an edition of 4,231 copies and was the author's first book published by Arkham House.\n\nMany of the stories appeared in Isaac Asimov's Science Fiction Magazine and The Magazine of Fantasy and Science Fiction, and the first five stories are set in Sterling's Shaper/Mechanist universe.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/359385.Crystal_Express"
   },
   {
@@ -614,10 +588,10 @@ window.BOOKS = [
     "publicationDate": "1989",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Horror_in_the_Museum_and_Other_Revisions",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/8/82/Horror_in_the_museum.jpg",
-    "coverImageFile": "covers/the-horror-in-the-museum-and-other-revisions-37.jpg",
+    "coverImageFile": "covers/the-horror-in-the-museum-and-other-revisions-429.jpg",
     "error": null,
-    "description": "The Horror in the Museum and Other Revisions is a collection of stories revised or ghostwritten by American author H. P. Lovecraft. It was originally published in 1970 by Arkham House in an edition of 4,058 copies. The dustjacket of the first edition features art by Gahan Wilson.\n\nThe collection was revised in 1989 by S. T. Joshi adding an introduction by Joshi, correcting the texts and expanding the contents.\n\nIn 2007, Del Rey published a trade paperback version with a new introduction by Stephen Jones, and a brief biography of Lovecraft at the end.\n\nThe revised version of Lovecraft's revisions includes Henry S. Whitehead's \"The Trap\" but not the other two stories by Whitehead in which Lovecraft had a hand (\"Cassius\" and \"Bothon\"). The revised version also includes two collaborations by Lovecraft with Robert H. Barlow, but not the other tales on which they worked together, of which there are four or five. Sonia Greene's \"Four O'Clock\" is omitted from the revised version, S.T. Joshi having determined that this tale is not properly a part of the Lovecraft corpus; the story is entirely Sonia's, Lovecraft having simply made a few suggestions as to its prose style.",
-    "goodreadsUrl": "https://www.goodreads.com/book/show/1157900.The_Horror_in_the_Museum"
+    "goodreadsUrl": "https://www.goodreads.com/book/show/1157900.The_Horror_in_the_Museum",
+    "coverEditPath": "covers/the-horror-in-the-museum-and-other-revisions-429.jpg"
   },
   {
     "id": 268,
@@ -633,7 +607,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/8/8b/Memories_of_the_space_age.jpg",
     "coverImageFile": "covers/memories-of-the-space-age-38.jpg",
     "error": null,
-    "description": "Memories of the Space Age is a collection of science fiction stories by British writer J. G. Ballard. It was released in 1988 by Arkham House. It was published in an edition of 4,903 copies and was the author's first book published by Arkham House. The stories, set at Cape Canaveral, originally appeared in the magazines Ambit, Fantastic Stories, Fantasy and Science Fiction, Interzone, New Worlds and Playboy.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/70274.Memories_of_the_Space_Age"
   },
   {
@@ -650,7 +623,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/c/c7/Rendezvous_in_averoigne.jpg",
     "coverImageFile": "covers/a-rendezvous-in-averoigne-39.jpg",
     "error": null,
-    "description": "A Rendezvous in Averoigne is a collection of science fiction, fantasy and horror stories by American writer Clark Ashton Smith. It was released in 1988 by Arkham House in an edition of 5,025 copies. The collection contains stories from Smith's major story cycles of Averoigne, Hyperborea, Poseidonis, Xiccarph, and Zothique. Its title story is a relatively conventional vampire story.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/102095.A_Rendezvous_in_Averoigne"
   },
   {
@@ -667,7 +639,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/0/01/Polyphemus_shea.jpg",
     "coverImageFile": "covers/polyphemus-book-40.jpg",
     "error": null,
-    "description": "Polyphemus is a collection of science fiction, fantasy and horror stories by American writer Michael Shea. It was released in 1987 by Arkham House. It was published in an edition of 3,528 copies and was the author's first hardcover book. Most of the stories originally appeared in The Magazine of Fantasy and Science Fiction.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/101953.Polyphemus"
   },
   {
@@ -684,7 +655,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/e/e0/Jaguar_hunter.jpg",
     "coverImageFile": "covers/the-jaguar-hunter-41.jpg",
     "error": null,
-    "description": "The Jaguar Hunter is a collection of science fiction, fantasy and horror stories by American author Lucius Shepard. Illustrated by J. K. Potter, it was released in May 1987 and was the author's first book published by Arkham House. It was originally published in an edition of 3,194 copies, with a second printing later in 1987 of 1,508 copies. Bantam Books issued a trade paperback edition in 1989, and Four Walls Eight Windows reprinted the collection in 2001. The first British publication came as a Paladin Books trade paperback in 1988, followed quickly by a Kerosina Books hardcover. A Rumanian translation appeared in 2008.\n\nThe Jaguar Hunter won the 1988 World Fantasy Award for best collection, as well as the Locus Award in the same category. Five of the stories were nominated for the Nebula Award, one winning the award; three of those were also nominated for the Hugo Award; and one nominated, for the Hugo, Nebula, and World Fantasy Awards. Ten of the eleven stories placed in the annual Locus polls, eight reached the top ten, and two won Locus Awards.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/1481227.Jaguar_Hunter"
   },
   {
@@ -701,7 +671,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/9/9c/Tales_of_the_quintana_roo.jpg",
     "coverImageFile": "covers/tales-of-the-quintana-roo-42.jpg",
     "error": null,
-    "description": "Tales of the Quintana Roo is a collection of fantasy stories by American author Alice Sheldon, writing as James Tiptree Jr. It was released in 1986 and was the author's first book published by Arkham House. It was published in an edition of 3,673 copies. The stories originally appeared in Isaac Asimov's Science Fiction Magazine and The Magazine of Fantasy & Science Fiction and are set in the easternmost shore of the Yucatán Peninsula in Mexico. In addition to winning the world fantasy award for best collection in 1987, each of the stories was nominated or won genre awards, and \"What Came Ashore at Lirios\" was included in the Oxford Book of Fantasy Stories.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/629950.Tales_of_the_Quintana_Roo"
   },
   {
@@ -718,7 +687,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/9/92/Dreams_of_dark_and_light.jpg",
     "coverImageFile": "covers/dreams-of-dark-and-light-the-great-short-fiction-of-tanith-lee-43.jpg",
     "error": null,
-    "description": "Dreams of Dark and Light: The Great Short Fiction of Tanith Lee is a collection of fantasy, horror and science fiction stories by author Tanith Lee. It was released in 1986 and was the author's first book published by Arkham House. It was published in an edition of 3,957 copies.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/363131.Dreams_of_Dark_and_Light"
   },
   {
@@ -733,10 +701,10 @@ window.BOOKS = [
     "publicationDate": "1986",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Dagon_and_Other_Macabre_Tales",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/8/8f/Dagon_first.jpg",
-    "coverImageFile": "covers/dagon-and-other-macabre-tales-44.jpg",
+    "coverImageFile": "covers/dagon-and-other-macabre-tales-430.jpg",
     "error": null,
-    "description": "Dagon and Other Macabre Tales is a collection of stories by American author H. P. Lovecraft, which also includes his essay on weird fiction, \"Supernatural Horror in Literature\". It was originally published in 1965 by Arkham House in an edition of 3,471 copies. Unlike some other first editions of Lovecraft collections issued by Arkham House in the mid-sixties, the true first edition is bound with head- and tailbands.\n\nThe collection was revised in 1986 by S.T. Joshi, replacing the introduction by August Derleth for one by Joshi and another by T. E. D. Klein. The bulk of the tales were also reordered chronologically, while some tales were moved to appendices. It was released in an edition of 4,023 copies, designated a 'corrected 5th printing'. This revised edition was read by Gordon Gould for the American Foundation for the Blind in 1987.",
-    "goodreadsUrl": "https://www.goodreads.com/book/show/102575.Dagon_and_Other_Macabre_Tales"
+    "goodreadsUrl": "https://www.goodreads.com/book/show/102575.Dagon_and_Other_Macabre_Tales",
+    "coverEditPath": "covers/dagon-and-other-macabre-tales-430.jpg"
   },
   {
     "id": 431,
@@ -750,10 +718,10 @@ window.BOOKS = [
     "publicationDate": "1985",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/At_the_Mountains_of_Madness_and_Other_Novels",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/a/a0/At_the_mountains_of_madness.jpg",
-    "coverImageFile": "covers/at-the-mountains-of-madness-and-other-novels-45.jpg",
+    "coverImageFile": "covers/at-the-mountains-of-madness-and-other-novels-431.jpg",
     "error": null,
-    "description": "At the Mountains of Madness and Other Novels is a collection of stories by American author H. P. Lovecraft. It was originally published in 1964 by Arkham House in an edition of 3,552 copies. The true first edition has no head- or tailbands and features a green dustjacket (as depicted right). (Later states of the dustjacket are red and orange.)\n\nThe collection was revised and the text restored in 1985 by S. T. Joshi, replacing the introduction by August Derleth for one by Joshi and another by James Turner. The 1985 edition was published in an edition of 3,990 copies and designated a \"corrected 5th printing\".",
-    "goodreadsUrl": "https://www.goodreads.com/book/show/32768.At_the_Mountains_of_Madness_and_Other_Novels"
+    "goodreadsUrl": "https://www.goodreads.com/book/show/32768.At_the_Mountains_of_Madness_and_Other_Novels",
+    "coverEditPath": "covers/at-the-mountains-of-madness-and-other-novels-431.jpg"
   },
   {
     "id": 432,
@@ -767,10 +735,10 @@ window.BOOKS = [
     "publicationDate": "1985",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Dunwich_Horror_and_Others",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/commons/6/63/Dunwich_Horror_and_Others_dust_jacket.jpg",
-    "coverImageFile": "covers/the-dunwich-horror-and-others-46.jpg",
+    "coverImageFile": "covers/the-dunwich-horror-and-others-432.webp",
     "error": null,
-    "description": "The Dunwich Horror and Others is a collection of fantasy, horror and science fiction short stories by American author H. P. Lovecraft. It was originally published in 1963 by Arkham House in an edition of 3,133 copies.\n\nThe true first edition is not bound with head- and tailbands, and the true first-state dustjacket carries a price of $5.00 (not $6.50 as on later printings). (Reportedly some copies lack head and tailbands, indicating the true first edition, but bear the $6.50 price on the dustjacket, suggesting that the publisher ran out of first-edition dustjackets before they ran out of first-edition books, so they raised the price to $6.50, sold the remaining first-edition volumes in second-state jackets, and then started reprinting the book).\n\nThe collection was revised in 1985 by S.T. Joshi, replacing the introduction by August Derleth for one by Joshi (\"A Note on the Texts\") and another by Robert Bloch (\"Heritage of Horror\"). This edition, designated a \"corrected sixth printing\", was published in an edition of 4,124 copies. Bloch's Introduction was reprinted here from its first appearance in The Best of H. P. Lovecraft: Bloodcurdling Tales of Horror and the Macabre.",
-    "goodreadsUrl": "https://www.goodreads.com/book/show/63213.The_Dunwich_Horror_and_Others"
+    "goodreadsUrl": "https://www.goodreads.com/book/show/63213.The_Dunwich_Horror_and_Others",
+    "coverEditPath": "covers/the-dunwich-horror-and-others-432.webp"
   },
   {
     "id": 277,
@@ -786,7 +754,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/2/2e/Lovecrafts_book.jpg",
     "coverImageFile": "covers/lovecrafts-book-47.jpg",
     "error": null,
-    "description": "Lovecraft's Book is a historical novel by American author Richard A. Lupoff. It was released in 1985 by Arkham House in an edition of 3,544 copies. It was the author's first book published by Arkham House.\n\nOriginally a 160,000-word manuscript, the published novel was a shorter popular re-write destined originally for mainstream publisher Putnam. When Putnam demanded even more re-writes, the Putnam version was sold to Arkham House and became Lovecraft's Book. The original 160,000-word manuscript was lost, but a carbon-copy was found in 2000 and the full original novel was published unabridged as Marblehead: A Novel of H. P. Lovecraft (2006).",
     "goodreadsUrl": "https://www.goodreads.com/book/show/1157899.Lovecraft_s_Book"
   },
   {
@@ -803,7 +770,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/0/07/Who_made_stevie_crye.jpg",
     "coverImageFile": "covers/who-made-stevie-crye-48.jpg",
     "error": null,
-    "description": "Who Made Stevie Crye?, subtitled A Novel of the American South, is a horror novel by American writer Michael Bishop. It was released in 1984 by Arkham House in an edition of 3,591 copies, and later in paperback by Headline. It was the author's first novel and third book published by Arkham House.\n\nA 30th Anniversary Edition was published by Fairwood Press in August 2014, including a new introduction by Jack Slay and a new afterword by the author. It also reprints the full-page black and white illustrations by J. K. Potter which were originally commissioned for the Arkham House edition.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/938985.Who_Made_Stevie_Crye_"
   },
   {
@@ -820,7 +786,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/f/fe/Watchers_at_the_strait_gate.jpg",
     "coverImageFile": "covers/watchers-at-the-strait-gate-49.jpg",
     "error": null,
-    "description": "Watchers at the Strait Gate is a collection of stories by American writer Russell Kirk. It was released in 1984 and was the author's second book published by Arkham House, and Kirk's third collection of supernatural stories. It was published in an edition of 3,459 copies.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/211910.Watchers_at_the_Strait_Gate"
   },
   {
@@ -837,7 +802,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/3/39/One_winter_in_eden.jpg",
     "coverImageFile": "covers/one-winter-in-eden-50.jpg",
     "error": null,
-    "description": "One Winter in Eden is a collection of science fiction and fantasy stories by author Michael Bishop. It was released in 1984 by Arkham House in an edition of 3,596 copies. It was the author's second book published by Arkham House.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/487820.One_Winter_in_Eden"
   },
   {
@@ -854,7 +818,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/f/fe/Zanzibar_cat.jpg",
     "coverImageFile": "covers/the-zanzibar-cat-51.jpg",
     "error": null,
-    "description": "The Zanzibar Cat is a science fiction collection of short stories by Joanna Russ, first published in 1983 by Arkham House. It was the author's first collection of short fiction and was published in an edition of 3,526 copies. The story \"When It Changed\" won a Nebula Award in 1972. \"Old Thoughts, Old Balances\" won a 1977 O. Henry Prize under the title \"The Autobiography of My Mother\".\n\nIt was reprinted (with revised contents) by Baen in 1984.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/2632650-the-zanzibar-cat"
   },
   {
@@ -871,7 +834,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/5/5d/Wind_from_a_burning_woman.jpg",
     "coverImageFile": "covers/the-wind-from-a-burning-woman-52.jpg",
     "error": null,
-    "description": "The Wind from a Burning Woman is a collection of science fiction stories by author Greg Bear. It was released in 1982 and was the author's first hardcover book. It was published by Arkham House in an edition of 3,046 copies.\n\nThe book is unusual among Arkham House publications in that a signed 'state' exists. Bear wanted to celebrate his first hardcover story collection with a limited edition, so he bought 250 copies himself, had special bookplates printed up, pasted them inside the front covers, and then signed each plate. He also had the two artists who worked on the book sign the plates. This state of the book was not strictly authorized by Arkham House, but can be considered a variant or special state of the volume.\n\nTwo of the included stories were nominated for a Nebula Award. \"Petra\" was nominated in 1983, but lost. \"Hardfought\" was nominated in 1984, and won.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/116324.The_Wind_from_a_Burning_Woman"
   },
   {
@@ -888,7 +850,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/8/8a/The_House_of_the_Wolf_%28Basil_Copper_novel_-_cover_art%29.jpg",
     "coverImageFile": "covers/the-house-of-the-wolf-53.jpg",
     "error": null,
-    "description": "The House of the Wolf is a Gothic horror novel by author Basil Copper. It was published by Arkham House in 1983 in an edition of 3,578 copies. It was the author's fourth book published by Arkham House. The book contains a number of interior black and white illustrations by Stephen E. Fabian.\n\nIn 2003 Sarob Press 2003 issued a limited edition of The House of the Wolf, limited to 150 copies, with cover art by Randy Broecker and interior illustrations by Stephen Jones.\n\nIn 2014 Valancourt Books reissued The House of the Wolf with Fabian's illustrations and a new Afterword by Stephen Jones.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/596680.The_House_of_the_Wolf"
   },
   {
@@ -905,7 +866,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/6/60/Darkling.jpg",
     "coverImageFile": "covers/the-darkling-54.jpg",
     "error": null,
-    "description": "The Darkling is a fantasy novel by author David Kesterton. It was published by Arkham House in 1982 in an edition of 3,126 copies. It was the author's first book.\n\nThe author complained of editorial interference with his prose which led to poor reviews, and with the aid of Anne McCaffrey and the Science Fiction Writers of America had Arkham House lawyers relinquish rights to the author. Arkham House retained the right to sell out the remaining copies of their edition.\n\nIn 2011, the author finally published a limited edition (105 copies) under the imprint of Necrominster Press which restored his preferred prose and added six illustrations to his 'corrected, authorized first edition'. This Necrominster Press edition is an associational oddity for Arkham House collectors.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/50254516-the-darkling"
   },
   {
@@ -922,7 +882,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/b/bb/Blooded_on_arachne.jpg",
     "coverImageFile": "covers/blooded-on-arachne-55.jpg",
     "error": null,
-    "description": "Blooded on Arachne is a collection of science fiction stories by American author Michael Bishop. It was published in 1982 by Arkham House in an edition of 4,081 copies. The volume, Bishop's first short fiction collection, contains two novellas as well as two poems.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/990036.Blooded_on_Arachne"
   },
   {
@@ -939,7 +898,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/8/82/Tales_from_the_nightside.jpg",
     "coverImageFile": "covers/tales-from-the-nightside-56.jpg",
     "error": null,
-    "description": "Tales from the Nightside is a collection of stories by American writer Charles L. Grant. It was released in 1981 and was the author's first book by Arkham House and was published in an edition of 4,121 copies. The book cover has been featured on Thrash Metal band Sepultura album Beneath the Remains.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/1597650.Tales_from_the_Nightside"
   },
   {
@@ -956,7 +914,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/a/ad/Collected_poems_tierney.jpg",
     "coverImageFile": "covers/collected-poems-richard-l-tierney-57.jpg",
     "error": null,
-    "description": "Collected Poems: Nightmares and Visions is a collection of poems by Richard L. Tierney. It was released in 1981 by Arkham House in an edition of 1,030 copies. The book is illustrated by Jason Van Hollander. The poems had previously appeared in such magazines as The Arkham Collector, Whispers, Nyctalops, Macabre, The Diversifier, Literary Magazine of Fantasy and Terror, Ambrosia, Dark Messenger Reader, Myrrdin, Fantasy Crossroads and others.\n\nLiterary historian Don Herron has stated that the collection presents Tierney as \"one of the most technically accomplished sonneteers of his generation, able to bring rhyming forms to bear on his own concerns, such as the especially nihilistic concluding poem \"To the Hydrogen Bomb\".",
     "goodreadsUrl": "https://www.goodreads.com/book/show/2628374-collected-poems"
   },
   {
@@ -973,7 +930,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/7/7e/Third_grave.jpg",
     "coverImageFile": "covers/the-third-grave-58.jpg",
     "error": null,
-    "description": "The Third Grave is a fantasy horror novel by author David Case. It was published by Arkham House in 1981 in an edition of 4,158 copies. It was Case's first book published by Arkham House. The novel was reissued in paperback by Valancourt Books in 2019.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/2805316-the-third-grave"
   },
   {
@@ -982,16 +938,16 @@ window.BOOKS = [
     "decade": "1980s",
     "listTitle": "New Tales of the Cthulhu Mythos",
     "listAuthor": "edited by Ramsey Campbell (1980)",
-    "title": "Tales of the Cthulhu Mythos",
-    "author": "H. P. Lovecraft and others",
+    "title": "New Tales of the Cthulhu Mythos",
+    "author": "Ramsey Campbell (Ed.)",
     "coverArtist": "Lee Brown Coye",
     "publicationDate": "1980",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/New_Tales_of_the_Cthulhu_Mythos",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/7/7e/Tales_of_the_Cthulhu_Mythos.jpg",
-    "coverImageFile": "covers/tales-of-the-cthulhu-mythos-golden-anniversary-anthology-35.jpg",
+    "coverImageFile": "covers/new-tales-of-the-cthulhu-mythos-289.jpg",
     "error": null,
-    "description": "A Cthulhu Mythos anthology is a type of short story collection that contains stories written in, or related to, the Cthulhu Mythos genre of horror fiction launched by H. P. Lovecraft. Such anthologies have helped to define and popularize the genre.",
-    "goodreadsUrl": "https://www.goodreads.com/book/show/36320.Tales_of_the_Cthulhu_Mythos"
+    "goodreadsUrl": "https://www.goodreads.com/book/show/36320.Tales_of_the_Cthulhu_Mythos",
+    "coverEditPath": "covers/new-tales-of-the-cthulhu-mythos-289.jpg"
   },
   {
     "id": 290,
@@ -1007,7 +963,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/3/3a/Necropolis_%28Copper_novel%29.jpg",
     "coverImageFile": "covers/necropolis-copper-novel-60.jpg",
     "error": null,
-    "description": "Necropolis is a Gothic novel by author Basil Copper. It was published by Arkham House in 1980 in an edition of 4,050 copies. It was Copper's third book published by Arkham House. Reprinted in 1981, it was the first Arkham House book (except works by Lovecraft and August Derleth) to receive a reprint. (Previous publications were limited editions printed once only).",
     "goodreadsUrl": "https://www.goodreads.com/book/show/228914.Necropolis"
   },
   {
@@ -1024,7 +979,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/0/03/Black_book_of_CAS.jpg",
     "coverImageFile": "covers/the-black-book-of-clark-ashton-smith-61.jpg",
     "error": null,
-    "description": "The Black Book of Clark Ashton Smith is Donald Sidney-Fryer and \"Rah\" Hoffmann's transcription of author Clark Ashton Smith's own literary notebook, used from 1929 for more than thirty years until Smith's death in 1961. \"This notebook contains plot ideas, bits of poetry in various states of completion, lists of fantastic names and titles of stories, both used and unused. The items in the Black Book have been carefully reproduced in the exact order in which they appeared in Smith's original notebook and each item has been numbered to aid in location and comparison, By comparing plot ideas with their corresponding finished tales, or first drafts of poems against the final versions, it is possible to gain insights into the creative process demonstrated by Smith.\"",
     "goodreadsUrl": "https://www.goodreads.com/book/show/3330433-the-black-book-of-clark-ashton-smith"
   },
   {
@@ -1041,7 +995,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/c/c4/Princess_of_all_lands.jpg",
     "coverImageFile": "covers/the-princess-of-all-lands-62.jpg",
     "error": null,
-    "description": "The Princess of All Lands is a collection of stories by American writer Russell Kirk. It was released in 1979 and was the author's first book published by Arkham House. It was published in an edition of 4,120 copies. The story \"There's a Long, Long Trail A-Winding\" had won a World Fantasy Award in 1977.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/927666.The_Princess_of_All_Lands"
   },
   {
@@ -1058,7 +1011,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/2/2a/In_the_Mist_and_Other_Uncanny_Encounters_%28book_cover%29.jpg",
     "coverImageFile": "covers/in-the-mist-and-other-uncanny-encounters-63.jpg",
     "error": null,
-    "description": "In the Mist and Other Uncanny Encounters is a collection of stories by British writer Elizabeth Walter. It was released in 1979 and was the author's first book published by Arkham House. It was published in an edition of 4,053 copies. The stories were selected by the author and were those she considered to be her best.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/3536238-in-the-mist-and-other-uncanny-encounters"
   },
   {
@@ -1075,7 +1027,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/e/e4/Half_in_shadow.jpg",
     "coverImageFile": "covers/half-in-shadow-64.jpg",
     "error": null,
-    "description": "Half in Shadow is a collection of stories by author Mary Elizabeth Counselman. Most of the stories had macabre or horror themes, and appeared previously in the magazine Weird Tales from the late 1930s through the 1950s. It includes the story \"The Three Marked Pennies\" one of the most popular in the magazine's history based on reader response.\n\nThe book had first been published as a fourteen story collection (six stories not in the later Arkham House edition) as a Consul paperback by World Distributors, UK, in 1964. It was released in 1978 by Arkham House with fourteen stories (six not in the earlier UK edition) and was the author's first hardcover book. It was published in an edition of 4,288 copies. The jacket and frontispiece are by Tim Kirk. There has also been a reprint - London: William Kimber, 1980.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/690677.Half_in_Shadow"
   },
   {
@@ -1092,7 +1043,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/2/22/Born_to_exile.jpg",
     "coverImageFile": "covers/born-to-exile-65.jpg",
     "error": null,
-    "description": "Born to Exile is a fantasy novel by American writer Phyllis Eisenstein, the first of her three Alaric novels. It was originally published in 1978 by longtime U. S. specialty press Arkham House in a first edition trade hardcover of 4,148 copies; it has since been published in several mass-market paperback editions and again in hardcover in the UK. Portions of the novel were first serialized as individual shorter works through The Magazine of Fantasy & Science Fiction. (The second novel in the series, In The Red Lord's Reach, was first published in 1989 as a mass-market paperback from Signet Books and as a 1992 UK hardcover from Grafton, having been first serialized in 1988 as three monthly installments in The Magazine of Fantasy and Science Fiction.)\n\nSheldon Jaffery states that this volume was the last Arkham House book to bear a colophon with the edition size stated, except for Clark Ashton Smith's The Black Book and Richard L. Tierney's Collected Poems.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/1095542.Born_to_Exile"
   },
   {
@@ -1109,7 +1059,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/b/b9/In_mayan_spledor.jpg",
     "coverImageFile": "covers/in-mayan-splendor-66.jpg",
     "error": null,
-    "description": "In Mayan Splendor is a collection of poems by Frank Belknap Long. It was released in 1977 by Arkham House in an edition of 2,947 copies. The book is illustrated by Stephen E. Fabian and contains the complete contents of Long's earlier verse collections, A Man from Genoa (1926) and The Goblin Tower (1935) plus additional poems.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/2570748-in-mayan-splendor"
   },
   {
@@ -1126,7 +1075,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/9/92/Horror_at_oakdeene.jpg",
     "coverImageFile": "covers/the-horror-at-oakdeene-and-others-67.jpg",
     "error": null,
-    "description": "The Horror at Oakdeene and Others is a collection of stories by author Brian Lumley. It was released in 1977 and was the author's third book published by Arkham House. It was published in an edition of 4,162 copies. Many of the stories are of the Cthulhu Mythos.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/1771090.The_Horror_at_Oakdeene_and_Others"
   },
   {
@@ -1143,7 +1091,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/8/8b/And_afterward_the_dark.jpg",
     "coverImageFile": "covers/and-afterward-the-dark-68.jpg",
     "error": null,
-    "description": "And Afterward, the Dark is a collection of stories by author Basil Copper. It was released in 1977 and was the author's second collection of stories published by Arkham House. It was published in an edition of 4,259 copies. One of the stories, \"Camera Obscura\", was produced in 1973 for the television series Night Gallery.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/872468.And_Afterward_the_Dark"
   },
   {
@@ -1160,7 +1107,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/4/46/Kecksies.jpg",
     "coverImageFile": "covers/kecksies-and-other-twilight-tales-69.jpg",
     "error": null,
-    "description": "Kecksies and Other Twilight Tales is a collection of stories by British writer Marjorie Bowen. It was released in 1976 and was the author's first collection of stories published in the United States. It was published by Arkham House in an edition of 4,391 copies.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/2570269-kecksies-and-other-twilight-tales"
   },
   {
@@ -1177,7 +1123,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/5/5a/Height_of_the_scream.jpg",
     "coverImageFile": "covers/the-height-of-the-scream-70.jpg",
     "error": null,
-    "description": "The Height of the Scream is a collection of horror stories by author Ramsey Campbell. Released in 1976 in an edition of 4,348 copies, it was the author's third collection of stories to be published by Arkham House.\n\nIt has since been reissued in various formats, most recently in a 2004 trade paperback from Babbage Press with a new introduction.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/2360600.The_Height_of_the_Scream"
   },
   {
@@ -1194,7 +1139,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/b/b0/Literary_Swordsmen_and_Sorcerers.jpg",
     "coverImageFile": "covers/literary-swordsmen-and-sorcerers-71.jpg",
     "error": null,
-    "description": "Literary Swordsmen and Sorcerers: The Makers of Heroic Fantasy is a work of collective biography on the formative authors of the heroic fantasy genre by L. Sprague de Camp (1907–2000), first published in 1976 by Arkham House in an edition of 5,431 copies. Nine chapters (2–10) are revisions from a series of ten articles, also titled \"Literary Swordsmen and Sorcerers,\" that initially appeared in the magazine Fantastic and the fanzine Amra between 1971 and 1976 (the tenth article, on L. Ron Hubbard, was omitted from the book). A French edition was issued in May 2010 under the title Les pionniers de la fantasy, and an ebook edition was issued in June 2014 by Gateway/Orion.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/421170.Literary_Swordsmen_and_Sorcerers"
   },
   {
@@ -1211,7 +1155,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/1/11/Dwellers_in_darkness.jpg",
     "coverImageFile": "covers/dwellers-in-darkness-72.jpg",
     "error": null,
-    "description": "Dwellers in Darkness is a collection of stories by American writer August Derleth. It was released in 1976 by Arkham House in an edition of 3,926 copies. It was the author's eighth collection of stories published by Arkham House. Two stories from Derleth's Judge Peck series are included in the collection. Also included is \"Ghost Lake\", the last story completed by Derleth before he died in 1971.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/2495030.Dwellers_in_Darkness"
   },
   {
@@ -1228,7 +1171,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/e/e9/SelectedLetters5.jpg",
     "coverImageFile": "covers/selected-letters-of-h-p-lovecraft-v-1934-1937-73.jpg",
     "error": null,
-    "description": "Selected Letters V (1934-1937) is a collection of letters by H. P. Lovecraft. It was released in 1976 by Arkham House in an edition of 5,138 copies. It is the fifth of a five volume series of collections of Lovecraft's letters and includes a preface by James Turner.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/102608.Selected_Letters_V"
   },
   {
@@ -1245,7 +1187,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/1/18/SelectedLetters4.jpg",
     "coverImageFile": "covers/selected-letters-of-h-p-lovecraft-iv-1932-1934-74.jpg",
     "error": null,
-    "description": "Selected Letters IV (1932–1934) is a collection of letters by H. P. Lovecraft. It was released in 1976 by Arkham House in an edition of 4,978 copies. It is the fourth of a five volume series of collections of Lovecraft's letters and includes a preface by James Turner.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/102610.Selected_Letters_IV"
   },
   {
@@ -1262,7 +1203,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/d/d6/Dreams_from_rlyeh.jpg",
     "coverImageFile": "covers/dreams-from-rlyeh-75.jpg",
     "error": null,
-    "description": "Dreams from R'lyeh is a collection of poems by Lin Carter. The book was released in hardcover by Arkham House in 1975 in an edition of 3,152 copies. It was Carter's only book published by Arkham House. The title sequence of sonnets, \"Dreams from R'lyeh\", has also been reprinted in Robert M. Price's The Xothic Legend Cycle: The Complete Mythos Fiction of Lin Carter (Chaosium, 1997).",
     "goodreadsUrl": "https://www.goodreads.com/book/show/806935.Dreams_from_R_lyeh"
   },
   {
@@ -1272,15 +1212,15 @@ window.BOOKS = [
     "listTitle": "The Purcell Papers",
     "listAuthor": ": four stories from the original collection (The Purcell Papers), along with nine other Le Fanu short stories and a pastiche of Le Fanu, \"The Churchyard Yew,\" written by August Derleth using Le Fanu's name as a pseudonym.",
     "title": "The Purcell Papers",
-    "author": null,
-    "coverArtist": null,
-    "publicationDate": null,
-    "wikipediaUrl": null,
+    "author": "Frank Belknap Long",
+    "coverArtist": "Frank Utpatel",
+    "publicationDate": "1975",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Purcell_Papers",
     "coverImageUrl": null,
-    "coverImageFile": null,
+    "coverImageFile": "covers/the-purcell-papers-306.webp",
     "error": null,
-    "description": null,
-    "goodreadsUrl": "https://www.goodreads.com/book/show/309714.The_Purcell_Papers"
+    "goodreadsUrl": "https://www.goodreads.com/book/show/309714.The_Purcell_Papers",
+    "coverEditPath": "covers/the-purcell-papers-306.webp"
   },
   {
     "id": 307,
@@ -1296,7 +1236,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/f/fb/Nameless_places.jpg",
     "coverImageFile": "covers/nameless-places-77.jpg",
     "error": null,
-    "description": "Nameless Places is an anthology of science fiction, fantasy and horror stories edited by Gerald W. Page. It was released in 1975 by Arkham House in an edition of 4,160 copies. The stories in this volume had not been previously published.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/421176.Nameless_Places"
   },
   {
@@ -1313,7 +1252,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/7/7c/House_of_the_worm.jpg",
     "coverImageFile": "covers/the-house-of-the-worm-78.jpg",
     "error": null,
-    "description": "The House of the Worm is a collection of stories by American writer Gary Myers. It was published in 1975 by Arkham House in an edition of 4,144 copies and was the author's first book. The collection is written in a style that closely mimics the works of H. P. Lovecraft and Lord Dunsany, serving as an effective expansion of Lovecraft's Dream Cycle.\n\nThough presented by the publisher as a novel of the Cthulhu Mythos, the book is, in fact, a collection of loosely connected stories.\n\nThe first story, \"The House of the Worm,\" was included (as \"The Feast in the House of the Worm\") in Lin Carter's anthology New Worlds for Old (1971), part of the Ballantine Adult Fantasy series. All ten stories from the collection were later included in Myers's 2013 collection, The Country of the Worm.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/1361030.The_House_of_the_Worm"
   },
   {
@@ -1330,7 +1268,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/b/b1/Harrigans_file.jpg",
     "coverImageFile": "covers/harrigans-file-79.jpg",
     "error": null,
-    "description": "Harrigan's File is a collection of stories by American writer August Derleth. It was released in 1975 by Arkham House in an edition of 4,102 copies. The book collects all of Derleth's science fiction. The stories are about newspaper reporter Tex Harrigan.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/710723.Harrigan_s_File"
   },
   {
@@ -1347,7 +1284,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/d/dc/Xelucha.jpg",
     "coverImageFile": "covers/x-lucha-and-others-80.jpg",
     "error": null,
-    "description": "Xélucha and Others is a collection of stories by British writer M. P. Shiel. It was released in 1975 by Arkham House in an edition of 4,283 copies. It was the author's first book published by Arkham House and was first announced in Arkham's 1948 catalog. It contains the stories Shiel considered to be his best.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/3668739-x-lucha-and-others"
   },
   {
@@ -1364,7 +1300,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/commons/4/4a/Frank_Belknap_Long_at_the_Craft_of_the_Horror_Writer_Panel%2C_18_August_1990_%28cropped%29.jpg",
     "coverImageFile": "covers/howard-phillips-lovecraft-dreamer-on-the-nightside-81.webp",
     "error": null,
-    "description": "Frank Belknap Long Jr. (April 27, 1901 – January 3, 1994) was an American writer of horror fiction, fantasy, science fiction, poetry, gothic romance, comic books, and non-fiction. Though his writing career spanned seven decades, he is best known for his horror and science fiction short stories, including contributions to the Cthulhu Mythos alongside his friend, H. P. Lovecraft. During his life, Long received the World Fantasy Award for Life Achievement (at the 1978 World Fantasy Convention), the Bram Stoker Award for Lifetime Achievement (in 1987, from the Horror Writers Association), and the First Fandom Hall of Fame Award (1977).",
     "goodreadsUrl": "https://www.goodreads.com/book/show/500641.Howard_Phillips_Lovecraft"
   },
   {
@@ -1381,7 +1316,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/3/3f/Watchers_out_of_time.jpg",
     "coverImageFile": "covers/the-watchers-out-of-time-and-others-82.jpg",
     "error": null,
-    "description": "The Watchers Out of Time and Others is an omnibus collection of stories by American writer August Derleth, inspired in part by notes left by H. P. Lovecraft after his death and presented as a \"posthumous collaboration\" between the two writers (Derleth acted as Lovecraft's literary executor). It was published in an edition of 5,070 copies. Several of the stories relate to the Cthulhu Mythos and had appeared previously in the earliest collections The Lurker at the Threshold, The Survivor and Others, The Shuttered Room and Other Pieces, The Dark Brotherhood and Other Pieces and other Arkham House publications.\n\nSome controversy exists among Lovecraft's admirers as to the ethics of presenting the stories as collaborative works. Upon this volume's publication, Donald Wandrei, one of Arkham House's founders, wrote letters to reviewers complaining that the stories were essentially Derleth's own works, incorporating fragments of unpublished Lovecraft prose. Gahan Wilson agreed that the stories \"should really be billed as being [Derleth's] own, and merely based on the notes and letters of Lovecraft, and on the Lovecraftian mythos as [Derleth] saw it, and no more than that.\"",
     "goodreadsUrl": "https://www.goodreads.com/book/show/774822.The_Watchers_Out_of_Time_and_Others"
   },
   {
@@ -1398,7 +1332,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/8/89/Collected_ghost_stories.jpg",
     "coverImageFile": "covers/collected-ghost-stories-83.jpg",
     "error": null,
-    "description": "Collected Ghost Stories is a posthumous collection of stories by author Mary E. Wilkins Freeman (1852–1930). It was released in 1974 by Arkham House in an edition of 4,155 copies. The book is the first collection of all of Freeman's supernatural stories.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/3904575-collected-ghost-stories"
   },
   {
@@ -1415,7 +1348,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/b/b7/Beneath_the_moors.jpg",
     "coverImageFile": "covers/beneath-the-moors-84.jpg",
     "error": null,
-    "description": "Beneath the Moors is a fantasy horror novel by English writer Brian Lumley. It was published by Arkham House in 1974 in an edition of 3,842 copies. It was Lumley's second book published by Arkham House. The novel is part of the Cthulhu Mythos.\n\nThe short novel incorporates the short story \"The Sister City\" by Brian Lumley, originally published in 1969.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/1862250.Beneath_the_Moors"
   },
   {
@@ -1432,7 +1364,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/a/a8/Stories_of_darkness_and_dread.jpg",
     "coverImageFile": "covers/stories-of-darkness-and-dread-85.jpg",
     "error": null,
-    "description": "Stories of Darkness and Dread is a collection of stories by American writer Joseph Payne Brennan. It was released in 1973 and was the author's second collection of stories published by Arkham House. It was published in an edition of 4,138 copies. (The colophon in the book states 4,000; however, the more accurate figure is taken from reference sources). Most of the stories had originally appeared in Alfred Hitchcock's Mystery Magazine, Macabre, Magazine of Horror and other magazines, although four of the tales had appeared in Brennan's earlier collection Scream at Midnight (1963).",
     "goodreadsUrl": "https://www.goodreads.com/book/show/2586776-stories-of-darkness-and-dread"
   },
   {
@@ -1449,7 +1380,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/b/b0/From_evils_pillow.jpg",
     "coverImageFile": "covers/from-evils-pillow-86.jpg",
     "error": null,
-    "description": "From Evil's Pillow is a collection of stories by English writer Basil Copper. It was released in 1973 and was the author's first collection of stories published in the United States. It was published by Arkham House in an edition of 3,468 copies.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/596687.From_Evil_s_Pillow"
   },
   {
@@ -1466,7 +1396,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/6/61/Demons_by_daylight.jpg",
     "coverImageFile": "covers/demons-by-daylight-87.jpg",
     "error": null,
-    "description": "Demons by Daylight is a collection of stories by English author Ramsey Campbell. Initially announced under the title Gardens of Night it was released in 1973. It was the author's second short story collection, after The Inhabitant of the Lake and Less Welcome Tenants. Like the earlier book, it was published by Arkham House.\n\nCampbell had completed work on the stories for it by 1968, and it was scheduled for publication in 1971; however, due to the 1971 death of editor and Arkham House co-founder August Derleth, the collection was delayed a further two years; it finally saw print in 1973. It was published in an edition totaling 3,472 copies and with dust jacket art by Eddie Jones, commissioned by Campbell.\n\nA variant edition was published by Jove/HBJ in May 1979. In the section 'Relationships', this edition omits \"The Second Staircase\" and adds \"Reply Guaranteed\" and \"The Telephones\".\n\nThe 1990 Carroll & Graf paperback reproduces the contents of the original Arkham House edition.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/218643.Demons_By_Daylight"
   },
   {
@@ -1483,7 +1412,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/6/6a/Rim_of_the_unknow.jpg",
     "coverImageFile": "covers/the-rim-of-the-unknown-88.jpg",
     "error": null,
-    "description": "The Rim of the Unknown is a collection of 23 stories by American writer Frank Belknap Long. It was published by Arkham House in 1972 with cover art by Herb Arnold and was the author's second collection of stories published by Arkham House. It was published in an edition of 3,650 copies.\n\nThe collection focusses primarily on Long's science fiction work in short form. While there is one tale (\"The Man with a Thousand Legs\") which appeared in Weird Tales, the other stories are reprinted from such sources as Science Fiction Plus, Thrilling Wonder Stories, Startling Stories, Astounding Science Fiction, and Fantastic Universe.\n\nThe rear flap of the book credits Long with having written various other works including the fugitive The Mystery of the Golden Butterfly. The latter appears to have been an Ellery Queen novel which remained unpublished, although it is known that Long was the author of two other Queen novels - The Golden Eagle Mystery (1942) and The Green Turtle Mystery (1944).",
     "goodreadsUrl": "https://www.goodreads.com/book/show/3904572-the-rim-of-the-unknown"
   },
   {
@@ -1500,7 +1428,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/b/bf/Disclosures_in_scarlet.jpg",
     "coverImageFile": "covers/disclosures-in-scarlet-89.jpg",
     "error": null,
-    "description": "Disclosures in Scarlet is a collection of stories by American writer Carl Jacobi. It was released in 1972 and was the author's third collection of stories published by Arkham House. It was published in an edition of 3,127 copies. The stories had been published originally in earlier anthologies edited by August Derleth or in the magazines Galaxy, If, Fantastic Universe and Thrilling Wonder Stories. The volume is dedicated to the memory of Jacobi's mother.\n\nFrank Utpatel's cover illustration depicts \"The Unpleasantness at Carver House\".",
     "goodreadsUrl": "https://www.goodreads.com/book/show/3823056-disclosures-in-scarlet"
   },
   {
@@ -1516,8 +1443,7 @@ window.BOOKS = [
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Arkham_Collector%3A_Volume_I",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/f/fe/The_Arkham_Collector%2C_Volume_I_book_cover.png",
     "coverImageFile": "covers/the-arkham-collector-volume-i-90.png",
-    "error": null,
-    "description": "The Arkham Collector: Volume I is a collection of the entire run of the magazine The Arkham Collector from 1967 to 1971. It was released in 1971 by Arkham House in an edition of 676 copies and was not jacketed. The printrun was determined by the number of separate issues with the fewest copies remaining unsold.\n\nIn addition to reprinting the entire contents of the separate issues, this compilation provides an Index to all poetry, essays, and stories that appeared in the magazine, and to 'necrologies' (obituaries of various Arkham House authors).\n\nSheldon Jaffery records two binding states for this volume: \"more commonly, a highly reflective black cloth, gold-stamped on the backstrip, measuring 12.5cm from hinge to foreedge; less common is a variant binding of dull (relatively non-reflective) black cloth measuring about 12cm from hinge to foreedge.\""
+    "error": null
   },
   {
     "id": 321,
@@ -1533,7 +1459,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/7/77/Caller_of_the_black.jpg",
     "coverImageFile": "covers/the-caller-of-the-black-91.jpg",
     "error": null,
-    "description": "The Caller of the Black is a collection of stories by British writer Brian Lumley. It was released in 1971 and was the author's first collection of stories published by Arkham House. It was published in an edition of 3,606 copies. Many of the stories are of the Cthulhu Mythos.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/5158721-the-caller-of-the-black"
   },
   {
@@ -1550,7 +1475,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/8/87/SelectedLetters3.jpg",
     "coverImageFile": "covers/selected-letters-of-h-p-lovecraft-iii-1929-1931-92.jpg",
     "error": null,
-    "description": "Selected Letters III (1929-1931) is a collection of letters by H. P. Lovecraft. It was released in 1971 by Arkham House in an edition of 2,513 copies. It is the third of a five volume series of collections of Lovecraft's letters and includes a preface by August Derleth and Donald Wandrei.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/102609.Selected_Letters_III"
   },
   {
@@ -1567,7 +1491,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/2/2f/Songs_and_sonnets_atlantean.jpg",
     "coverImageFile": "covers/songs-and-sonnets-atlantean-93.jpg",
     "error": null,
-    "description": "Songs and Sonnets Atlantean refers to either the 1971 first volume in a trilogy of poetry collections by Donald Sidney-Fryer or to his complete trilogy. Each volume claims some poems were written by poets in the lost continent of Atlantis and translated by Sidney-Fryer into English. Songs and Sonnets Atlantean: The Second Series was published in 2003, and The Third Series in 2005. All three Atlantean collections were gathered in the 2008 volume The Atlantis Fragments: The Trilogy of Songs and Sonnets Atlantean. Sidney-Fryer also wrote two companion novels. His series has been praised by critics. “Fryer has created, in his fictional Atlantis, an entire civilization and a body of absorbing literature,” said New Bedford Standard-Times. Fritz Leiber wrote in Fantastic Stories: “A total picture of a fabulous Atlantis is presented, more convincing and touching than that of a novel might be. But the book. shows much more than that. Sunken Atlantis becomes a symbol of all lost glories and grandeurs of Earth.” The Murfreesboro Sidelines reported: “The poems are of unearthly beauty. Whether the poems really are from the Atlantean or whether they are the creations of the poet Fryer, they deserve to be read and to be experienced.”",
     "goodreadsUrl": "https://www.goodreads.com/book/show/51886202-songs-and-sonnets-atlantean"
   },
   {
@@ -1584,7 +1507,7 @@ window.BOOKS = [
     "coverImageUrl": null,
     "coverImageFile": null,
     "error": null,
-    "description": "The Arkham Collector was an American fantasy, horror fiction and poetry magazine first published in Summer 1967. The magazine, edited by August Derleth, was the second of two magazines published by Arkham House, the other being the Arkham Sampler. Each issue of The Arkham Collector had an approximate print run of 2,500 copies. Its headquarters was in Sauk City, Wisconsin.\n\nThe Arkham Collector published news of upcoming Arkham House publications, items of associational interest, fiction and poetry. The magazine published work by H. P. Lovecraft, Clark Ashton Smith, Carl Jacobi, Joseph Payne Brennan, Brian Lumley, Gary Myers and others. Issue 10, Summer 1971, included the first published story by Alan Dean Foster. The magazine ran for ten issues and suspended publication following Derleth's death on July 4, 1971.\n\nA hardbound volume in an edition of 676 copies (issued without dustjacket), collecting the entire run of ten issues, was published by Arkham House in 1971. See: The_Arkham_Collector:_Volume_I"
+    "hidden": true
   },
   {
     "id": 325,
@@ -1600,7 +1523,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/7/7e/Dark_things.jpg",
     "coverImageFile": "covers/dark-things-95.jpg",
     "error": null,
-    "description": "Dark Things is an anthology of horror stories edited by American writer August Derleth. It was released in 1971 by Arkham House in an edition of 3,051 copies. It was Derleth's fourth anthology of previously unpublished stories released by Arkham House. A translation in Japanese has also been released.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/395711.Dark_Things"
   },
   {
@@ -1617,7 +1539,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/4/4f/Eight_tales.jpg",
     "coverImageFile": "covers/eight-tales-96.jpg",
     "error": null,
-    "description": "Eight Tales is a collection of stories by British writer Walter de la Mare. It was released in 1971 and was the author's first collection of stories published by Arkham House. It was published in an edition of 2,992 copies. The stories were all written under de la Mare's pseudonym \"Walter Ramal\" and had not appeared previously in book form.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/971259.Eight_Tales"
   },
   {
@@ -1634,7 +1555,7 @@ window.BOOKS = [
     "coverImageUrl": null,
     "coverImageFile": null,
     "error": null,
-    "description": "The Arkham Collector was an American fantasy, horror fiction and poetry magazine first published in Summer 1967. The magazine, edited by August Derleth, was the second of two magazines published by Arkham House, the other being the Arkham Sampler. Each issue of The Arkham Collector had an approximate print run of 2,500 copies. Its headquarters was in Sauk City, Wisconsin.\n\nThe Arkham Collector published news of upcoming Arkham House publications, items of associational interest, fiction and poetry. The magazine published work by H. P. Lovecraft, Clark Ashton Smith, Carl Jacobi, Joseph Payne Brennan, Brian Lumley, Gary Myers and others. Issue 10, Summer 1971, included the first published story by Alan Dean Foster. The magazine ran for ten issues and suspended publication following Derleth's death on July 4, 1971.\n\nA hardbound volume in an edition of 676 copies (issued without dustjacket), collecting the entire run of ten issues, was published by Arkham House in 1971. See: The_Arkham_Collector:_Volume_I"
+    "hidden": true
   },
   {
     "id": 327,
@@ -1650,7 +1571,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/4/4e/Faceinthemirror.jpg",
     "coverImageFile": "covers/the-face-in-the-mirror-98.jpg",
     "error": null,
-    "description": "The Face in the Mirror is a collection of stories by author Denys Val Baker. It was released in 1971 and was the author's first American collection of stories. It was published by Arkham House in an edition of 2,045 copies.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/9382802-the-face-in-the-mirror"
   },
   {
@@ -1667,7 +1587,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/6/63/Selected_poems.jpg",
     "coverImageFile": "covers/selected-poems-c-a-smith-99.jpg",
     "error": null,
-    "description": "Selected Poems is a collection of poems by American writer Clark Ashton Smith. It was released in 1971 by Arkham House in an edition of 2,118 copies. The collection also includes several translations of French and Spanish poems. Christophe des Laurieres and Clérigo Herrero, however, are not real people, and the poems are actually compositions of Smith's.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/33955129-selected-poems"
   },
   {
@@ -1684,7 +1603,7 @@ window.BOOKS = [
     "coverImageUrl": null,
     "coverImageFile": null,
     "error": null,
-    "description": "The Arkham Collector was an American fantasy, horror fiction and poetry magazine first published in Summer 1967. The magazine, edited by August Derleth, was the second of two magazines published by Arkham House, the other being the Arkham Sampler. Each issue of The Arkham Collector had an approximate print run of 2,500 copies. Its headquarters was in Sauk City, Wisconsin.\n\nThe Arkham Collector published news of upcoming Arkham House publications, items of associational interest, fiction and poetry. The magazine published work by H. P. Lovecraft, Clark Ashton Smith, Carl Jacobi, Joseph Payne Brennan, Brian Lumley, Gary Myers and others. Issue 10, Summer 1971, included the first published story by Alan Dean Foster. The magazine ran for ten issues and suspended publication following Derleth's death on July 4, 1971.\n\nA hardbound volume in an edition of 676 copies (issued without dustjacket), collecting the entire run of ten issues, was published by Arkham House in 1971. See: The_Arkham_Collector:_Volume_I"
+    "hidden": true
   },
   {
     "id": 267,
@@ -1700,7 +1619,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/8/82/Horror_in_the_museum.jpg",
     "coverImageFile": "covers/the-horror-in-the-museum-and-other-revisions-37.jpg",
     "error": null,
-    "description": "The Horror in the Museum and Other Revisions is a collection of stories revised or ghostwritten by American author H. P. Lovecraft. It was originally published in 1970 by Arkham House in an edition of 4,058 copies. The dustjacket of the first edition features art by Gahan Wilson.\n\nThe collection was revised in 1989 by S. T. Joshi adding an introduction by Joshi, correcting the texts and expanding the contents.\n\nIn 2007, Del Rey published a trade paperback version with a new introduction by Stephen Jones, and a brief biography of Lovecraft at the end.\n\nThe revised version of Lovecraft's revisions includes Henry S. Whitehead's \"The Trap\" but not the other two stories by Whitehead in which Lovecraft had a hand (\"Cassius\" and \"Bothon\"). The revised version also includes two collaborations by Lovecraft with Robert H. Barlow, but not the other tales on which they worked together, of which there are four or five. Sonia Greene's \"Four O'Clock\" is omitted from the revised version, S.T. Joshi having determined that this tale is not properly a part of the Lovecraft corpus; the story is entirely Sonia's, Lovecraft having simply made a few suggestions as to its prose style.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/1157900.The_Horror_in_the_Museum"
   },
   {
@@ -1717,7 +1635,7 @@ window.BOOKS = [
     "coverImageUrl": null,
     "coverImageFile": null,
     "error": null,
-    "description": "The Arkham Collector was an American fantasy, horror fiction and poetry magazine first published in Summer 1967. The magazine, edited by August Derleth, was the second of two magazines published by Arkham House, the other being the Arkham Sampler. Each issue of The Arkham Collector had an approximate print run of 2,500 copies. Its headquarters was in Sauk City, Wisconsin.\n\nThe Arkham Collector published news of upcoming Arkham House publications, items of associational interest, fiction and poetry. The magazine published work by H. P. Lovecraft, Clark Ashton Smith, Carl Jacobi, Joseph Payne Brennan, Brian Lumley, Gary Myers and others. Issue 10, Summer 1971, included the first published story by Alan Dean Foster. The magazine ran for ten issues and suspended publication following Derleth's death on July 4, 1971.\n\nA hardbound volume in an edition of 676 copies (issued without dustjacket), collecting the entire run of ten issues, was published by Arkham House in 1971. See: The_Arkham_Collector:_Volume_I"
+    "hidden": true
   },
   {
     "id": 329,
@@ -1733,7 +1651,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/2/28/Other_dimensions.jpg",
     "coverImageFile": "covers/other-dimensions-103.jpg",
     "error": null,
-    "description": "Other Dimensions is a collection of 26 stories by American writer Clark Ashton Smith, edited by Donald Sidney-Fryer. It was released in 1970 and was the author's sixth collection of stories published by Arkham House. It was released in an edition of 3,144 copies. The stories were originally published between 1910 and 1953 in Weird Tales and other pulp magazines.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/6585005-other-dimensions"
   },
   {
@@ -1750,7 +1667,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/5/55/Demons_and_dinosaurs.jpg",
     "coverImageFile": "covers/demons-and-dinosaurs-104.jpg",
     "error": null,
-    "description": "Demons and Dinosaurs is a 1970 collection of poetry by American writer L. Sprague de Camp, published by Arkham House in an edition of 500 copies. It was de Camp's first book published by Arkham House. It was printed in the UK by Villiers Publications for Arkham House.\n\nIn addition to de Camp's poems, the book contains an introductory piece about the author by fellow writer Lin Carter.\n\nMost of the poems in the collection were incorporated into de Camp's later poetry collections, Phantoms and Fancies and Heroes and Hobgoblins, though the arrangement was different in each instance.\n\nThe poems \"Avebury,\" \"Daydreams,\" \"First Lake at Midnight,\" \"Kaziranga, Assam,\" \"Myself,\" and \"The End of the Lost Race Story\" are unique to this collection.\n\n\"Acrophobia,\" \"Heroes,\" \"Night,\" \"Time,\" and \"To R.E.H.\" are shared with Phantoms and Fancies only.\n\n\"The Ogre\" is shared with Heroes and Hobgoblins only.\n\nThe remaining poems appear in all three collections.\n\nThe \"Bessas the Bactrian\" to whom the last seven poems are attributed is a character and occasional poet in de Camp's 1961 historical novel The Dragon of the Ishtar Gate, in which most of them were originally published. The attribution was subsequently dropped from those carried over into de Camp's later poetry collections.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/6185159-demons-and-dinosaurs"
   },
   {
@@ -1767,7 +1683,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/8/84/Thirty_Years_of_Arkham_House%2C_1939%E2%80%9369_--_A_History_and_Bibliography_%28book_cover%29.jpg",
     "coverImageFile": "covers/thirty-years-of-arkham-house-1939-69-a-history-and-bibliography-105.jpg",
     "error": null,
-    "description": "Thirty Years of Arkham House, 1939–1969: A History and Bibliography is a bibliography of books published from 1939 to 1969 under the imprints of Arkham House, Mycroft & Moran and Stanton & Lee. It was released in 1970 by Arkham House in an edition of 2,137 copies.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/22734482-thirty-years-of-arkham-house-1939-1969"
   },
   {
@@ -1784,7 +1699,7 @@ window.BOOKS = [
     "coverImageUrl": null,
     "coverImageFile": null,
     "error": null,
-    "description": "The Arkham Collector was an American fantasy, horror fiction and poetry magazine first published in Summer 1967. The magazine, edited by August Derleth, was the second of two magazines published by Arkham House, the other being the Arkham Sampler. Each issue of The Arkham Collector had an approximate print run of 2,500 copies. Its headquarters was in Sauk City, Wisconsin.\n\nThe Arkham Collector published news of upcoming Arkham House publications, items of associational interest, fiction and poetry. The magazine published work by H. P. Lovecraft, Clark Ashton Smith, Carl Jacobi, Joseph Payne Brennan, Brian Lumley, Gary Myers and others. Issue 10, Summer 1971, included the first published story by Alan Dean Foster. The magazine ran for ten issues and suspended publication following Derleth's death on July 4, 1971.\n\nA hardbound volume in an edition of 676 copies (issued without dustjacket), collecting the entire run of ten issues, was published by Arkham House in 1971. See: The_Arkham_Collector:_Volume_I"
+    "hidden": true
   },
   {
     "id": 332,
@@ -1800,7 +1715,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/e/e5/Folsom_flint.jpg",
     "coverImageFile": "covers/the-folsom-flint-and-other-curious-tales-107.jpg",
     "error": null,
-    "description": "The Folsom Flint and Other Curious Tales is a collection of stories by American writer David H. Keller. It was released in 1969 by Arkham House in an edition of 2,031 copies. It was the author's second book to be published by Arkham House.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/336819.The_Folsom_Flint_and_Other_Curious_Tales"
   },
   {
@@ -1815,10 +1729,10 @@ window.BOOKS = [
     "publicationDate": "1969",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Tales_of_the_Cthulhu_Mythos",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/7/7e/Tales_of_the_Cthulhu_Mythos.jpg",
-    "coverImageFile": "covers/cthulhu-mythos-anthology-108.jpg",
+    "coverImageFile": "covers/tales-of-the-cthulhu-mythos-333.jpg",
     "error": null,
-    "description": "A Cthulhu Mythos anthology is a type of short story collection that contains stories written in, or related to, the Cthulhu Mythos genre of horror fiction launched by H. P. Lovecraft. Such anthologies have helped to define and popularize the genre.",
-    "goodreadsUrl": "https://www.goodreads.com/book/show/36320.Tales_of_the_Cthulhu_Mythos"
+    "goodreadsUrl": "https://www.goodreads.com/book/show/36320.Tales_of_the_Cthulhu_Mythos",
+    "coverEditPath": "covers/tales-of-the-cthulhu-mythos-333.jpg"
   },
   {
     "id": 437,
@@ -1834,7 +1748,7 @@ window.BOOKS = [
     "coverImageUrl": null,
     "coverImageFile": null,
     "error": null,
-    "description": "The Arkham Collector was an American fantasy, horror fiction and poetry magazine first published in Summer 1967. The magazine, edited by August Derleth, was the second of two magazines published by Arkham House, the other being the Arkham Sampler. Each issue of The Arkham Collector had an approximate print run of 2,500 copies. Its headquarters was in Sauk City, Wisconsin.\n\nThe Arkham Collector published news of upcoming Arkham House publications, items of associational interest, fiction and poetry. The magazine published work by H. P. Lovecraft, Clark Ashton Smith, Carl Jacobi, Joseph Payne Brennan, Brian Lumley, Gary Myers and others. Issue 10, Summer 1971, included the first published story by Alan Dean Foster. The magazine ran for ten issues and suspended publication following Derleth's death on July 4, 1971.\n\nA hardbound volume in an edition of 676 copies (issued without dustjacket), collecting the entire run of ten issues, was published by Arkham House in 1971. See: The_Arkham_Collector:_Volume_I"
+    "hidden": true
   },
   {
     "id": 438,
@@ -1850,7 +1764,7 @@ window.BOOKS = [
     "coverImageUrl": null,
     "coverImageFile": null,
     "error": null,
-    "description": "The Arkham Collector was an American fantasy, horror fiction and poetry magazine first published in Summer 1967. The magazine, edited by August Derleth, was the second of two magazines published by Arkham House, the other being the Arkham Sampler. Each issue of The Arkham Collector had an approximate print run of 2,500 copies. Its headquarters was in Sauk City, Wisconsin.\n\nThe Arkham Collector published news of upcoming Arkham House publications, items of associational interest, fiction and poetry. The magazine published work by H. P. Lovecraft, Clark Ashton Smith, Carl Jacobi, Joseph Payne Brennan, Brian Lumley, Gary Myers and others. Issue 10, Summer 1971, included the first published story by Alan Dean Foster. The magazine ran for ten issues and suspended publication following Derleth's death on July 4, 1971.\n\nA hardbound volume in an edition of 676 copies (issued without dustjacket), collecting the entire run of ten issues, was published by Arkham House in 1971. See: The_Arkham_Collector:_Volume_I"
+    "hidden": true
   },
   {
     "id": 439,
@@ -1866,7 +1780,7 @@ window.BOOKS = [
     "coverImageUrl": null,
     "coverImageFile": null,
     "error": null,
-    "description": "The Arkham Collector was an American fantasy, horror fiction and poetry magazine first published in Summer 1967. The magazine, edited by August Derleth, was the second of two magazines published by Arkham House, the other being the Arkham Sampler. Each issue of The Arkham Collector had an approximate print run of 2,500 copies. Its headquarters was in Sauk City, Wisconsin.\n\nThe Arkham Collector published news of upcoming Arkham House publications, items of associational interest, fiction and poetry. The magazine published work by H. P. Lovecraft, Clark Ashton Smith, Carl Jacobi, Joseph Payne Brennan, Brian Lumley, Gary Myers and others. Issue 10, Summer 1971, included the first published story by Alan Dean Foster. The magazine ran for ten issues and suspended publication following Derleth's death on July 4, 1971.\n\nA hardbound volume in an edition of 676 copies (issued without dustjacket), collecting the entire run of ten issues, was published by Arkham House in 1971. See: The_Arkham_Collector:_Volume_I"
+    "hidden": true
   },
   {
     "id": 334,
@@ -1882,7 +1796,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/8/8b/Nightmares_and_daydreams.jpg",
     "coverImageFile": "covers/nightmares-and-daydreams-112.jpg",
     "error": null,
-    "description": "Nightmares and Daydreams is a collection of stories by author Nelson Bond. It was released in 1968 by Arkham House in an edition of 2,040 copies. It was the author's first book to be published by Arkham House. Most of the stories had previously appeared in the magazine Blue Book.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/12924603-nightmares-and-daydreams"
   },
   {
@@ -1899,7 +1812,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/3/39/SelectedLetters2.jpg",
     "coverImageFile": "covers/selected-letters-of-h-p-lovecraft-ii-1925-1929-113.jpg",
     "error": null,
-    "description": "Selected Letters II, 1925-1929 is a collection of letters by H. P. Lovecraft. It was released in 1968 by Arkham House in an edition of 2,482 copies. It is the second of a five volume series of collections of Lovecraft's letters and includes a preface by August Derleth and Donald Wandrei.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/13422040-selected-letters-ii"
   },
   {
@@ -1916,7 +1828,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/b/bd/Green_round_first.jpg",
     "coverImageFile": "covers/the-green-round-114.jpg",
     "error": null,
-    "description": "The Green Round is a horror novel by Welsh author Arthur Machen. It was originally published by Ernest Benn Limited in 1933. The first U.S. edition was published by Arkham House in 1968 in an edition of 2,058 copies. It was the only book by Machen to be published by Arkham House.\n\nCritic S. T. Joshi has referred to the novel as \"a drearily verbose and unfocussed rehashing of old themes\".\n\nAccording to the Friends of Arthur Machen website, \"Machen's final full-length work of fiction is judged a failure by some. However, in this work, Machen's earlier exploration of the fantastic moves outward to embrace the absurd, of Kafka, Camus and Sartre. Not recommended for devotees of gothic and horror, but of potential fascination for the rest of us.\" Archived 25 October 2020 at the Wayback Machine",
     "goodreadsUrl": "https://www.goodreads.com/book/show/2933072-the-green-round"
   },
   {
@@ -1933,7 +1844,7 @@ window.BOOKS = [
     "coverImageUrl": null,
     "coverImageFile": null,
     "error": null,
-    "description": "The Arkham Collector was an American fantasy, horror fiction and poetry magazine first published in Summer 1967. The magazine, edited by August Derleth, was the second of two magazines published by Arkham House, the other being the Arkham Sampler. Each issue of The Arkham Collector had an approximate print run of 2,500 copies. Its headquarters was in Sauk City, Wisconsin.\n\nThe Arkham Collector published news of upcoming Arkham House publications, items of associational interest, fiction and poetry. The magazine published work by H. P. Lovecraft, Clark Ashton Smith, Carl Jacobi, Joseph Payne Brennan, Brian Lumley, Gary Myers and others. Issue 10, Summer 1971, included the first published story by Alan Dean Foster. The magazine ran for ten issues and suspended publication following Derleth's death on July 4, 1971.\n\nA hardbound volume in an edition of 676 copies (issued without dustjacket), collecting the entire run of ten issues, was published by Arkham House in 1971. See: The_Arkham_Collector:_Volume_I"
+    "hidden": true
   },
   {
     "id": 337,
@@ -1949,7 +1860,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/5/52/Strange_gateways.jpg",
     "coverImageFile": "covers/strange-gateways-116.jpg",
     "error": null,
-    "description": "Strange Gateways is a collection of stories by American writer E. Hoffmann Price. It was released in 1967 by Arkham House in an edition of 2,007 copies. It was the author's first hardcover collection. The tale \"Tarbis of the Lake\" is a collaboration with H. P. Lovecraft.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/5522559-strange-gateways"
   },
   {
@@ -1966,7 +1876,7 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/d/d7/Three_tales_of_horror.jpg",
     "coverImageFile": "covers/three-tales-of-horror-117.jpg",
     "error": null,
-    "description": "3 Tales of Horror is an illustrated collection of stories by American author H. P. Lovecraft. Initially announced under the title Three Arkham Tales, it was released in 1967 by Arkham House in an edition of 1,522 copies. The book includes 15 drawings by American artist Lee Brown Coye."
+    "goodreadsUrl": "https://www.goodreads.com/book/show/5743125-three-tales-of-horror"
   },
   {
     "id": 339,
@@ -1982,7 +1892,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/5/55/Mind_parasites.jpg",
     "coverImageFile": "covers/the-mind-parasites-118.jpg",
     "error": null,
-    "description": "The Mind Parasites is a science fiction horror novel by English author Colin Wilson. It was published by Arkham House in 1967 in an edition of 3,045 copies. It was Wilson's first and only book published by Arkham House.\n\nThe book is developed within H. P. Lovecraft's Cthulhu Mythos.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/14495.The_Mind_Parasites"
   },
   {
@@ -1999,7 +1908,7 @@ window.BOOKS = [
     "coverImageUrl": null,
     "coverImageFile": null,
     "error": null,
-    "description": "The Arkham Collector was an American fantasy, horror fiction and poetry magazine first published in Summer 1967. The magazine, edited by August Derleth, was the second of two magazines published by Arkham House, the other being the Arkham Sampler. Each issue of The Arkham Collector had an approximate print run of 2,500 copies. Its headquarters was in Sauk City, Wisconsin.\n\nThe Arkham Collector published news of upcoming Arkham House publications, items of associational interest, fiction and poetry. The magazine published work by H. P. Lovecraft, Clark Ashton Smith, Carl Jacobi, Joseph Payne Brennan, Brian Lumley, Gary Myers and others. Issue 10, Summer 1971, included the first published story by Alan Dean Foster. The magazine ran for ten issues and suspended publication following Derleth's death on July 4, 1971.\n\nA hardbound volume in an edition of 676 copies (issued without dustjacket), collecting the entire run of ten issues, was published by Arkham House in 1971. See: The_Arkham_Collector:_Volume_I"
+    "hidden": true
   },
   {
     "id": 340,
@@ -2015,7 +1924,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/e/ec/Travellers_by_night.jpg",
     "coverImageFile": "covers/travellers-by-night-120.jpg",
     "error": null,
-    "description": "Travellers by Night is an anthology of horror stories edited by American writer August Derleth. It was released in 1967 by Arkham House in an edition of 2,486 copies. None of the stories had been previously published.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/4824716-travellers-by-night"
   },
   {
@@ -2032,7 +1940,7 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/8/8a/Deep_waters.jpg",
     "coverImageFile": "covers/deep-waters-book-121.jpg",
     "error": null,
-    "description": "Deep Waters is a collection of short stories by British writer William Hope Hodgson published in 1967 by Arkham House in an edition of 2,556 copies, the second of the author's books to be published by Arkham. The stories are primarily set in the Sargasso Sea."
+    "goodreadsUrl": "https://www.goodreads.com/book/show/20705405-deep-waters"
   },
   {
     "id": 342,
@@ -2048,7 +1956,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/6/69/Black_medicine.jpg",
     "coverImageFile": "covers/black-medicine-122.jpg",
     "error": null,
-    "description": "Black Medicine is a collection of stories by American writer Arthur J. Burks. It was released in 1966 by Arkham House in an edition of 1,952 copies and was the author's first book published by Arkham House. All but one of the stories had originally appeared in the magazine Weird Tales.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/8820467-black-medicine"
   },
   {
@@ -2065,7 +1972,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/9/99/Colonel_markesan.jpg",
     "coverImageFile": "covers/colonel-markesan-and-less-pleasant-people-123.jpg",
     "error": null,
-    "description": "Colonel Markesan and Less Pleasant People is a collection of stories by American authors August Derleth and Mark Schorer writing in collaboration. It was released in 1966 by Arkham House in an edition of 2,405 copies. The stories were written while the two authors shared a cabin on the Wisconsin River in Sauk City during the summer of 1931. Most of the stories were published in the magazine Weird Tales. Two of the stories, \"Colonel Markesan\" and \"The Return of Andrew Bentley\", were adapted for the Thriller television series.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/949942.Colonel_Markesan_and_Less_Pleasant_People"
   },
   {
@@ -2082,7 +1988,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/c/c1/Dark_brotherhood.jpg",
     "coverImageFile": "covers/the-dark-brotherhood-and-other-pieces-124.webp",
     "error": null,
-    "description": "The Dark Brotherhood and Other Pieces is a collection of stories, poems and essays by American author H. P. Lovecraft and others, edited by August Derleth. It was released in 1966 by Arkham House in an edition of 3,460 copies. The dustjacket is by Frank Utpatel.\n\nSome controversy was raised by the publication of the Chalker bibliography (see below), as George T. Wetzel claimed with some plausibility that Chalker had pirated Wetzel's own bibliography of 1955.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/5743145-the-dark-brotherhood-and-other-pieces"
   },
   {
@@ -2099,7 +2004,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/5/5c/Strange_harvest.jpg",
     "coverImageFile": "covers/strange-harvest-book-125.jpg",
     "error": null,
-    "description": "Strange Harvest is a collection of 17 stories by American writer Donald Wandrei. It was released in 1965 and was the author's fourth book published by Arkham House. It was released in an edition of 2,000 copies. Many of the (primarily science fiction) stories originally appeared in the magazines Weird Tales and Astounding Stories.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/2607150-strange-harvest"
   },
   {
@@ -2116,7 +2020,7 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/f/f1/Something_breathing.jpg",
     "coverImageFile": "covers/something-breathing-126.jpg",
     "error": null,
-    "description": "Something Breathing is a collection of poems by Stanley McNail. It was released in 1965 by Arkham House in an edition of 500 copies. It was the author's only book to be published by Arkham House. The book was printed in England by Villiers for Arkham House and is bound in green cloth rather than the distinctive gold printing on black binding of most Arkham House publications."
+    "goodreadsUrl": "https://www.goodreads.com/book/show/3602733-something-breathing"
   },
   {
     "id": 347,
@@ -2132,7 +2036,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/1/14/Quick_and_the_dead.jpg",
     "coverImageFile": "covers/the-quick-and-the-dead-collection-127.jpg",
     "error": null,
-    "description": "The Quick and the Dead is a collection of stories by author Vincent Starrett. It was released in 1965 and was the author's only collection of stories published by Arkham House. It was released in an edition of 2,047 copies. The stories were originally published between 1920 and 1932 in various pulp magazines.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/13329363-the-quick-and-the-dead"
   },
   {
@@ -2149,7 +2052,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/8/8f/Dagon_first.jpg",
     "coverImageFile": "covers/dagon-and-other-macabre-tales-44.jpg",
     "error": null,
-    "description": "Dagon and Other Macabre Tales is a collection of stories by American author H. P. Lovecraft, which also includes his essay on weird fiction, \"Supernatural Horror in Literature\". It was originally published in 1965 by Arkham House in an edition of 3,471 copies. Unlike some other first editions of Lovecraft collections issued by Arkham House in the mid-sixties, the true first edition is bound with head- and tailbands.\n\nThe collection was revised in 1986 by S.T. Joshi, replacing the introduction by August Derleth for one by Joshi and another by T. E. D. Klein. The bulk of the tales were also reordered chronologically, while some tales were moved to appendices. It was released in an edition of 4,023 copies, designated a 'corrected 5th printing'. This revised edition was read by Gordon Gould for the American Foundation for the Blind in 1987.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/102575.Dagon_and_Other_Macabre_Tales"
   },
   {
@@ -2166,7 +2068,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/2/2d/Poems_in_prose.jpg",
     "coverImageFile": "covers/poems-in-prose-smith-129.jpg",
     "error": null,
-    "description": "Poems in Prose is an illustrated collection of prose poems by Clark Ashton Smith, edited by Donald Sidney-Fryer. It was released in 1965 and was published by Arkham House in an edition of 1,016 copies. The book is a nearly complete collection of Smith's prose poetry. French editor and critic Philippe Gindre called the book \"the magnificent Poems in Prose.\"",
     "goodreadsUrl": "https://www.goodreads.com/book/show/20414344-poems-in-prose"
   },
   {
@@ -2183,7 +2084,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/4/44/SelectedLetters1.jpg",
     "coverImageFile": "covers/selected-letters-of-h-p-lovecraft-i-1911-1924-130.jpg",
     "error": null,
-    "description": "Selected Letters I, 1911-1924 is a collection of letters by H. P. Lovecraft. It was released in 1964 by Arkham House in an edition of 2,504 copies. It is the first of a five volume series of collections of Lovecraft's letters and includes a preface by August Derleth and Donald Wandrei.\n\nThe five-volume series represents only a fragment of Lovecraft's correspondence.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/102611.Selected_Letters_I"
   },
   {
@@ -2200,7 +2100,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/0/07/Tales_of_science_and_sorcery.jpg",
     "coverImageFile": "covers/tales-of-science-and-sorcery-131.jpg",
     "error": null,
-    "description": "Tales of Science and Sorcery is a collection of stories by American writer Clark Ashton Smith. It was released in 1964 and was the author's fifth collection of stories published by Arkham House. It was released in an edition of 2,482 copies. The stories were originally published between 1930 and 1958 in Weird Tales and other pulp magazines.\n\nThe collection contains stories from Smith's major story cycles of Hyperborea, Averoigne and Zothique.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/287433.Tales_of_Science_and_Sorcery"
   },
   {
@@ -2217,7 +2116,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/1/13/Nightmare_need.jpg",
     "coverImageFile": "covers/nightmare-need-132.jpg",
     "error": null,
-    "description": "Nightmare Need is a collection of poems by Joseph Payne Brennan. It was released in 1964 by Arkham House in an edition of 500 copies. The book was printed and published in England by Villiers Publications Ltd for Arkham House and lacks the distinctive gold printing on black binding of most Arkham House publications.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/22050768-nightmare-need"
   },
   {
@@ -2234,7 +2132,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/d/dc/Portraits_in_moonlight.jpg",
     "coverImageFile": "covers/portraits-in-moonlight-133.jpg",
     "error": null,
-    "description": "Portraits in Moonlight is a collection of stories by American author Carl Jacobi. It was released during 1964 by Arkham House with an edition of 1,987 copies and was the author's second collection published by Arkham House. Half of the stories had been published originally in the magazine Weird Tales. Some of the stories are science fiction. The volume is dedicated to the memory of Jacobi's father.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/13268127-portraits-in-moonlight"
   },
   {
@@ -2251,7 +2148,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/a/a0/At_the_mountains_of_madness.jpg",
     "coverImageFile": "covers/at-the-mountains-of-madness-and-other-novels-45.jpg",
     "error": null,
-    "description": "At the Mountains of Madness and Other Novels is a collection of stories by American author H. P. Lovecraft. It was originally published in 1964 by Arkham House in an edition of 3,552 copies. The true first edition has no head- or tailbands and features a green dustjacket (as depicted right). (Later states of the dustjacket are red and orange.)\n\nThe collection was revised and the text restored in 1985 by S. T. Joshi, replacing the introduction by August Derleth for one by Joshi and another by James Turner. The 1985 edition was published in an edition of 3,990 copies and designated a \"corrected 5th printing\".",
     "goodreadsUrl": "https://www.goodreads.com/book/show/32768.At_the_Mountains_of_Madness_and_Other_Novels"
   },
   {
@@ -2268,7 +2164,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/f/f1/Over_the_edge.jpg",
     "coverImageFile": "covers/over-the-edge-anthology-135.jpg",
     "error": null,
-    "description": "Over the Edge is an anthology of horror stories edited by American writer August Derleth. It was released in 1964 by Arkham House in an edition of 2,520 copies. The anthology was produced to mark the 25th anniversary of Arkham House. None of the stories had been previously published.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/3607340-over-the-edge"
   },
   {
@@ -2285,7 +2180,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/a/a3/Poems_for_midnight.jpg",
     "coverImageFile": "covers/poems-for-midnight-136.jpg",
     "error": null,
-    "description": "Poems for Midnight is an illustrated collection of 61 poems by Donald Wandrei. It was released in 1964 by Arkham House in an edition of 742 copies. The collection also contains four pen and ink drawings by the author's brother, Howard Wandrei. Some of the early poems were revised radically for their appearance in Poems for Midnight.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/35392569-poems-for-midnight"
   },
   {
@@ -2302,7 +2196,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/d/d2/Inhabitant_of_the_lake.jpg",
     "coverImageFile": "covers/the-inhabitant-of-the-lake-and-less-welcome-tenants-137.jpg",
     "error": null,
-    "description": "The Inhabitant of the Lake and Less Welcome Tenants is a collection of fantasy and horror short stories by British author J. Ramsey Campbell, who dropped the initial from his name in subsequent publications. Initially announced under the title The Box in the Priory it was released in 1964 by Arkham House in an edition of 2,009 copies and was the author's first book. The stories are part of the Cthulhu Mythos. Campbell had originally written his introduction to be included in the book The Dark Brotherhood and Other Pieces under the title \"Cthulhu in Britain\". However, Arkham's editor, August Derleth, decided to use it here (retitled \"A Word from the Author\").\n\nThe stories utilise such settings as Brichester, Goatswood and Clotton - Campbell's equivalent English invented locales comprising the Severn Valley, based upon H. P. Lovecraft's invention of such locales as Arkham, Dunwich, and Kingsport. The title story introduces Campbell's fictitious book of occult lore, the Revelations of Gla'aki, similar to Lovecraft's Necronomicon.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/362914.The_Inhabitant_of_the_Lake_and_Less_Welcome_Tenants"
   },
   {
@@ -2319,7 +2212,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/f/f2/Dark_man_and_others.jpg",
     "coverImageFile": "covers/the-dark-man-and-others-138.jpg",
     "error": null,
-    "description": "The Dark Man and Others is a posthumously published anthology of fifteen short stories by American author Robert E. Howard, named after his short story \"The Dark Man\", and covering the genres of adventure fiction, horror, historical fiction, fantasy, sword and sorcery, weird fiction and the weird West. It was first published in 1963 by Arkham House, and was edited by August Derleth. Eleven of the stories had previously been published in the pulp magazine Weird Tales, and one each in Argosy, Oriental Stories and Strange Tales. It was reprinted in 1971 as a paperback by Lancer.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/443764.The_Dark_Man_and_Others"
   },
   {
@@ -2336,7 +2228,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/2/28/Mr_george.jpg",
     "coverImageFile": "covers/mr-george-and-other-odd-persons-139.jpg",
     "error": null,
-    "description": "Mr. George and Other Odd Persons is a collection of fantasy and horror short stories by American author August Derleth, written under the pseudonym of Stephen Grendon. It was released in 1963 by Arkham House in an edition of 2,546 copies. Most of the stories had appeared previously in the magazine Weird Tales. Two appeared in The Arkham Sampler. The title story was dramatized for the Thriller TV series.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/2733533-mr-george-and-other-odd-persons"
   },
   {
@@ -2353,7 +2244,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/d/d6/Who_fears_the_devil.jpg",
     "coverImageFile": "covers/who-fears-the-devil-140.jpg",
     "error": null,
-    "description": "Who Fears the Devil? is a collection of fantasy and horror short stories by American author Manly Wade Wellman. It was released in 1963 by Arkham House in an edition of 2,058 copies and was Wellman's only book released by Arkham House. The collection consists of all of Wellman's Silver John stories that had been published at the time. They had all previously appeared in The Magazine of Fantasy & Science Fiction. Wellman contributed new short sketches to the collection. The book is dedicated to Wellman's friend, the North Carolina folkorist and musician Bascom Lamar Lunsford.\n\nDarrell Schweitzer has described the book as a classic of fantasy literature, stating Who Fears The Devil? \"has genuinely enriched the field because of its unique subject matter and Wellman's heartfelt enthusiasm for it\".",
     "goodreadsUrl": "https://www.goodreads.com/book/show/939467.Who_Fears_The_Devil_"
   },
   {
@@ -2368,9 +2258,10 @@ window.BOOKS = [
     "publicationDate": "1963",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Autobiography%3A_Some_Notes_on_a_Nonentity",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/9/9e/Nonentity.jpg",
-    "coverImageFile": "covers/autobiography-some-notes-on-a-nonentity-141.jpg",
+    "coverImageFile": "covers/autobiography-some-notes-on-a-nonentity-359.jpg",
     "error": null,
-    "description": "Autobiography: Some Notes on a Nonentity is an autobiographical essay by American author H. P. Lovecraft. It was released in 1963 by Arkham House in an edition of 500 copies. The essay was originally included in Beyond the Wall of Sleep. This reprinting includes annotations by August Derleth. More recently it has been reprinted in the books Lord of a Visible World: An Autobiography in Letters edited by S. T. Joshi and David E. Schultz (2000), and Collected Essays, Volume 5: Philosophy; Autobiography & Miscellany edited by S. T. Joshi (2006)."
+    "goodreadsUrl": "https://www.goodreads.com/book/show/29865383-autobiography-some-notes-on-a-nonentity",
+    "coverEditPath": "covers/autobiography-some-notes-on-a-nonentity-359.jpg"
   },
   {
     "id": 276,
@@ -2386,7 +2277,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/commons/6/63/Dunwich_Horror_and_Others_dust_jacket.jpg",
     "coverImageFile": "covers/the-dunwich-horror-and-others-46.jpg",
     "error": null,
-    "description": "The Dunwich Horror and Others is a collection of fantasy, horror and science fiction short stories by American author H. P. Lovecraft. It was originally published in 1963 by Arkham House in an edition of 3,133 copies.\n\nThe true first edition is not bound with head- and tailbands, and the true first-state dustjacket carries a price of $5.00 (not $6.50 as on later printings). (Reportedly some copies lack head and tailbands, indicating the true first edition, but bear the $6.50 price on the dustjacket, suggesting that the publisher ran out of first-edition dustjackets before they ran out of first-edition books, so they raised the price to $6.50, sold the remaining first-edition volumes in second-state jackets, and then started reprinting the book).\n\nThe collection was revised in 1985 by S.T. Joshi, replacing the introduction by August Derleth for one by Joshi (\"A Note on the Texts\") and another by Robert Bloch (\"Heritage of Horror\"). This edition, designated a \"corrected sixth printing\", was published in an edition of 4,124 copies. Bloch's Introduction was reprinted here from its first appearance in The Best of H. P. Lovecraft: Bloodcurdling Tales of Horror and the Macabre.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/63213.The_Dunwich_Horror_and_Others"
   },
   {
@@ -2403,7 +2293,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/commons/c/cc/Collected_Poems_%28HP_Lovecraft_-_front_cover%29.jpg",
     "coverImageFile": "covers/collected-poems-h-p-lovecraft-143.jpg",
     "error": null,
-    "description": "Collected Poems is an illustrated collection of poems by H. P. Lovecraft. It was released in 1963 by Arkham House in an edition of 2,013 copies. The editor August Derleth, in his foreword, stated that the book contains the best of Lovecraft's poetry, as well as the second-best and even his earlier work.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/13613202-collected-poems"
   },
   {
@@ -2420,7 +2309,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/5/57/Horror_from_the_hills.jpg",
     "coverImageFile": "covers/the-horror-from-the-hills-144.jpg",
     "error": null,
-    "description": "The Horror from the Hills is a horror novel by American writer Frank Belknap Long. It was published by Arkham House in 1963 in an edition of 1,997 copies. The novel is part of the Cthulhu Mythos. There are two states of the Arkham House edition. The copyright notice was omitted from the copyright page by the printer. Copies lacking the copyright notice comprise the scarcer state. In some copies the copyright notice appears as a small pasted-in addition (second state), a change made after some copies without the notice had been placed in circulation.\n\nThe novel was originally serialized in two parts in Weird Tales magazine, appearing in the January and February–March, 1931 issues. Long also incorporated a dream of H. P. Lovecraft into the novel, using Lovecraft's description nearly verbatim and with his permission.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/3904596-the-horror-from-the-hills"
   },
   {
@@ -2437,7 +2325,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/commons/1/1e/100_books_by_august_derleth.jpg",
     "coverImageFile": "covers/100-books-by-august-derleth-145.jpg",
     "error": null,
-    "description": "100 Books by August Derleth is a bibliography of books by American author August Derleth. It was released in 1962 by Arkham House in an edition of 1,225 copies. Approximately 200 copies of the edition were bound in pictorial boards for libraries (the edition in boards was issued without dustwrapper). The foreword is by Donald Wandrei.\n\nThe book includes two plates, one a frontispiece of Derleth in his office, the other of Derleth with his children, Walden William and April Rose. There is also an illustration reproducing a mock certificate awarding Derleth the degree of \"Doctor of Philosophy in Mythos\" to Derleth, from Miskatonic University.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/126460684-100-books-by-august-derleth"
   },
   {
@@ -2454,7 +2341,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/commons/1/13/%22The_Trail_of_Cthulhu%22%2C_by_August_Derleth.jpg",
     "coverImageFile": "covers/the-trail-of-cthulhu-146.jpg",
     "error": null,
-    "description": "The Trail of Cthulhu is a series of interconnected short stories by American writer August Derleth as part of the Cthulhu Mythos genre of horror fiction. The stories chronicle the struggles of Laban Shrewsbury and his companions against the Great Old Ones, particularly Cthulhu.\n\nThe stories were originally published in Weird Tales from 1944 to 1952, and were republished in collected form as The Trail of Cthulhu by Arkham House in 1962 in an edition of 2,470 copies.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/731072.The_Trail_of_Cthulhu"
   },
   {
@@ -2471,7 +2357,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/5/5c/Dark_mind_dark_heart.jpg",
     "coverImageFile": "covers/dark-mind-dark-heart-147.jpg",
     "error": null,
-    "description": "Dark Mind, Dark Heart is an anthology of horror stories edited by American writer August Derleth. It was released in 1962 by Arkham House in an edition of 2,493 copies. The anthology was conceived as a collection of new stories by old Arkham House authors. The anthology includes the first Cthulhu Mythos story by Ramsey Campbell.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/716958.Dark_Mind_Dark_Heart"
   },
   {
@@ -2488,7 +2373,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/5/5d/Lonesome_places.jpg",
     "coverImageFile": "covers/lonesome-places-148.jpg",
     "error": null,
-    "description": "Lonesome Places is a collection of fantasy and horror short stories by American author August Derleth. It was released in 1962 by Arkham House in an edition of 2,201 copies and was Derleth's fifth collection of weird tales. The collection contains the stories that Derleth believed to be his best of the preceding 15 years.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/4737467-lonesome-places"
   },
   {
@@ -2505,24 +2389,24 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/3/38/Dreams_and_fancies.jpg",
     "coverImageFile": "covers/dreams-and-fancies-149.jpg",
     "error": null,
-    "description": "Dreams and Fancies is a collection of letters and fantasy, horror and science fiction short stories by American author H. P. Lovecraft. It was released in 1962 by Arkham House in an edition of 2,030 copies and was the sixth collection of Lovecraft's work to be released by Arkham House.\n\nThe concept of the collection was to present letters by Lovecraft recounting dreams, and the stories which may have derived from those dreams. It also includes fragments of letters from Lovecraft to various correspondence in which his dreams are discussed.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/5347916-dreams-and-fancies"
   },
   {
     "id": 238,
     "imprint": "arkham_house",
-    "decade": "1960s",
+    "decade": "2000s",
     "listTitle": "The Shunned House",
     "listAuthor": "by H. P. Lovecraft (1961)",
-    "title": "The Shunned House",
-    "author": "H. P. Lovecraft",
+    "title": "The Shunned House Facsimile",
+    "author": "H. P. Lovecraft and Robert Weinberg",
     "coverArtist": null,
-    "publicationDate": "1961",
+    "publicationDate": "2008",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Shunned_House",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/commons/2/26/The_Shunned_House.jpg",
-    "coverImageFile": "covers/the-shunned-house-150.jpg",
+    "coverImageFile": "covers/the-shunned-house-238.png",
     "error": null,
-    "description": "\"The Shunned House\" is a horror fiction novelette by American author H. P. Lovecraft, written on October 16–19, 1924. It was first published in the October 1937 issue of Weird Tales."
+    "goodreadsUrl": "https://www.goodreads.com/book/show/8507286-the-shunned-house",
+    "coverEditPath": "covers/the-shunned-house-238.png"
   },
   {
     "id": 367,
@@ -2538,7 +2422,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/4/4c/Fire_and_sleet_and_candlelight.jpg",
     "coverImageFile": "covers/fire-and-sleet-and-candlelight-151.jpg",
     "error": null,
-    "description": "Fire and Sleet and Candlelight was a poetry anthology edited by August Derleth, and published in 1961 by Arkham House in an edition of 2,026 copies. The title was suggested to Derleth by Lin Carter and is taken from the Lyke-Wake Dirge. For this companion volume to Dark of the Moon: Poems of Fantasy and the Macabre, Derleth included only living poets or poems that had not been previously published.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/2543653.Fire_and_Sleet_and_Candlelight"
   },
   {
@@ -2555,7 +2438,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/e/e5/Strayers_from_sheol.jpg",
     "coverImageFile": "covers/strayers-from-sheol-152.jpg",
     "error": null,
-    "description": "Strayers from Sheol is a collection of stories by author H. Russell Wakefield. It was released in 1961 and was the second collection of the author's stories to be published by Arkham House. It was published in an edition of 2,070 copies.\n\nSome of the stories had appeared originally in Weird Tales, The Arkham Sampler, The Magazine of Fantasy & Science Fiction and Fantastic Universe.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/1568456.Strayers_from_Sheol"
   },
   {
@@ -2572,7 +2454,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/6/69/Invaders_from_the_dark.jpg",
     "coverImageFile": "covers/invaders-from-the-dark-153.jpg",
     "error": null,
-    "description": "Invaders from the Dark is a horror novel by American writer Greye La Spina. It was published by Arkham House in 1960 in an edition of 1,559 copies. It was La Spina's first and only hardcover book.\n\nThe novel was originally serialized in Weird Tales magazine. It appeared in the April, May and June, 1925 issues.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/6408740-invaders-from-the-dark"
   },
   {
@@ -2589,7 +2470,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/9/93/Pleasant_dreams_nightmares.jpg",
     "coverImageFile": "covers/pleasant-dreams-nightmares-154.jpg",
     "error": null,
-    "description": "Pleasant Dreams: Nightmares is a collection of fantasy and horror short stories by American writer Robert Bloch. It was released in 1960 and was the author's second book published by Arkham House. It was released in an edition of 2,060 copies.\n\nThe stories originally appeared in several magazines between 1946 and 1958. The collection includes Bloch's 1959 Hugo Award winning story, \"That Hell-Bound Train\".",
     "goodreadsUrl": "https://www.goodreads.com/book/show/1490134.Pleasant_Dreams"
   },
   {
@@ -2606,7 +2486,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/8/82/Abominations_of_yondo.JPG",
     "coverImageFile": "covers/the-abominations-of-yondo-155.jpg",
     "error": null,
-    "description": "The Abominations of Yondo is a collection of fantasy, horror and science fiction short stories by American writer Clark Ashton Smith. It was released in 1960 and was the author's fourth collection of stories published by Arkham House. It was released in an edition of 2,005 copies. The stories were mostly written between 1930 and 1935.\n\nThe collection contains stories from Smith's major story cycles of Hyperborea, Poseidonis, Averoigne and Zothique.\n\nThe title story is told by a man who has been released from being tortured by the priests of the lion-headed god Ong, and who tries to make his way to safety through the desert of Yondo, but is so perturbed by the horrors he encounters that he flees back to the realm of the torturers.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/6342887-the-abominations-of-yondo"
   },
   {
@@ -2623,7 +2502,7 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/f/ff/Shuttered_room.jpg",
     "coverImageFile": "covers/the-shuttered-room-and-other-pieces-156.jpg",
     "error": null,
-    "description": "The Shuttered Room and Other Pieces is an anthology of fantasy and horror short stories, essays and memoirs by American author H. P. Lovecraft and others. It was released in 1959 by Arkham House in an edition of 2,527 copies and was the fifth collection of Lovecraft's work to be released by Arkham House. August Derleth, the owner of Arkham House, and an admirer and literary executor to Lovecraft, edited the collection and wrote the title story, \"The Shuttered Room\", as well as another story, \"The Fisherman of Falcon Point\" from lines of story ideas left by Lovecraft after his death. Derleth billed himself as a \"posthumous collaborator\".\n\nAlthough most copies of this volume have the usual Holliston Black Novilex binding used by Arkham House at this period, there are reportedly some copies (possibly a few dozen) with less sturdy \"board\" covers made of a softer material and without the dustjacket. These may constitute a variant state of the volume."
+    "goodreadsUrl": "https://www.goodreads.com/book/show/10049265-the-shuttered-room-and-other-pieces"
   },
   {
     "id": 373,
@@ -2639,7 +2518,7 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/4/45/Some_notes_on_hpl.jpg",
     "coverImageFile": "covers/some-notes-on-h-p-lovecraft-157.jpg",
     "error": null,
-    "description": "Some Notes on H. P. Lovecraft is a collection of biographical notes about H. P. Lovecraft by writer August Derleth. It was released in 1959 by Arkham House in an edition of 1,044 copies."
+    "goodreadsUrl": "https://www.goodreads.com/book/show/5743580-some-notes-on-h-p-lovecraft"
   },
   {
     "id": 374,
@@ -2655,8 +2534,8 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/4/4f/Arkham_House_%28logo%29.png",
     "coverImageFile": "covers/arkham-house-the-first-20-years-158.png",
     "error": null,
-    "description": "Arkham House was an American publishing house specializing in weird fiction. It was founded in Sauk City, Wisconsin, in 1939 by August Derleth and Donald Wandrei to publish hardcover collections of H. P. Lovecraft's best works, which had previously been published only in pulp magazines. The company's name is derived from Lovecraft's fictional New England city, Arkham, Massachusetts. Arkham House editions are noted for the quality of their printing and binding. The printer's mark for Arkham House was designed by Frank Utpatel.",
-    "goodreadsUrl": "https://www.goodreads.com/book/show/22734482-thirty-years-of-arkham-house-1939-1969"
+    "goodreadsUrl": "https://www.goodreads.com/book/show/22734482-thirty-years-of-arkham-house-1939-1969",
+    "deleted": true
   },
   {
     "id": 375,
@@ -2672,7 +2551,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/6/62/Nine_horrors_and_a_dream.jpg",
     "coverImageFile": "covers/nine-horrors-and-a-dream-159.jpg",
     "error": null,
-    "description": "Nine Horrors and a Dream is a collection of fantasy and horror short stories by American writer Joseph Payne Brennan. It was released in 1958 by Arkham House in an edition of 1,336 copies. It was the author's first collection of stories to be published.\n\nThe jacket front panel and spine give the title only as Nine Horrors, although the full title appears on the inner jacket flap and title page.\n\nSome of the stories had originally appeared in the magazine Weird Tales and other pulps of the 1950s. One of the stories, \"Levitation\", was adapted for the television series Tales from the Darkside.\n\n\"The Calamander Chest\" was recorded by Vincent Price for inclusion on the Caedmon Educational Recordings release of The Goblins at the Bathhouse, 1978. The title is from the Ruth Manning-Sanders tale on side 1.\n\nThe volume was reprinted by Ballantine Books (pb, 1962) with a cover illustration by Richard Powers. A recent pb reprint has been issued by Dover Publications (2019).",
     "goodreadsUrl": "https://www.goodreads.com/book/show/939453.Nine_Horrors_and_a_Dream"
   },
   {
@@ -2689,7 +2567,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/4/4f/Mask_of_cthulhu.jpg",
     "coverImageFile": "covers/the-mask-of-cthulhu-160.jpg",
     "error": null,
-    "description": "The Mask of Cthulhu is a collection of fantasy and horror short stories by American writer August Derleth. It was released in 1958 by Arkham House in an edition of 2,051 copies. It was reprinted by Beagle Books in 1971.\n\nThe stories are part of the Cthulhu Mythos and most had appeared in the magazine Weird Tales between 1939 and 1953.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/1886928.The_Mask_of_Cthulhu"
   },
   {
@@ -2706,7 +2583,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/4/4d/Spells_and_philtres.jpg",
     "coverImageFile": "covers/spells-and-philtres-161.jpg",
     "error": null,
-    "description": "Spells and Philtres is a collection of poems by Clark Ashton Smith. It was released in 1958 and was the author's fifth book and second collection of poetry to be published by Arkham House. It was released in an edition of 519 copies. The book was a second stop-gap volume following The Dark Chateau. It represented Smith's poetry while the more extensive Selected Poems was being prepared which did not ultimately appear until 1971. The collection also includes several translations of French and Spanish poems. Clérigo Herrero, however, is not a real person and the poem is actually a composition of Smith's.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/5631054-spells-and-philtres"
   },
   {
@@ -2723,7 +2599,7 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/b/ba/Always_comes_evening.jpg",
     "coverImageFile": "covers/always-comes-evening-162.jpg",
     "error": null,
-    "description": "Always Comes Evening is a collection of poems by Robert E. Howard. It was released in 1957 and was the author's second book to be published by Arkham House. It was released in an edition of 636 copies. The publication was subsidized by Howard's literary executor, Glenn Lord who compiled the poems.\n\nThe volume exists in two states. 536 copies had the title and Howard's name running from bottom to top of the spine, as done in Europe. When the error was discovered during the printing process, the last 100 copies were made American-style with the title and Howard's name running from top to bottom."
+    "goodreadsUrl": "https://www.goodreads.com/book/show/1512252.Always_Comes_Evening"
   },
   {
     "id": 379,
@@ -2739,7 +2615,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/a/a1/Survivor_and_others.jpg",
     "coverImageFile": "covers/the-survivor-and-others-163.jpg",
     "error": null,
-    "description": "The Survivor and Others is a collection of fantasy and horror short stories by American writer August Derleth. It was released in an edition of 2,096 copies. It was reissued in paperback by Ballantine Books in 1962 and 1971. The stories were based on and inspired by unused ideas of H. P. Lovecraft, and billed as \"posthumous collaborations\" with him. Derleth was in fact Lovecraft's literary executor after the latter's death in 1937.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/872968.The_Survivor_and_Others"
   },
   {
@@ -2756,7 +2631,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/b/bc/Feasting_dead.jpg",
     "coverImageFile": "covers/the-feasting-dead-164.jpg",
     "error": null,
-    "description": "The Feasting Dead is a horror novel by British writer John Metcalfe. It was published by Arkham House in 1954 in an edition of 1,242 copies. It was the only book published by Arkham House in 1954. A new edition was issued by Valancourt Books in 2014.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/3314560-the-feasting-dead"
   },
   {
@@ -2773,7 +2647,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/8/82/Curse_of_yig.jpg",
     "coverImageFile": "covers/the-curse-of-yig-book-165.jpg",
     "error": null,
-    "description": "The Curse of Yig is a collection of fantasy and horror short stories and essays by American writer Zealia Bishop. It was released in 1953 and was the author's only collection published by Arkham House. It was released in an edition of 1,217 copies.\n\nThe three stories had originally appeared in the magazine Weird Tales and were co-written by H. P. Lovecraft. The stories are part of the Cthulhu Mythos.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/11904105-the-curse-of-yig"
   },
   {
@@ -2790,7 +2663,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/5/5f/Night%27s_yawning_peal.jpg",
     "coverImageFile": "covers/nights-yawning-peal-a-ghostly-company-166.jpg",
     "error": null,
-    "description": "Night's Yawning Peal: A Ghostly Company is an anthology of supernatural short stories edited by American writer August Derleth. It was released in 1952 by Arkham House with Pellegrini & Cudahy in an edition of 4,500 copies. The cover price on the first edition is $3.00. It is the second and last book that Arkham published with Pellegrini and Cudahy.\n\nAn abridged paperback omitting several stories was published by Signet in 1974 as Night's Yawning Peal",
     "goodreadsUrl": "https://www.goodreads.com/book/show/82070.Night_s_Yawning_Peal"
   },
   {
@@ -2807,7 +2679,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/c/c9/Tales_from_underwood.jpg",
     "coverImageFile": "covers/tales-from-underwood-167.jpg",
     "error": null,
-    "description": "Tales from Underwood is a collection of fantasy, horror and science fiction short stories by American writer David H. Keller. It was released in 1952 and was the author's first collection published in association with Arkham House. It was also the first of only two books published by Pellegrini & Cudahy for Arkham House. It was released in an edition of 3,500 copies.\n\nMost of the stories had originally appeared in the magazines Weird Tales and Amazing Stories.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/5471361-tales-from-underwood"
   },
   {
@@ -2824,7 +2695,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/c/c1/Dark_chateau.jpg",
     "coverImageFile": "covers/the-dark-chateau-168.jpg",
     "error": null,
-    "description": "The Dark Chateau is a collection of poems by American writer Clark Ashton Smith. It was released in 1951 and was the author's fourth book to be published by Arkham House. It was released in an edition of 563 copies. The book was intended to be a stop-gap volume representing Smith's poetry while the more extensive Selected Poems was being prepared, although Selected Poems did not ultimately appear until 1971.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/12742049-the-dark-chateau"
   },
   {
@@ -2841,7 +2711,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/6/61/A_Hornbook_for_Witches_%28cover_art%29.jpg",
     "coverImageFile": "covers/a-hornbook-for-witches-169.jpg",
     "error": null,
-    "description": "A Hornbook for Witches: Poems of Fantasy is a collection of poems by Leah Bodine Drake. It was released in 1950, and was the author's first book and her only collection published by Arkham House. It was released in an edition of 553 copies, of which 300 were given to the author, making this one of the rarest books published by Arkham House. The jacket was the work of Frank Utpatel. The volume is dedicated to Drake's ancestor Jean Bodin \"who also concerned himself with witches.\"\n\nAccording to Sheldon Jaffery's The Arkham House Companion, \"the story goes that Ms Drake approached Derleth and requested that a book of her poetry be published by Arkham House, one that would contain a great many more poems than were contained in the 1947 anthology Dark of the Moon. Derleth refused except on the condition that she bear the cost, to which she agreed. After publication of A Hornbook for Witches, Drake received back about 300 copies as her share of the enterprise. Thus, the rarity of the book is explained, as only 253 were available for distribution by Arkham House directly to its dealers and subscribers. It's uncertain what became of Drake's 300 copies, although many may have been given or sold to her friends and neighbors. Lin Carter once told me that he was, some years ago, in a small midwestern city and saw Drake toting a shopping bag overflowing with copies of Hornbook, which she was autographing and selling for $1.50 per copy. The story has the ring of truth since Leah Bodine Drake, at the time the book was published, worked for the Evansville, Indiana Courier. Carter, lacking the foresight that we all acquire through hindsight, failed to buy any copies. He later spent $450.00 for one in less than perfect condition, as it was the last book needed to complete his Arkham House collection.\"\n\nThe New York Times reviewer Orville Prescott described Drake as \"a poet who writes in conventional rhyme schemes about very unconventional subjects\" and noted that \"for the most part Miss Drake goes her own original and fanciful way. Her poems may not be contributions to the great art of poetry, but they are rather fun in a grisly fashion.\" Boucher and McComas wrote that the collection would appeal \"to devotees of supernatural verse (or of attractive book-making).\"\n\nAn audiobook by the same name was released in 1976, read by Vincent Price. It contains four poems by Drake (\"A Hornbook for Witches\", \"Witches on the Heath\", \"'All Saints Eve\", and \"The Ballad of the Jabberwock\") as well as other material. The audio was originally released as both LP and on cassette (by Caedmon TC-1497) but can now be sourced on the internet as a CD recording.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/3904585"
   },
   {
@@ -2858,7 +2727,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/6/6b/Throne_of_saturn.jpg",
     "coverImageFile": "covers/the-throne-of-saturn-short-story-collection-170.jpg",
     "error": null,
-    "description": "The Throne of Saturn is a collection of science fiction short stories by British author S. Fowler Wright. It was released in 1949 and was the author's first American book and his only collection published by Arkham House. It was released in an edition of 3,062 copies.\n\nThe book is an expansion of The New Gods Lead published by Jarrolds in 1932 by the addition of two stories.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/13033273-the-throne-of-saturn"
   },
   {
@@ -2875,7 +2743,7 @@ window.BOOKS = [
     "coverImageUrl": null,
     "coverImageFile": null,
     "error": null,
-    "description": "The Arkham Sampler was an American fantasy and horror fiction magazine first published in Winter 1948. The headquarters was in Sauk City, Wisconsin. The magazine, edited by August Derleth, was the first of two magazines published by Arkham House. It was published on a quarterly basis. The cover design was prepared by Ronald Clyne and was printed in alternating colors for the eight quarterly issues. Each issue had a print run of 1,200 copies with the exception of the Winter 1949 \"All Science-Fiction Issue\", of which 2,000 copies were printed. The Autumn 1949 issue was the last edition of the magazine.\n\nThe Arkham Sampler published fiction, poetry, reviews, letters, articles and bibliographic data. The magazine published original works by H. P. Lovecraft, Ray Bradbury, Robert E. Howard, Theodore Sturgeon, A. E. van Vogt, Robert Bloch and others. Other writers featured in the magazine include Anthony Boucher, Everett F. Bleiler, Martin Gardner, Carl Jacobi, David H. Keller, Fritz Leiber, Frank Belknap Long, E. Hoffmann Price, Vincent Starrett, Jules Verne and H. Russell Wakefield."
+    "hidden": true
   },
   {
     "id": 421,
@@ -2891,7 +2759,7 @@ window.BOOKS = [
     "coverImageUrl": null,
     "coverImageFile": null,
     "error": null,
-    "description": "The Arkham Sampler was an American fantasy and horror fiction magazine first published in Winter 1948. The headquarters was in Sauk City, Wisconsin. The magazine, edited by August Derleth, was the first of two magazines published by Arkham House. It was published on a quarterly basis. The cover design was prepared by Ronald Clyne and was printed in alternating colors for the eight quarterly issues. Each issue had a print run of 1,200 copies with the exception of the Winter 1949 \"All Science-Fiction Issue\", of which 2,000 copies were printed. The Autumn 1949 issue was the last edition of the magazine.\n\nThe Arkham Sampler published fiction, poetry, reviews, letters, articles and bibliographic data. The magazine published original works by H. P. Lovecraft, Ray Bradbury, Robert E. Howard, Theodore Sturgeon, A. E. van Vogt, Robert Bloch and others. Other writers featured in the magazine include Anthony Boucher, Everett F. Bleiler, Martin Gardner, Carl Jacobi, David H. Keller, Fritz Leiber, Frank Belknap Long, E. Hoffmann Price, Vincent Starrett, Jules Verne and H. Russell Wakefield."
+    "hidden": true
   },
   {
     "id": 422,
@@ -2907,7 +2775,7 @@ window.BOOKS = [
     "coverImageUrl": null,
     "coverImageFile": null,
     "error": null,
-    "description": "The Arkham Sampler was an American fantasy and horror fiction magazine first published in Winter 1948. The headquarters was in Sauk City, Wisconsin. The magazine, edited by August Derleth, was the first of two magazines published by Arkham House. It was published on a quarterly basis. The cover design was prepared by Ronald Clyne and was printed in alternating colors for the eight quarterly issues. Each issue had a print run of 1,200 copies with the exception of the Winter 1949 \"All Science-Fiction Issue\", of which 2,000 copies were printed. The Autumn 1949 issue was the last edition of the magazine.\n\nThe Arkham Sampler published fiction, poetry, reviews, letters, articles and bibliographic data. The magazine published original works by H. P. Lovecraft, Ray Bradbury, Robert E. Howard, Theodore Sturgeon, A. E. van Vogt, Robert Bloch and others. Other writers featured in the magazine include Anthony Boucher, Everett F. Bleiler, Martin Gardner, Carl Jacobi, David H. Keller, Fritz Leiber, Frank Belknap Long, E. Hoffmann Price, Vincent Starrett, Jules Verne and H. Russell Wakefield."
+    "hidden": true
   },
   {
     "id": 423,
@@ -2923,7 +2791,7 @@ window.BOOKS = [
     "coverImageUrl": null,
     "coverImageFile": null,
     "error": null,
-    "description": "The Arkham Sampler was an American fantasy and horror fiction magazine first published in Winter 1948. The headquarters was in Sauk City, Wisconsin. The magazine, edited by August Derleth, was the first of two magazines published by Arkham House. It was published on a quarterly basis. The cover design was prepared by Ronald Clyne and was printed in alternating colors for the eight quarterly issues. Each issue had a print run of 1,200 copies with the exception of the Winter 1949 \"All Science-Fiction Issue\", of which 2,000 copies were printed. The Autumn 1949 issue was the last edition of the magazine.\n\nThe Arkham Sampler published fiction, poetry, reviews, letters, articles and bibliographic data. The magazine published original works by H. P. Lovecraft, Ray Bradbury, Robert E. Howard, Theodore Sturgeon, A. E. van Vogt, Robert Bloch and others. Other writers featured in the magazine include Anthony Boucher, Everett F. Bleiler, Martin Gardner, Carl Jacobi, David H. Keller, Fritz Leiber, Frank Belknap Long, E. Hoffmann Price, Vincent Starrett, Jules Verne and H. Russell Wakefield."
+    "hidden": true
   },
   {
     "id": 387,
@@ -2939,7 +2807,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/3/32/Something_about_cats.jpg",
     "coverImageFile": "covers/something-about-cats-and-other-pieces-175.jpg",
     "error": null,
-    "description": "Something About Cats and Other Pieces is a collection of fantasy, horror and science fiction short stories, poetry and essays by American author H. P. Lovecraft. 2,995 copies were released in 1949 and was the fourth collection of Lovecraft's work published by Arkham House.\n\nThe stories for this volume were selected by August Derleth.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/1104566.Something_About_Cats_and_Other_Pieces"
   },
   {
@@ -2956,7 +2823,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/8/86/Not_long_for_this_world.jpg",
     "coverImageFile": "covers/not-long-for-this-world-176.jpg",
     "error": null,
-    "description": "Not Long for this World is a collection of fantasy and horror short stories by American writer August Derleth. It was released in 1948 and was the author's third collection published by Arkham House. It was released in an edition of 2,067 copies.\n\nMost of the stories had originally appeared in the magazine Weird Tales.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/2436635.Not_Long_for_This_World"
   },
   {
@@ -2973,7 +2839,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/9/99/Genius_loci.jpg",
     "coverImageFile": "covers/genius-loci-and-other-tales-177.jpg",
     "error": null,
-    "description": "Genius Loci and Other Tales is a collection of fantasy, horror and science fiction short stories by American writer Clark Ashton Smith. It was released in 1948 and was the author's third book published by Arkham House. It was released in an edition of 3,047 copies. The stories were written between 1930 and 1935.\n\nThe collection contains stories from Smith's major story cycles of Averoigne and Zothique.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/1950319.Genius_Loci_and_Other_Tales"
   },
   {
@@ -2990,7 +2855,7 @@ window.BOOKS = [
     "coverImageUrl": null,
     "coverImageFile": null,
     "error": null,
-    "description": "The Arkham Sampler was an American fantasy and horror fiction magazine first published in Winter 1948. The headquarters was in Sauk City, Wisconsin. The magazine, edited by August Derleth, was the first of two magazines published by Arkham House. It was published on a quarterly basis. The cover design was prepared by Ronald Clyne and was printed in alternating colors for the eight quarterly issues. Each issue had a print run of 1,200 copies with the exception of the Winter 1949 \"All Science-Fiction Issue\", of which 2,000 copies were printed. The Autumn 1949 issue was the last edition of the magazine.\n\nThe Arkham Sampler published fiction, poetry, reviews, letters, articles and bibliographic data. The magazine published original works by H. P. Lovecraft, Ray Bradbury, Robert E. Howard, Theodore Sturgeon, A. E. van Vogt, Robert Bloch and others. Other writers featured in the magazine include Anthony Boucher, Everett F. Bleiler, Martin Gardner, Carl Jacobi, David H. Keller, Fritz Leiber, Frank Belknap Long, E. Hoffmann Price, Vincent Starrett, Jules Verne and H. Russell Wakefield."
+    "hidden": true
   },
   {
     "id": 425,
@@ -3006,7 +2871,7 @@ window.BOOKS = [
     "coverImageUrl": null,
     "coverImageFile": null,
     "error": null,
-    "description": "The Arkham Sampler was an American fantasy and horror fiction magazine first published in Winter 1948. The headquarters was in Sauk City, Wisconsin. The magazine, edited by August Derleth, was the first of two magazines published by Arkham House. It was published on a quarterly basis. The cover design was prepared by Ronald Clyne and was printed in alternating colors for the eight quarterly issues. Each issue had a print run of 1,200 copies with the exception of the Winter 1949 \"All Science-Fiction Issue\", of which 2,000 copies were printed. The Autumn 1949 issue was the last edition of the magazine.\n\nThe Arkham Sampler published fiction, poetry, reviews, letters, articles and bibliographic data. The magazine published original works by H. P. Lovecraft, Ray Bradbury, Robert E. Howard, Theodore Sturgeon, A. E. van Vogt, Robert Bloch and others. Other writers featured in the magazine include Anthony Boucher, Everett F. Bleiler, Martin Gardner, Carl Jacobi, David H. Keller, Fritz Leiber, Frank Belknap Long, E. Hoffmann Price, Vincent Starrett, Jules Verne and H. Russell Wakefield."
+    "hidden": true
   },
   {
     "id": 426,
@@ -3022,7 +2887,7 @@ window.BOOKS = [
     "coverImageUrl": null,
     "coverImageFile": null,
     "error": null,
-    "description": "The Arkham Sampler was an American fantasy and horror fiction magazine first published in Winter 1948. The headquarters was in Sauk City, Wisconsin. The magazine, edited by August Derleth, was the first of two magazines published by Arkham House. It was published on a quarterly basis. The cover design was prepared by Ronald Clyne and was printed in alternating colors for the eight quarterly issues. Each issue had a print run of 1,200 copies with the exception of the Winter 1949 \"All Science-Fiction Issue\", of which 2,000 copies were printed. The Autumn 1949 issue was the last edition of the magazine.\n\nThe Arkham Sampler published fiction, poetry, reviews, letters, articles and bibliographic data. The magazine published original works by H. P. Lovecraft, Ray Bradbury, Robert E. Howard, Theodore Sturgeon, A. E. van Vogt, Robert Bloch and others. Other writers featured in the magazine include Anthony Boucher, Everett F. Bleiler, Martin Gardner, Carl Jacobi, David H. Keller, Fritz Leiber, Frank Belknap Long, E. Hoffmann Price, Vincent Starrett, Jules Verne and H. Russell Wakefield."
+    "hidden": true
   },
   {
     "id": 427,
@@ -3038,7 +2903,7 @@ window.BOOKS = [
     "coverImageUrl": null,
     "coverImageFile": null,
     "error": null,
-    "description": "The Arkham Sampler was an American fantasy and horror fiction magazine first published in Winter 1948. The headquarters was in Sauk City, Wisconsin. The magazine, edited by August Derleth, was the first of two magazines published by Arkham House. It was published on a quarterly basis. The cover design was prepared by Ronald Clyne and was printed in alternating colors for the eight quarterly issues. Each issue had a print run of 1,200 copies with the exception of the Winter 1949 \"All Science-Fiction Issue\", of which 2,000 copies were printed. The Autumn 1949 issue was the last edition of the magazine.\n\nThe Arkham Sampler published fiction, poetry, reviews, letters, articles and bibliographic data. The magazine published original works by H. P. Lovecraft, Ray Bradbury, Robert E. Howard, Theodore Sturgeon, A. E. van Vogt, Robert Bloch and others. Other writers featured in the magazine include Anthony Boucher, Everett F. Bleiler, Martin Gardner, Carl Jacobi, David H. Keller, Fritz Leiber, Frank Belknap Long, E. Hoffmann Price, Vincent Starrett, Jules Verne and H. Russell Wakefield."
+    "hidden": true
   },
   {
     "id": 390,
@@ -3054,7 +2919,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/6/6d/Book_Cover_for_%22Roads%22.jpg",
     "coverImageFile": "covers/roads-novel-182.jpg",
     "error": null,
-    "description": "Roads is a short novel by author Seabury Quinn. It was published by Arkham House in 1948 in an edition of 2,137 copies. It was Arkham House's first illustrated book and the author's first hardcover.\n\nThe story, in an unrevised edition, originally appeared in the January 1938 issue of Weird Tales magazine.\n\nRoads is a Christmas story that traces the origins of Santa Claus from the beginning of the Christian era.\n\nThe story is split into three parts:\n\nRoads was re-issued in 2005 by Red Jacket Press, as a fully authorized facsimile reproduction of the original Arkham House edition, and again by Shadowridge Press in 2017.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/470670.Roads"
   },
   {
@@ -3071,7 +2935,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/e/e7/Fourth_book_of_jorkens_first.jpg",
     "coverImageFile": "covers/the-fourth-book-of-jorkens-183.jpg",
     "error": null,
-    "description": "The Fourth Book of Jorkens is a collection of fantasy short stories, narrated by Mr. Joseph Jorkens, by writer Lord Dunsany. It was first published by Jarrolds in 1947. It was the fourth collection of Dunsany's Jorkens tales to be published. It has also been issued in combination with the third book, Jorkens Has a Large Whiskey, and two uncollected short stories, in the omnibus edition The Collected Jorkens, Volume Two, published by Night Shade Books in 2004.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/7861860-the-fourth-book-of-jorkens"
   },
   {
@@ -3088,7 +2951,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/f/fe/Web_of_easter_island.jpg",
     "coverImageFile": "covers/the-web-of-easter-island-184.jpg",
     "error": null,
-    "description": "The Web of Easter Island is a novel by American writer Donald Wandrei. It was published by Arkham House in 1948 in an edition of 3,068 copies. It was the fourth full-length novel to be published by Arkham House.\n\nThe Web of Easter Island was first written in 1932, many years prior to publication under the title Dead Titans, Waken!. The manuscript was rejected by several publishers including Harper & Brothers but was eventually revised and published by Arkham House. It is loosely related to the Cthulhu Mythos (it is dedicated to H. P. Lovecraft) and follows the exploits of Carter E. Graham from England to Easter Island, where ancient horror is discovered and combatted.\n\nChapter XII of The Web of Easter Island is a somewhat rewritten version of the story A Fragment of a Dream from Wandrei's collection The Eye and the Finger.\n\nDead Titans, Waken! was edited for re-publication by S.T. Joshi and was to have been issued during the 1990s by Fedogan and Bremer. It was finally published by Centipede Press in a limited edition of 300 copies in March 2012 as an omnibus edition also including another Wandrei novel, Invisible Sun (which remained unpublished during Wandrei's lifetime and appears here for the first time.). Fedogan and Bremer eventually issued a paperback edition in 2017 which is also an omnibus of the two novels although titled only Dead Titans, Waken! S.T. Joshi's Afterword to these omnibus editions contains considerable information about the genesis of both works.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/2307034.The_Web_of_Easter_Island"
   },
   {
@@ -3105,7 +2967,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/e/e2/Travelling_grave.jpg",
     "coverImageFile": "covers/the-travelling-grave-and-other-stories-185.jpg",
     "error": null,
-    "description": "The Travelling Grave and Other Stories is a collection of horror and fantasy short stories by author L. P. Hartley. It was released in 1948 and was the author's first American collection of fantastic tales. It was published by Arkham House in an edition of 2,047 copies.\n\nMost of the stories had originally appeared in two British collections: Night Fears and The Killing Bottle and Other Stories.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/2155960.The_Travelling_Grave_and_Other_Stories"
   },
   {
@@ -3122,7 +2983,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/2/26/Nights_black_agents.jpg",
     "coverImageFile": "covers/nights-black-agents-186.jpg",
     "error": null,
-    "description": "Night's Black Agents is a collection of fantasy and horror short stories by American writer Fritz Leiber. It was released in 1947 and was the author's first book. The book's title is taken from Macbeth, Act III, scene ii. It was published by Arkham House in an edition of 3,084 copies.\n\nMost of the stories originally appeared in the magazines Unknown and Weird Tales. Three were first published in this book. The last two stories showcase Leiber's Sword and Sorcery heroes Fafhrd and the Gray Mouser.\n\nLater editions added additional material under the same title. The Berkley (1978) reprint adds two stories \"The Girl with the Hungry Eyes\" and \"A Bit of the Dark World\". The definitive version is the Gregg Press (1980) hardcover which adds a Foreword by Richard Gid Powers to the complete contents of the Berkley edition and is thus an expansion of the original Arkham House edition.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/1613812.Night_s_Black_Agents"
   },
   {
@@ -3139,7 +2999,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/f/fb/Revelations_in_black.jpg",
     "coverImageFile": "covers/revelations-in-black-187.jpg",
     "error": null,
-    "description": "Revelations in Black is a collection of fantasy and horror short stories by American writer Carl Jacobi. It was released in 1947 and was the author's first book. It was published by Arkham House with an edition of 3,082 copies.\n\nMost of the stories were published originally in the magazines Weird Tales and Startling Stories.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/324673.Revelations_in_Black"
   },
   {
@@ -3156,7 +3015,7 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/d/d5/Dark_carnival_originall.jpg",
     "coverImageFile": "covers/dark-carnival-short-story-collection-188.jpg",
     "error": null,
-    "description": "Dark Carnival is a short story collection by American writer Ray Bradbury, first published October 1947 by Arkham House. It was his debut book, and many of the stories were reprinted elsewhere."
+    "goodreadsUrl": "https://www.goodreads.com/book/show/1794059.Dark_Carnival"
   },
   {
     "id": 397,
@@ -3172,7 +3031,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/5/5e/Dark_of_the_moon.jpg",
     "coverImageFile": "covers/dark-of-the-moon-poems-of-fantasy-and-the-macabre-189.jpg",
     "error": null,
-    "description": "Dark of the Moon: Poems of Fantasy and the Macabre is a poetry anthology edited by August Derleth and published in 1947 by Arkham House in an edition of 2,634 copies. It is a pioneering anthology of odd poetry from the Middle Ages to the present, arranged chronologically.\n\nA publishing curiosity is that this book had two different dustjackets – the only Arkham House book to have this feature. Both states of the jacket feature a background photograph of a mountain, although on the two jackets the image is reversed as compared with each other. The first-state jacket has lettering in green, whereas the second state jacket is lettered in orange and white. The jacket with the green lettering is the first state of the dustjacket (pictured right). Its lettering was rendered by Wisconsin artist Frank Utpatel. This state is the rarer of the two jackets, since a large number of the Utpatel jackets were destroyed by silverfish during storage.\n\nThe second state dust jacket, which features orange and white lettering, was redesigned by Gary Gore, who from 1959 on, became increasingly more active in working with August Derleth on Arkham House covers.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/781239.Dark_of_the_Moon"
   },
   {
@@ -3189,7 +3047,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/a/a9/This_mortal_coil.jpg",
     "coverImageFile": "covers/this-mortal-coil-book-190.jpg",
     "error": null,
-    "description": "This Mortal Coil is a collection of fantasy and horror short stories by author Cynthia Asquith. It was released in 1947 and was the only collection of the author's stories to be published by Arkham House. It was published in an edition of 2,609 copies.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/2845541-this-mortal-coil"
   },
   {
@@ -3206,7 +3063,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/c/ca/Slan.jpg",
     "coverImageFile": "covers/slan-191.jpg",
     "error": null,
-    "description": "Slan is a science-fiction novel by the Canadian-American writer A. E. van Vogt (1912–2000) — it is also the name of the fictional race of superbeings featured in the novel. The work was first serialized in the magazine Astounding Science Fiction (Sept–Dec 1940) and then published in hardcover in 1946 by Arkham House in an edition of 4,051 copies.\n\nIn 2016, Slan was awarded the Retro-Hugo Award for Best Novel for 1941.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/643792.Slan"
   },
   {
@@ -3223,7 +3079,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/4/45/Clock_strikes_twelve.jpg",
     "coverImageFile": "covers/the-clock-strikes-twelve-192.jpg",
     "error": null,
-    "description": "The Clock Strikes Twelve is a collection of stories by author H. Russell Wakefield, published by Arkham House in 1946, and was the first collection of the author's stories to be published by Arkham House. (An earlier edition, with four fewer stories, had been published in England in 1940.) It was published in an edition of 4,040 copies.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/56968182-the-clock-strikes-twelve"
   },
   {
@@ -3240,7 +3095,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/4/45/Fearful_pleasures.jpg",
     "coverImageFile": "covers/fearful-pleasures-193.jpg",
     "error": null,
-    "description": "Fearful Pleasures is a collection of fantasy and horror short stories by author A. E. Coppard. It was released in 1946 and was the first collection of the author's stories to be published by Arkham House. It was published in an edition of 4,033 copies.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/5248022-fearful-pleasures"
   },
   {
@@ -3257,7 +3111,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/e/ed/West_india_lights.jpg",
     "coverImageFile": "covers/west-india-lights-194.jpg",
     "error": null,
-    "description": "West India Lights is a collection of fantasy and horror short stories by American writer Henry S. Whitehead. It was released in 1946 and was the second collection of the author's stories to be published by Arkham House. It was published in an edition of 3,037 copies.\n\nMost of the stories had originally appeared in the magazines Weird Tales, Strange Tales, and Amazing Stories.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/3904565-west-india-lights"
   },
   {
@@ -3274,7 +3127,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/c/c0/Skull_face_and_others.jpg",
     "coverImageFile": "covers/skull-face-and-others-195.jpg",
     "error": null,
-    "description": "Skull-Face and Others is a collection of fantasy and horror short stories by American writer Robert E. Howard. It was the author's third book and was published by Arkham House in 1946 in an edition of 3,004 copies.\n\nMost of the stories had originally appeared in the magazine Weird Tales.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/18271132-skull-face-and-others"
   },
   {
@@ -3291,7 +3143,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/5/57/House_on_the_borderland.jpg",
     "coverImageFile": "covers/the-house-on-the-borderland-and-other-novels-196.jpg",
     "error": null,
-    "description": "The House on the Borderland and Other Novels is a collection of short novels by British writer William Hope Hodgson. It was published by Arkham House in 1946 in an edition of 3,014 copies. The collection was reprinted by Gollancz in 2002, with a new introduction by China Miéville, as volume 33 of their Fantasy Masterworks series.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/220937.The_House_on_the_Borderland"
   },
   {
@@ -3308,7 +3159,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/3/39/Doll_and_one_other.jpg",
     "coverImageFile": "covers/the-doll-and-one-other-197.jpg",
     "error": null,
-    "description": "The Doll and One Other is a collection of two fantasy and horror novelettes by author Algernon Blackwood. It was released in 1946 and was the first publication of either novelette. It was published by Arkham House in an edition of 3,490 copies.\n\nThe first novelette, \"The Doll\", was adapted for an episode of the television show Night Gallery. It was also adapted for the December 24, 1944, episode of old time radio show The Weird Circle.\n\nJames Agate Jr adapted the story for CBS Radio Mystery Theatre (ep. 1224 - July 22, 1981) under the title Toy Death starring Kristoffer Tabori and Patricia Elliott.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/61300920-the-doll-and-one-other"
   },
   {
@@ -3325,7 +3175,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/9/9a/Hounds_of_tindalos.jpg",
     "coverImageFile": "covers/the-hounds-of-tindalos-book-198.jpg",
     "error": null,
-    "description": "The Hounds of Tindalos is a collection of fantasy, horror and science fiction short stories by American writer Frank Belknap Long. It was released in 1946 and was the author's third book. It was published by Arkham House in an edition of 2,602 copies with cover art by Hannes Bok. A British hardcover was issued by Museum Press in 1950. Belmont Books reprinted The Hounds of Tindalos in two paperback volumes, The Hounds of Tindalos (1963) and The Dark Beasts (1964), omitting three stories; Panther Books issued a complete two-volume British paperback edition as The Hounds of Tindalos (1975) and The Black Druid (1975).\n\nThe 1975 Doubleday collection The Early Long may be considered as crucially supplemental to the Arkham House volume, since while it comprises only seventeen of the twenty-one stories in the Arkham House book, it adds \"an excellent introduction and head notes\" written by Long. (The 1978 paperback edition of The Early Long was retitled The Hounds of Tindalos.)",
     "goodreadsUrl": "https://www.goodreads.com/book/show/1831275.The_Hounds_of_Tindalos"
   },
   {
@@ -3342,7 +3191,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/0/06/Lurker_at_the_threshold.jpg",
     "coverImageFile": "covers/the-lurker-at-the-threshold-199.jpg",
     "error": null,
-    "description": "The Lurker at the Threshold is a horror novel by American writer August Derleth, based on short fragments written by H. P. Lovecraft, who died in 1937, and published as a collaboration between the two authors. According to S. T. Joshi, of the novel's 50,000 words, 1,200 were written by Lovecraft.\n\nThe novel was originally published in 1945 by Arkham House in a hardcover edition of 3,041 copies, listed as the second (and final) volume in the \"Library of Arkham House Novels of Fantasy and Terror\". A British hardcover followed from Museum Press in 1948. The first British paperback was issued in 1970, with an American paperback published by Beagle Books in 1971. The novel has since been regularly reissued by Ballantine Books, then by Carroll & Graf. A French translation, Le rôdeur devant le seuil, appeared in 1973.\n\nThe Lurker at the Threshold was included in The Watchers Out of Time and Others, the 1974 Arkham House omnibus edition of Derleth's stories credited as collaborations with Lovecraft (but excluded from similarly titled paperback editions compiling those stories).",
     "goodreadsUrl": "https://www.goodreads.com/book/show/164312.The_Lurker_at_the_Threshold"
   },
   {
@@ -3359,7 +3207,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/e/e1/Green_Tea_and_Other_Ghost_Stories.jpg",
     "coverImageFile": "covers/green-tea-and-other-ghost-stories-200.jpg",
     "error": null,
-    "description": "Green Tea and Other Ghost Stories is a collection of fantasy and horror short stories by Irish author J. Sheridan Le Fanu. It was released in 1945 and was the author's first book to be published in the United States. It was published by Arkham House in an edition of 2,026 copies. A much less extensive collection of Le Fanu stories was published under the same title by Dover Books in 1993.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/752869.Green_Tea_and_Other_Ghost_Stories"
   },
   {
@@ -3376,7 +3223,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/3/31/Witch_house.jpg",
     "coverImageFile": "covers/witch-house-201.jpg",
     "error": null,
-    "description": "Witch House is a fantasy novel by American writer Evangeline Walton. It was published in 1945 by Arkham House in an edition of 3,000 copies. It was the first full-length novel to be published by Arkham House and was listed as the initial book in the Library of Arkham House Novels of Fantasy and Terror. An expanded version, with a newly written 20,000-word prologue, was published in England in 1950. In 2013, Centipede Press issued the first American edition of this revised version, also including previously unpublished writings by Walton and several of her short stories.\n\nAccording to Robert Weinberg, the volume was Arkham House's greatest flop - an excellent novel that took nearly two decades to go out of print.\n\nE. F. Bleiler described the novel as a \"Neo-Gothic thriller. [marked by] imaginative writing, a good climax, but a prolonged, dull first section and characterizations that do not click.\" The Encyclopedia of Fantasy found it to be \"an atmospheric Haunted-Dwelling tale\".",
     "goodreadsUrl": "https://www.goodreads.com/book/show/2378596.Witch_House"
   },
   {
@@ -3393,7 +3239,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/0/07/Opener_of_the_way.jpg",
     "coverImageFile": "covers/the-opener-of-the-way-202.jpg",
     "error": null,
-    "description": "The Opener of the Way is a collection of fantasy and horror short stories by American writer Robert Bloch. It was released in 1945 and was the author's first book. It was published by Arkham House in an edition of 2,065 copies. Most of the stories had appeared in the magazine Weird Tales in the 1930s and 1940s, and some of the stories are part of the Cthulhu Mythos.\n\nA British hardcover was issued by Neville Spearman in 1974, with Panther Books issuing a two-volume paperback reprint in 1976. An Italian translation, with the stories reordered, appeared in 1991. The collection was never reprinted in the United States, but its contents (aside from Bloch's introduction) were included in the 1994 omnibus The Early Fears. Valancourt Books has scheduled an American reprinting of The Opener of the Way for late 2024, with a new introduction by Ramsey Campbell.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/3051048-the-opener-of-the-way"
   },
   {
@@ -3410,7 +3255,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/4/4a/Something_near.jpg",
     "coverImageFile": "covers/something-near-203.jpg",
     "error": null,
-    "description": "Something Near is a collection of fantasy and horror short stories by American writer August Derleth. It was released in 1945 and was the author's second book published by Arkham House. 2,054 copies were printed. The collection has never been reprinted.\n\nMost of the stories had appeared earlier in the magazine Weird Tales.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/3904566-something-near"
   },
   {
@@ -3427,7 +3271,7 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/commons/e/e8/Marginalia_lovecraft.jpg",
     "coverImageFile": "covers/marginalia-collection-204.jpg",
     "error": null,
-    "description": "Marginalia is a collection of Fantasy, Horror and Science fiction short stories, essays, biography and poetry by and about the American author H. P. Lovecraft. It was released in 1944 and was the third collection of Lovecraft's work published by Arkham House. 2,035 copies were printed.\n\nThe contents of this volume were selected by August Derleth and Donald Wandrei. The dust-jacket art is a reproduction of Virgil Finlay's illustration for Lovecraft's story \"The Shunned House.\""
+    "goodreadsUrl": "https://www.goodreads.com/book/show/5743058-marginalia"
   },
   {
     "id": 413,
@@ -3443,7 +3287,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/3/3e/Lost_Worlds_Smith.jpg",
     "coverImageFile": "covers/lost-worlds-smith-collection-205.jpg",
     "error": null,
-    "description": "Lost Worlds is a collection of fantasy, horror and science fiction short stories by the American writer Clark Ashton Smith. It was published in 1944 and was the author's second book published by Arkham House. 2,043 copies were printed.\n\nThe stories for this volume were selected by the author. The collection contains stories from Smith's major story cycles of Hyperborea, Atlantis, Averoigne, Zothique and Xiccarph.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/102092.Lost_Worlds"
   },
   {
@@ -3460,7 +3303,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/4/4e/Jumbee.JPG",
     "coverImageFile": "covers/jumbee-and-other-uncanny-tales-206.jpg",
     "error": null,
-    "description": "Jumbee and Other Uncanny Tales is a collection of fantasy and horror short stories by American writer Henry S. Whitehead. It was released in 1944 and was his first book published by Arkham House. 1,559 copies were printed. The introduction is by Whitehead's fellow Floridian Robert H. Barlow.\n\nThe stories for this volume were taken chiefly from the magazines Weird Tales and Adventure.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/4744376-jumbee-and-other-uncanny-tales"
   },
   {
@@ -3477,7 +3319,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/2/2e/Eye_and_the_finger.jpg",
     "coverImageFile": "covers/the-eye-and-the-finger-207.jpg",
     "error": null,
-    "description": "The Eye and the Finger is a collection of fantasy, horror and science fiction short stories by American writer Donald Wandrei. It was released in 1944 and was his first book published by Arkham House. 1,617 copies were printed.\n\nThe 21 stories here collected had appeared previously in Weird Tales, Esquire, Argosy, Astounding Stories and other magazines. They were selected by the author and were the ones he considered to be his best at the time. The dust jacket illustration is by the author's brother, Howard Wandrei.\n\nDon Herron quotes bookseller/publisher Roy A. Squires as saying that The Eye and the Finger is \"one of the most difficult to find of Arkham House fiction titles - it was out of print in 1946.\" The collection has never been reprinted in its original form, although all the stories are included in the Fedogan & Bremer omnibus collections Don't Dream: The Collected Fantasy and Horror of Donald Wandrei and Colossus: The Collected Science Fiction of Donald Wandrei.\n\nChapter XII of The Web of Easter Island is a somewhat rewritten version of the story \"A Fragment of a Dream\".",
     "goodreadsUrl": "https://www.goodreads.com/book/show/5519359-the-eye-and-the-finger"
   },
   {
@@ -3494,7 +3335,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/4/40/Beyond_the_wall_of_sleep.jpg",
     "coverImageFile": "covers/beyond-the-wall-of-sleep-collection-208.jpg",
     "error": null,
-    "description": "Beyond the Wall of Sleep is a collection of fantasy, horror and science fiction short stories, poems and essays by American author H. P. Lovecraft. It was released in 1943 and was the second collection of Lovecraft's work published by Arkham House. 1,217 copies were printed. The volume is named for the Lovecraft short story \"Beyond the Wall of Sleep\".\n\nThe stories for this volume were selected by August Derleth and Donald Wandrei. The dust jacket art was a collage of photographs of sculptures by Clark Ashton Smith.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/13596226-beyond-the-wall-of-sleep"
   },
   {
@@ -3511,7 +3351,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/commons/d/d5/%22Out_of_Space_and_Time%22%2C_by_Clark_Ashton_Smith.jpg",
     "coverImageFile": "covers/out-of-space-and-time-209.jpg",
     "error": null,
-    "description": "Out of Space and Time is a collection of fantasy, horror and science fiction short stories by American writer Clark Ashton Smith. It was released in 1942 and was the third book published by Arkham House. 1,054 copies were printed. A British hardcover appeared from Neville Spearman in 1971, with a two-volume paperback reprint following from Panther Books in 1974. Bison Books issued a trade paperback edition in 2006.\n\nThe stories for this volume were selected by the author and were considered by him to be his best fantasy and horror stories to date. The collection contains stories from Smith's major story cycles of Averoigne, Hyperborea, Poseidonis, and Zothique. Smith had wanted to call the collection \"The End of the Story and Other Stories\", but acceded to Derleth's suggestion, an allusion to Edgar Allan Poe's \"Dream-Land\".",
     "goodreadsUrl": "https://www.goodreads.com/book/show/102093.Out_Of_Space_And_Time"
   },
   {
@@ -3528,7 +3367,6 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/f/f0/Someone_in_the_dark.jpg",
     "coverImageFile": "covers/someone-in-the-dark-210.jpg",
     "error": null,
-    "description": "Someone in the Dark is a collection of fantasy and horror short stories by author August Derleth. It was released in 1941 and was the second book published by Arkham House. 1,115 copies were printed, priced at $2.00. In Thirty Years of Arkham House, Derleth implied that this title had sold out by the end of 1944.\n\nHowever, more than twenty years later, in 1967, Derleth listed Someone in the Dark in an Arkham House bulletin with this announcement: \"We have acquired a small stock of this title, Derleth's first collection of macabre tales, published in 1941. They will be sold at $5.00 the copy to patrons interested in acquiring the book.\" Derleth was being disingenuous in suggesting these 'unearthed' copies were the 1941 edition. The additional 300 copies were printed in offset by Hunter Publishing Co. in Winston-Salem in 1965, the reprint probably authorized by Derleth himself. (In The Arkham House Companion, Sheldon Jaffery quotes a letter that seems to indicate this). The 1965 reprint are a quarter-inch higher than the originals, and are bound with headbands (not present in the 1941 first editions).\n\nThe 1965 edition is scarce. While it is not generally considered an official Arkham House publication, it is considered an essential acquisition for Arkham House completists.\n\nA paperback reprint was issued by Jove Books in 1978.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/3280403-someone-in-the-dark"
   },
   {
@@ -3545,8 +3383,7 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/2/27/The_Outsider_and_Others_book_cover.jpg",
     "coverImageFile": "covers/the-outsider-and-others-211.jpg",
     "error": null,
-    "description": "The Outsider and Others is a collection of stories by American writer H. P. Lovecraft. It was released in 1939 and was the first book published by Arkham House. 1,268 copies were printed. It went out of print early in 1944 and has never been reprinted.\n\nThe volume takes its name from the Lovecraft short story \"The Outsider\"; The Outsider and Other Stories was Lovecraft's preferred title for a short story collection considered, but never issued, by Farnsworth Wright. The stories for this volume were selected by August Derleth and Donald Wandrei. The dust jacket art was a montage of drawings by Virgil Finlay for Weird Tales magazine, of which only one or two had originally illustrated Lovecraft stories.\n\nE. F. Bleiler describes the collection's publication as \"the beginning of serious specialist publishing of fantastic fiction in America\".",
-    "goodreadsUrl": "https://www.goodreads.com/book/show/176155"
+    "goodreadsUrl": "https://www.goodreads.com/book/show/11399579-the-outsider-and-others"
   },
   {
     "imprint": "mycroft_moran",
@@ -3562,7 +3399,6 @@ window.BOOKS = [
     "coverImageFile": "covers/the-original-text-solar-pons-omnibus-edition-212.jpg",
     "error": null,
     "id": 212,
-    "description": "The Original Text Solar Pons Omnibus Edition is a collection of detective fiction stories by author August Derleth. It was released in 2000 by Mycroft & Moran (under license to George Vanderburgh of Battered Silicon Dispatch Box, Canada) and was published in two volumes. The set collects all of the Solar Pons stories of August Derleth. The stories are pastiches of the Sherlock Holmes tales of Arthur Conan Doyle. The collection restores the text to its original state, removing the edits made by Basil Copper for the 1982 collection The Solar Pons Omnibus. The stories are also ordered by their date of publication rather than by their internal chronology as was done for the earlier omnibus edition. This edition also drops the Robert Bloch Foreword from the 1982 edition and adds two new introductory essays by Peter Ruber.\n\nThe publisher announced a paperback reissue of this set in eight volumes, but as 2025, these volumes have not appeared.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/879509"
   },
   {
@@ -3579,7 +3415,6 @@ window.BOOKS = [
     "coverImageFile": "covers/in-lovecrafts-shadow-213.jpg",
     "error": null,
     "id": 213,
-    "description": "In Lovecraft's Shadow: The Cthulhu Mythos Stories of August Derleth is a collection of fantasy and horror short stories by American writer August Derleth. It was released in 1998 by Mycroft & Moran in an edition of 2,051 copies.\n\nThe stories are part of the Cthulhu Mythos and several had appeared previously in the Arkham House collections: The Mask of Cthulhu (1958), The Trail of Cthulhu (1962) and Colonel Markesan and Less Pleasant People (with Mark Schorer, 1966).",
     "goodreadsUrl": "https://www.goodreads.com/book/show/920819"
   },
   {
@@ -3596,7 +3431,7 @@ window.BOOKS = [
     "coverImageFile": "covers/the-final-adventures-of-solar-pons-214.jpg",
     "error": null,
     "id": 214,
-    "description": "The Final Adventures of Solar Pons is a collection of detective science fiction short stories by author August Derleth. It was released in 1998 by Mycroft & Moran. It is a collection of Derleth's Solar Pons stories which are pastiches of the Sherlock Holmes tales of Arthur Conan Doyle."
+    "goodreadsUrl": "https://www.goodreads.com/book/show/879503.The_Final_Adventures_of_Solar_Pons"
   },
   {
     "imprint": "mycroft_moran",
@@ -3612,7 +3447,6 @@ window.BOOKS = [
     "coverImageFile": "covers/the-solar-pons-omnibus-215.jpg",
     "error": null,
     "id": 215,
-    "description": "The Solar Pons Omnibus is a collection of detective fiction stories by author August Derleth. It was released in 1982 by Arkham House in an edition of 3,031 copies. The collection was published in two volumes with a slipcase.\n\nThe set collects all 71 of the Solar Pons stories by Derleth, which are pastiches of the Sherlock Holmes tales of Arthur Conan Doyle. The collection was edited by Basil Copper and provided with a new foreword by Robert Bloch. The stories are arranged by their internal chronology, rather than by the date of their release. The stories had previously appeared under Arkham House's Mycroft & Moran imprint.\n\nAs some fans found Copper's edits objectionable, The Original Text Solar Pons Omnibus Edition was issued in 2000, reverting the stories to the previous versions. The later omnibus also discarded Copper's chronological arrangement in favor of the order in which the stories had appeared in the original Derleth volumes.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/2733519"
   },
   {
@@ -3629,7 +3463,6 @@ window.BOOKS = [
     "coverImageFile": "covers/prince-zaleski-and-cummings-king-monk-216.jpg",
     "error": null,
     "id": 216,
-    "description": "Prince Zaleski and Cummings King Monk is a collection of supernatural detective short stories by the author M. P. Shiel. It was released in 1977 by Mycroft & Moran in an edition of 4036 copies. The first three Prince Zaleski stories had appeared in Shiel's first published work, Prince Zaleski (London: John Lane; Boston: Roberts Brothers, 1895). The fourth was first published in Ellery Queen's Mystery Magazine for January, 1955. The Cummings King Monk stories were drawn from The Pale Ape and Other Pulses (1911).",
     "goodreadsUrl": "https://www.goodreads.com/book/show/523910.Prince_Zaleski_and_Cummings_King_Monk"
   },
   {
@@ -3646,7 +3479,7 @@ window.BOOKS = [
     "coverImageFile": "covers/the-chronicles-of-solar-pons-217.jpg",
     "error": null,
     "id": 217,
-    "description": "The Chronicles of Solar Pons is a collection of detective fiction short stories by author August Derleth. It is the sixth volume in the series of Derleth's Solar Pons short stories, and was released in 1973 by Mycroft & Moran in an edition of 4,176 copies."
+    "goodreadsUrl": "https://www.goodreads.com/book/show/879500.The_Chronicles_of_Solar_Pons"
   },
   {
     "imprint": "mycroft_moran",
@@ -3662,7 +3495,7 @@ window.BOOKS = [
     "coverImageFile": "covers/number-seven-queer-street-218.jpg",
     "error": null,
     "id": 218,
-    "description": "Number Seven, Queer Street is a collection of supernatural detective short stories by author Margery Lawrence. It was first published by Robert Hale in the United Kingdom in 1945. The first United States edition was published in 1969 by Mycroft & Moran in an edition of 2,027 copies and omits the last two stories. The stories are about Lawrence's supernatural detective Miles Pennoyer."
+    "goodreadsUrl": "https://www.goodreads.com/book/show/10009178-number-seven-queer-street"
   },
   {
     "imprint": "mycroft_moran",
@@ -3678,7 +3511,6 @@ window.BOOKS = [
     "coverImageFile": "covers/mr-fairliess-final-journey-219.jpg",
     "error": null,
     "id": 219,
-    "description": "Mr. Fairlie's Final Journey is a detective fiction novel by American writer August Derleth. It was released in 1968 by Mycroft & Moran in an edition of 3,493 copies. The novel is part of Derleth's Solar Pons stories which are pastiches of the Sherlock Holmes tales of Arthur Conan Doyle. It was the eighth Solar Pons book published by Mycroft & Moran.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/1831256.Mr_Fairlie_s_Final_Journey"
   },
   {
@@ -3695,7 +3527,7 @@ window.BOOKS = [
     "coverImageFile": "covers/the-adventure-of-the-unique-dickensians-220.jpg",
     "error": null,
     "id": 220,
-    "description": "\"The Adventure of the Unique Dickensians\" is a detective fiction short story by American writer August Derleth. It was released in 1968 by Mycroft & Moran in an edition of 2,012 copies. The 38-page chapbook is illustrated by Frank Utpatel.\n\nOf the Mycroft and Moran edition, 35 copies were bound in black cloth printed in gilt on the spine and front board, likely by collector/publisher Gerry de la Ree and distributed thus probably during the 1980s. The bound copies bear a label affixed to the inside front pastedown with a statement of the copy number, e.g. \"#6 of 35 bound copies.\"\n\nThe story is part of Derleth's Solar Pons series of pastiches of the Sherlock Holmes tales of Arthur Conan Doyle. It is a Christmas story about Ebenezer Snawley, an eccentric collector of Dickensiana who dresses in 19th-century clothing and is harassed by a man who bawls street cries near his dwelling.\n\nThe story was eventually collected in The Chronicles of Solar Pons."
+    "goodreadsUrl": "https://www.goodreads.com/book/show/7023279-the-adventure-of-the-unique-dickensians"
   },
   {
     "imprint": "mycroft_moran",
@@ -3711,7 +3543,7 @@ window.BOOKS = [
     "coverImageFile": "covers/wisconsin-murders-221.jpg",
     "error": null,
     "id": 221,
-    "description": "Wisconsin Murders is a collection of true crime accounts written by author August Derleth. It was released in 1968 by Mycroft & Moran in an edition of 1,958 copies. The stories detail sixteen cases of sudden death in Wisconsin for 1842 to 1926. Three of the accounts had appeared previously in American Weekly and Saint Mystery Magazine."
+    "goodreadsUrl": "https://www.goodreads.com/book/show/32767235-wisconsin-murders"
   },
   {
     "imprint": "mycroft_moran",
@@ -3727,7 +3559,7 @@ window.BOOKS = [
     "coverImageFile": "covers/the-exploits-of-chevalier-dupin-222.jpg",
     "error": null,
     "id": 222,
-    "description": "The Exploits of the Chevalier Dupin is a collection of detective short stories by author Michael Harrison. It was released in 1968 by Mycroft & Moran in an edition of 1,917 copies. The stories are pastiches of the C. Auguste Dupin stories of Edgar Allan Poe. The stories were first published in Ellery Queen's Mystery Magazine.\n\nThere is an expanded UK edition by a different publisher which adds a further five stories This appeared under the title Murder in the Rue Royale and Further Exploits of the Chevalier Dupin, (UK: Tom Stacey, 1972). Both editions contain the introduction by Ellery Queen, and the non-fiction piece on Dupin by Harrison."
+    "goodreadsUrl": "https://www.goodreads.com/book/show/2510273.The_Exploits_of_Chevalier_Dupin"
   },
   {
     "imprint": "mycroft_moran",
@@ -3743,7 +3575,7 @@ window.BOOKS = [
     "coverImageFile": "covers/a-praed-street-dossier-223.jpg",
     "error": null,
     "id": 223,
-    "description": "A Praed Street Dossier is a collection of detective fiction short stories, essays and marginalia by author August Derleth. It was released in 1968 by Mycroft & Moran in an edition of 2,904 copies and was illustrated by Frank Utpatel. It was an associational collection to Derleth's Solar Pons series of pastiches of the Sherlock Holmes tales of Arthur Conan Doyle. The two science fiction stories, \"The Adventure of the Snitch in Time\" and \"The Adventure of the Ball of Nostradamus\", written with Mack Reynolds, were originally published in The Magazine of Fantasy and Science Fiction.\n\nAn earlier edition of the volume was released by Peter Ruber's Candlelight Press: Ms Praed Street Papers. Issued in stiff pictorial wrappers only, with dustjacket, it featured the same Frank Utpatel dustjacket artwork as the later Mycroft & Moran edition. Praed Street Papers begins with an Introduction by Peter Ruber that describes a weekend spent with August Derleth and ends with \"a Tentative Chronology of Solar Pons\" based on the Robert Pattrick Chronology. (Robert Pattrick, a Pontine scholar of the first order, had nearly completed a chronology of Derleth’s Solar Pons cases when he died in 1960. August Derleth made a few revisions to “complete it” and it was included in The Reminiscences of Solar Pons. Pattrick's Chronology only addressed adventures chronicled in the book collections and not those included in magazines).\n\nPraed Street Papers includes essays 1-4 that were reprinted in A Praed Street Dossier. The fictional \"From the Notebooks of Dr Lyndon Parker\" is included, but without \"The Adventure of the Bookseller's Clerk.\" It also includes a section called \"The Pictured Pons\" which features comic-strip versions of \"The Adventure of the Limping Man\" and \"The Adventure of the Missing tenants.\" Frank Utpatel tried the pictured strips in the 1930s, but after two rejections gave up the project. Derleth suggests that the essential flaw in the strip was \"its extreme wordiness and lack of action.\""
+    "goodreadsUrl": "https://www.goodreads.com/book/show/13641587-a-praed-street-dossier"
   },
   {
     "imprint": "mycroft_moran",
@@ -3759,7 +3591,6 @@ window.BOOKS = [
     "coverImageFile": "covers/the-phantom-fighter-224.jpg",
     "error": null,
     "id": 224,
-    "description": "The Phantom Fighter is a collection of Occult detective short stories by author Seabury Quinn. It was released in 1966 by Mycroft & Moran in an edition of 2,022 copies. The stories are about Quinn's detective Jules de Grandin and were originally published in the magazine Weird Tales. Quinn was still alive in 1966, and he revised and modernized the stories in this collection.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/12941626-the-phantom-fighter"
   },
   {
@@ -3776,7 +3607,6 @@ window.BOOKS = [
     "coverImageFile": "covers/the-casebook-of-solar-pons-225.jpg",
     "error": null,
     "id": 225,
-    "description": "The Casebook of Solar Pons is a collection of detective fiction short stories by American writer August Derleth. It was released in 1965 by Mycroft & Moran in an edition of 3,020 copies. It was the sixth collection of Derleth's Solar Pons stories which are pastiches of the Sherlock Holmes tales of Arthur Conan Doyle.\n\nThe story \"The Adventure of the Haunted Library\" features a tribute to the William Hope Hodgson character Carnacki the Ghost-Finder, who is said to have initially investigated the case before passing it on to Solar Pons. Derleth published the first American (and first expanded) edition of Carnacki, the Ghost-Finder under his Arkham House imprint.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/1831247.The_Casebook_of_Solar_Pons"
   },
   {
@@ -3793,7 +3623,7 @@ window.BOOKS = [
     "coverImageFile": "covers/the-reminiscences-of-solar-pons-226.jpg",
     "error": null,
     "id": 226,
-    "description": "The Reminiscences of Solar Pons is a collection of detective fiction short stories by author August Derleth. It was released in 1961 by Mycroft & Moran in an edition of 2,052 copies. It was the fifth collection of Derleth's Solar Pons stories which are pastiches of the Sherlock Holmes tales of Arthur Conan Doyle."
+    "goodreadsUrl": "https://www.goodreads.com/book/show/6052605-the-reminiscences-of-solar-pons"
   },
   {
     "imprint": "mycroft_moran",
@@ -3809,7 +3639,6 @@ window.BOOKS = [
     "coverImageFile": "covers/the-return-of-solar-pons-227.jpg",
     "error": null,
     "id": 227,
-    "description": "The Return of Solar Pons is a collection of detective fiction short stories by American writer August Derleth. It was released in 1958 by Mycroft & Moran in an edition of 2,079 copies. It was the fourth collection of Derleth's Solar Pons stories, which are pastiches of the Sherlock Holmes tales of Arthur Conan Doyle.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/710725.The_Return_of_Solar_Pons"
   },
   {
@@ -3826,7 +3655,7 @@ window.BOOKS = [
     "coverImageFile": "covers/three-problems-for-solar-pons-228.jpg",
     "error": null,
     "id": 228,
-    "description": "Three Problems for Solar Pons is a collection of detective fiction short stories by American writer August Derleth. It was released in 1952 by Mycroft & Moran in an edition of 996 copies. It was the third collection of Derleth's Solar Pons stories which are pastiches of the Sherlock Holmes tales of Arthur Conan Doyle. The book was intended as an interim collection and all the stories are reprinted in The Return of Solar Pons. Because of the low print run, it is the scarcest Mycroft & Moran book.\n\nThe dustjacket was by artist Ronald Clyne."
+    "goodreadsUrl": "https://www.goodreads.com/book/show/10041771-three-problems-for-solar-pons"
   },
   {
     "imprint": "mycroft_moran",
@@ -3842,7 +3671,7 @@ window.BOOKS = [
     "coverImageFile": "covers/the-memoirs-of-solar-pons-229.jpg",
     "error": null,
     "id": 229,
-    "description": "The Memoirs of Solar Pons is a collection of detective fiction short stories by American writer August Derleth. It was released in 1951 by Mycroft & Moran in an edition of 2,038 copies. It was the second collection of Derleth's Solar Pons stories which are pastiches of the Sherlock Holmes tales of Arthur Conan Doyle.\n\nThis volume of the Solar Pons series was also sold for book club publication. In 1951 Unicorn Mystery Book Club (New York) issued an omnibus including Memoirs of Solar Pons (alongside The Beautiful Stranger by Bernice Carey, Fish Lane by Louis Corkill, and Hangman’s Hat by Paul Ernst). The Unicorn omnibuses were edited (apparently anonymously) by Hans Stefan Santesson. Memoirs was the only volume of the Solar Pons series to be published as a book club edition as well as by Arkham House."
+    "goodreadsUrl": "https://www.goodreads.com/book/show/1831257.The_Memoirs_of_Solar_Pons"
   },
   {
     "imprint": "mycroft_moran",
@@ -3858,7 +3687,7 @@ window.BOOKS = [
     "coverImageFile": "covers/carnacki-the-ghost-finder-230.jpg",
     "error": null,
     "id": 230,
-    "description": "Carnacki the Ghost-Finder is a collection of occult detective short stories by English writer William Hope Hodgson, featuring the titular protagonist. It was first published in 1913 by the English publisher Eveleigh Nash. In 1947, a new edition of 3,050 copies was published by Mycroft & Moran and included three additional stories (the last three listed below). In 1951 Ellery Queen covered the Mycroft & Moran version as No. 53 in Queen's Quorum: A History of the Detective-Crime Short Story As Revealed by the 100 Most Important Books Published in this Field Since 1845.\n\nFor several decades subsequent to the Mycroft and Moran edition, Carnacki collections routinely if not always contained all nine stories. Project Gutenberg Ebook #10832 (2004) contains only the first six stories, however, and arranges them in sequence of their 1910 and 1912 magazine publication. Some other publications follow Project Gutenberg, perhaps using its text."
+    "goodreadsUrl": "https://www.goodreads.com/book/show/345563.Carnacki_the_Ghost_Finder"
   },
   {
     "imprint": "mycroft_moran",
@@ -3867,14 +3696,13 @@ window.BOOKS = [
     "listAuthor": "- (a.k.a. Regarding Sherlock Holmes: The Adventures of Solar Pons) - (in the UK: The Adventures of Solar Pons), by August Derleth (1945)",
     "title": "\"In Re: Sherlock Holmes\" -- The Adventures of Solar Pons",
     "author": "August Derleth",
-    "coverArtist": null,
+    "coverArtist": "Ronald Clyne",
     "publicationDate": "1945",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/In_Re%3A_Sherlock_Holmes",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/f/fb/In_Re_Sherlock_Holmes.jpg",
     "coverImageFile": "covers/in-re-sherlock-holmes-231.jpg",
     "error": null,
     "id": 231,
-    "description": "\"In Re: Sherlock Holmes\"—The Adventures of Solar Pons (in the UK it was titled The Adventures of Solar Pons) is a collection of detective fiction short stories by American writer August Derleth. It was released in 1945 by Mycroft & Moran in an edition of 3,604 copies. It was the first book issued under the Mycroft & Moran imprint. The book is the first collection of Derleth's Solar Pons stories. The stories are pastiches of the Sherlock Holmes tales of Arthur Conan Doyle.",
     "goodreadsUrl": "https://www.goodreads.com/book/show/710722.The_Adventures_of_Solar_Pons"
   }
 ];
