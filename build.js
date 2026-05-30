@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+const crypto = require("crypto");
 const fs = require("fs");
 const path = require("path");
 const { loadEdits, applyEditsToBooks } = require("./scripts/lib/edits");
@@ -95,7 +96,16 @@ function concatViewerCss() {
   return destPath;
 }
 
-function applyBuildHtmlTransforms(html) {
+function collectionCsvCacheBustPath(csvPath) {
+  const hash = crypto
+    .createHash("sha256")
+    .update(fs.readFileSync(csvPath))
+    .digest("hex")
+    .slice(0, 8);
+  return `my_collection/my_collection.${hash}.csv`;
+}
+
+function applyBuildHtmlTransforms(html, options = {}) {
   const stylesheetBlock = VIEWER_CSS_FILES.map(
     (file) => `    <link rel="stylesheet" href="css/${file}" />`,
   ).join("\n");
@@ -104,8 +114,14 @@ function applyBuildHtmlTransforms(html) {
 
   const collectionScript =
     '<script src="my_collection/collection.js"></script>';
-  const inject = `<script>window.READ_ONLY = true;</script>\n  ${collectionScript}`;
-  next = next.replace(collectionScript, inject);
+  const injectParts = ["<script>window.READ_ONLY = true;</script>"];
+  if (options.collectionCsvPath) {
+    injectParts.push(
+      `<script>window.SAMPLE_COLLECTION_CSV = ${JSON.stringify(options.collectionCsvPath)};</script>`,
+    );
+  }
+  injectParts.push(collectionScript);
+  next = next.replace(collectionScript, injectParts.join("\n  "));
 
   const shareImage = `${DEPLOY_ORIGIN}/images/share.png`;
   next = next.replaceAll('content="images/share.png"', `content="${shareImage}"`);
@@ -165,7 +181,14 @@ function buildStaticSite() {
   }
   fs.mkdirSync(BUILD_DIR, { recursive: true });
 
-  const html = applyBuildHtmlTransforms(fs.readFileSync(VIEWER_HTML, "utf8"));
+  let collectionCsvBuildPath = null;
+  if (fs.existsSync(COLLECTION_CSV)) {
+    collectionCsvBuildPath = collectionCsvCacheBustPath(COLLECTION_CSV);
+  }
+
+  const html = applyBuildHtmlTransforms(fs.readFileSync(VIEWER_HTML, "utf8"), {
+    collectionCsvPath: collectionCsvBuildPath,
+  });
   fs.writeFileSync(path.join(BUILD_DIR, "robots.txt"), ROBOTS_NO_CRAWL);
   fs.writeFileSync(path.join(BUILD_DIR, "index.html"), html);
 
@@ -185,8 +208,11 @@ function buildStaticSite() {
   if (fs.existsSync(COLLECTION_JS)) {
     copyFile(COLLECTION_JS, path.join(BUILD_DIR, "my_collection", "collection.js"));
   }
-  if (fs.existsSync(COLLECTION_CSV)) {
-    copyFile(COLLECTION_CSV, path.join(BUILD_DIR, "my_collection", "my_collection.csv"));
+  if (collectionCsvBuildPath) {
+    copyFile(
+      COLLECTION_CSV,
+      path.join(BUILD_DIR, collectionCsvBuildPath),
+    );
   }
 
   let copiedAssets = 0;

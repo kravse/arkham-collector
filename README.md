@@ -66,7 +66,7 @@ Stable book `id` values come from imprint + Wikipedia URL + list year (see `scri
 
 ### Build (`npm run build`)
 
-[`build.js`](build.js) writes a static site under **`build/`**: `viewer.html` → `index.html`, `window.READ_ONLY = true`, `my_collection/` for the sample toggle, bundled `css/viewer.css`, JS/covers, merged slim `data/books.js` + `data/descriptions.js`, `images/` (logos + favicons), root-level favicon files for browsers that request `/favicon.ico`, `site.webmanifest`, plus `robots.txt` and a `noindex` meta tag. Deploy `build/` to [arkhamcollector.com](https://arkhamcollector.com) or any static host.
+[`build.js`](build.js) writes a static site under **`build/`**: `viewer.html` → `index.html`, `window.READ_ONLY = true`, `my_collection/` for the sample toggle (CSV copied as `my_collection.<hash>.csv` with `window.SAMPLE_COLLECTION_CSV` set for cache busting), bundled `css/viewer.css`, JS/covers, merged slim `data/books.js` + `data/descriptions.js`, `images/` (logos + favicons), root-level favicon files for browsers that request `/favicon.ico`, `site.webmanifest`, plus `robots.txt` and a `noindex` meta tag. Deploy `build/` to [arkhamcollector.com](https://arkhamcollector.com) or any static host.
 
 Hidden and deleted books are excluded from copied covers but remain in shipped data unless you filter elsewhere.
 

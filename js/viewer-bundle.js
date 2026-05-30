@@ -383,13 +383,17 @@ function countCollectionRowsCovered(books, includeHidden) {
 
 /* Sample and own collection, want list, localStorage */
 
+const DEFAULT_COLLECTION_CSV = "my_collection/my_collection.csv";
+
 async function loadCollectionCsvItems() {
   if (readOnly && window.MY_COLLECTION?.length) {
     return window.MY_COLLECTION;
   }
 
+  const csvPath = window.SAMPLE_COLLECTION_CSV || DEFAULT_COLLECTION_CSV;
+
   try {
-    const response = await fetch("my_collection/my_collection.csv");
+    const response = await fetch(csvPath);
     if (response.ok) {
       return parseCollection(await response.text());
     }
