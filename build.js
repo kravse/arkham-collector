@@ -7,6 +7,7 @@ const {
   findLocalCoverForBook,
   resolveCoverPathsInBooks,
 } = require("./scripts/lib/covers-files");
+const { bundleViewerJs } = require("./scripts/bundle-viewer-js");
 
 const ROOT = __dirname;
 const BUILD_DIR = path.join(ROOT, "build");
@@ -64,6 +65,8 @@ Disallow: /
 `;
 
 function buildStaticSite() {
+  bundleViewerJs();
+
   if (!fs.existsSync(BOOKS_JSON)) {
     throw new Error("Missing data/books.json. Run the crawler first.");
   }

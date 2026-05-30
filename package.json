@@ -24,6 +24,7 @@
     "compact-edits": "node scripts/index.js --compact-edits",
     "fill-covers": "node scripts/index.js --fill-covers",
     "fill-covers:dry-run": "node scripts/index.js --fill-covers --dry-run",
+    "bundle-viewer": "node scripts/bundle-viewer-js.js",
     "build": "node build.js",
     "serve": "node server.js"
   },

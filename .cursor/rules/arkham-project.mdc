@@ -26,7 +26,8 @@ Do not edit the plan files in `.cursor/plans/` for this — only `README.md`. Ke
 
 | Path | Role |
 |------|------|
-| `viewer.html` | Source UI (HTML + inline app JS). Not the deploy artifact. |
+| `viewer.html` | Source UI markup (loads `js/viewer-bundle.js`). Not the deploy artifact. |
+| `js/viewer/` | Viewer app source modules; `npm run bundle-viewer` → `js/viewer-bundle.js` |
 | `css/` | All viewer styles — **no inline `<style>` in viewer.html** |
 | `scripts/` | Wikipedia crawler and data-sync CLI (CommonJS modules) |
 | `data/books.json`, `data/books.js` | Scraped book data only (`window.BOOKS`) |
@@ -81,7 +82,7 @@ Entry point for all npm crawl/sync scripts: `node scripts/index.js`
 
 ## Viewer app JavaScript
 
-App logic remains inline in `viewer.html` for now. Follow existing patterns there: vanilla JS, `localStorage` for want-list (`arkham-want-list`), sample collection (`arkham-sample-collection`, seeded from CSV), own collection (`arkham-collection`), and active mode (`arkham-collection-source`); gear settings can reset sample to CSV defaults; `getVisibleBooks()` for filtered order; descriptions editable via the edit dialog (stored in `edits.json`).
+App logic lives in `js/viewer/` (eight topic files, one shared IIFE) and ships as `js/viewer-bundle.js`. Edit the partials, then `npm run bundle-viewer` (also runs at the start of `npm run build`). Follow existing patterns: vanilla JS, `localStorage` for want-list (`arkham-want-list`), sample collection (`arkham-sample-collection`, seeded from CSV), own collection (`arkham-collection`), and active mode (`arkham-collection-source`); gear settings can reset sample to CSV defaults; `getVisibleBooks()` for filtered order; descriptions editable via the edit dialog (stored in `edits.json`).
 
 `js/book-edits.js` merges `window.BOOKS` with `window.BOOK_EDITS` at startup. Linked from `viewer.html`, copied in `build.js` via `copyDirectory("js")`.
 

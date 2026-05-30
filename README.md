@@ -54,9 +54,9 @@ At load time, [`js/book-edits.js`](js/book-edits.js) merges scraped books with e
 
 Stable book `id` values come from imprint + Wikipedia URL + list year (see `scripts/lib/book-ids.js`). Full bibliography crawls replace scraped rows by that key but keep the same `id` when the line matches.
 
-### Viewer (`viewer.html`)
+### Viewer (`viewer.html` + `js/viewer/`)
 
-- Vanilla HTML/CSS/JS — no bundler.
+- Vanilla HTML/CSS/JS — no bundler. UI markup in `viewer.html`; app code in `js/viewer/` (bundled to `js/viewer-bundle.js` via `npm run bundle-viewer`, also run automatically by `npm run build`).
 - Styles in [`css/`](css/) (load order matters; see project conventions).
 - Grid of cards; click a card for the detail overlay (Wikipedia **W**, Goodreads **G**, want-list, collection badges).
 - **Goodreads:** uses `goodreadsUrl` from data/edits when set; otherwise **G** opens a [Goodreads book search](https://www.goodreads.com/search) (title + author last name).
@@ -147,6 +147,7 @@ All npm scripts below run through `node scripts/index.js` with flags parsed in [
 | Script | Command | What it does |
 |--------|---------|----------------|
 | `serve` | `node server.js` | Local editor + API on port 8742. |
+| `bundle-viewer` | `node scripts/bundle-viewer-js.js` | Rebuild `js/viewer-bundle.js` from `js/viewer/` after editing viewer JS. |
 | `build` | `node build.js` | Static output in `build/` (read-only; sample CSV + gear collection toggle). |
 
 ---
@@ -182,7 +183,8 @@ All npm scripts below run through `node scripts/index.js` with flags parsed in [
 |------|------|
 | `viewer.html` | Source UI (not the deploy artifact) |
 | `css/` | All viewer styles |
-| `js/` | `book-edits.js`, `sanitize-text.js` |
+| `js/` | `book-edits.js`, `sanitize-text.js`, `viewer-bundle.js` |
+| `js/viewer/` | Viewer app source modules (see `npm run bundle-viewer`) |
 | `scripts/` | Crawler and sync CLI (`index.js`, `cli.js`, `config.js`, `lib/`, `tasks/`) |
 | `data/books.json` | Scraped catalog |
 | `data/edits.json` | Manual overrides |
