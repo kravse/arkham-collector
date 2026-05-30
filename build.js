@@ -9,8 +9,7 @@ const {
 } = require("./scripts/lib/covers-files");
 
 const ROOT = __dirname;
-const localCollection = process.argv.includes("--local-collection");
-const BUILD_DIR = path.join(ROOT, localCollection ? "build" : "build-for-me");
+const BUILD_DIR = path.join(ROOT, "build");
 const BOOKS_JSON = path.join(ROOT, "data", "books.json");
 const BOOKS_JS = path.join(ROOT, "data", "books.js");
 const EDITS_JSON = path.join(ROOT, "data", "edits.json");
@@ -92,18 +91,15 @@ function buildStaticSite() {
   let html = fs.readFileSync(VIEWER_HTML, "utf8");
   const collectionScript =
     '<script src="my_collection/collection.js"></script>';
-  const defaultSource = localCollection ? "own" : "sample";
-  const inject = `<script>window.READ_ONLY = true; window.DEFAULT_COLLECTION_SOURCE = '${defaultSource}';</script>\n  ${collectionScript}`;
+  const inject = `<script>window.READ_ONLY = true;</script>\n  ${collectionScript}`;
   html = html.replace(collectionScript, inject);
-  if (localCollection) {
-    if (!html.includes('name="robots"')) {
-      html = html.replace(
-        "</head>",
-        '  <meta name="robots" content="noindex, nofollow" />\n  </head>',
-      );
-    }
-    fs.writeFileSync(path.join(BUILD_DIR, "robots.txt"), ROBOTS_NO_CRAWL);
+  if (!html.includes('name="robots"')) {
+    html = html.replace(
+      "</head>",
+      '  <meta name="robots" content="noindex, nofollow" />\n  </head>',
+    );
   }
+  fs.writeFileSync(path.join(BUILD_DIR, "robots.txt"), ROBOTS_NO_CRAWL);
   fs.writeFileSync(path.join(BUILD_DIR, "index.html"), html);
 
   fs.mkdirSync(path.join(BUILD_DIR, "data"), { recursive: true });
@@ -180,9 +176,7 @@ function buildStaticSite() {
     console.log(`Covers missing on disk: ${missingCovers}`);
   }
   console.log(
-    localCollection
-      ? "Collection: gear toggle (default own; sample CSV bundled)"
-      : "Collection: gear toggle (default sample CSV; own via localStorage)",
+    "Collection: gear toggle (default own; sample CSV bundled)",
   );
   const openPath = path.join(BUILD_DIR, "index.html");
   console.log(`Open ${openPath} or deploy the ${BUILD_DIR}/ folder to your static host.`);

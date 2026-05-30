@@ -16,7 +16,7 @@ The canonical project overview and **npm script reference** is [`README.md`](../
 - `package.json` scripts or CLI flags in `scripts/cli.js`
 - New or removed crawl/sync tasks under `scripts/tasks/`
 - Data model fields in `books.json` / `edits.json` or edit-dialog / API behavior
-- Build or deploy workflow (`build.js`, `server.js`, `build-for-me/` or `build/` output)
+- Build or deploy workflow (`build.js`, `server.js`, `build/` output)
 - Major viewer features (filters, overlays, external links, read-only vs serve mode)
 - Project layout (new top-level dirs or moved entry points)
 
@@ -34,7 +34,7 @@ Do not edit the plan files in `.cursor/plans/` for this — only `README.md`. Ke
 | `my_collection/` | Sample owned-books CSV + `collection.js`; shipped in all builds; gear settings toggle sample vs `localStorage` own collection |
 | `covers/` | Downloaded cover images |
 | `examples/` | Saved Wikipedia HTML for `--local` crawls |
-| `build.js` | Default `npm run build` → `build-for-me/` (personal, CSV collection); `--local-collection` → `build/` (public deploy) |
+| `build.js` → `build/` | Static site (`npm run build`): read-only viewer, sample CSV bundled, collection via gear settings |
 | `server.js` | Dev server with PATCH/upload (`npm run serve`, port 8742) |
 | `my_script.js` | Thin wrapper → `scripts/index.js` (backward compat only) |
 
@@ -92,8 +92,8 @@ App logic remains inline in `viewer.html` for now. Follow existing patterns ther
 - **Hide** sets `hidden: true` in edits (still visible on localhost with “Show hidden”)
 - Full crawls / sync scripts overwrite scraped fields in `books.json` only; edits in `edits.json` (dates, covers, hidden, etc.) survive
 - Legacy `hidden` on scraped books is auto-migrated to `edits.json` when scripts write `books.json`
-- After data or viewer changes for deploy: `npm run build` → `build-for-me/` (personal) or `npm run build -- --local-collection` → `build/` (public)
-- Do not hand-edit `build/`, `build-for-me/`, or generated `data/books.js` / `data/edits.js` — edit source and rebuild/re-crawl
+- After data or viewer changes for deploy: `npm run build` → `build/`
+- Do not hand-edit `build/` or generated `data/books.js` / `data/edits.js` — edit source and rebuild/re-crawl
 - Do not modify generated SDK files unless explicitly asked
 
 ## General editing principles
