@@ -4,7 +4,7 @@ A personal gallery of books published by [Arkham House](https://en.wikipedia.org
 
 **Live site:** [arkham-house.netlify.app](https://arkham-house.netlify.app) — public build; collection defaults to your own list in the browser, with an optional sample CSV via the gear settings.
 
-**Your collection (CSV):** The repo includes a sample [`my_collection/my_collection.csv`](my_collection/my_collection.csv) (title, author, year, status). Replace it with your own list, then run `npm run sync-collection` to regenerate `my_collection/collection.js` before `npm run serve` or `npm run build`.
+**Your collection (CSV):** The repo includes a sample [`my_collection/my_collection.csv`](my_collection/my_collection.csv) (title, author, year). Replace it with your own list, then run `npm run sync-collection` to regenerate `my_collection/collection.js` before `npm run serve` or `npm run build`. An optional fourth column in an existing CSV is ignored.
 
 **Collection modes (gear in the bottom bar):** Choose **Use sample collection** or **Use my own collection**. Both work the same way (Collect in the book overlay); each is stored separately in `localStorage` (`arkham-sample-collection` and `arkham-collection`). The sample list starts from the bundled CSV on first visit; **Reset sample collection** in settings restores that default. The active mode is saved in `arkham-collection-source`.
 

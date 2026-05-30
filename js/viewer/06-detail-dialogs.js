@@ -242,7 +242,6 @@ function collectionRowsForExport() {
       book.title || book.listTitle || "Untitled",
       book.author || "",
       parseYear(book.publicationDate) || "",
-      "shelf",
     ]);
 }
 
