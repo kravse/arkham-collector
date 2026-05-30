@@ -194,24 +194,65 @@
             <input
               type="radio"
               name="collection-source"
-              id="collection-source-sample"
-              value="sample"
-            />
-            Use sample collection
-          </label>
-          <label class="settings-collection-option">
-            <input
-              type="radio"
-              name="collection-source"
               id="collection-source-own"
               value="own"
             />
             Use my own collection
           </label>
+          <label class="settings-collection-option">
+            <input
+              type="radio"
+              name="collection-source"
+              id="collection-source-sample"
+              value="sample"
+            />
+            Use sample collection
+          </label>
         </fieldset>
+        <button
+          type="button"
+          id="export-collection-btn"
+          class="settings-collection-action"
+        >
+          Export collection CSV
+        </button>
+        <button
+          type="button"
+          id="reset-sample-collection-btn"
+          class="settings-collection-action settings-reset-sample"
+          hidden
+        >
+          Reset sample collection
+        </button>
+        <div
+          id="reset-sample-confirm"
+          class="settings-reset-confirm"
+          hidden
+        >
+          <p class="settings-reset-warning">
+            This replaces your sample collection with the default sample list.
+            Any books you added or removed in sample mode will be lost.
+          </p>
+          <div class="settings-reset-confirm-actions">
+            <button
+              type="button"
+              id="reset-sample-cancel-btn"
+              class="settings-collection-action"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              id="reset-sample-confirm-btn"
+              class="settings-collection-action settings-reset-sample"
+            >
+              Yes, reset sample
+            </button>
+          </div>
+        </div>
         <p class="settings-collection-hint">
-          Your own collection is saved in this browser. Switching to the sample
-          does not erase it.
+          Each collection is saved separately in this browser. Reset sample
+          restores the default sample list.
         </p>
       </div>
     </div>
@@ -508,6 +549,19 @@
       );
       const collectionSourceOwnInput =
         document.getElementById("collection-source-own");
+      const exportCollectionBtn = document.getElementById("export-collection-btn");
+      const resetSampleCollectionBtn = document.getElementById(
+        "reset-sample-collection-btn",
+      );
+      const resetSampleConfirmPanel = document.getElementById(
+        "reset-sample-confirm",
+      );
+      const resetSampleCancelBtn = document.getElementById(
+        "reset-sample-cancel-btn",
+      );
+      const resetSampleConfirmBtn = document.getElementById(
+        "reset-sample-confirm-btn",
+      );
       const attributionBtn = document.getElementById("attribution-btn");
       const attributionDialog = document.getElementById("attribution-dialog");
       const attributionCloseBtn = document.getElementById("attribution-close");
@@ -523,6 +577,7 @@
       const SORT_STORAGE_KEY = "arkham-sort";
       const WANT_STORAGE_KEY = "arkham-want-list";
       const COLLECTION_STORAGE_KEY = "arkham-collection";
+      const SAMPLE_COLLECTION_STORAGE_KEY = "arkham-sample-collection";
       const COLLECTION_SOURCE_KEY = "arkham-collection-source";
       const HEADER_FILTERS_STORAGE_KEY = "arkham-header-filters-expanded";
       const SORT_MODES = new Set([
@@ -540,13 +595,18 @@
       let mycroftOnly = false;
       let wantOnly = false;
       let wantIds = new Set();
-      let collectionIds = new Set();
+      let ownCollectionIds = new Set();
+      let sampleCollectionIds = new Set();
       let collectionSource = "sample";
       let headerFiltersExpanded = true;
       let detailBookId = null;
 
       function useOwnCollection() {
         return collectionSource === "own";
+      }
+
+      function activeCollectionIds() {
+        return useOwnCollection() ? ownCollectionIds : sampleCollectionIds;
       }
 
       function defaultCollectionSource() {
@@ -584,6 +644,27 @@
         }
         if (collectionSourceOwnInput) {
           collectionSourceOwnInput.checked = collectionSource === "own";
+        }
+        if (resetSampleCollectionBtn) {
+          resetSampleCollectionBtn.hidden = collectionSource !== "sample";
+        }
+        hideResetSampleConfirm();
+      }
+
+      function showResetSampleConfirm() {
+        if (!resetSampleConfirmPanel || !resetSampleCollectionBtn) {
+          return;
+        }
+        resetSampleCollectionBtn.hidden = true;
+        resetSampleConfirmPanel.hidden = false;
+      }
+
+      function hideResetSampleConfirm() {
+        if (resetSampleConfirmPanel) {
+          resetSampleConfirmPanel.hidden = true;
+        }
+        if (resetSampleCollectionBtn && collectionSource === "sample") {
+          resetSampleCollectionBtn.hidden = false;
         }
       }
 
@@ -720,10 +801,7 @@
       }
 
       function getCollectionItem(book) {
-        if (useOwnCollection()) {
-          return collectionIds.has(book.id) ? { status: "shelf" } : null;
-        }
-        return findCollectionMatch(book);
+        return activeCollectionIds().has(book.id) ? { status: "shelf" } : null;
       }
 
       function isInCollection(book) {
@@ -749,31 +827,57 @@
         const eligible = books.filter(
           (book) => !isDeleted(book) && (includeHidden || !book.hidden),
         );
-        if (useOwnCollection()) {
-          return eligible.filter((book) => collectionIds.has(book.id)).length;
-        }
-        return collection.filter((item) =>
-          eligible.some((book) => bookCoversCollectionItem(book, item)),
-        ).length;
+        return eligible.filter((book) => activeCollectionIds().has(book.id))
+          .length;
       }
 
-      async function loadCollection() {
-        if (useOwnCollection()) {
-          collection = [];
-          return;
-        }
-
+      async function loadCollectionCsvItems() {
         try {
           const response = await fetch("my_collection/my_collection.csv");
           if (response.ok) {
-            collection = parseCollection(await response.text());
-            return;
+            return parseCollection(await response.text());
           }
         } catch (_) {
           // fetch fails on file://; fall back to collection.js
         }
 
-        collection = window.MY_COLLECTION || [];
+        return window.MY_COLLECTION || [];
+      }
+
+      async function buildSampleIdsFromCsv() {
+        const items = await loadCollectionCsvItems();
+        const savedRows = collection;
+        collection = items;
+        const ids = new Set();
+        for (const book of getActiveBooks()) {
+          if (findCollectionMatch(book)) {
+            ids.add(book.id);
+          }
+        }
+        collection = savedRows;
+        return ids;
+      }
+
+      async function ensureSampleCollectionIds() {
+        try {
+          const saved = localStorage.getItem(SAMPLE_COLLECTION_STORAGE_KEY);
+          if (saved !== null) {
+            const parsed = JSON.parse(saved);
+            if (Array.isArray(parsed)) {
+              sampleCollectionIds = new Set(
+                parsed
+                  .map((id) => Number(id))
+                  .filter((id) => Number.isFinite(id)),
+              );
+              return;
+            }
+          }
+        } catch (_) {
+          // localStorage unavailable or invalid JSON
+        }
+
+        sampleCollectionIds = await buildSampleIdsFromCsv();
+        saveSampleCollectionIds();
       }
 
       function parseSortYear(value) {
@@ -879,34 +983,53 @@
         }
       }
 
-      function loadCollectionIds() {
+      function loadOwnCollectionIds() {
         try {
           const saved = localStorage.getItem(COLLECTION_STORAGE_KEY);
           if (!saved) {
-            collectionIds = new Set();
+            ownCollectionIds = new Set();
             return;
           }
           const parsed = JSON.parse(saved);
           if (!Array.isArray(parsed)) {
-            collectionIds = new Set();
+            ownCollectionIds = new Set();
             return;
           }
-          collectionIds = new Set(
+          ownCollectionIds = new Set(
             parsed.map((id) => Number(id)).filter((id) => Number.isFinite(id)),
           );
         } catch (_) {
-          collectionIds = new Set();
+          ownCollectionIds = new Set();
         }
       }
 
-      function saveCollectionIds() {
+      function saveOwnCollectionIds() {
         try {
           localStorage.setItem(
             COLLECTION_STORAGE_KEY,
-            JSON.stringify([...collectionIds].sort((a, b) => a - b)),
+            JSON.stringify([...ownCollectionIds].sort((a, b) => a - b)),
           );
         } catch (_) {
           // localStorage unavailable
+        }
+      }
+
+      function saveSampleCollectionIds() {
+        try {
+          localStorage.setItem(
+            SAMPLE_COLLECTION_STORAGE_KEY,
+            JSON.stringify([...sampleCollectionIds].sort((a, b) => a - b)),
+          );
+        } catch (_) {
+          // localStorage unavailable
+        }
+      }
+
+      function saveActiveCollectionIds() {
+        if (useOwnCollection()) {
+          saveOwnCollectionIds();
+        } else {
+          saveSampleCollectionIds();
         }
       }
 
@@ -923,9 +1046,9 @@
           wantIds.delete(id);
         } else {
           wantIds.add(id);
-          if (useOwnCollection() && collectionIds.has(id)) {
-            collectionIds.delete(id);
-            saveCollectionIds();
+          if (activeCollectionIds().has(id)) {
+            activeCollectionIds().delete(id);
+            saveActiveCollectionIds();
           }
         }
         saveWantList();
@@ -936,21 +1059,19 @@
       }
 
       function toggleCollection(bookId) {
-        if (!useOwnCollection()) {
-          return;
-        }
         const id = Number(bookId);
         if (!Number.isFinite(id)) {
           return;
         }
-        if (collectionIds.has(id)) {
-          collectionIds.delete(id);
+        const ids = activeCollectionIds();
+        if (ids.has(id)) {
+          ids.delete(id);
         } else {
-          collectionIds.add(id);
+          ids.add(id);
           wantIds.delete(id);
           saveWantList();
         }
-        saveCollectionIds();
+        saveActiveCollectionIds();
         render();
         if (!bookDetailDialog.hidden) {
           openBookDetail(detailBookId);
@@ -1027,15 +1148,12 @@
       function getStatTotal(all) {
         const showHidden = showHiddenInput.checked;
         if (collectionOnly) {
-          if (useOwnCollection()) {
-            return all.filter(
-              (book) =>
-                !isDeleted(book) &&
-                (showHidden || !book.hidden) &&
-                isInCollection(book),
-            ).length;
-          }
-          return collection.length;
+          return all.filter(
+            (book) =>
+              !isDeleted(book) &&
+              (showHidden || !book.hidden) &&
+              isInCollection(book),
+          ).length;
         }
         return all.filter((book) => showHidden || !book.hidden).length;
       }
@@ -1054,7 +1172,7 @@
         );
         const wantCount = getWantCount();
         const wantLabel = wantCount ? `WANT (${wantCount})` : "WANT";
-        const collectionCount = useOwnCollection() ? getCollectionCount() : 0;
+        const collectionCount = getCollectionCount();
         const collectionLabel = collectionCount
           ? `COLLECTION (${collectionCount})`
           : "COLLECTION";
@@ -1413,10 +1531,6 @@
       }
 
       function renderCollectionButton(book) {
-        if (!useOwnCollection()) {
-          return "";
-        }
-
         const collected = isInCollection(book);
         const label = collected ? "Collection" : "Collect";
         const className = `collection-btn${collected ? " active" : ""}`;
@@ -1609,9 +1723,7 @@
           if (collectionOnly) {
             message = searchInput.value.trim()
               ? "No books in your collection match your search."
-              : useOwnCollection()
-                ? "Your collection is empty — open a book and tap Collect to add it."
-                : "No books in your collection to show.";
+              : "Your collection is empty — open a book and tap Collect to add it.";
           } else if (hiddenOnly) {
             message = searchInput.value.trim()
               ? "No hidden books match your search."
@@ -1732,9 +1844,7 @@
           .filter(Boolean)
           .join("");
         const wantButton = renderWantButton(book);
-        const collectionControl = useOwnCollection()
-          ? renderCollectionButton(book)
-          : renderOwnedBadge(book);
+        const collectionControl = renderCollectionButton(book);
         const bottomRow = renderCardBottomRow(
           "",
           wantButton,
@@ -1827,6 +1937,7 @@
       }
 
       function openSettingsDialog() {
+        hideResetSampleConfirm();
         syncSettingsCollectionRadios();
         settingsDialog.hidden = false;
         settingsBtn.setAttribute("aria-expanded", "true");
@@ -1847,7 +1958,86 @@
         }
         collectionSource = next;
         saveCollectionSourcePreference();
-        await loadCollection();
+        syncSettingsCollectionRadios();
+        render();
+        if (!bookDetailDialog.hidden && detailBookId) {
+          openBookDetail(detailBookId);
+        }
+      }
+
+      function escapeCsvField(value) {
+        const text = String(value ?? "");
+        if (/[",\n\r]/.test(text)) {
+          return `"${text.replace(/"/g, '""')}"`;
+        }
+        return text;
+      }
+
+      function collectionRowsForExport() {
+        const ids = activeCollectionIds();
+        return getActiveBooks()
+          .filter((book) => ids.has(book.id))
+          .sort((a, b) => {
+            const yearA = parseSortYear(a.publicationDate);
+            const yearB = parseSortYear(b.publicationDate);
+            if (yearA == null && yearB == null) {
+              return (a.title || "").localeCompare(b.title || "");
+            }
+            if (yearA == null) return 1;
+            if (yearB == null) return -1;
+            if (yearA !== yearB) {
+              return yearA - yearB;
+            }
+            return (a.title || "").localeCompare(b.title || "");
+          })
+          .map((book) => [
+            book.title || book.listTitle || "Untitled",
+            book.author || "",
+            parseYear(book.publicationDate) || "",
+            "shelf",
+          ]);
+      }
+
+      function exportCollectionCsv() {
+        const rows = collectionRowsForExport();
+        if (!rows.length) {
+          window.alert("Your collection is empty — nothing to export.");
+          return;
+        }
+
+        const csv = `${rows
+          .map((cols) => cols.map(escapeCsvField).join(","))
+          .join("\n")}\n`;
+        const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "my_collection.csv";
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        URL.revokeObjectURL(url);
+      }
+
+      async function resetSampleCollection() {
+        try {
+          localStorage.removeItem(SAMPLE_COLLECTION_STORAGE_KEY);
+        } catch (_) {
+          // localStorage unavailable
+        }
+
+        sampleCollectionIds = await buildSampleIdsFromCsv();
+        let wantChanged = false;
+        for (const id of sampleCollectionIds) {
+          if (wantIds.delete(id)) {
+            wantChanged = true;
+          }
+        }
+        if (wantChanged) {
+          saveWantList();
+        }
+        saveSampleCollectionIds();
+        hideResetSampleConfirm();
         render();
         if (!bookDetailDialog.hidden && detailBookId) {
           openBookDetail(detailBookId);
@@ -2147,6 +2337,30 @@
         }
       });
 
+      if (exportCollectionBtn) {
+        exportCollectionBtn.addEventListener("click", () => {
+          exportCollectionCsv();
+        });
+      }
+
+      if (resetSampleCollectionBtn) {
+        resetSampleCollectionBtn.addEventListener("click", () => {
+          showResetSampleConfirm();
+        });
+      }
+
+      if (resetSampleCancelBtn) {
+        resetSampleCancelBtn.addEventListener("click", () => {
+          hideResetSampleConfirm();
+        });
+      }
+
+      if (resetSampleConfirmBtn) {
+        resetSampleConfirmBtn.addEventListener("click", () => {
+          resetSampleCollection();
+        });
+      }
+
       attributionBtn.addEventListener("click", () => {
         if (attributionDialog.hidden) {
           openAttributionDialog();
@@ -2213,7 +2427,8 @@
 
       loadWantList();
       restoreCollectionSourcePreference();
-      loadCollectionIds();
+      syncSettingsCollectionRadios();
+      loadOwnCollectionIds();
       loadHeaderFiltersPreference();
       updateHeaderFiltersState();
       restoreSortPreference();
@@ -2258,7 +2473,7 @@
       });
 
       checkServeSupport()
-        .then(() => loadCollection())
+        .then(() => ensureSampleCollectionIds())
         .then(render);
     </script>
   </body>

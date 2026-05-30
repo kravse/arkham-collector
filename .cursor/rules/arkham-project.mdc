@@ -31,7 +31,7 @@ Do not edit the plan files in `.cursor/plans/` for this — only `README.md`. Ke
 | `scripts/` | Wikipedia crawler and data-sync CLI (CommonJS modules) |
 | `data/books.json`, `data/books.js` | Scraped book data only (`window.BOOKS`) |
 | `data/edits.json`, `data/edits.js` | Manual edits keyed by book id (`window.BOOK_EDITS`); written only by `server.js` — only fields differing from scraped `books.json` (plus `hidden`, `deleted`); `npm run compact-edits` prunes redundant rows |
-| `my_collection/` | Sample owned-books CSV + `collection.js`; shipped in all builds; gear settings toggle sample vs `localStorage` own collection |
+| `my_collection/` | Sample owned-books CSV + `collection.js`; shipped in all builds; gear settings toggle sample (`arkham-sample-collection`) vs own (`arkham-collection`) |
 | `covers/` | Downloaded cover images |
 | `examples/` | Saved Wikipedia HTML for `--local` crawls |
 | `build.js` → `build/` | Static site (`npm run build`): read-only viewer, sample CSV bundled, collection via gear settings |
@@ -81,7 +81,7 @@ Entry point for all npm crawl/sync scripts: `node scripts/index.js`
 
 ## Viewer app JavaScript
 
-App logic remains inline in `viewer.html` for now. Follow existing patterns there: vanilla JS, `localStorage` for want-list (`arkham-want-list`) and own collection (`arkham-collection`, `arkham-collection-source`); gear settings toggle sample CSV vs own collection; `getVisibleBooks()` for filtered order; descriptions editable via the edit dialog (stored in `edits.json`).
+App logic remains inline in `viewer.html` for now. Follow existing patterns there: vanilla JS, `localStorage` for want-list (`arkham-want-list`), sample collection (`arkham-sample-collection`, seeded from CSV), own collection (`arkham-collection`), and active mode (`arkham-collection-source`); gear settings can reset sample to CSV defaults; `getVisibleBooks()` for filtered order; descriptions editable via the edit dialog (stored in `edits.json`).
 
 `js/book-edits.js` merges `window.BOOKS` with `window.BOOK_EDITS` at startup. Linked from `viewer.html`, copied in `build.js` via `copyDirectory("js")`.
 

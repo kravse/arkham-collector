@@ -6,7 +6,7 @@ A personal gallery of books published by [Arkham House](https://en.wikipedia.org
 
 **Your collection (CSV):** The repo includes a sample [`my_collection/my_collection.csv`](my_collection/my_collection.csv) (title, author, year, status). Replace it with your own list, then run `npm run sync-collection` to regenerate `my_collection/collection.js` before `npm run serve` or `npm run build`.
 
-**Collection modes (gear in the bottom bar):** Choose **Use sample collection** (read-only badges from `my_collection/`, no Collect button) or **Use my own collection** (add/remove via Collect in the book overlay; stored in `localStorage` as `arkham-collection`). The choice is saved in `arkham-collection-source` and survives reloads. Switching to sample does not erase your own collection.
+**Collection modes (gear in the bottom bar):** Choose **Use sample collection** or **Use my own collection**. Both work the same way (Collect in the book overlay); each is stored separately in `localStorage` (`arkham-sample-collection` and `arkham-collection`). The sample list starts from the bundled CSV on first visit; **Reset sample collection** in settings restores that default. The active mode is saved in `arkham-collection-source`.
 
 **Deploy:** `npm run build` writes to `build/` with `robots.txt` and `noindex`. Collection defaults to **own** in the browser; the sample CSV is bundled for the gear toggle.
 
@@ -60,7 +60,7 @@ Stable book `id` values come from imprint + Wikipedia URL + list year (see `scri
 - Styles in [`css/`](css/) (load order matters; see project conventions).
 - Grid of cards; click a card for the detail overlay (Wikipedia **W**, Goodreads **G**, want-list, collection badges).
 - **Goodreads:** uses `goodreadsUrl` from data/edits when set; otherwise **G** opens a [Goodreads book search](https://www.goodreads.com/search) (title + author last name).
-- Want list in `localStorage` (`arkham-want-list`). Collection: sample CSV or your own list (`arkham-collection`), toggled in gear settings.
+- Want list in `localStorage` (`arkham-want-list`). Collection: sample (`arkham-sample-collection`) or your own (`arkham-collection`), toggled in gear settings.
 - **localhost only:** hover cover → edit / hide; edit dialog and API require `npm run serve`.
 
 ### Build (`npm run build`)
