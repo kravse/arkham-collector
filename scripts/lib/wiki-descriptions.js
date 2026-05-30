@@ -1,10 +1,10 @@
 const cheerio = require("cheerio");
-const { normalizeLabel } = require("./text");
+const { stripCitationReferences } = require("./text");
 
 function cleanParagraphText($, paragraph) {
   const clone = paragraph.clone();
   clone.find(".reference, .mw-editsection, sup").remove();
-  return normalizeLabel(clone.text());
+  return stripCitationReferences(clone.text());
 }
 
 function isSectionBoundary($, element) {

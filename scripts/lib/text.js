@@ -11,6 +11,16 @@ function normalizeLabel(text) {
     .trim();
 }
 
+/** Wikipedia footnote markers left in plain text after HTML cleanup, e.g. [1] [12]. */
+function stripCitationReferences(text) {
+  return normalizeLabel(
+    String(text || "")
+      .replace(/\s*\[\d+\]/g, "")
+      .replace(/\s+\./g, ".")
+      .replace(/\.{2,}/g, "."),
+  );
+}
+
 function cellText($, cell) {
   return normalizeLabel($(cell).text());
 }
@@ -203,6 +213,7 @@ function sanitizeUrlInput(value) {
 module.exports = {
   sleep,
   normalizeLabel,
+  stripCitationReferences,
   cellText,
   parseYearFromListLine,
   parseAuthorFromListLine,
