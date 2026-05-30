@@ -286,11 +286,26 @@
 
 .book-detail-scroll-block {
   width: 100%;
-  flex: 0 0 8.69rem;
-  height: 8.69rem;
-  min-height: 8.69rem;
-  max-height: 8.69rem;
+  flex: 1 1 auto;
+  min-height: 0;
   margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  overflow: hidden;
+  text-align: left;
+}
+
+.book-detail-scroll-block .book-detail-meta {
+  flex-shrink: 0;
+  margin-bottom: 0;
+}
+
+.book-detail-scroll-block .book-detail-description {
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+  margin: 0;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
@@ -298,21 +313,6 @@
   border-radius: 8px;
   border: 1px solid rgba(154, 163, 178, 0.18);
   background: rgba(23, 26, 33, 0.72);
-  text-align: left;
-}
-
-.book-detail-scroll-block .book-detail-meta {
-  margin-bottom: 0.45rem;
-}
-
-.book-detail-scroll-block .book-detail-description {
-  width: 100%;
-  margin: 0;
-  padding: 0;
-  border: none;
-  border-radius: 0;
-  background: transparent;
-  overflow: visible;
   font-family: ui-sans-serif, system-ui, sans-serif;
   font-size: 0.78rem;
   line-height: 1.5;
@@ -489,29 +489,16 @@ body.book-detail-open {
     display: contents;
   }
 
-  .book-detail-description {
-    width: 100%;
-    flex: 0 1 auto;
-    height: auto;
-    min-height: 0;
-    max-height: min(17.38rem, 47.4vh);
+  .book-detail-scroll-block .book-detail-meta {
     margin-top: 0.15rem;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior: contain;
-    padding: 0.65rem 0.75rem;
-    border-radius: 8px;
-    border: 1px solid rgba(154, 163, 178, 0.18);
-    background: rgba(23, 26, 33, 0.72);
-    font-family: ui-sans-serif, system-ui, sans-serif;
-    font-size: 0.78rem;
-    line-height: 1.5;
-    color: #c5ccd8;
-    text-align: left;
-    white-space: pre-wrap;
   }
 
-  .book-detail-description--empty {
+  .book-detail-scroll-block .book-detail-description {
+    flex: 0 1 auto;
+    max-height: min(17.38rem, 47.4vh);
+  }
+
+  .book-detail-scroll-block .book-detail-description--empty {
     display: none;
   }
 

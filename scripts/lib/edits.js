@@ -75,10 +75,13 @@ function filterActiveBooks(books) {
 
 function applyEditsToBook(book, editsById) {
   const edit = getEditForBook(editsById, book.id);
+  const { hidden: _hidden, deleted: _deleted, ...base } = book;
   if (!edit) {
-    return book;
+    return { ...base, hidden: false, deleted: false };
   }
-  const merged = { ...book, ...edit };
+  const merged = { ...base, ...edit };
+  merged.hidden = edit.hidden === true;
+  merged.deleted = edit.deleted === true;
   if (edit.coverImageFile) {
     merged.coverEditPath = edit.coverImageFile;
   }

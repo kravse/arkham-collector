@@ -39,22 +39,33 @@ window.BOOK_EDITS = {
     "coverArtist": "Ronald Clyne"
   },
   "232": {
-    "hidden": true
+    "coverImageFile": "covers/baker-street-irregular-232.jpg",
+    "goodreadsUrl": "https://www.goodreads.com/book/show/9439207-the-baker-street-irregular",
+    "description": "Baker Street Irregular is a mystery and espionage tale told by a member of a whimsical Sherlock Holmes club born in a speakeasy, as Woody Hazelbaker undergoes America's political struggles in the 1930s and Second World War in the '40s, stretching from the Great Depression's worst year to the beginning of the Cold War. A young New York lawyer, Woody gets a cold dose of reality from a gangster client he keeps secret from the world, then puts stratagems he learned to use when he and other Baker Street Irregulars react to Hitler's war against Europe's democracies",
+    "coverArtist": "Laurie Fraser Manifold"
   },
   "233": {
     "hidden": true
   },
   "234": {
-    "hidden": true
+    "hidden": true,
+    "coverImageFile": "covers/who-shall-i-say-is-calling-other-stories-234.jpg",
+    "description": "Part of the The Macabre Quarto. \n\nContents\n\nThose Who Seek\nThe Bishop Sees Through\nThe House in the Magnolias\nThe Sheraton Mirror\nThe Return of Andrew Bentley\nBirkett's Twelfth Corpse\nColonel Markesan\nThe Shuttered House\nThe Panelled Room\nLogoda's Heads\nHere, Daemos!\nA Wig for Miss Devore\nPacific 421\nThe Inverness Cape\nMrs. Lannisfree\nMr. George\nThe Ghost Walk\nMara\nThe Lonesome Place\nMrs. Manifold\nKingsridge 214\nA Room in a House\n\"Who Shall I Say Is Calling?\"\nThe Dark Boy\nThe Lamp of Alhazred\nThe Patchwork Quilt\nMiss Esperson\nGhost Lake\nAfterword by George A. Vanderburgh"
   },
   "235": {
+    "coverImageFile": "covers/the-sleepers-and-other-wakeful-things-235.jpg",
+    "description": "Part of the The Macabre Quarto. \n\nContents\n\nThe Night Rider (1927)\nThe River (1927)\nThe Black Castle (1927)\nThe Turret Room (1927)\nThe Sleepers (1927)\nThe Three-Storied House (1928)\nThe Tenant at Number Seven (1928)\nMelodie in E Minor (1929)\nThe House on the Highway (1929)\nThe Lilac Bush (1930)\nAcross the Hall (1930)\nJust a Song at Twilight (1930)\nMrs. Bentley's Daughter (1930)\nGhosts Who Re-enact Their Crimes (1931)\nWraiths of the Sea (1931)\nLaughter in the Night (1932)\nThe White Moth (1933)\nThe Metronome (1935)\nMuggridge's Aunt (1935)\nMr. Berbeck Had a Dream (1935)\nThe Telephone in the Library (1936)\nThe Wind from the River (1937)\nMcGovern's Obsession (1937)\nThree Gentlemen in Black (1938)\nThe Vengeance of Ai (1939)\nMan in the Dark (1939)\nA Message for His Majesty (1939)\nThe Room in the Annex (1939)\nAfter You, Mr. Henderson (1940)\nThe Four Who Came Back (1940)\nNo Light for Uncle Henry (1943)\nAlannah (1945)\nCarousel (1945)\nDead Man's Shoes (1946)\nThe Churchyard Yew (1947)\nTwilight Play (1949)\nThe Ormolu Clock (1950) Cover\nThe Man on B-17 (1950)\nThe Closing Door (1950)\nPott's Triumph (1950)\nA Knocking in the Wall (1951)\nHector (1951)\nThe Night Road (1952)\nThe Ebony Stick (1953)\nThe Disc Recorder (1953)\nComplete with Ghost (1958)",
     "hidden": true
   },
   "236": {
+    "coverImageFile": "covers/that-is-not-dead-236.jpg",
+    "description": "Part of the The Macabre Quarto. \n\nContents\n\nThe Devil's Pay (1926)\nThe Inheritors (1929)\nHe Shall Come (1929)\nA Matter of Sight (1930)\nThe Portrait (1930)\nThe Whistler (1930)\nThe Bridge of Sighs (1931)\nThe Shadow on the Sky (1932)\nIn the Left Wing (1932)\nAn Elegy for Mr. Danielson (1933)\nWild Grapes (1934)\nThe Slanting Shadow (1935)\nGlory Hand (1937)\nEyes of the Serpent (1939)\nThe Second Print (1939)\nMrs. Elting Does Her Part (1939)\nA Gift for Uncle Herman (1939)\nA Bottle for Corezzi (1939)\nCome to Me (1941)\nAltimer's Amulet (1941)\nCompliments of Spectro (1941)\nMrs. Corter Makes Up Her Mind (1942)\nLansing's Luxury (1942)\nA Thin Gentleman with Gloves (1943)\nLady Macbeth of Pimley Square (1944)\nThe Lost Day (1945)\nThe Bishop's Gambit (1947)\nA Collector of Stones (1946)\nThe Extra Passenger (1947)\nThe Night Train to Lost Valley (1948)\nThe Wind in the Lilacs (1948)\nThe Tsantsa in the Parlor (1948)\nThe Blue Spectacles (1949)\nThe Slayers and the Slain (1949)\nThe Place of Desolation (1952)\nHallowe'en for Mr. Faulkner (1959)",
     "hidden": true
   },
   "237": {
-    "hidden": true
+    "hidden": true,
+    "coverImageFile": "covers/august-derleths-eerie-creatures-237.jpg",
+    "description": "Part of the The Macabre Quarto. \n\nIntroduction by Brian Lumley\n\n--Vampire\nBat's Belfry (1926)\nNellie Foster (1933)\nThe Satin Mask (1936)\nThe Drifting Snow (1939)\nThe Occupant of the Crypt (1947)\nReanimated Dead\nThey Shall Rise (1936)\nThe Return of Sarah Purcell (1936)\nDeath Holds the Post (1936)\nA Gentleman from Prague (1944)\nParrington's Pool (1947)\n--Shapeshifters\nThe Owl on the Moor (1928)\nThe Woman at Loon Point (1936)\nElemental/Mythological\nThe Deserted Garden (1929)\nOld Mark (1929)\nThe Place in the Woods (1954)\n--Imps and Demons\nScarlatti's Bottle (1929)\nThe Captain is Afraid (1931)\nLesandro's Familiar (1936)\nBramwell's Guardian (1940)\nMr. Ames' Devil (1943)\nBaynter's Imp (1943)\nBlessed are the Meek (1948)\nBalu (1949)\nSaunder's Little Friend (1948)\n--Miscellaneous\nThe Marmoset (1926)\nThe Tenant (1928)\nRiders in the Sky (1928)\nThe Pacer (1930)\nRed Hands (1932)\nThe Carven Image (1932)"
   },
   "238": {
     "title": "The Shunned House Facsimile",

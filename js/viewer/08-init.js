@@ -143,11 +143,15 @@ attributionDialog.querySelectorAll("[data-close-attribution]").forEach((element)
 });
 
 document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && !editDialog.hidden) {
+    closeEditDialog();
+    return;
+  }
   if (event.key === "Escape" && !bookDetailDialog.hidden) {
     closeBookDetail();
     return;
   }
-  if (!bookDetailDialog.hidden) {
+  if (!bookDetailDialog.hidden && editDialog.hidden) {
     if (event.key === "ArrowLeft") {
       event.preventDefault();
       navigateDetail(-1);
@@ -158,10 +162,6 @@ document.addEventListener("keydown", (event) => {
       navigateDetail(1);
       return;
     }
-  }
-  if (event.key === "Escape" && !editDialog.hidden) {
-    closeEditDialog();
-    return;
   }
   if (event.key === "Escape" && !settingsDialog.hidden) {
     closeSettingsDialog();
