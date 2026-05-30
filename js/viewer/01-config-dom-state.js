@@ -59,6 +59,12 @@ const resetSampleCancelBtn = document.getElementById(
 const resetSampleConfirmBtn = document.getElementById(
   "reset-sample-confirm-btn",
 );
+const settingsCollectionHintSample = document.getElementById(
+  "settings-collection-hint-sample",
+);
+const settingsCollectionHintOwn = document.getElementById(
+  "settings-collection-hint-own",
+);
 const attributionBtn = document.getElementById("attribution-btn");
 const attributionDialog = document.getElementById("attribution-dialog");
 const attributionCloseBtn = document.getElementById("attribution-close");
@@ -135,6 +141,23 @@ function saveCollectionSourcePreference() {
   }
 }
 
+function syncSettingsCollectionHint() {
+  const inConfirm =
+    resetSampleConfirmPanel && !resetSampleConfirmPanel.hidden;
+  const showSampleHint =
+    !inConfirm &&
+    collectionSource === "sample" &&
+    resetSampleCollectionBtn &&
+    !resetSampleCollectionBtn.hidden;
+
+  if (settingsCollectionHintSample) {
+    settingsCollectionHintSample.hidden = !showSampleHint;
+  }
+  if (settingsCollectionHintOwn) {
+    settingsCollectionHintOwn.hidden = showSampleHint;
+  }
+}
+
 function syncSettingsCollectionRadios() {
   if (collectionSourceSampleInput) {
     collectionSourceSampleInput.checked = collectionSource === "sample";
@@ -146,6 +169,7 @@ function syncSettingsCollectionRadios() {
     resetSampleCollectionBtn.hidden = collectionSource !== "sample";
   }
   hideResetSampleConfirm();
+  syncSettingsCollectionHint();
 }
 
 function showResetSampleConfirm() {
@@ -154,6 +178,7 @@ function showResetSampleConfirm() {
   }
   resetSampleCollectionBtn.hidden = true;
   resetSampleConfirmPanel.hidden = false;
+  syncSettingsCollectionHint();
 }
 
 function hideResetSampleConfirm() {
@@ -163,4 +188,5 @@ function hideResetSampleConfirm() {
   if (resetSampleCollectionBtn && collectionSource === "sample") {
     resetSampleCollectionBtn.hidden = false;
   }
+  syncSettingsCollectionHint();
 }
