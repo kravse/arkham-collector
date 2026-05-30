@@ -2,8 +2,13 @@
 
 const DEFAULT_COLLECTION_CSV = "my_collection/my_collection.csv";
 
-async function loadCollectionCsvItems() {
+async function loadCollectionCsvItems(options = {}) {
+  const forceCsv = options.forceCsv === true;
   const csvPath = window.SAMPLE_COLLECTION_CSV || DEFAULT_COLLECTION_CSV;
+
+  if (!forceCsv && readOnly && window.MY_COLLECTION?.length) {
+    return window.MY_COLLECTION;
+  }
 
   try {
     const response = await fetch(csvPath);
@@ -14,15 +19,11 @@ async function loadCollectionCsvItems() {
     // fetch fails on file://; fall back to collection.js
   }
 
-  if (readOnly && window.MY_COLLECTION?.length) {
-    return window.MY_COLLECTION;
-  }
-
   return window.MY_COLLECTION || [];
 }
 
-async function buildSampleIdsFromCsv() {
-  const items = await loadCollectionCsvItems();
+async function buildSampleIdsFromCsv(options = {}) {
+  const items = await loadCollectionCsvItems(options);
   const savedRows = collection;
   collection = items;
   const ids = new Set();

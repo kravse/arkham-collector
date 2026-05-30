@@ -273,7 +273,9 @@ async function resetSampleCollection() {
     // localStorage unavailable
   }
 
-  sampleCollectionIds = await buildSampleIdsFromCsv();
+  sampleCollectionIds = await buildSampleIdsFromCsv({
+    forceCsv: Boolean(window.SAMPLE_COLLECTION_CSV),
+  });
   let wantChanged = false;
   for (const id of sampleCollectionIds) {
     if (wantIds.delete(id)) {

@@ -10,6 +10,7 @@ const {
   resolveCoverPathsInBooks,
 } = require("./scripts/lib/covers-files");
 const { bundleViewerJs } = require("./scripts/bundle-viewer-js");
+const { syncCollectionFromCsv } = require("./scripts/lib/collection");
 
 const ROOT = __dirname;
 const BUILD_DIR = path.join(ROOT, "build");
@@ -96,13 +97,21 @@ function concatViewerCss() {
   return destPath;
 }
 
-function collectionCsvCacheBustPath(csvPath) {
+function contentCacheBustPath(relativeDir, baseName, filePath) {
   const hash = crypto
     .createHash("sha256")
-    .update(fs.readFileSync(csvPath))
+    .update(fs.readFileSync(filePath))
     .digest("hex")
     .slice(0, 8);
-  return `my_collection/my_collection.${hash}.csv`;
+  return `${relativeDir}/${baseName}.${hash}${path.extname(filePath)}`;
+}
+
+function collectionCsvCacheBustPath(csvPath) {
+  return contentCacheBustPath("my_collection", "my_collection", csvPath);
+}
+
+function collectionJsCacheBustPath(jsPath) {
+  return contentCacheBustPath("my_collection", "collection", jsPath);
 }
 
 function applyBuildHtmlTransforms(html, options = {}) {
@@ -114,13 +123,16 @@ function applyBuildHtmlTransforms(html, options = {}) {
 
   const collectionScript =
     '<script src="my_collection/collection.js"></script>';
+  const collectionScriptOut = options.collectionJsPath
+    ? `<script src="${options.collectionJsPath}"></script>`
+    : collectionScript;
   const injectParts = ["<script>window.READ_ONLY = true;</script>"];
   if (options.collectionCsvPath) {
     injectParts.push(
       `<script>window.SAMPLE_COLLECTION_CSV = ${JSON.stringify(options.collectionCsvPath)};</script>`,
     );
   }
-  injectParts.push(collectionScript);
+  injectParts.push(collectionScriptOut);
   next = next.replace(collectionScript, injectParts.join("\n  "));
 
   const shareImage = `${DEPLOY_ORIGIN}/images/share.png`;
@@ -182,12 +194,18 @@ function buildStaticSite() {
   fs.mkdirSync(BUILD_DIR, { recursive: true });
 
   let collectionCsvBuildPath = null;
+  let collectionJsBuildPath = null;
   if (fs.existsSync(COLLECTION_CSV)) {
+    syncCollectionFromCsv();
     collectionCsvBuildPath = collectionCsvCacheBustPath(COLLECTION_CSV);
+    if (fs.existsSync(COLLECTION_JS)) {
+      collectionJsBuildPath = collectionJsCacheBustPath(COLLECTION_JS);
+    }
   }
 
   const html = applyBuildHtmlTransforms(fs.readFileSync(VIEWER_HTML, "utf8"), {
     collectionCsvPath: collectionCsvBuildPath,
+    collectionJsPath: collectionJsBuildPath,
   });
   fs.writeFileSync(path.join(BUILD_DIR, "robots.txt"), ROBOTS_NO_CRAWL);
   fs.writeFileSync(path.join(BUILD_DIR, "index.html"), html);
@@ -205,8 +223,16 @@ function buildStaticSite() {
     );
   }
 
-  if (fs.existsSync(COLLECTION_JS)) {
-    copyFile(COLLECTION_JS, path.join(BUILD_DIR, "my_collection", "collection.js"));
+  if (collectionJsBuildPath && fs.existsSync(COLLECTION_JS)) {
+    copyFile(
+      COLLECTION_JS,
+      path.join(BUILD_DIR, collectionJsBuildPath),
+    );
+  } else if (fs.existsSync(COLLECTION_JS)) {
+    copyFile(
+      COLLECTION_JS,
+      path.join(BUILD_DIR, "my_collection", "collection.js"),
+    );
   }
   if (collectionCsvBuildPath) {
     copyFile(

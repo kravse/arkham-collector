@@ -4,11 +4,11 @@ A personal gallery of books published by [Arkham House](https://en.wikipedia.org
 
 **Live site:** [arkhamcollector.com](https://arkhamcollector.com) — public build; collection defaults to your own list in the browser, with an optional sample CSV via the gear settings.
 
-**Your collection (CSV):** The repo includes a sample [`my_collection/my_collection.csv`](my_collection/my_collection.csv) (title, author, year). Replace it with your own list, then run `npm run sync-collection` to regenerate `my_collection/collection.js` before `npm run serve` or `npm run build`. An optional fourth column in an existing CSV is ignored.
+**Your collection (CSV):** The repo includes a sample [`my_collection/my_collection.csv`](my_collection/my_collection.csv) (title, author, year). Edit that CSV as your source list; `npm run build` and `npm run serve` regenerate `my_collection/collection.js` from it automatically. Use `npm run sync-collection` only if you need the JS file updated without starting the server or running a full build. An optional fourth column in an existing CSV is ignored.
 
 **Collection modes (gear in the bottom bar):** Choose **Use sample collection** or **Use my own collection**. Both work the same way (Collect in the book overlay); each is stored separately in `localStorage` (`arkham-sample-collection` and `arkham-collection`). The sample list starts from the bundled CSV on first visit; **Reset sample collection** in settings restores that default. The active mode is saved in `arkham-collection-source`.
 
-**Deploy:** `npm run build` writes to `build/` with `robots.txt` and `noindex`. Collection defaults to **own** in the browser; the sample CSV is bundled for the gear toggle.
+**Deploy:** `npm run build` syncs the sample CSV to `collection.js`, copies cache-busted `my_collection.*.<hash>.csv` and `collection.*.<hash>.js` into `build/`, and sets `robots.txt` / `noindex`. Collection defaults to **own** in the browser; the sample list uses the bundled JS on first load and refetches the hashed CSV when you reset the sample collection.
 
 ### Homepage
 
@@ -139,7 +139,7 @@ All npm scripts below run through `node scripts/index.js` with flags parsed in [
 
 | Script | Command | What it does |
 |--------|---------|----------------|
-| `sync-collection` | `... --sync-collection` | Regenerate `my_collection/collection.js` from `my_collection/my_collection.csv`. |
+| `sync-collection` | `... --sync-collection` | Regenerate `my_collection/collection.js` from CSV (also runs automatically on `build` and `serve`). |
 | `dedupe-book-ids` | `... --dedupe-book-ids` | Split duplicate stable ids; move shared `hidden` edits to reprint ids. |
 | `compact-edits` | `... --compact-edits` | Remove edit fields that match scraped `books.json` (safe to re-run). |
 
