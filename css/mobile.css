@@ -153,7 +153,7 @@
   .stats-filters {
     order: 1;
     display: grid;
-    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1.2fr) minmax(0, 1.15fr);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr) minmax(0, 1fr);
     gap: 0.4rem;
     width: 100%;
   }

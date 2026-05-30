@@ -86,18 +86,12 @@ function renderStats(visible, all) {
   const hasMycroft = activeBooks.some(
     (book) => book.imprint === "mycroft_moran",
   );
-  const wantCount = getWantCount();
-  const wantLabel = wantCount ? `WANT (${wantCount})` : "WANT";
-  const collectionCount = getCollectionCount();
-  const collectionLabel = collectionCount
-    ? `COLLECTION (${collectionCount})`
-    : "COLLECTION";
   const filters = [
-    `<button type="button" class="stat owned-stat stat-toggle${collectionOnly ? " active" : ""}" id="collection-filter-toggle" aria-pressed="${collectionOnly}">${collectionLabel}</button>`,
+    `<button type="button" class="stat owned-stat stat-toggle${collectionOnly ? " active" : ""}" id="collection-filter-toggle" aria-pressed="${collectionOnly}">COLLECTION</button>`,
     hasMycroft
       ? `<button type="button" class="stat mycroft-stat stat-toggle${mycroftOnly ? " active" : ""}" id="mycroft-filter-toggle" aria-pressed="${mycroftOnly}">MYCROFT &amp; MORAN</button>`
       : "",
-    `<button type="button" class="stat want-stat stat-toggle${wantOnly ? " active" : ""}" id="want-filter-toggle" aria-pressed="${wantOnly}">${wantLabel}</button>`,
+    `<button type="button" class="stat want-stat stat-toggle${wantOnly ? " active" : ""}" id="want-filter-toggle" aria-pressed="${wantOnly}">WANT</button>`,
     hiddenCount && serveEnabled
       ? `<button type="button" class="stat hidden-stat stat-toggle${hiddenOnly ? " active" : ""}" id="hidden-filter-toggle" aria-pressed="${hiddenOnly}">HIDDEN</button>`
       : "",
