@@ -3,10 +3,6 @@
 const DEFAULT_COLLECTION_CSV = "my_collection/my_collection.csv";
 
 async function loadCollectionCsvItems() {
-  if (readOnly && window.MY_COLLECTION?.length) {
-    return window.MY_COLLECTION;
-  }
-
   const csvPath = window.SAMPLE_COLLECTION_CSV || DEFAULT_COLLECTION_CSV;
 
   try {
@@ -16,6 +12,10 @@ async function loadCollectionCsvItems() {
     }
   } catch (_) {
     // fetch fails on file://; fall back to collection.js
+  }
+
+  if (readOnly && window.MY_COLLECTION?.length) {
+    return window.MY_COLLECTION;
   }
 
   return window.MY_COLLECTION || [];
