@@ -197,6 +197,12 @@ input[type="search"]::-webkit-search-cancel-button {
   display: contents;
 }
 
+.stats-filters .stat,
+.stats-filters .stat-toggle {
+  font-size: inherit;
+  letter-spacing: inherit;
+}
+
 .stat,
 .stat-toggle {
   background: var(--panel);
