@@ -159,7 +159,7 @@ Disallow: /
 `;
 
 /** Canonical deploy origin for absolute Open Graph / Twitter image URLs. */
-const DEPLOY_ORIGIN = "https://arkhamcollector.com";
+const DEPLOY_ORIGIN = "https://arkhamcollector.org";
 
 function buildStaticSite() {
   bundleViewerJs();

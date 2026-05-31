@@ -1,220 +1,142 @@
 # Arkham House bibliography gallery
 
-> **Note:** This project was built with AI assistance, but it was guided and shaped through hundreds of prompts—not generated in one shot.
+**[arkhamcollector.org](https://arkhamcollector.org)** — browse ~200 Arkham House and Mycroft & Moran editions with covers, search, and collector tools. No account; your list stays in the browser.
 
-A personal gallery of books published by [Arkham House](https://en.wikipedia.org/wiki/Arkham_House) and the Mycroft & Moran imprint, scraped from Wikipedia bibliographies. Browse covers, search and sort the catalog, track what you own and want on the live site, and curate book metadata (covers, dates, links) in a local dev server.
+> Built with AI assistance, guided through hundreds of prompts—not generated in one shot.
 
-**Live site:** [arkhamcollector.com](https://arkhamcollector.com) — read-only catalog; your collection and want list live in the browser.
+## What the site is for
 
-### Curating your collection (live site)
+A visual catalog for collectors and readers of [Arkham House](https://en.wikipedia.org/wiki/Arkham_House) weird fiction: every bibliography line from Wikipedia, cover art where available, publication metadata, and links out to Wikipedia and Goodreads. Use it to **browse the imprint**, **mark what you own**, **track a want list**, and **filter** down to gaps in your shelves.
 
-On [arkhamcollector.com](https://arkhamcollector.com) (or any deployed build), you build **your own** collection in the browser—nothing is sent to a server.
+| | |
+|---|---|
+| **Search & sort** | Full grid by title, author, or publication date |
+| **Filters** | Collection, want list, Mycroft & Moran imprint, decade |
+| **Book detail** | Cover, description, cover artist, **W** / **G** links, **Collect** and want toggles |
+| **Your data** | Stored in `localStorage` on your device only—nothing uploaded |
+| **Export** | Download your active collection as CSV from gear settings |
 
-1. Open a book from the grid and tap **Collect** in the detail overlay to mark it owned (tap again to remove).
-2. Use the **COLLECTION** filter in the header to show only titles you’ve marked.
-3. Open **gear** (bottom bar) → **Use my own collection** (default on deploy). Your list is stored in this browser only (`localStorage`, key `arkham-collection`).
-4. **Export collection CSV** in settings downloads title, author, and year for whichever list is active in gear (your own or the sample). Same three-column shape as the repo sample CSV. There is no import in the UI—you add titles by using **Collect** on each book.
+### Screenshots
 
-**Sample vs your own:** In gear, **Use sample collection** loads a bundled demo list (maintainer’s CSV baked into the build). **Use my own collection** switches back to your marks. The two lists are independent; resetting the sample does not change your own collection. **Reset sample collection** restores the bundled default sample list.
-
-### Sample collection CSV (maintainers)
-
-The repo ships a demo [`my_collection/my_collection.csv`](my_collection/my_collection.csv) (title, author, year) that becomes the site’s **sample** list after build—not visitors’ personal collections. Edit that file to change the default sample; `npm run build` and `npm run serve` regenerate `my_collection/collection.js` from it automatically. Use `npm run sync-collection` only if you need the JS file updated without starting the server or running a full build. An optional fourth column in an existing CSV is ignored.
-
-**Deploy:** `npm run build` syncs the sample CSV to `collection.js`, copies cache-busted `my_collection.*.<hash>.csv` and `collection.*.<hash>.js` into `build/`, and sets `robots.txt` / `noindex`. Collection defaults to **own** in the browser; the sample list uses the bundled JS on first load and refetches the hashed CSV when you reset the sample collection.
-
-### Homepage
-
-Search, sort, and browse the full bibliography as a cover grid with collection, Mycroft & Moran, and want-list filters.
+**Homepage** — search, sort, and filters on the cover grid.
 
 <img src="images/example-homepage.png" alt="Homepage — search, sort, and cover grid" width="680" />
 
-### Book detail overlay
-
-Tap a card to see the cover, title with year, author and cover artist, a scrollable Wikipedia description, and quick links to Wikipedia, Goodreads, and your want list.
+**Book detail** — overlay with description and collector actions.
 
 <img src="images/example-overlay.png" alt="Book detail overlay with cover, metadata, and description" width="680" />
 
-### Want list & collection
-
-Filter to titles you own or are hunting for, with COLLECTION and WANTED badges on each card. Mark ownership with **Collect** in the book overlay; mark hunting titles with the want control. See [Curating your collection (live site)](#curating-your-collection-live-site) for gear settings and export.
+**Collection & want list** — badges and header filters.
 
 <img src="images/example-want-collection.png" alt="Want list and collection filters on cards" width="680" />
 
-## Quick start
+## Using the site
+
+1. Open a card → **Collect** to mark a copy you own (tap again to remove).
+2. Toggle **want** on titles you are hunting.
+3. Filter with **COLLECTION** or **WANT** in the header.
+4. **Gear** (bottom bar): switch **Use my own collection** (default on the live site) vs **Use sample collection** (a bundled demo list). The two lists are separate; **Reset sample collection** only affects the demo.
+5. **Export collection CSV** exports whichever mode is active (title, author, year). There is no import—add books with **Collect**.
+
+## Run it locally
+
+The repo ships scraped catalog data (`data/books.json`, `books.js`, `descriptions.js`, `covers/`). You do **not** need to crawl Wikipedia to try the viewer.
 
 ```bash
+git clone <your-fork-url>
+cd arkham
 npm install
-npm run crawl          # first-time: scrape Wikipedia → data/books.json (live network)
-npm run serve          # http://localhost:8742 — edit books, upload covers, hide titles
-npm run build          # static site in build/
+npm run serve    # http://localhost:8742 — full UI + edit/hide/upload API
+# or
+npm run build && open build/index.html   # read-only static site (matches deploy)
 ```
 
-Open `build/index.html` or deploy `build/`. The built site is read-only (no edit UI).
+**`npm run serve`** — edit metadata, upload covers, hide or soft-delete titles; changes go to `data/edits.json` only.
 
-## How it works
+**`npm run build`** — writes `build/` for static hosting (`READ_ONLY`, bundled CSS/JS, `noindex`). Deploy that folder to any static host.
 
-### Two layers of book data
+## Customize the catalog (maintainers)
 
-| Layer | Files | Written by | Purpose |
-|-------|--------|------------|---------|
-| **Scraped** | `data/books.json`, `data/books.js`, `data/descriptions.js` | Crawler & sync scripts | Full JSON in `books.json`; viewer scripts split descriptions into `descriptions.js` for faster load |
-| **Edits** | `data/edits.json`, `data/edits.js` | `npm run serve` only | Overrides keyed by book `id`: only fields that differ from scraped `books.json` (plus `hidden` / `deleted` flags) |
+| Layer | Files | Who writes it |
+|-------|--------|----------------|
+| Scraped | `data/books.json`, `books.js`, `descriptions.js` | Crawler & sync scripts |
+| Overrides | `data/edits.json` | Dev server (`npm run serve`) only |
 
-At load time, [`js/book-edits.js`](js/book-edits.js) merges scraped books with edits (`{ ...book, ...edit }`). **Edits win** for any field present in `edits.json`. Saving in the edit dialog compares each value to the scraped row and stores only differences, so a later crawl or sync can update fields you did not change.
+At load time, [`js/book-edits.js`](js/book-edits.js) merges scraped rows with edits; only differing fields are stored in `edits.json` so re-crawls can refresh untouched fields.
 
-`npm run compact-edits` — one-time cleanup: drop edit fields that now match scraped data (e.g. after importing Goodreads URLs into `books.json`).
+**Sample collection in builds:** [`my_collection/my_collection.csv`](my_collection/my_collection.csv) is the maintainer demo list (not visitors’ personal collections). `build` and `serve` sync it to `collection.js` and ship cache-busted `my_collection.<hash>.csv` + `collection.<hash>.js` in `build/`.
 
-Stable book `id` values come from imprint + Wikipedia URL + list year (see `scripts/lib/book-ids.js`). Full bibliography crawls replace scraped rows by that key but keep the same `id` when the line matches.
+**First-time scrape** (optional, overwrites scraped data):
 
-### Viewer (`viewer.html` + `js/viewer/`)
+```bash
+npm run crawl              # live Wikipedia + covers (confirms unless --yes)
+npm run crawl:local        # offline from examples/*.html
+npm run crawl:mycroft      # Mycroft & Moran rows only
+```
 
-- Vanilla HTML/CSS/JS — no bundler. UI markup in `viewer.html`; app code in `js/viewer/` (bundled to `js/viewer-bundle.js` via `npm run bundle-viewer`, also run automatically by `npm run build`).
-- Catalog loads from slim `data/books.js` plus `data/descriptions.js` (text loaded for the detail overlay). Production `build/` ships one `css/viewer.css` and does not include `data/books.json`.
-- Styles in [`css/`](css/) (load order matters; see project conventions).
-- Grid of cards; click a card for the detail overlay (Wikipedia **W**, Goodreads **G**, want-list, collection badges).
-- **Goodreads:** uses `goodreadsUrl` from data/edits when set; otherwise **G** opens a [Goodreads book search](https://www.goodreads.com/search) (title + author last name).
-- Want list in `localStorage` (`arkham-want-list`). **Own** collection: book ids in `arkham-collection`, toggled per card with **Collect**. **Sample** collection: `arkham-sample-collection`, seeded from bundled CSV; mode switch in gear (`arkham-collection-source`). Export the active list as CSV from settings (no import).
-- **localhost only:** hover cover → edit / hide; edit dialog and API require `npm run serve`.
+Do not hand-edit `build/` or generated `data/*.js`—change source and rebuild.
 
-### Build (`npm run build`)
+## Wikipedia & licensing
 
-[`build.js`](build.js) writes a static site under **`build/`**: `viewer.html` → `index.html`, `window.READ_ONLY = true`, `my_collection/` for the sample toggle (CSV copied as `my_collection.<hash>.csv` with `window.SAMPLE_COLLECTION_CSV` set for cache busting), bundled `css/viewer.css`, JS/covers, merged slim `data/books.js` + `data/descriptions.js`, `images/` (logos + favicons), root-level favicon files for browsers that request `/favicon.ico`, `site.webmanifest`, plus `robots.txt` and a `noindex` meta tag. Deploy `build/` to [arkhamcollector.com](https://arkhamcollector.com) or any static host.
+The bibliography and many book descriptions come from [Wikipedia](https://en.wikipedia.org/) (scraped via the scripts in `scripts/`). Description text is used under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/); each book links to its source article (**W** in the detail overlay). Cover images may be from Wikipedia, Wikimedia Commons, Open Library, or local uploads—licenses vary by file.
 
-Hidden and deleted books are excluded from copied covers but remain in shipped data unless you filter elsewhere.
-
-Do not hand-edit `build/` or generated `data/*.js` — change source and rebuild.
-
-### Dev server (`npm run serve`)
-
-[`server.js`](server.js) serves the repo root on port **8742** (override with `PORT`).
-
-| Endpoint | Purpose |
-|----------|---------|
-| `PATCH /api/books/:id` | Save edit fields + optional cover upload → `edits.json` |
-| `PATCH /api/books/:id/hidden` | Hide / unhide |
-| `DELETE /api/books/:id` | Soft-delete (`deleted: true` in edits) |
-| `POST /api/books/:id/cover` | Cover-only upload |
-
-### Crawler CLI (`scripts/index.js`)
-
-All npm scripts below run through `node scripts/index.js` with flags parsed in [`scripts/cli.js`](scripts/cli.js).
-
-**Shared flags** (where supported):
-
-| Flag | Meaning |
-|------|---------|
-| `--yes` | Skip destructive scrape warning |
-| `--local` | Use saved HTML under `examples/` instead of live Wikipedia |
-| `--limit N` | Process only the first N items (crawl rows, sync pages, Goodreads attempts, etc.) |
-| `--delay-ms N` | Pause between HTTP requests (default 2000) |
-| `--dry-run` | Preview without writing (fill-covers, sync-goodreads) |
-| `--skip-download` | Crawl metadata without downloading cover images |
-
----
+On [arkhamcollector.org](https://arkhamcollector.org), open **Wikipedia attribution** in the footer for source pages, license text, and reuse notes. If you fork or republish scraped descriptions, follow [Wikipedia’s reuse guidance](https://en.wikipedia.org/wiki/Wikipedia:Reusing_Wikipedia_content) (credit, link, and CC BY-SA 4.0 where applicable). This project is not affiliated with Arkham House, Wikipedia, or the Wikimedia Foundation.
 
 ## npm scripts
 
-### Crawl (Wikipedia bibliography)
-
-| Script | Command | What it does |
-|--------|---------|----------------|
-| `crawl` | `node scripts/index.js` | Full **Arkham House** bibliography from live Wikipedia; downloads covers to `covers/`; writes `data/books.json`. **Warns** unless `--yes`. |
-| `crawl:local` | `... --local` | Same, using `examples/Arkham House - Wikipedia.html` (no cover downloads). |
-| `crawl:mycroft` | `... --mycroft-only` | **Mycroft & Moran** imprint only; merges into existing `books.json`. |
-| `crawl:mycroft:local` | `... --mycroft-only --local` | Mycroft crawl from saved example HTML. |
-| `crawl:test` | `... --limit 5` | Short test crawl (5 rows). |
-
-### Sync (patch `books.json` without full re-crawl)
-
-| Script | Command | What it does |
-|--------|---------|----------------|
-| `sync-publication-dates` | `... --sync-publication-dates --local` | Refresh publication years from bibliography tables (local HTML by default in npm script). |
-| `sync-authors` | `... --sync-authors` | Copy `listAuthor` into `author` when missing. |
-| `sync-descriptions` | `... --sync-descriptions` | Pull lead paragraphs from Wikipedia article HTML into `description`. Skips books with a custom description in edits. **Warns** unless `--yes`. |
-| `sync-descriptions:local` | `... --sync-descriptions --local` | Descriptions from `examples/` sample pages only. |
-| `sync-goodreads` | `... --sync-goodreads` | Match Goodreads edition URLs via [Open Library](https://openlibrary.org) (`goodreadsUrl` on each book). Skips books that already have a URL and manual Goodreads edits. |
-| `sync-goodreads:missing` | `... --sync-goodreads-missing` | Same matcher, **only books with no `goodreadsUrl`** — safe to rerun after rate limits; `--limit` counts missing books only. |
-| `sync-goodreads:dry-run` | `... --sync-goodreads --dry-run` | Log matches without writing. |
-| `sync-goodreads:missing:dry-run` | `... --sync-goodreads-missing --dry-run` | Preview missing-only pass. |
-| `import-goodreads-shelf` | `... --import-goodreads-shelf` | Import URLs from the four saved `examples/Arkham House Books _ Goodreads*.html` shelf exports (overwrites scraped `goodreadsUrl`; skips manual edits). |
-| | `... --force-goodreads` | With `sync-goodreads` only: replace existing scraped URLs (still skips `edits.json` overrides). |
-
-### Covers
-
-| Script | Command | What it does |
-|--------|---------|----------------|
-| `fill-covers` | `... --fill-covers` | Find/download missing covers (Wikipedia + Open Library). **Warns** unless `--yes`. |
-| `fill-covers:dry-run` | `... --fill-covers --dry-run` | Report what would be filled. |
-| `reconcile-covers` | `... --reconcile-covers` | Align `coverImageFile` in `books.json` with files already on disk under `covers/`. |
-
-### Collection & maintenance
-
-| Script | Command | What it does |
-|--------|---------|----------------|
-| `sync-collection` | `... --sync-collection` | Regenerate `my_collection/collection.js` from CSV (also runs automatically on `build` and `serve`). |
-| `dedupe-book-ids` | `... --dedupe-book-ids` | Split duplicate stable ids; move shared `hidden` edits to reprint ids. |
-| `compact-edits` | `... --compact-edits` | Remove edit fields that match scraped `books.json` (safe to re-run). |
+Entry point: `node scripts/index.js`. Common flags: `--yes`, `--local`, `--limit N`, `--delay-ms N`, `--dry-run`, `--skip-download`.
 
 ### Site
 
-| Script | Command | What it does |
-|--------|---------|----------------|
-| `serve` | `node server.js` | Local editor + API on port 8742. |
-| `bundle-viewer` | `node scripts/bundle-viewer-js.js` | Rebuild `js/viewer-bundle.js` from `js/viewer/` after editing viewer JS. |
-| `build` | `node build.js` | Static output in `build/` (read-only; sample CSV + gear collection toggle). |
+| Script | Purpose |
+|--------|---------|
+| `serve` | Dev server on port 8742 (`PORT` to override) |
+| `build` | Static site in `build/` |
+| `bundle-viewer` | Rebuild `js/viewer-bundle.js` from `js/viewer/` |
 
----
+### Crawl & sync
 
-## Typical workflows
+| Script | Purpose |
+|--------|---------|
+| `crawl` | Full Arkham House bibliography (live) |
+| `crawl:local` | Arkham House from saved HTML |
+| `crawl:mycroft` / `crawl:mycroft:local` | Mycroft & Moran imprint |
+| `crawl:test` | First 5 rows |
+| `sync-descriptions` | Wikipedia lead paragraphs → descriptions |
+| `sync-descriptions:local` | Descriptions from `examples/` |
+| `sync-goodreads` | Goodreads URLs via Open Library |
+| `sync-goodreads:missing` | Only titles missing a URL |
+| `sync-goodreads:*:dry-run` | Preview Goodreads matching |
+| `import-goodreads-shelf` | URLs from Goodreads shelf HTML in `examples/` |
+| `sync-publication-dates` | Years from bibliography tables (local HTML) |
+| `sync-authors` | Fill `author` from `listAuthor` |
+| `fill-covers` / `fill-covers:dry-run` | Download missing covers |
+| `reconcile-covers` | Match `coverImageFile` to files on disk |
 
-**Initial setup**
+### Maintenance
 
-1. `npm run crawl` (or `crawl:local` for offline bibliography only)
-2. `npm run sync-descriptions` / `sync-goodreads` as needed
-3. `npm run serve` — fix titles, covers, links
-4. `npm run build` — open or deploy `build/`
+| Script | Purpose |
+|--------|---------|
+| `sync-collection` | CSV → `collection.js` (also runs on `build` / `serve`) |
+| `compact-edits` | Drop edit fields that match scraped data |
+| `dedupe-book-ids` | Split duplicate stable ids |
 
-**Ongoing curation**
-
-- Prefer `npm run serve` for one-off fixes (writes `edits.json` only).
-- Use targeted syncs instead of full `crawl` when possible.
-- `npm run sync-goodreads:dry-run` before a bulk Goodreads pass.
-- After rate limits: `npm run sync-goodreads:missing` (or `... --limit 20 --delay-ms 3000`) picks up where you left off.
-- Preferred bulk source: `npm run import-goodreads-shelf` (uses your Goodreads shelf HTML in `examples/`).
-- Full `crawl` overwrites scraped fields; synced `goodreadsUrl` / `description` are preserved on matching rows when the new scrape omits them.
-
-**Hide vs delete**
-
-- **Hide** — `hidden: true` in edits; visible on localhost with “Show hidden”.
-- **Delete** — `deleted: true` in edits; removed from UI; scraped row remains in `books.json`.
-
----
+**Curation tips:** Prefer `serve` for one-off fixes. Use targeted syncs instead of full `crawl` when possible. **Hide** (`hidden` in edits) shows on localhost with “Show hidden”; **delete** removes from the UI but keeps the scraped row.
 
 ## Project layout
 
 | Path | Role |
 |------|------|
-| `viewer.html` | Source UI (not the deploy artifact) |
-| `css/` | All viewer styles |
-| `js/` | `book-edits.js`, `sanitize-text.js`, `viewer-bundle.js` |
-| `js/viewer/` | Viewer app source modules (see `npm run bundle-viewer`) |
-| `data/descriptions.js` | Scraped descriptions keyed by book id (`window.BOOK_DESCRIPTIONS`) |
-| `scripts/` | Crawler and sync CLI (`index.js`, `cli.js`, `config.js`, `lib/`, `tasks/`) |
-| `data/books.json` | Scraped catalog |
-| `data/edits.json` | Manual overrides |
-| `covers/` | Downloaded cover images |
-| `my_collection/` | Maintainer sample CSV + generated `collection.js` (bundled as the site’s demo collection) |
-| `examples/` | Saved Wikipedia HTML for `--local` |
-| `build/` | Generated static site (`npm run build`) — do not edit |
-| `server.js` | Dev server |
-| `my_script.js` | Legacy wrapper → `scripts/index.js` |
+| `viewer.html` | UI shell (loads `js/viewer-bundle.js`) |
+| `js/viewer/` | Viewer source; `npm run bundle-viewer` |
+| `css/` | Styles (bundled to `css/viewer.css` in `build/`) |
+| `data/` | Catalog + edits + descriptions |
+| `covers/` | Cover images |
+| `my_collection/` | Maintainer sample CSV + `collection.js` |
+| `scripts/` | Crawler CLI (`index.js`, `lib/`, `tasks/`) |
+| `build/` | Generated deploy output |
+| `server.js` | Dev API for edits and uploads |
 
-Entry point for crawl/sync: `node scripts/index.js`. See [`.cursor/rules/arkham-project.mdc`](.cursor/rules/arkham-project.mdc) for contributor conventions.
+Vanilla HTML/CSS/JS—no TypeScript or app framework. Dependencies: **cheerio**, **express**, **multer**.
 
-## Dependencies
-
-- **cheerio** — HTML parsing for Wikipedia crawls
-- **express** + **multer** — dev server and cover uploads
-
-No TypeScript, bundler, or framework.
+Contributor conventions: [`.cursor/rules/arkham-project.mdc`](.cursor/rules/arkham-project.mdc).
