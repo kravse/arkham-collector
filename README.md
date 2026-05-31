@@ -1,12 +1,25 @@
 # Arkham House bibliography gallery
 
-A personal gallery of books published by [Arkham House](https://en.wikipedia.org/wiki/Arkham_House) and the Mycroft & Moran imprint, scraped from Wikipedia bibliographies. Browse covers, search and sort the catalog, track your collection, and curate metadata in a local dev server.
+> **Note:** This project was built with AI assistance, but it was guided and shaped through hundreds of prompts—not generated in one shot.
 
-**Live site:** [arkhamcollector.com](https://arkhamcollector.com) — public build; collection defaults to your own list in the browser, with an optional sample CSV via the gear settings.
+A personal gallery of books published by [Arkham House](https://en.wikipedia.org/wiki/Arkham_House) and the Mycroft & Moran imprint, scraped from Wikipedia bibliographies. Browse covers, search and sort the catalog, track what you own and want on the live site, and curate book metadata (covers, dates, links) in a local dev server.
 
-**Your collection (CSV):** The repo includes a sample [`my_collection/my_collection.csv`](my_collection/my_collection.csv) (title, author, year). Edit that CSV as your source list; `npm run build` and `npm run serve` regenerate `my_collection/collection.js` from it automatically. Use `npm run sync-collection` only if you need the JS file updated without starting the server or running a full build. An optional fourth column in an existing CSV is ignored.
+**Live site:** [arkhamcollector.com](https://arkhamcollector.com) — read-only catalog; your collection and want list live in the browser.
 
-**Collection modes (gear in the bottom bar):** Choose **Use sample collection** or **Use my own collection**. Both work the same way (Collect in the book overlay); each is stored separately in `localStorage` (`arkham-sample-collection` and `arkham-collection`). The sample list starts from the bundled CSV on first visit; **Reset sample collection** in settings restores that default. The active mode is saved in `arkham-collection-source`.
+### Curating your collection (live site)
+
+On [arkhamcollector.com](https://arkhamcollector.com) (or any deployed build), you build **your own** collection in the browser—nothing is sent to a server.
+
+1. Open a book from the grid and tap **Collect** in the detail overlay to mark it owned (tap again to remove).
+2. Use the **COLLECTION** filter in the header to show only titles you’ve marked.
+3. Open **gear** (bottom bar) → **Use my own collection** (default on deploy). Your list is stored in this browser only (`localStorage`, key `arkham-collection`).
+4. **Export collection CSV** in settings downloads title, author, and year for whichever list is active in gear (your own or the sample). Same three-column shape as the repo sample CSV. There is no import in the UI—you add titles by using **Collect** on each book.
+
+**Sample vs your own:** In gear, **Use sample collection** loads a bundled demo list (maintainer’s CSV baked into the build). **Use my own collection** switches back to your marks. The two lists are independent; resetting the sample does not change your own collection. **Reset sample collection** restores the bundled default sample list.
+
+### Sample collection CSV (maintainers)
+
+The repo ships a demo [`my_collection/my_collection.csv`](my_collection/my_collection.csv) (title, author, year) that becomes the site’s **sample** list after build—not visitors’ personal collections. Edit that file to change the default sample; `npm run build` and `npm run serve` regenerate `my_collection/collection.js` from it automatically. Use `npm run sync-collection` only if you need the JS file updated without starting the server or running a full build. An optional fourth column in an existing CSV is ignored.
 
 **Deploy:** `npm run build` syncs the sample CSV to `collection.js`, copies cache-busted `my_collection.*.<hash>.csv` and `collection.*.<hash>.js` into `build/`, and sets `robots.txt` / `noindex`. Collection defaults to **own** in the browser; the sample list uses the bundled JS on first load and refetches the hashed CSV when you reset the sample collection.
 
@@ -24,7 +37,7 @@ Tap a card to see the cover, title with year, author and cover artist, a scrolla
 
 ### Want list & collection
 
-Filter to titles you own or are hunting for, with COLLECTION and WANTED badges on each card.
+Filter to titles you own or are hunting for, with COLLECTION and WANTED badges on each card. Mark ownership with **Collect** in the book overlay; mark hunting titles with the want control. See [Curating your collection (live site)](#curating-your-collection-live-site) for gear settings and export.
 
 <img src="images/example-want-collection.png" alt="Want list and collection filters on cards" width="680" />
 
@@ -61,7 +74,7 @@ Stable book `id` values come from imprint + Wikipedia URL + list year (see `scri
 - Styles in [`css/`](css/) (load order matters; see project conventions).
 - Grid of cards; click a card for the detail overlay (Wikipedia **W**, Goodreads **G**, want-list, collection badges).
 - **Goodreads:** uses `goodreadsUrl` from data/edits when set; otherwise **G** opens a [Goodreads book search](https://www.goodreads.com/search) (title + author last name).
-- Want list in `localStorage` (`arkham-want-list`). Collection: sample (`arkham-sample-collection`) or your own (`arkham-collection`), toggled in gear settings.
+- Want list in `localStorage` (`arkham-want-list`). **Own** collection: book ids in `arkham-collection`, toggled per card with **Collect**. **Sample** collection: `arkham-sample-collection`, seeded from bundled CSV; mode switch in gear (`arkham-collection-source`). Export the active list as CSV from settings (no import).
 - **localhost only:** hover cover → edit / hide; edit dialog and API require `npm run serve`.
 
 ### Build (`npm run build`)
@@ -191,7 +204,7 @@ All npm scripts below run through `node scripts/index.js` with flags parsed in [
 | `data/books.json` | Scraped catalog |
 | `data/edits.json` | Manual overrides |
 | `covers/` | Downloaded cover images |
-| `my_collection/` | Owned-books CSV + `collection.js` |
+| `my_collection/` | Maintainer sample CSV + generated `collection.js` (bundled as the site’s demo collection) |
 | `examples/` | Saved Wikipedia HTML for `--local` |
 | `build/` | Generated static site (`npm run build`) — do not edit |
 | `server.js` | Dev server |
