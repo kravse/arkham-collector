@@ -39,6 +39,26 @@
   color: var(--text);
 }
 
+.settings-section {
+  display: flex;
+  flex-direction: column;
+}
+
+.settings-section-title {
+  margin: 0 0 0.55rem;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(232, 234, 237, 0.45);
+}
+
+.settings-divider {
+  margin: 0.9rem 0;
+  border: 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
 .settings-close {
   position: absolute;
   top: 0.55rem;
@@ -68,7 +88,8 @@
   background: rgba(28, 24, 18, 0.92);
 }
 
-.settings-collection-options {
+.settings-collection-options,
+.settings-highlight-options {
   display: flex;
   flex-direction: column;
   gap: 0.55rem;

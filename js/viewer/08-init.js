@@ -129,6 +129,22 @@ if (resetSampleConfirmBtn) {
   });
 }
 
+if (highlightWantsInput) {
+  highlightWantsInput.addEventListener("change", () => {
+    highlightWants = highlightWantsInput.checked;
+    saveHighlightWantsPreference();
+    render();
+  });
+}
+
+if (highlightCollectionInput) {
+  highlightCollectionInput.addEventListener("change", () => {
+    highlightCollection = highlightCollectionInput.checked;
+    saveHighlightCollectionPreference();
+    render();
+  });
+}
+
 attributionBtn.addEventListener("click", () => {
   if (attributionDialog.hidden) {
     openAttributionDialog();
@@ -220,6 +236,7 @@ showHiddenInput.addEventListener("change", render);
 
 loadWantList();
 restoreCollectionSourcePreference();
+restoreHighlightPreferences();
 syncSettingsCollectionRadios();
 loadOwnCollectionIds();
 loadHeaderFiltersPreference();

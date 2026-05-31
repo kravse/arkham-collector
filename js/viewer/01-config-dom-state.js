@@ -65,6 +65,8 @@ const settingsCollectionHintSample = document.getElementById(
 const settingsCollectionHintOwn = document.getElementById(
   "settings-collection-hint-own",
 );
+const highlightWantsInput = document.getElementById("highlight-wants");
+const highlightCollectionInput = document.getElementById("highlight-collection");
 const attributionBtn = document.getElementById("attribution-btn");
 const attributionDialog = document.getElementById("attribution-dialog");
 const attributionCloseBtn = document.getElementById("attribution-close");
@@ -83,6 +85,8 @@ const COLLECTION_STORAGE_KEY = "arkham-collection";
 const SAMPLE_COLLECTION_STORAGE_KEY = "arkham-sample-collection";
 const COLLECTION_SOURCE_KEY = "arkham-collection-source";
 const HEADER_FILTERS_STORAGE_KEY = "arkham-header-filters-expanded";
+const HIGHLIGHT_WANTS_KEY = "arkham-highlight-wants";
+const HIGHLIGHT_COLLECTION_KEY = "arkham-highlight-collection";
 const SORT_MODES = new Set([
   "date-desc",
   "date-asc",
@@ -102,6 +106,8 @@ let ownCollectionIds = new Set();
 let sampleCollectionIds = new Set();
 let collectionSource = "sample";
 let headerFiltersExpanded = true;
+let highlightWants = true;
+let highlightCollection = true;
 let detailBookId = null;
 
 function useOwnCollection() {
@@ -158,6 +164,62 @@ function syncSettingsCollectionHint() {
   }
 }
 
+function restoreHighlightPreferences() {
+  try {
+    const savedWants = localStorage.getItem(HIGHLIGHT_WANTS_KEY);
+    if (savedWants === "0") {
+      highlightWants = false;
+    } else if (savedWants === "1") {
+      highlightWants = true;
+    }
+
+    const savedCollection = localStorage.getItem(HIGHLIGHT_COLLECTION_KEY);
+    if (savedCollection === "0") {
+      highlightCollection = false;
+    } else if (savedCollection === "1") {
+      highlightCollection = true;
+    }
+  } catch (_) {
+    // localStorage unavailable
+  }
+}
+
+function saveHighlightWantsPreference() {
+  try {
+    localStorage.setItem(HIGHLIGHT_WANTS_KEY, highlightWants ? "1" : "0");
+  } catch (_) {
+    // localStorage unavailable
+  }
+}
+
+function saveHighlightCollectionPreference() {
+  try {
+    localStorage.setItem(
+      HIGHLIGHT_COLLECTION_KEY,
+      highlightCollection ? "1" : "0",
+    );
+  } catch (_) {
+    // localStorage unavailable
+  }
+}
+
+function syncSettingsHighlightCheckboxes() {
+  if (highlightWantsInput) {
+    highlightWantsInput.checked = highlightWants;
+  }
+  if (highlightCollectionInput) {
+    highlightCollectionInput.checked = highlightCollection;
+  }
+}
+
+function shouldHighlightWantsOnCards() {
+  return highlightWants || wantOnly;
+}
+
+function shouldHighlightCollectionOnCards() {
+  return highlightCollection || collectionOnly;
+}
+
 function syncSettingsCollectionRadios() {
   if (collectionSourceSampleInput) {
     collectionSourceSampleInput.checked = collectionSource === "sample";
@@ -170,6 +232,7 @@ function syncSettingsCollectionRadios() {
   }
   hideResetSampleConfirm();
   syncSettingsCollectionHint();
+  syncSettingsHighlightCheckboxes();
 }
 
 function showResetSampleConfirm() {

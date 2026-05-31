@@ -422,7 +422,8 @@ window.tryCoverFallback = function (img) {
 
 function renderCard(book) {
   const inCollection = isInCollection(book);
-  const ownedClass = inCollection ? " owned" : "";
+  const ownedClass =
+    inCollection && shouldHighlightCollectionOnCards() ? " owned" : "";
   const hiddenClass = book.hidden ? " hidden-book" : "";
   const imageHtml = renderCover(book, book.coverCacheKey);
   const coverActions = renderCoverActions(book);
@@ -441,7 +442,8 @@ function renderCard(book) {
     ? `<span class="hidden-badge">Hidden</span>`
     : "";
 
-  const wantedClass = isWanted(book) ? " wanted" : "";
+  const wantedClass =
+    isWanted(book) && shouldHighlightWantsOnCards() ? " wanted" : "";
 
   return `
   <article class="card${ownedClass}${wantedClass}${hiddenClass}" data-book-id="${book.id}">

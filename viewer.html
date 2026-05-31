@@ -223,81 +223,99 @@
           &times;
         </button>
         <h2 id="settings-dialog-title">Settings</h2>
-        <fieldset class="settings-collection-options">
-          <legend class="visually-hidden">Collection source</legend>
-          <label class="settings-collection-option">
-            <input
-              type="radio"
-              name="collection-source"
-              id="collection-source-own"
-              value="own"
-            />
-            Use my own collection
-          </label>
-          <label class="settings-collection-option">
-            <input
-              type="radio"
-              name="collection-source"
-              id="collection-source-sample"
-              value="sample"
-            />
-            Use sample collection
-          </label>
-        </fieldset>
-        <button
-          type="button"
-          id="export-collection-btn"
-          class="settings-collection-action"
-        >
-          Export collection CSV
-        </button>
-        <button
-          type="button"
-          id="reset-sample-collection-btn"
-          class="settings-collection-action settings-reset-sample"
-          hidden
-        >
-          Reset sample collection
-        </button>
-        <div id="reset-sample-confirm" class="settings-reset-confirm" hidden>
-          <p class="settings-reset-warning">
-            This replaces your sample collection with the default sample list.
-            Any books you added or removed in sample mode will be lost.
-          </p>
-          <div class="settings-reset-confirm-actions">
-            <button
-              type="button"
-              id="reset-sample-cancel-btn"
-              class="settings-collection-action"
-            >
-              Cancel
-            </button>
-            <button
-              type="button"
-              id="reset-sample-confirm-btn"
-              class="settings-collection-action settings-reset-sample"
-            >
-              Yes, reset sample
-            </button>
+        <section class="settings-section">
+          <h3 class="settings-section-title">Collection</h3>
+          <fieldset class="settings-collection-options">
+            <legend class="visually-hidden">Collection source</legend>
+            <label class="settings-collection-option">
+              <input
+                type="radio"
+                name="collection-source"
+                id="collection-source-own"
+                value="own"
+              />
+              Use my own collection
+            </label>
+            <label class="settings-collection-option">
+              <input
+                type="radio"
+                name="collection-source"
+                id="collection-source-sample"
+                value="sample"
+              />
+              Use sample collection
+            </label>
+          </fieldset>
+          <button
+            type="button"
+            id="export-collection-btn"
+            class="settings-collection-action"
+          >
+            Export collection CSV
+          </button>
+          <button
+            type="button"
+            id="reset-sample-collection-btn"
+            class="settings-collection-action settings-reset-sample"
+            hidden
+          >
+            Reset sample collection
+          </button>
+          <div id="reset-sample-confirm" class="settings-reset-confirm" hidden>
+            <p class="settings-reset-warning">
+              This replaces your sample collection with the default sample list.
+              Any books you added or removed in sample mode will be lost.
+            </p>
+            <div class="settings-reset-confirm-actions">
+              <button
+                type="button"
+                id="reset-sample-cancel-btn"
+                class="settings-collection-action"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                id="reset-sample-confirm-btn"
+                class="settings-collection-action settings-reset-sample"
+              >
+                Yes, reset sample
+              </button>
+            </div>
           </div>
-        </div>
-        <p
-          id="settings-collection-hint-sample"
-          class="settings-collection-hint"
-          hidden
-        >
-          Your own collection and the sample collection are saved separately.
-          Reset sample restores the default sample collection. It won&apos;t
-          wipe your own collection.
-        </p>
-        <p
-          id="settings-collection-hint-own"
-          class="settings-collection-hint"
-        >
-          Your own collection and the sample collection are saved separately.
-          Try the sample collection anytime—switch back to your own collection
-          when you want it back.
-        </p>
+          <p
+            id="settings-collection-hint-sample"
+            class="settings-collection-hint"
+            hidden
+          >
+            Your own collection and the sample collection are saved separately.
+            Reset sample restores the default sample collection. It won&apos;t
+            wipe your own collection.
+          </p>
+          <p
+            id="settings-collection-hint-own"
+            class="settings-collection-hint"
+          >
+            Your own collection and the sample collection are saved separately.
+            Try the sample collection anytime—switch back to your own collection
+            when you want it back.
+          </p>
+        </section>
+        <hr class="settings-divider" aria-hidden="true" />
+        <section class="settings-section">
+          <h3 class="settings-section-title">Card display</h3>
+          <fieldset class="settings-highlight-options">
+            <legend class="visually-hidden">Card highlighting</legend>
+            <label class="settings-collection-option">
+              <input type="checkbox" id="highlight-wants" checked />
+              Highlight wants
+            </label>
+            <label class="settings-collection-option">
+              <input type="checkbox" id="highlight-collection" checked />
+              Highlight collection
+            </label>
+          </fieldset>
+        </section>
       </div>
     </div>
 
