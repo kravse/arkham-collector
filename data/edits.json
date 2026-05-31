@@ -43,7 +43,8 @@
       "coverImageFile": "covers/baker-street-irregular-232.jpg",
       "goodreadsUrl": "https://www.goodreads.com/book/show/9439207-the-baker-street-irregular",
       "description": "Baker Street Irregular is a mystery and espionage tale told by a member of a whimsical Sherlock Holmes club born in a speakeasy, as Woody Hazelbaker undergoes America's political struggles in the 1930s and Second World War in the '40s, stretching from the Great Depression's worst year to the beginning of the Cold War. A young New York lawyer, Woody gets a cold dose of reality from a gangster client he keeps secret from the world, then puts stratagems he learned to use when he and other Baker Street Irregulars react to Hitler's war against Europe's democracies",
-      "coverArtist": "Laurie Fraser Manifold"
+      "coverArtist": "Laurie Fraser Manifold",
+      "hidden": true
     },
     "233": {
       "hidden": true
@@ -74,7 +75,8 @@
       "publicationDate": "2008",
       "decade": "2000s",
       "coverImageFile": "covers/the-shunned-house-238.png",
-      "goodreadsUrl": "https://www.goodreads.com/book/show/8507286-the-shunned-house"
+      "goodreadsUrl": "https://www.goodreads.com/book/show/8507286-the-shunned-house",
+      "hidden": true
     },
     "245": {
       "goodreadsUrl": "https://www.goodreads.com/book/show/370614.Book_of_the_Dead"
