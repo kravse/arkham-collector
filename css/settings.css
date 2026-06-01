@@ -111,6 +111,10 @@
   accent-color: var(--accent);
 }
 
+.settings-collection-option[hidden] {
+  display: none;
+}
+
 .settings-collection-action {
   display: block;
   width: 100%;

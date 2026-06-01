@@ -537,6 +537,7 @@ function render() {
     if (!bookDetailDialog.hidden && detailBookId) {
       updateDetailNav();
     }
+    syncSettingsHighlightCheckboxes();
     return;
   }
 
@@ -547,4 +548,6 @@ function render() {
     refreshDetailToolbar(detailBook);
     updateDetailNav();
   }
+
+  syncSettingsHighlightCheckboxes();
 }

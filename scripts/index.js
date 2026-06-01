@@ -13,6 +13,7 @@ const { syncGoodreads } = require("./tasks/sync-goodreads");
 const { importGoodreadsShelf } = require("./tasks/import-goodreads-shelf");
 const { dedupeBookIds } = require("./tasks/dedupe-book-ids");
 const { compactEdits } = require("./tasks/compact-edits");
+const { fixArkhamMagazines } = require("./tasks/fix-arkham-magazines");
 const { main } = require("./tasks/crawl");
 
 initState(process.argv.slice(2));
@@ -70,6 +71,12 @@ if (state.args.syncCollection) {
 } else if (state.args.compactEdits) {
   try {
     compactEdits();
+  } catch (error) {
+    fail(error);
+  }
+} else if (state.args.fixArkhamMagazines) {
+  try {
+    fixArkhamMagazines();
   } catch (error) {
     fail(error);
   }

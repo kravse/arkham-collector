@@ -80,6 +80,32 @@ function parseYear(value) {
   return match ? match[0] : null;
 }
 
+const SEASON_SORT_ORDER = {
+  winter: 1,
+  spring: 2,
+  summer: 3,
+  autumn: 4,
+  fall: 4,
+};
+
+function parseSortDateValue(value) {
+  const year = parseYear(value);
+  if (!year) {
+    return null;
+  }
+
+  const seasonMatch = String(value || "")
+    .trim()
+    .match(/^(Winter|Spring|Summer|Autumn|Fall)\b/i);
+  if (seasonMatch) {
+    const season = seasonMatch[1].toLowerCase();
+    const slot = SEASON_SORT_ORDER[season] ?? 5;
+    return Number(year) * 10 + slot;
+  }
+
+  return Number(year) * 10 + 9;
+}
+
 function decadeFromYear(year) {
   const value = parseInt(year, 10);
   if (!value) {
@@ -89,6 +115,43 @@ function decadeFromYear(year) {
     return String(value);
   }
   return `${Math.floor(value / 10) * 10}s`;
+}
+
+const SAMPLER_ISSUE_TITLE_RE = /^The Arkham Sampler \(Vol\. [IV]+, No\. \d+\)$/;
+const COLLECTOR_ISSUE_TITLE_RE = /^The Arkham Collector \(No\. \d+\)$/;
+
+function isMagazineIssue(book) {
+  const listTitle = String(book?.listTitle || "").trim();
+  const title = String(book?.title || "").trim();
+
+  if (listTitle === "The Arkham Sampler") {
+    return SAMPLER_ISSUE_TITLE_RE.test(title);
+  }
+  if (listTitle === "The Arkham Collector") {
+    return COLLECTOR_ISSUE_TITLE_RE.test(title);
+  }
+  return false;
+}
+
+function passesHiddenVisibility(book) {
+  const showHidden = showHiddenInput.checked;
+  return hiddenOnly ? book.hidden : showHidden || !book.hidden;
+}
+
+function hasVisibleMagazineIssues() {
+  return getActiveBooks().some(
+    (book) => isMagazineIssue(book) && !book.hidden,
+  );
+}
+
+function passesBookVisibility(book) {
+  if (!passesHiddenVisibility(book)) {
+    return false;
+  }
+  if (isMagazineIssue(book) && !showMagazines) {
+    return false;
+  }
+  return true;
 }
 
 function parseCollection(csvText) {

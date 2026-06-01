@@ -62,11 +62,10 @@ function matchesSearch(book, query) {
 }
 
 function getStatTotal(activeBooks) {
-  const showHidden = showHiddenInput.checked;
   if (hiddenOnly) {
     return activeBooks.filter((book) => book.hidden).length;
   }
-  return activeBooks.filter((book) => showHidden || !book.hidden).length;
+  return activeBooks.filter((book) => passesBookVisibility(book)).length;
 }
 
 function renderStats(visible, all) {
@@ -98,11 +97,8 @@ function renderStats(visible, all) {
 
 function getVisibleBooks() {
   const query = searchInput.value.trim();
-  const showHidden = showHiddenInput.checked;
   return getSortedActiveBooks()
-    .filter((book) =>
-      hiddenOnly ? book.hidden : showHidden || !book.hidden,
-    )
+    .filter((book) => passesBookVisibility(book))
     .filter((book) => !mycroftOnly || book.imprint === "mycroft_moran")
     .filter((book) => !collectionOnly || isInCollection(book))
     .filter((book) => !wantOnly || isWanted(book))

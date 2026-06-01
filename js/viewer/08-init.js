@@ -145,6 +145,14 @@ if (highlightCollectionInput) {
   });
 }
 
+if (showMagazinesInput) {
+  showMagazinesInput.addEventListener("change", () => {
+    showMagazines = showMagazinesInput.checked;
+    saveShowMagazinesPreference();
+    render();
+  });
+}
+
 attributionBtn.addEventListener("click", () => {
   if (attributionDialog.hidden) {
     openAttributionDialog();
@@ -237,6 +245,7 @@ showHiddenInput.addEventListener("change", render);
 loadWantList();
 restoreCollectionSourcePreference();
 restoreHighlightPreferences();
+restoreShowMagazinesPreference();
 syncSettingsCollectionRadios();
 loadOwnCollectionIds();
 loadHeaderFiltersPreference();

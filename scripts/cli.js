@@ -18,6 +18,7 @@ function parseArgs(argv) {
     importGoodreadsShelf: false,
     dedupeBookIds: false,
     compactEdits: false,
+    fixArkhamMagazines: false,
     yes: false,
   };
 
@@ -48,6 +49,8 @@ function parseArgs(argv) {
       options.dedupeBookIds = true;
     } else if (arg === "--compact-edits") {
       options.compactEdits = true;
+    } else if (arg === "--fix-arkham-magazines") {
+      options.fixArkhamMagazines = true;
     } else if (arg === "--skip-download") {
       options.skipDownload = true;
     } else if (arg === "--sync-collection") {
@@ -109,6 +112,9 @@ function getScriptMode(args) {
   }
   if (args.compactEdits) {
     return "compactEdits";
+  }
+  if (args.fixArkhamMagazines) {
+    return "fixArkhamMagazines";
   }
   return "crawl";
 }

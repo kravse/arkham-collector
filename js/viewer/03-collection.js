@@ -59,7 +59,7 @@ async function ensureSampleCollectionIds() {
 }
 
 function parseSortYear(value) {
-  return parseYear(value) ? Number(parseYear(value)) : null;
+  return parseSortDateValue(value);
 }
 
 function restoreSortPreference() {
@@ -257,15 +257,13 @@ function toggleCollection(bookId) {
 }
 
 function getWantCount() {
-  const showHidden = showHiddenInput.checked;
   return getActiveBooks().filter(
-    (book) => (showHidden || !book.hidden) && isWanted(book),
+    (book) => passesBookVisibility(book) && isWanted(book),
   ).length;
 }
 
 function getCollectionCount() {
-  const showHidden = showHiddenInput.checked;
   return getActiveBooks().filter(
-    (book) => (showHidden || !book.hidden) && isInCollection(book),
+    (book) => passesBookVisibility(book) && isInCollection(book),
   ).length;
 }

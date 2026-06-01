@@ -67,6 +67,8 @@ const settingsCollectionHintOwn = document.getElementById(
 );
 const highlightWantsInput = document.getElementById("highlight-wants");
 const highlightCollectionInput = document.getElementById("highlight-collection");
+const showMagazinesInput = document.getElementById("show-magazines");
+const showMagazinesOption = document.getElementById("show-magazines-option");
 const attributionBtn = document.getElementById("attribution-btn");
 const attributionDialog = document.getElementById("attribution-dialog");
 const attributionCloseBtn = document.getElementById("attribution-close");
@@ -87,6 +89,7 @@ const COLLECTION_SOURCE_KEY = "arkham-collection-source";
 const HEADER_FILTERS_STORAGE_KEY = "arkham-header-filters-expanded";
 const HIGHLIGHT_WANTS_KEY = "arkham-highlight-wants";
 const HIGHLIGHT_COLLECTION_KEY = "arkham-highlight-collection";
+const SHOW_MAGAZINES_KEY = "arkham-show-magazines";
 const SORT_MODES = new Set([
   "date-desc",
   "date-asc",
@@ -108,6 +111,7 @@ let collectionSource = "sample";
 let headerFiltersExpanded = true;
 let highlightWants = true;
 let highlightCollection = true;
+let showMagazines = false;
 let detailBookId = null;
 
 function useOwnCollection() {
@@ -203,12 +207,39 @@ function saveHighlightCollectionPreference() {
   }
 }
 
+function restoreShowMagazinesPreference() {
+  try {
+    const saved = localStorage.getItem(SHOW_MAGAZINES_KEY);
+    if (saved === "0") {
+      showMagazines = false;
+    } else if (saved === "1") {
+      showMagazines = true;
+    }
+  } catch (_) {
+    // localStorage unavailable
+  }
+}
+
+function saveShowMagazinesPreference() {
+  try {
+    localStorage.setItem(SHOW_MAGAZINES_KEY, showMagazines ? "1" : "0");
+  } catch (_) {
+    // localStorage unavailable
+  }
+}
+
 function syncSettingsHighlightCheckboxes() {
   if (highlightWantsInput) {
     highlightWantsInput.checked = highlightWants;
   }
   if (highlightCollectionInput) {
     highlightCollectionInput.checked = highlightCollection;
+  }
+  if (showMagazinesInput) {
+    showMagazinesInput.checked = showMagazines;
+  }
+  if (showMagazinesOption) {
+    showMagazinesOption.hidden = !hasVisibleMagazineIssues();
   }
 }
 

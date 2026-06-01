@@ -12,8 +12,7 @@ window.BOOKS = [
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Arkham_Sampler",
     "coverImageUrl": null,
     "coverImageFile": null,
-    "error": null,
-    "hidden": true
+    "error": null
   },
   {
     "id": 232,
@@ -28,8 +27,7 @@ window.BOOKS = [
     "wikipediaUrl": null,
     "coverImageUrl": null,
     "coverImageFile": null,
-    "error": null,
-    "hidden": true
+    "error": null
   },
   {
     "id": 233,
@@ -44,8 +42,7 @@ window.BOOKS = [
     "wikipediaUrl": null,
     "coverImageUrl": null,
     "coverImageFile": null,
-    "error": null,
-    "hidden": true
+    "error": null
   },
   {
     "id": 234,
@@ -60,8 +57,7 @@ window.BOOKS = [
     "wikipediaUrl": null,
     "coverImageUrl": null,
     "coverImageFile": null,
-    "error": null,
-    "hidden": true
+    "error": null
   },
   {
     "id": 235,
@@ -76,8 +72,7 @@ window.BOOKS = [
     "wikipediaUrl": null,
     "coverImageUrl": null,
     "coverImageFile": null,
-    "error": null,
-    "hidden": true
+    "error": null
   },
   {
     "id": 236,
@@ -92,8 +87,7 @@ window.BOOKS = [
     "wikipediaUrl": null,
     "coverImageUrl": null,
     "coverImageFile": null,
-    "error": null,
-    "hidden": true
+    "error": null
   },
   {
     "id": 237,
@@ -108,8 +102,7 @@ window.BOOKS = [
     "wikipediaUrl": null,
     "coverImageUrl": null,
     "coverImageFile": null,
-    "error": null,
-    "hidden": true
+    "error": null
   },
   {
     "id": 428,
@@ -124,8 +117,7 @@ window.BOOKS = [
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Shunned_House",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/commons/2/26/The_Shunned_House.jpg",
     "coverImageFile": "covers/the-shunned-house-8.jpg",
-    "error": null,
-    "hidden": true
+    "error": null
   },
   {
     "id": 239,
@@ -236,8 +228,7 @@ window.BOOKS = [
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Book_of_the_Dead_(memoir)",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/c/cc/Book_of_the_dead_price.jpg",
     "coverImageFile": "covers/book-of-the-dead-memoir-15.jpg",
-    "error": null,
-    "goodreadsUrl": "https://www.goodreads.com/book/show/370614.Book_of_the_Dead"
+    "error": null
   },
   {
     "id": 246,
@@ -546,19 +537,18 @@ window.BOOKS = [
   {
     "id": 265,
     "imprint": "arkham_house",
-    "decade": "1990s",
+    "decade": "1980s",
     "listTitle": "Tales of the Cthulhu Mythos",
     "listAuthor": "by H. P. Lovecraft and Divers Hands (1989)",
     "title": "Tales of the Cthulhu Mythos",
     "author": "H. P. Lovecraft and others",
     "coverArtist": "Lee Brown Coye",
-    "publicationDate": "1990",
-    "wikipediaUrl": "https://en.wikipedia.org/wiki/Cthulhu_Mythos_anthology#Tales_of_the_Cthulhu_Mythos:_Golden_Anniversary_Anthology",
+    "publicationDate": "1989",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Tales_of_the_Cthulhu_Mythos%3A_Golden_Anniversary_Anthology",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/7/7e/Tales_of_the_Cthulhu_Mythos.jpg",
-    "coverImageFile": "covers/tales-of-the-cthulhu-mythos-golden-anniversary-anthology-265.jpg",
+    "coverImageFile": "covers/tales-of-the-cthulhu-mythos-golden-anniversary-anthology-35.jpg",
     "error": null,
-    "goodreadsUrl": "https://www.goodreads.com/book/show/36320.Tales_of_the_Cthulhu_Mythos",
-    "coverEditPath": "covers/tales-of-the-cthulhu-mythos-golden-anniversary-anthology-265.jpg"
+    "goodreadsUrl": "https://www.goodreads.com/book/show/36320.Tales_of_the_Cthulhu_Mythos"
   },
   {
     "id": 266,
@@ -588,10 +578,9 @@ window.BOOKS = [
     "publicationDate": "1989",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Horror_in_the_Museum_and_Other_Revisions",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/8/82/Horror_in_the_museum.jpg",
-    "coverImageFile": "covers/the-horror-in-the-museum-and-other-revisions-429.jpg",
+    "coverImageFile": "covers/the-horror-in-the-museum-and-other-revisions-37.jpg",
     "error": null,
-    "goodreadsUrl": "https://www.goodreads.com/book/show/1157900.The_Horror_in_the_Museum",
-    "coverEditPath": "covers/the-horror-in-the-museum-and-other-revisions-429.jpg"
+    "goodreadsUrl": "https://www.goodreads.com/book/show/1157900.The_Horror_in_the_Museum"
   },
   {
     "id": 268,
@@ -701,10 +690,9 @@ window.BOOKS = [
     "publicationDate": "1986",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Dagon_and_Other_Macabre_Tales",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/8/8f/Dagon_first.jpg",
-    "coverImageFile": "covers/dagon-and-other-macabre-tales-430.jpg",
+    "coverImageFile": "covers/dagon-and-other-macabre-tales-44.jpg",
     "error": null,
-    "goodreadsUrl": "https://www.goodreads.com/book/show/102575.Dagon_and_Other_Macabre_Tales",
-    "coverEditPath": "covers/dagon-and-other-macabre-tales-430.jpg"
+    "goodreadsUrl": "https://www.goodreads.com/book/show/102575.Dagon_and_Other_Macabre_Tales"
   },
   {
     "id": 431,
@@ -718,10 +706,9 @@ window.BOOKS = [
     "publicationDate": "1985",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/At_the_Mountains_of_Madness_and_Other_Novels",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/a/a0/At_the_mountains_of_madness.jpg",
-    "coverImageFile": "covers/at-the-mountains-of-madness-and-other-novels-431.jpg",
+    "coverImageFile": "covers/at-the-mountains-of-madness-and-other-novels-45.jpg",
     "error": null,
-    "goodreadsUrl": "https://www.goodreads.com/book/show/32768.At_the_Mountains_of_Madness_and_Other_Novels",
-    "coverEditPath": "covers/at-the-mountains-of-madness-and-other-novels-431.jpg"
+    "goodreadsUrl": "https://www.goodreads.com/book/show/32768.At_the_Mountains_of_Madness_and_Other_Novels"
   },
   {
     "id": 432,
@@ -735,10 +722,9 @@ window.BOOKS = [
     "publicationDate": "1985",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Dunwich_Horror_and_Others",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/commons/6/63/Dunwich_Horror_and_Others_dust_jacket.jpg",
-    "coverImageFile": "covers/the-dunwich-horror-and-others-432.webp",
+    "coverImageFile": "covers/the-dunwich-horror-and-others-46.jpg",
     "error": null,
-    "goodreadsUrl": "https://www.goodreads.com/book/show/63213.The_Dunwich_Horror_and_Others",
-    "coverEditPath": "covers/the-dunwich-horror-and-others-432.webp"
+    "goodreadsUrl": "https://www.goodreads.com/book/show/63213.The_Dunwich_Horror_and_Others"
   },
   {
     "id": 277,
@@ -938,16 +924,15 @@ window.BOOKS = [
     "decade": "1980s",
     "listTitle": "New Tales of the Cthulhu Mythos",
     "listAuthor": "edited by Ramsey Campbell (1980)",
-    "title": "New Tales of the Cthulhu Mythos",
-    "author": "Ramsey Campbell (Ed.)",
+    "title": "Tales of the Cthulhu Mythos",
+    "author": "H. P. Lovecraft and others",
     "coverArtist": "Lee Brown Coye",
     "publicationDate": "1980",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/New_Tales_of_the_Cthulhu_Mythos",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/7/7e/Tales_of_the_Cthulhu_Mythos.jpg",
-    "coverImageFile": "covers/new-tales-of-the-cthulhu-mythos-289.jpg",
+    "coverImageFile": "covers/tales-of-the-cthulhu-mythos-golden-anniversary-anthology-35.jpg",
     "error": null,
-    "goodreadsUrl": "https://www.goodreads.com/book/show/36320.Tales_of_the_Cthulhu_Mythos",
-    "coverEditPath": "covers/new-tales-of-the-cthulhu-mythos-289.jpg"
+    "goodreadsUrl": "https://www.goodreads.com/book/show/36320.Tales_of_the_Cthulhu_Mythos"
   },
   {
     "id": 290,
@@ -1212,15 +1197,14 @@ window.BOOKS = [
     "listTitle": "The Purcell Papers",
     "listAuthor": ": four stories from the original collection (The Purcell Papers), along with nine other Le Fanu short stories and a pastiche of Le Fanu, \"The Churchyard Yew,\" written by August Derleth using Le Fanu's name as a pseudonym.",
     "title": "The Purcell Papers",
-    "author": "Frank Belknap Long",
-    "coverArtist": "Frank Utpatel",
-    "publicationDate": "1975",
-    "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Purcell_Papers",
+    "author": null,
+    "coverArtist": null,
+    "publicationDate": null,
+    "wikipediaUrl": null,
     "coverImageUrl": null,
-    "coverImageFile": "covers/the-purcell-papers-306.webp",
+    "coverImageFile": null,
     "error": null,
-    "goodreadsUrl": "https://www.goodreads.com/book/show/309714.The_Purcell_Papers",
-    "coverEditPath": "covers/the-purcell-papers-306.webp"
+    "goodreadsUrl": "https://www.goodreads.com/book/show/309714.The_Purcell_Papers"
   },
   {
     "id": 307,
@@ -1498,16 +1482,16 @@ window.BOOKS = [
     "imprint": "arkham_house",
     "decade": "1970s",
     "listTitle": "The Arkham Collector",
-    "listAuthor": "Number Ten: Summer, 1971",
-    "title": "The Arkham Collector",
+    "listAuthor": "",
+    "title": "The Arkham Collector (No. 10)",
     "author": null,
     "coverArtist": null,
-    "publicationDate": null,
+    "publicationDate": "Summer, 1971",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Arkham_Collector",
     "coverImageUrl": null,
     "coverImageFile": null,
     "error": null,
-    "hidden": true
+    "listYear": "1971-10"
   },
   {
     "id": 325,
@@ -1546,16 +1530,16 @@ window.BOOKS = [
     "imprint": "arkham_house",
     "decade": "1970s",
     "listTitle": "The Arkham Collector",
-    "listAuthor": "Number Nine: Spring, 1971",
-    "title": "The Arkham Collector",
+    "listAuthor": "",
+    "title": "The Arkham Collector (No. 9)",
     "author": null,
     "coverArtist": null,
-    "publicationDate": null,
+    "publicationDate": "Spring, 1971",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Arkham_Collector",
     "coverImageUrl": null,
     "coverImageFile": null,
     "error": null,
-    "hidden": true
+    "listYear": "1971-9"
   },
   {
     "id": 327,
@@ -1594,16 +1578,16 @@ window.BOOKS = [
     "imprint": "arkham_house",
     "decade": "1970s",
     "listTitle": "The Arkham Collector",
-    "listAuthor": "Number Eight: Winter, 1971",
-    "title": "The Arkham Collector",
+    "listAuthor": "",
+    "title": "The Arkham Collector (No. 8)",
     "author": null,
     "coverArtist": null,
-    "publicationDate": null,
+    "publicationDate": "Winter, 1971",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Arkham_Collector",
     "coverImageUrl": null,
     "coverImageFile": null,
     "error": null,
-    "hidden": true
+    "listYear": "1971-8"
   },
   {
     "id": 267,
@@ -1626,16 +1610,16 @@ window.BOOKS = [
     "imprint": "arkham_house",
     "decade": "1970s",
     "listTitle": "The Arkham Collector",
-    "listAuthor": "Number Seven: Summer, 1970",
-    "title": "The Arkham Collector",
+    "listAuthor": "",
+    "title": "The Arkham Collector (No. 7)",
     "author": null,
     "coverArtist": null,
-    "publicationDate": null,
+    "publicationDate": "Summer, 1970",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Arkham_Collector",
     "coverImageUrl": null,
     "coverImageFile": null,
     "error": null,
-    "hidden": true
+    "listYear": "1970-7"
   },
   {
     "id": 329,
@@ -1690,16 +1674,16 @@ window.BOOKS = [
     "imprint": "arkham_house",
     "decade": "1970s",
     "listTitle": "The Arkham Collector",
-    "listAuthor": "Number Six: Winter, 1970",
-    "title": "The Arkham Collector",
+    "listAuthor": "",
+    "title": "The Arkham Collector (No. 6)",
     "author": null,
     "coverArtist": null,
-    "publicationDate": null,
+    "publicationDate": "Winter, 1970",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Arkham_Collector",
     "coverImageUrl": null,
     "coverImageFile": null,
     "error": null,
-    "hidden": true
+    "listYear": "1970-6"
   },
   {
     "id": 332,
@@ -1729,58 +1713,57 @@ window.BOOKS = [
     "publicationDate": "1969",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Tales_of_the_Cthulhu_Mythos",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/7/7e/Tales_of_the_Cthulhu_Mythos.jpg",
-    "coverImageFile": "covers/tales-of-the-cthulhu-mythos-333.jpg",
+    "coverImageFile": "covers/cthulhu-mythos-anthology-108.jpg",
     "error": null,
-    "goodreadsUrl": "https://www.goodreads.com/book/show/36320.Tales_of_the_Cthulhu_Mythos",
-    "coverEditPath": "covers/tales-of-the-cthulhu-mythos-333.jpg"
+    "goodreadsUrl": "https://www.goodreads.com/book/show/36320.Tales_of_the_Cthulhu_Mythos"
   },
   {
     "id": 437,
     "imprint": "arkham_house",
     "decade": "1960s",
     "listTitle": "The Arkham Collector",
-    "listAuthor": "Number Five: Summer, 1969",
-    "title": "The Arkham Collector",
+    "listAuthor": "",
+    "title": "The Arkham Collector (No. 5)",
     "author": null,
     "coverArtist": null,
-    "publicationDate": null,
+    "publicationDate": "Summer, 1969",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Arkham_Collector",
     "coverImageUrl": null,
     "coverImageFile": null,
     "error": null,
-    "hidden": true
+    "listYear": "1969-5"
   },
   {
     "id": 438,
     "imprint": "arkham_house",
     "decade": "1960s",
     "listTitle": "The Arkham Collector",
-    "listAuthor": "Number Four: Winter, 1969",
-    "title": "The Arkham Collector",
+    "listAuthor": "",
+    "title": "The Arkham Collector (No. 4)",
     "author": null,
     "coverArtist": null,
-    "publicationDate": null,
+    "publicationDate": "Winter, 1969",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Arkham_Collector",
     "coverImageUrl": null,
     "coverImageFile": null,
     "error": null,
-    "hidden": true
+    "listYear": "1969-4"
   },
   {
     "id": 439,
     "imprint": "arkham_house",
     "decade": "1960s",
     "listTitle": "The Arkham Collector",
-    "listAuthor": "Number Three: Summer, 1968",
-    "title": "The Arkham Collector",
+    "listAuthor": "",
+    "title": "The Arkham Collector (No. 3)",
     "author": null,
     "coverArtist": null,
-    "publicationDate": null,
+    "publicationDate": "Summer, 1968",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Arkham_Collector",
     "coverImageUrl": null,
     "coverImageFile": null,
     "error": null,
-    "hidden": true
+    "listYear": "1968-3"
   },
   {
     "id": 334,
@@ -1835,16 +1818,16 @@ window.BOOKS = [
     "imprint": "arkham_house",
     "decade": "1960s",
     "listTitle": "The Arkham Collector",
-    "listAuthor": "Number Two: Winter, 1968",
-    "title": "The Arkham Collector",
+    "listAuthor": "",
+    "title": "The Arkham Collector (No. 2)",
     "author": null,
     "coverArtist": null,
-    "publicationDate": null,
+    "publicationDate": "Winter, 1968",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Arkham_Collector",
     "coverImageUrl": null,
     "coverImageFile": null,
     "error": null,
-    "hidden": true
+    "listYear": "1968-2"
   },
   {
     "id": 337,
@@ -1875,8 +1858,7 @@ window.BOOKS = [
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Three_Tales_of_Horror",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/d/d7/Three_tales_of_horror.jpg",
     "coverImageFile": "covers/three-tales-of-horror-117.jpg",
-    "error": null,
-    "goodreadsUrl": "https://www.goodreads.com/book/show/5743125-three-tales-of-horror"
+    "error": null
   },
   {
     "id": 339,
@@ -1899,16 +1881,16 @@ window.BOOKS = [
     "imprint": "arkham_house",
     "decade": "1960s",
     "listTitle": "The Arkham Collector",
-    "listAuthor": "Number One: Summer, 1967",
-    "title": "The Arkham Collector",
+    "listAuthor": "",
+    "title": "The Arkham Collector (No. 1)",
     "author": null,
     "coverArtist": null,
-    "publicationDate": null,
+    "publicationDate": "Summer, 1967",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Arkham_Collector",
     "coverImageUrl": null,
     "coverImageFile": null,
     "error": null,
-    "hidden": true
+    "listYear": "1967-1"
   },
   {
     "id": 340,
@@ -1939,8 +1921,7 @@ window.BOOKS = [
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Deep_Waters_(book)",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/8/8a/Deep_waters.jpg",
     "coverImageFile": "covers/deep-waters-book-121.jpg",
-    "error": null,
-    "goodreadsUrl": "https://www.goodreads.com/book/show/20705405-deep-waters"
+    "error": null
   },
   {
     "id": 342,
@@ -2019,8 +2000,7 @@ window.BOOKS = [
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Something_Breathing",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/f/f1/Something_breathing.jpg",
     "coverImageFile": "covers/something-breathing-126.jpg",
-    "error": null,
-    "goodreadsUrl": "https://www.goodreads.com/book/show/3602733-something-breathing"
+    "error": null
   },
   {
     "id": 347,
@@ -2258,10 +2238,8 @@ window.BOOKS = [
     "publicationDate": "1963",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Autobiography%3A_Some_Notes_on_a_Nonentity",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/9/9e/Nonentity.jpg",
-    "coverImageFile": "covers/autobiography-some-notes-on-a-nonentity-359.jpg",
-    "error": null,
-    "goodreadsUrl": "https://www.goodreads.com/book/show/29865383-autobiography-some-notes-on-a-nonentity",
-    "coverEditPath": "covers/autobiography-some-notes-on-a-nonentity-359.jpg"
+    "coverImageFile": "covers/autobiography-some-notes-on-a-nonentity-141.jpg",
+    "error": null
   },
   {
     "id": 276,
@@ -2394,19 +2372,17 @@ window.BOOKS = [
   {
     "id": 238,
     "imprint": "arkham_house",
-    "decade": "2000s",
+    "decade": "1960s",
     "listTitle": "The Shunned House",
     "listAuthor": "by H. P. Lovecraft (1961)",
-    "title": "The Shunned House Facsimile",
-    "author": "H. P. Lovecraft and Robert Weinberg",
+    "title": "The Shunned House",
+    "author": "H. P. Lovecraft",
     "coverArtist": null,
-    "publicationDate": "2008",
+    "publicationDate": "1961",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Shunned_House",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/commons/2/26/The_Shunned_House.jpg",
-    "coverImageFile": "covers/the-shunned-house-238.png",
-    "error": null,
-    "goodreadsUrl": "https://www.goodreads.com/book/show/8507286-the-shunned-house",
-    "coverEditPath": "covers/the-shunned-house-238.png"
+    "coverImageFile": "covers/the-shunned-house-150.jpg",
+    "error": null
   },
   {
     "id": 367,
@@ -2501,8 +2477,7 @@ window.BOOKS = [
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Shuttered_Room_and_Other_Pieces",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/f/ff/Shuttered_room.jpg",
     "coverImageFile": "covers/the-shuttered-room-and-other-pieces-156.jpg",
-    "error": null,
-    "goodreadsUrl": "https://www.goodreads.com/book/show/10049265-the-shuttered-room-and-other-pieces"
+    "error": null
   },
   {
     "id": 373,
@@ -2517,8 +2492,7 @@ window.BOOKS = [
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Some_Notes_on_H._P._Lovecraft",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/4/45/Some_notes_on_hpl.jpg",
     "coverImageFile": "covers/some-notes-on-h-p-lovecraft-157.jpg",
-    "error": null,
-    "goodreadsUrl": "https://www.goodreads.com/book/show/5743580-some-notes-on-h-p-lovecraft"
+    "error": null
   },
   {
     "id": 374,
@@ -2534,8 +2508,7 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/4/4f/Arkham_House_%28logo%29.png",
     "coverImageFile": "covers/arkham-house-the-first-20-years-158.png",
     "error": null,
-    "goodreadsUrl": "https://www.goodreads.com/book/show/22734482-thirty-years-of-arkham-house-1939-1969",
-    "deleted": true
+    "goodreadsUrl": "https://www.goodreads.com/book/show/22734482-thirty-years-of-arkham-house-1939-1969"
   },
   {
     "id": 375,
@@ -2598,8 +2571,7 @@ window.BOOKS = [
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Always_Comes_Evening",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/b/ba/Always_comes_evening.jpg",
     "coverImageFile": "covers/always-comes-evening-162.jpg",
-    "error": null,
-    "goodreadsUrl": "https://www.goodreads.com/book/show/1512252.Always_Comes_Evening"
+    "error": null
   },
   {
     "id": 379,
@@ -2734,64 +2706,64 @@ window.BOOKS = [
     "imprint": "arkham_house",
     "decade": "1940s",
     "listTitle": "The Arkham Sampler",
-    "listAuthor": "Volume II, Number Four: Autumn, 1949",
-    "title": "The Arkham Sampler",
+    "listAuthor": "",
+    "title": "The Arkham Sampler (Vol. II, No. 4)",
     "author": null,
     "coverArtist": null,
-    "publicationDate": null,
+    "publicationDate": "Autumn, 1949",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Arkham_Sampler",
     "coverImageUrl": null,
     "coverImageFile": null,
     "error": null,
-    "hidden": true
+    "listYear": "1949-II-4"
   },
   {
     "id": 421,
     "imprint": "arkham_house",
     "decade": "1940s",
     "listTitle": "The Arkham Sampler",
-    "listAuthor": "Volume II, Number Three: Summer, 1949",
-    "title": "The Arkham Sampler",
+    "listAuthor": "",
+    "title": "The Arkham Sampler (Vol. II, No. 3)",
     "author": null,
     "coverArtist": null,
-    "publicationDate": null,
+    "publicationDate": "Summer, 1949",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Arkham_Sampler",
     "coverImageUrl": null,
     "coverImageFile": null,
     "error": null,
-    "hidden": true
+    "listYear": "1949-II-3"
   },
   {
     "id": 422,
     "imprint": "arkham_house",
     "decade": "1940s",
     "listTitle": "The Arkham Sampler",
-    "listAuthor": "Volume II, Number Two: Spring, 1949",
-    "title": "The Arkham Sampler",
+    "listAuthor": "",
+    "title": "The Arkham Sampler (Vol. II, No. 2)",
     "author": null,
     "coverArtist": null,
-    "publicationDate": null,
+    "publicationDate": "Spring, 1949",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Arkham_Sampler",
     "coverImageUrl": null,
     "coverImageFile": null,
     "error": null,
-    "hidden": true
+    "listYear": "1949-II-2"
   },
   {
     "id": 423,
     "imprint": "arkham_house",
     "decade": "1940s",
     "listTitle": "The Arkham Sampler",
-    "listAuthor": "Volume II, Number One: Winter, 1949",
-    "title": "The Arkham Sampler",
+    "listAuthor": "",
+    "title": "The Arkham Sampler (Vol. II, No. 1)",
     "author": null,
     "coverArtist": null,
-    "publicationDate": null,
+    "publicationDate": "Winter, 1949",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Arkham_Sampler",
     "coverImageUrl": null,
     "coverImageFile": null,
     "error": null,
-    "hidden": true
+    "listYear": "1949-II-1"
   },
   {
     "id": 387,
@@ -2846,64 +2818,64 @@ window.BOOKS = [
     "imprint": "arkham_house",
     "decade": "1940s",
     "listTitle": "The Arkham Sampler",
-    "listAuthor": "Volume I, Number Four: Autumn, 1948",
-    "title": "The Arkham Sampler",
+    "listAuthor": "",
+    "title": "The Arkham Sampler (Vol. I, No. 4)",
     "author": null,
     "coverArtist": null,
-    "publicationDate": null,
+    "publicationDate": "Autumn, 1948",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Arkham_Sampler",
     "coverImageUrl": null,
     "coverImageFile": null,
     "error": null,
-    "hidden": true
+    "listYear": "1948-I-4"
   },
   {
     "id": 425,
     "imprint": "arkham_house",
     "decade": "1940s",
     "listTitle": "The Arkham Sampler",
-    "listAuthor": "Volume I, Number Three: Summer, 1948",
-    "title": "The Arkham Sampler",
+    "listAuthor": "",
+    "title": "The Arkham Sampler (Vol. I, No. 3)",
     "author": null,
     "coverArtist": null,
-    "publicationDate": null,
+    "publicationDate": "Summer, 1948",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Arkham_Sampler",
     "coverImageUrl": null,
     "coverImageFile": null,
     "error": null,
-    "hidden": true
+    "listYear": "1948-I-3"
   },
   {
     "id": 426,
     "imprint": "arkham_house",
     "decade": "1940s",
     "listTitle": "The Arkham Sampler",
-    "listAuthor": "Volume I, Number Two: Spring, 1948",
-    "title": "The Arkham Sampler",
+    "listAuthor": "",
+    "title": "The Arkham Sampler (Vol. I, No. 2)",
     "author": null,
     "coverArtist": null,
-    "publicationDate": null,
+    "publicationDate": "Spring, 1948",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Arkham_Sampler",
     "coverImageUrl": null,
     "coverImageFile": null,
     "error": null,
-    "hidden": true
+    "listYear": "1948-I-2"
   },
   {
     "id": 427,
     "imprint": "arkham_house",
     "decade": "1940s",
     "listTitle": "The Arkham Sampler",
-    "listAuthor": "Volume I, Number One: Winter, 1948",
-    "title": "The Arkham Sampler",
+    "listAuthor": "",
+    "title": "The Arkham Sampler (Vol. I, No. 1)",
     "author": null,
     "coverArtist": null,
-    "publicationDate": null,
+    "publicationDate": "Winter, 1948",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Arkham_Sampler",
     "coverImageUrl": null,
     "coverImageFile": null,
     "error": null,
-    "hidden": true
+    "listYear": "1948-I-1"
   },
   {
     "id": 390,
@@ -3014,8 +2986,7 @@ window.BOOKS = [
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Dark_Carnival_(short_story_collection)",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/d/d5/Dark_carnival_originall.jpg",
     "coverImageFile": "covers/dark-carnival-short-story-collection-188.jpg",
-    "error": null,
-    "goodreadsUrl": "https://www.goodreads.com/book/show/1794059.Dark_Carnival"
+    "error": null
   },
   {
     "id": 397,
@@ -3270,8 +3241,7 @@ window.BOOKS = [
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Marginalia_(collection)",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/commons/e/e8/Marginalia_lovecraft.jpg",
     "coverImageFile": "covers/marginalia-collection-204.jpg",
-    "error": null,
-    "goodreadsUrl": "https://www.goodreads.com/book/show/5743058-marginalia"
+    "error": null
   },
   {
     "id": 413,
@@ -3383,7 +3353,7 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/2/27/The_Outsider_and_Others_book_cover.jpg",
     "coverImageFile": "covers/the-outsider-and-others-211.jpg",
     "error": null,
-    "goodreadsUrl": "https://www.goodreads.com/book/show/11399579-the-outsider-and-others"
+    "goodreadsUrl": "https://www.goodreads.com/book/show/176155"
   },
   {
     "imprint": "mycroft_moran",
@@ -3430,8 +3400,7 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/d/d2/Final_Adventures_of_Solar_Pons.jpg",
     "coverImageFile": "covers/the-final-adventures-of-solar-pons-214.jpg",
     "error": null,
-    "id": 214,
-    "goodreadsUrl": "https://www.goodreads.com/book/show/879503.The_Final_Adventures_of_Solar_Pons"
+    "id": 214
   },
   {
     "imprint": "mycroft_moran",
@@ -3478,8 +3447,7 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/0/0f/Chronicles_of_solar_pons.jpg",
     "coverImageFile": "covers/the-chronicles-of-solar-pons-217.jpg",
     "error": null,
-    "id": 217,
-    "goodreadsUrl": "https://www.goodreads.com/book/show/879500.The_Chronicles_of_Solar_Pons"
+    "id": 217
   },
   {
     "imprint": "mycroft_moran",
@@ -3494,8 +3462,7 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/b/bc/Number_seven_queer_street.jpg",
     "coverImageFile": "covers/number-seven-queer-street-218.jpg",
     "error": null,
-    "id": 218,
-    "goodreadsUrl": "https://www.goodreads.com/book/show/10009178-number-seven-queer-street"
+    "id": 218
   },
   {
     "imprint": "mycroft_moran",
@@ -3526,8 +3493,7 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/3/3e/Adventure_of_the_unique_dickensians.jpg",
     "coverImageFile": "covers/the-adventure-of-the-unique-dickensians-220.jpg",
     "error": null,
-    "id": 220,
-    "goodreadsUrl": "https://www.goodreads.com/book/show/7023279-the-adventure-of-the-unique-dickensians"
+    "id": 220
   },
   {
     "imprint": "mycroft_moran",
@@ -3542,8 +3508,7 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/3/39/Wisconsin_murders.jpg",
     "coverImageFile": "covers/wisconsin-murders-221.jpg",
     "error": null,
-    "id": 221,
-    "goodreadsUrl": "https://www.goodreads.com/book/show/32767235-wisconsin-murders"
+    "id": 221
   },
   {
     "imprint": "mycroft_moran",
@@ -3558,8 +3523,7 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/2/26/The_Exploits_of_Chevalier_Dupin.jpg",
     "coverImageFile": "covers/the-exploits-of-chevalier-dupin-222.jpg",
     "error": null,
-    "id": 222,
-    "goodreadsUrl": "https://www.goodreads.com/book/show/2510273.The_Exploits_of_Chevalier_Dupin"
+    "id": 222
   },
   {
     "imprint": "mycroft_moran",
@@ -3574,8 +3538,7 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/0/08/Praed_street_dossier.jpg",
     "coverImageFile": "covers/a-praed-street-dossier-223.jpg",
     "error": null,
-    "id": 223,
-    "goodreadsUrl": "https://www.goodreads.com/book/show/13641587-a-praed-street-dossier"
+    "id": 223
   },
   {
     "imprint": "mycroft_moran",
@@ -3622,8 +3585,7 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/c/c7/Reminiscences_of_solar_pons.jpg",
     "coverImageFile": "covers/the-reminiscences-of-solar-pons-226.jpg",
     "error": null,
-    "id": 226,
-    "goodreadsUrl": "https://www.goodreads.com/book/show/6052605-the-reminiscences-of-solar-pons"
+    "id": 226
   },
   {
     "imprint": "mycroft_moran",
@@ -3654,8 +3616,7 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/1/1b/Three_problems_for_solar_pons.jpg",
     "coverImageFile": "covers/three-problems-for-solar-pons-228.jpg",
     "error": null,
-    "id": 228,
-    "goodreadsUrl": "https://www.goodreads.com/book/show/10041771-three-problems-for-solar-pons"
+    "id": 228
   },
   {
     "imprint": "mycroft_moran",
@@ -3670,8 +3631,7 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/5/58/Memoirs_of_solar_pons.jpg",
     "coverImageFile": "covers/the-memoirs-of-solar-pons-229.jpg",
     "error": null,
-    "id": 229,
-    "goodreadsUrl": "https://www.goodreads.com/book/show/1831257.The_Memoirs_of_Solar_Pons"
+    "id": 229
   },
   {
     "imprint": "mycroft_moran",
@@ -3686,8 +3646,7 @@ window.BOOKS = [
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/b/ba/Carnacki%2C_the_Ghost-Finder_%28book_cover%29.jpg",
     "coverImageFile": "covers/carnacki-the-ghost-finder-230.jpg",
     "error": null,
-    "id": 230,
-    "goodreadsUrl": "https://www.goodreads.com/book/show/345563.Carnacki_the_Ghost_Finder"
+    "id": 230
   },
   {
     "imprint": "mycroft_moran",
@@ -3696,7 +3655,7 @@ window.BOOKS = [
     "listAuthor": "- (a.k.a. Regarding Sherlock Holmes: The Adventures of Solar Pons) - (in the UK: The Adventures of Solar Pons), by August Derleth (1945)",
     "title": "\"In Re: Sherlock Holmes\" -- The Adventures of Solar Pons",
     "author": "August Derleth",
-    "coverArtist": "Ronald Clyne",
+    "coverArtist": null,
     "publicationDate": "1945",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/In_Re%3A_Sherlock_Holmes",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/f/fb/In_Re_Sherlock_Holmes.jpg",

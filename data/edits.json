@@ -109,7 +109,7 @@
       "coverImageFile": "covers/the-arkham-collector-volume-i-320.jpg"
     },
     "324": {
-      "hidden": true
+      "coverImageFile": "covers/the-arkham-collector-324.jpg"
     },
     "333": {
       "coverImageFile": "covers/tales-of-the-cthulhu-mythos-333.jpg",
@@ -161,31 +161,32 @@
       "coverImageFile": "covers/the-outsider-and-others-419.png"
     },
     "420": {
-      "hidden": true
+      "coverImageFile": "covers/the-arkham-sampler-420.jpg"
     },
     "421": {
-      "hidden": true
+      "coverImageFile": "covers/the-arkham-sampler-421.jpg"
     },
     "422": {
-      "hidden": true
+      "coverImageFile": "covers/the-arkham-sampler-422.jpg"
     },
     "423": {
-      "hidden": true
+      "coverImageFile": "covers/the-arkham-sampler-423.jpg"
     },
     "424": {
-      "hidden": true
+      "coverImageFile": "covers/the-arkham-sampler-424.jpg"
     },
     "425": {
-      "hidden": true
+      "coverImageFile": "covers/the-arkham-sampler-425.jpg"
     },
     "426": {
-      "hidden": true
+      "coverImageFile": "covers/the-arkham-sampler-426.jpg"
     },
     "427": {
-      "hidden": true
+      "coverImageFile": "covers/the-arkham-sampler-427.jpg"
     },
     "428": {
-      "hidden": true
+      "hidden": true,
+      "deleted": true
     },
     "429": {
       "coverImageFile": "covers/the-horror-in-the-museum-and-other-revisions-429.jpg"
@@ -200,31 +201,31 @@
       "coverImageFile": "covers/the-dunwich-horror-and-others-432.webp"
     },
     "433": {
-      "hidden": true
+      "coverImageFile": "covers/the-arkham-collector-433.jpg"
     },
     "434": {
-      "hidden": true
+      "coverImageFile": "covers/the-arkham-collector-434.jpg"
     },
     "435": {
-      "hidden": true
+      "coverImageFile": "covers/the-arkham-collector-435.jpg"
     },
     "436": {
-      "hidden": true
+      "coverImageFile": "covers/the-arkham-collector-436.jpg"
     },
     "437": {
-      "hidden": true
+      "coverImageFile": "covers/the-arkham-collector-437.jpg"
     },
     "438": {
-      "hidden": true
+      "coverImageFile": "covers/the-arkham-collector-438.jpg"
     },
     "439": {
-      "hidden": true
+      "coverImageFile": "covers/the-arkham-collector-439.jpg"
     },
     "440": {
-      "hidden": true
+      "coverImageFile": "covers/the-arkham-collector-440.jpg"
     },
     "441": {
-      "hidden": true
+      "coverImageFile": "covers/the-arkham-collector-441.jpg"
     }
   }
 }

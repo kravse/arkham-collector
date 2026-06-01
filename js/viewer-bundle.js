@@ -67,6 +67,8 @@ const settingsCollectionHintOwn = document.getElementById(
 );
 const highlightWantsInput = document.getElementById("highlight-wants");
 const highlightCollectionInput = document.getElementById("highlight-collection");
+const showMagazinesInput = document.getElementById("show-magazines");
+const showMagazinesOption = document.getElementById("show-magazines-option");
 const attributionBtn = document.getElementById("attribution-btn");
 const attributionDialog = document.getElementById("attribution-dialog");
 const attributionCloseBtn = document.getElementById("attribution-close");
@@ -87,6 +89,7 @@ const COLLECTION_SOURCE_KEY = "arkham-collection-source";
 const HEADER_FILTERS_STORAGE_KEY = "arkham-header-filters-expanded";
 const HIGHLIGHT_WANTS_KEY = "arkham-highlight-wants";
 const HIGHLIGHT_COLLECTION_KEY = "arkham-highlight-collection";
+const SHOW_MAGAZINES_KEY = "arkham-show-magazines";
 const SORT_MODES = new Set([
   "date-desc",
   "date-asc",
@@ -108,6 +111,7 @@ let collectionSource = "sample";
 let headerFiltersExpanded = true;
 let highlightWants = true;
 let highlightCollection = true;
+let showMagazines = false;
 let detailBookId = null;
 
 function useOwnCollection() {
@@ -203,12 +207,39 @@ function saveHighlightCollectionPreference() {
   }
 }
 
+function restoreShowMagazinesPreference() {
+  try {
+    const saved = localStorage.getItem(SHOW_MAGAZINES_KEY);
+    if (saved === "0") {
+      showMagazines = false;
+    } else if (saved === "1") {
+      showMagazines = true;
+    }
+  } catch (_) {
+    // localStorage unavailable
+  }
+}
+
+function saveShowMagazinesPreference() {
+  try {
+    localStorage.setItem(SHOW_MAGAZINES_KEY, showMagazines ? "1" : "0");
+  } catch (_) {
+    // localStorage unavailable
+  }
+}
+
 function syncSettingsHighlightCheckboxes() {
   if (highlightWantsInput) {
     highlightWantsInput.checked = highlightWants;
   }
   if (highlightCollectionInput) {
     highlightCollectionInput.checked = highlightCollection;
+  }
+  if (showMagazinesInput) {
+    showMagazinesInput.checked = showMagazines;
+  }
+  if (showMagazinesOption) {
+    showMagazinesOption.hidden = !hasVisibleMagazineIssues();
   }
 }
 
@@ -337,6 +368,32 @@ function parseYear(value) {
   return match ? match[0] : null;
 }
 
+const SEASON_SORT_ORDER = {
+  winter: 1,
+  spring: 2,
+  summer: 3,
+  autumn: 4,
+  fall: 4,
+};
+
+function parseSortDateValue(value) {
+  const year = parseYear(value);
+  if (!year) {
+    return null;
+  }
+
+  const seasonMatch = String(value || "")
+    .trim()
+    .match(/^(Winter|Spring|Summer|Autumn|Fall)\b/i);
+  if (seasonMatch) {
+    const season = seasonMatch[1].toLowerCase();
+    const slot = SEASON_SORT_ORDER[season] ?? 5;
+    return Number(year) * 10 + slot;
+  }
+
+  return Number(year) * 10 + 9;
+}
+
 function decadeFromYear(year) {
   const value = parseInt(year, 10);
   if (!value) {
@@ -346,6 +403,43 @@ function decadeFromYear(year) {
     return String(value);
   }
   return `${Math.floor(value / 10) * 10}s`;
+}
+
+const SAMPLER_ISSUE_TITLE_RE = /^The Arkham Sampler \(Vol\. [IV]+, No\. \d+\)$/;
+const COLLECTOR_ISSUE_TITLE_RE = /^The Arkham Collector \(No\. \d+\)$/;
+
+function isMagazineIssue(book) {
+  const listTitle = String(book?.listTitle || "").trim();
+  const title = String(book?.title || "").trim();
+
+  if (listTitle === "The Arkham Sampler") {
+    return SAMPLER_ISSUE_TITLE_RE.test(title);
+  }
+  if (listTitle === "The Arkham Collector") {
+    return COLLECTOR_ISSUE_TITLE_RE.test(title);
+  }
+  return false;
+}
+
+function passesHiddenVisibility(book) {
+  const showHidden = showHiddenInput.checked;
+  return hiddenOnly ? book.hidden : showHidden || !book.hidden;
+}
+
+function hasVisibleMagazineIssues() {
+  return getActiveBooks().some(
+    (book) => isMagazineIssue(book) && !book.hidden,
+  );
+}
+
+function passesBookVisibility(book) {
+  if (!passesHiddenVisibility(book)) {
+    return false;
+  }
+  if (isMagazineIssue(book) && !showMagazines) {
+    return false;
+  }
+  return true;
 }
 
 function parseCollection(csvText) {
@@ -505,7 +599,7 @@ async function ensureSampleCollectionIds() {
 }
 
 function parseSortYear(value) {
-  return parseYear(value) ? Number(parseYear(value)) : null;
+  return parseSortDateValue(value);
 }
 
 function restoreSortPreference() {
@@ -703,16 +797,14 @@ function toggleCollection(bookId) {
 }
 
 function getWantCount() {
-  const showHidden = showHiddenInput.checked;
   return getActiveBooks().filter(
-    (book) => (showHidden || !book.hidden) && isWanted(book),
+    (book) => passesBookVisibility(book) && isWanted(book),
   ).length;
 }
 
 function getCollectionCount() {
-  const showHidden = showHiddenInput.checked;
   return getActiveBooks().filter(
-    (book) => (showHidden || !book.hidden) && isInCollection(book),
+    (book) => passesBookVisibility(book) && isInCollection(book),
   ).length;
 }
 
@@ -781,11 +873,10 @@ function matchesSearch(book, query) {
 }
 
 function getStatTotal(activeBooks) {
-  const showHidden = showHiddenInput.checked;
   if (hiddenOnly) {
     return activeBooks.filter((book) => book.hidden).length;
   }
-  return activeBooks.filter((book) => showHidden || !book.hidden).length;
+  return activeBooks.filter((book) => passesBookVisibility(book)).length;
 }
 
 function renderStats(visible, all) {
@@ -817,11 +908,8 @@ function renderStats(visible, all) {
 
 function getVisibleBooks() {
   const query = searchInput.value.trim();
-  const showHidden = showHiddenInput.checked;
   return getSortedActiveBooks()
-    .filter((book) =>
-      hiddenOnly ? book.hidden : showHidden || !book.hidden,
-    )
+    .filter((book) => passesBookVisibility(book))
     .filter((book) => !mycroftOnly || book.imprint === "mycroft_moran")
     .filter((book) => !collectionOnly || isInCollection(book))
     .filter((book) => !wantOnly || isWanted(book))
@@ -1368,6 +1456,7 @@ function render() {
     if (!bookDetailDialog.hidden && detailBookId) {
       updateDetailNav();
     }
+    syncSettingsHighlightCheckboxes();
     return;
   }
 
@@ -1378,6 +1467,8 @@ function render() {
     refreshDetailToolbar(detailBook);
     updateDetailNav();
   }
+
+  syncSettingsHighlightCheckboxes();
 }
 
 
@@ -2021,6 +2112,14 @@ if (highlightCollectionInput) {
   });
 }
 
+if (showMagazinesInput) {
+  showMagazinesInput.addEventListener("change", () => {
+    showMagazines = showMagazinesInput.checked;
+    saveShowMagazinesPreference();
+    render();
+  });
+}
+
 attributionBtn.addEventListener("click", () => {
   if (attributionDialog.hidden) {
     openAttributionDialog();
@@ -2113,6 +2212,7 @@ showHiddenInput.addEventListener("change", render);
 loadWantList();
 restoreCollectionSourcePreference();
 restoreHighlightPreferences();
+restoreShowMagazinesPreference();
 syncSettingsCollectionRadios();
 loadOwnCollectionIds();
 loadHeaderFiltersPreference();

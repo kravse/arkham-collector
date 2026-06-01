@@ -119,6 +119,8 @@ Entry point: `node scripts/index.js`. Common flags: `--yes`, `--local`, `--limit
 |--------|---------|
 | `sync-collection` | CSV → `collection.js` (also runs on `build` / `serve`) |
 | `compact-edits` | Drop edit fields that match scraped data |
+| `fix-arkham-magazines` | Move issue/season data out of `listAuthor` into `title` and `publicationDate` for Arkham Sampler and Collector magazine issues |
+| `fix-arkham-magazines:dry-run` | Preview magazine fixes without writing |
 | `dedupe-book-ids` | Split duplicate stable ids |
 
 **Curation tips:** Prefer `serve` for one-off fixes. Use targeted syncs instead of full `crawl` when possible. **Hide** (`hidden` in edits) shows on localhost with “Show hidden”; **delete** removes from the UI but keeps the scraped row.
