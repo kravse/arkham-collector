@@ -7,50 +7,24 @@ const { parseYear } = require("./text");
 const BOOK_ORDER_JSON = path.join(DATA_DIR, "book-order.json");
 const BOOK_ORDER_JS = path.join(DATA_DIR, "book-order.js");
 
-const SEASON_SORT_ORDER = {
-  winter: 1,
-  spring: 2,
-  summer: 3,
-  autumn: 4,
-  fall: 4,
-};
-
-function sortKey(publicationDate) {
-  const year = parseYear(publicationDate);
-  if (!year) {
-    return null;
-  }
-
-  const seasonMatch = String(publicationDate || "")
-    .trim()
-    .match(/^(Winter|Spring|Summer|Autumn|Fall)\b/i);
-  if (seasonMatch) {
-    const season = seasonMatch[1].toLowerCase();
-    const slot = SEASON_SORT_ORDER[season] ?? 5;
-    return Number(year) * 10 + slot;
-  }
-
-  return Number(year) * 10 + 9;
-}
-
-function bookSortKey(book) {
-  return sortKey(book?.publicationDate);
+function bookCalendarYear(book) {
+  return parseYear(book?.publicationDate);
 }
 
 function compareDefault(a, b) {
-  const keyA = bookSortKey(a);
-  const keyB = bookSortKey(b);
-  if (keyA == null && keyB == null) {
+  const yearA = bookCalendarYear(a);
+  const yearB = bookCalendarYear(b);
+  if (yearA == null && yearB == null) {
     return a.id - b.id;
   }
-  if (keyA == null) {
+  if (yearA == null) {
     return 1;
   }
-  if (keyB == null) {
+  if (yearB == null) {
     return -1;
   }
-  if (keyA !== keyB) {
-    return keyA - keyB;
+  if (yearA !== yearB) {
+    return Number(yearA) - Number(yearB);
   }
   return a.id - b.id;
 }
@@ -63,7 +37,7 @@ function defaultOrder(books) {
   return [...activeBooks(books)].sort(compareDefault).map((book) => book.id);
 }
 
-function groupIdsBySortKey(books, ids) {
+function groupIdsByYear(books, ids) {
   const byId = new Map(activeBooks(books).map((book) => [book.id, book]));
   const groups = new Map();
 
@@ -72,25 +46,25 @@ function groupIdsBySortKey(books, ids) {
     if (!book) {
       continue;
     }
-    const key = bookSortKey(book);
-    const bucketKey = key == null ? "null" : String(key);
+    const year = bookCalendarYear(book);
+    const bucketKey = year == null ? "null" : String(year);
     if (!groups.has(bucketKey)) {
-      groups.set(bucketKey, { key, ids: [] });
+      groups.set(bucketKey, { year, ids: [] });
     }
     groups.get(bucketKey).ids.push(id);
   }
 
   return [...groups.values()].sort((a, b) => {
-    if (a.key == null && b.key == null) {
+    if (a.year == null && b.year == null) {
       return 0;
     }
-    if (a.key == null) {
+    if (a.year == null) {
       return 1;
     }
-    if (b.key == null) {
+    if (b.year == null) {
       return -1;
     }
-    return a.key - b.key;
+    return Number(a.year) - Number(b.year);
   });
 }
 
@@ -108,7 +82,7 @@ function normalizeOrder(books, savedOrder) {
   const candidate = [...savedValid, ...missing];
 
   const result = [];
-  for (const group of groupIdsBySortKey(active, candidate)) {
+  for (const group of groupIdsByYear(active, candidate)) {
     const bucketIds = [...group.ids];
     bucketIds.sort((a, b) => {
       const ia = savedIndex.has(a) ? savedIndex.get(a) : Number.MAX_SAFE_INTEGER;
@@ -153,15 +127,10 @@ function validateOrder(books, order) {
 
   const byId = new Map(active.map((book) => [book.id, book]));
   for (let index = 1; index < order.length; index += 1) {
-    const prev = byId.get(order[index - 1]);
-    const next = byId.get(order[index]);
-    const prevKey = bookSortKey(prev);
-    const nextKey = bookSortKey(next);
-    if (prevKey == null || nextKey == null) {
-      continue;
-    }
-    if (prevKey > nextKey) {
-      return "Order cannot place a later publication date before an earlier one";
+    const prevYear = bookCalendarYear(byId.get(order[index - 1]));
+    const nextYear = bookCalendarYear(byId.get(order[index]));
+    if (prevYear && nextYear && Number(prevYear) > Number(nextYear)) {
+      return "Order cannot place a later year before an earlier one";
     }
   }
 
@@ -200,20 +169,15 @@ function canSwapIds(books, order, fromIndex, toIndex) {
     return false;
   }
 
-  const byId = new Map(activeBooks(books).map((book) => [book.id, book]));
-  const keyA = bookSortKey(byId.get(order[fromIndex]));
-  const keyB = bookSortKey(byId.get(order[toIndex]));
-  if (keyA == null || keyB == null) {
-    return keyA === keyB;
-  }
-  return keyA === keyB;
+  const next = [...order];
+  [next[fromIndex], next[toIndex]] = [next[toIndex], next[fromIndex]];
+  return validateOrder(books, next) === null;
 }
 
 module.exports = {
   BOOK_ORDER_JSON,
   BOOK_ORDER_JS,
-  sortKey,
-  bookSortKey,
+  bookCalendarYear,
   defaultOrder,
   normalizeOrder,
   validateOrder,

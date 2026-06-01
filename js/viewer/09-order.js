@@ -6,45 +6,55 @@ function getBookById(bookId) {
   return books.find((entry) => entry.id === bookId) || null;
 }
 
+function isValidBookOrder(order) {
+  for (let index = 1; index < order.length; index += 1) {
+    const prevYear = parseYear(getBookById(order[index - 1])?.publicationDate);
+    const nextYear = parseYear(getBookById(order[index])?.publicationDate);
+    if (prevYear && nextYear && Number(prevYear) > Number(nextYear)) {
+      return false;
+    }
+  }
+  return true;
+}
+
+function wouldSwapBooksInOrder(order, indexA, indexB) {
+  if (
+    indexA < 0 ||
+    indexB < 0 ||
+    indexA >= order.length ||
+    indexB >= order.length ||
+    indexA === indexB
+  ) {
+    return false;
+  }
+
+  const next = [...order];
+  [next[indexA], next[indexB]] = [next[indexB], next[indexA]];
+  return isValidBookOrder(next);
+}
+
+function wouldMoveBookToIndex(order, bookId, targetIndex) {
+  const from = order.indexOf(bookId);
+  if (from < 0 || targetIndex < 0 || targetIndex >= order.length || from === targetIndex) {
+    return false;
+  }
+
+  const next = [...order];
+  next.splice(from, 1);
+  if (from < targetIndex) {
+    targetIndex -= 1;
+  }
+  next.splice(targetIndex, 0, bookId);
+  return isValidBookOrder(next);
+}
+
 function canMoveBookInOrder(order, index, delta) {
   const target = index + delta;
   if (target < 0 || target >= order.length) {
     return false;
   }
 
-  const bookA = getBookById(order[index]);
-  const bookB = getBookById(order[target]);
-  if (!bookA || !bookB) {
-    return false;
-  }
-
-  const keyA = parseSortYear(bookA.publicationDate);
-  const keyB = parseSortYear(bookB.publicationDate);
-  if (keyA == null || keyB == null) {
-    return keyA === keyB;
-  }
-  return keyA === keyB;
-}
-
-function getBookSortKeyForOrder(bookId) {
-  const book = getBookById(bookId);
-  if (!book) {
-    return null;
-  }
-  return parseSortYear(book.publicationDate);
-}
-
-function canDropBookOnTarget(dragId, targetId) {
-  if (!Number.isInteger(dragId) || !Number.isInteger(targetId) || dragId === targetId) {
-    return false;
-  }
-
-  const dragKey = getBookSortKeyForOrder(dragId);
-  const targetKey = getBookSortKeyForOrder(targetId);
-  if (dragKey == null || targetKey == null) {
-    return dragKey === targetKey;
-  }
-  return dragKey === targetKey;
+  return wouldSwapBooksInOrder(order, index, target);
 }
 
 function getOrderDialogIds() {
@@ -195,17 +205,23 @@ function moveBookInWorkingOrder(bookId, delta) {
 
 function reorderBookToTarget(dragId, targetId) {
   const from = workingBookOrder.indexOf(dragId);
-  let to = workingBookOrder.indexOf(targetId);
-  if (from < 0 || to < 0 || from === to || !canDropBookOnTarget(dragId, targetId)) {
+  const to = workingBookOrder.indexOf(targetId);
+  if (
+    from < 0 ||
+    to < 0 ||
+    from === to ||
+    !wouldMoveBookToIndex(workingBookOrder, dragId, to)
+  ) {
     return;
   }
 
   const next = [...workingBookOrder];
   next.splice(from, 1);
+  let insertAt = to;
   if (from < to) {
-    to -= 1;
+    insertAt -= 1;
   }
-  next.splice(to, 0, dragId);
+  next.splice(insertAt, 0, dragId);
   workingBookOrder = next;
   bookOrderDirty = true;
   renderBookOrderList();
@@ -256,6 +272,7 @@ function onBookOrderDragOver(event) {
   }
 
   const targetId = Number(row.dataset.bookId);
+  const targetIndex = workingBookOrder.indexOf(targetId);
   bookOrderList
     .querySelectorAll(".order-dialog-row-drop-target")
     .forEach((element) => {
@@ -264,7 +281,7 @@ function onBookOrderDragOver(event) {
       }
     });
 
-  if (!canDropBookOnTarget(bookOrderDragId, targetId)) {
+  if (!wouldMoveBookToIndex(workingBookOrder, bookOrderDragId, targetIndex)) {
     event.dataTransfer.dropEffect = "none";
     return;
   }

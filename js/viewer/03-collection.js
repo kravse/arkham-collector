@@ -58,10 +58,6 @@ async function ensureSampleCollectionIds() {
   saveSampleCollectionIds();
 }
 
-function parseSortYear(value) {
-  return parseSortDateValue(value);
-}
-
 function restoreSortPreference() {
   try {
     const saved = localStorage.getItem(SORT_STORAGE_KEY);

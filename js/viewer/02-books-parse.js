@@ -80,32 +80,6 @@ function parseYear(value) {
   return match ? match[0] : null;
 }
 
-const SEASON_SORT_ORDER = {
-  winter: 1,
-  spring: 2,
-  summer: 3,
-  autumn: 4,
-  fall: 4,
-};
-
-function parseSortDateValue(value) {
-  const year = parseYear(value);
-  if (!year) {
-    return null;
-  }
-
-  const seasonMatch = String(value || "")
-    .trim()
-    .match(/^(Winter|Spring|Summer|Autumn|Fall)\b/i);
-  if (seasonMatch) {
-    const season = seasonMatch[1].toLowerCase();
-    const slot = SEASON_SORT_ORDER[season] ?? 5;
-    return Number(year) * 10 + slot;
-  }
-
-  return Number(year) * 10 + 9;
-}
-
 function decadeFromYear(year) {
   const value = parseInt(year, 10);
   if (!value) {

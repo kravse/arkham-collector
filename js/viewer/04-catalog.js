@@ -16,19 +16,19 @@ function compareOrderTiebreak(a, b) {
 }
 
 function compareCanonical(a, b) {
-  const dateA = parseSortYear(a.publicationDate);
-  const dateB = parseSortYear(b.publicationDate);
-  if (dateA == null && dateB == null) {
+  const yearA = parseYear(a.publicationDate);
+  const yearB = parseYear(b.publicationDate);
+  if (yearA == null && yearB == null) {
     return compareOrderTiebreak(a, b);
   }
-  if (dateA == null) {
+  if (yearA == null) {
     return 1;
   }
-  if (dateB == null) {
+  if (yearB == null) {
     return -1;
   }
-  if (dateA !== dateB) {
-    return dateA - dateB;
+  if (yearA !== yearB) {
+    return yearA - yearB;
   }
   return compareOrderTiebreak(a, b);
 }

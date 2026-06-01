@@ -79,6 +79,12 @@ window.BOOK_EDITS = {
   "246": {
     "description": "Arkham's Masters of Horror is an anthology of fantasy and horror stories edited by Peter Ruber. It was released by Arkham House in an edition of approximately 4,000 copies in 2000. The book includes an introductory essay by Ruber before each story and about its author.\n\nRuber drew criticism from the horror/fantasy community for the hostility with which he introduced some authors within the volume - for instance, his accusation that H.P. Lovecraft \"had a schizoid personality\" and could be labelled \"a genuine crackpot.\""
   },
+  "256": {
+    "publicationDate": "1995"
+  },
+  "263": {
+    "publicationDate": "1991"
+  },
   "265": {
     "publicationDate": "1990",
     "decade": "1990s",
