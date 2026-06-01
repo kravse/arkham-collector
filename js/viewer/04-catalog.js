@@ -1,19 +1,43 @@
 /* Sort, search, filters, and visible book list */
 
-let sortedActiveCache = { mode: null, books: null };
+let sortedActiveCache = { books: null };
 
 function invalidateSortedCache() {
-  sortedActiveCache.mode = null;
   sortedActiveCache.books = null;
 }
 
+function compareOrderTiebreak(a, b) {
+  const indexA = bookOrderIndex.has(a.id) ? bookOrderIndex.get(a.id) : a.id;
+  const indexB = bookOrderIndex.has(b.id) ? bookOrderIndex.get(b.id) : b.id;
+  if (indexA !== indexB) {
+    return indexA - indexB;
+  }
+  return a.id - b.id;
+}
+
+function compareCanonical(a, b) {
+  const dateA = parseSortYear(a.publicationDate);
+  const dateB = parseSortYear(b.publicationDate);
+  if (dateA == null && dateB == null) {
+    return compareOrderTiebreak(a, b);
+  }
+  if (dateA == null) {
+    return 1;
+  }
+  if (dateB == null) {
+    return -1;
+  }
+  if (dateA !== dateB) {
+    return dateA - dateB;
+  }
+  return compareOrderTiebreak(a, b);
+}
+
 function getSortedActiveBooks() {
-  const mode = sortSelect.value;
-  if (sortedActiveCache.mode === mode && sortedActiveCache.books) {
+  if (sortedActiveCache.books) {
     return sortedActiveCache.books;
   }
-  const sorted = sortBooks(getActiveBooks(), mode);
-  sortedActiveCache.mode = mode;
+  const sorted = sortBooks(getActiveBooks());
   sortedActiveCache.books = sorted;
   return sorted;
 }
@@ -24,36 +48,8 @@ function onSortChange() {
   render();
 }
 
-function sortBooks(list, mode) {
-  const copy = [...list];
-  if (mode === "title-asc" || mode === "title") {
-    return copy.sort((a, b) =>
-      (a.title || "").localeCompare(b.title || ""),
-    );
-  }
-  if (mode === "title-desc") {
-    return copy.sort((a, b) =>
-      (b.title || "").localeCompare(a.title || ""),
-    );
-  }
-  if (mode === "date-desc" || mode === "date-asc") {
-    return copy.sort((a, b) => {
-      const yearA = parseSortYear(a.publicationDate);
-      const yearB = parseSortYear(b.publicationDate);
-      if (yearA == null && yearB == null) return 0;
-      if (yearA == null) return 1;
-      if (yearB == null) return -1;
-      return mode === "date-desc" ? yearB - yearA : yearA - yearB;
-    });
-  }
-  return copy.sort((a, b) => {
-    const yearA = parseSortYear(a.publicationDate);
-    const yearB = parseSortYear(b.publicationDate);
-    if (yearA == null && yearB == null) return 0;
-    if (yearA == null) return 1;
-    if (yearB == null) return -1;
-    return yearA - yearB;
-  });
+function sortBooks(list) {
+  return [...list].sort(compareCanonical);
 }
 
 function matchesSearch(book, query) {

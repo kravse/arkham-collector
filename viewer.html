@@ -44,6 +44,7 @@
     <link rel="stylesheet" href="css/header.css" />
     <link rel="stylesheet" href="css/attribution.css" />
     <link rel="stylesheet" href="css/settings.css" />
+    <link rel="stylesheet" href="css/order-dialog.css" />
     <link rel="stylesheet" href="css/cards.css" />
     <link rel="stylesheet" href="css/edit-dialog.css" />
     <link rel="stylesheet" href="css/book-detail.css" />
@@ -72,6 +73,16 @@
           </div>
         </div>
         <div class="header-actions">
+          <button
+            type="button"
+            id="book-order-btn"
+            class="header-order-btn"
+            aria-expanded="false"
+            aria-controls="book-order-dialog"
+            hidden
+          >
+            Reorder
+          </button>
           <button
             type="button"
             id="header-filters-toggle"
@@ -131,7 +142,7 @@
           </button>
         </div>
         <div class="controls-secondary">
-          <div class="sort-control">
+          <div class="sort-control" id="sort-control-wrap">
             <label class="sort-label" for="sort">Sort</label>
             <select id="sort" aria-label="Sort books">
               <option value="date-asc" selected>Oldest first</option>
@@ -420,6 +431,39 @@
       </div>
     </div>
 
+    <div id="book-order-dialog" class="order-dialog" hidden>
+      <div class="order-dialog-backdrop" data-close-book-order></div>
+      <div
+        class="order-dialog-panel"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="book-order-dialog-title"
+      >
+        <button
+          type="button"
+          id="book-order-close"
+          class="order-dialog-close"
+          aria-label="Close reorder dialog"
+        >
+          &times;
+        </button>
+        <h2 id="book-order-dialog-title">Reorder books</h2>
+        <p class="order-dialog-note">
+          Books stay in publication-date order. Drag or use the arrows to move
+          titles only within the same date (including season).
+        </p>
+        <div id="book-order-list" class="order-dialog-list"></div>
+        <div class="order-dialog-actions">
+          <button type="button" id="book-order-cancel" class="order-dialog-btn">
+            Cancel
+          </button>
+          <button type="button" id="book-order-save" class="order-dialog-btn order-dialog-btn-primary">
+            Save order
+          </button>
+        </div>
+      </div>
+    </div>
+
     <main>
       <div class="grid" id="grid"></div>
     </main>
@@ -568,6 +612,7 @@
     <script src="my_collection/collection.js"></script>
     <script src="data/books.js"></script>
     <script src="data/descriptions.js"></script>
+    <script src="data/book-order.js"></script>
     <script src="data/edits.js"></script>
     <script src="js/book-edits.js"></script>
     <script src="js/sanitize-text.js"></script>

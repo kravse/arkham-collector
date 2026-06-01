@@ -69,13 +69,9 @@ window.BOOK_EDITS = {
     "description": "Part of the The Macabre Quarto. \n\nIntroduction by Brian Lumley\n\n--Vampire\nBat's Belfry (1926)\nNellie Foster (1933)\nThe Satin Mask (1936)\nThe Drifting Snow (1939)\nThe Occupant of the Crypt (1947)\nReanimated Dead\nThey Shall Rise (1936)\nThe Return of Sarah Purcell (1936)\nDeath Holds the Post (1936)\nA Gentleman from Prague (1944)\nParrington's Pool (1947)\n--Shapeshifters\nThe Owl on the Moor (1928)\nThe Woman at Loon Point (1936)\nElemental/Mythological\nThe Deserted Garden (1929)\nOld Mark (1929)\nThe Place in the Woods (1954)\n--Imps and Demons\nScarlatti's Bottle (1929)\nThe Captain is Afraid (1931)\nLesandro's Familiar (1936)\nBramwell's Guardian (1940)\nMr. Ames' Devil (1943)\nBaynter's Imp (1943)\nBlessed are the Meek (1948)\nBalu (1949)\nSaunder's Little Friend (1948)\n--Miscellaneous\nThe Marmoset (1926)\nThe Tenant (1928)\nRiders in the Sky (1928)\nThe Pacer (1930)\nRed Hands (1932)\nThe Carven Image (1932)"
   },
   "238": {
-    "title": "The Shunned House Facsimile",
-    "author": "H. P. Lovecraft and Robert Weinberg",
-    "publicationDate": "2008",
-    "decade": "2000s",
-    "coverImageFile": "covers/the-shunned-house-238.png",
+    "coverImageFile": "covers/the-shunned-house-238.jpg",
     "goodreadsUrl": "https://www.goodreads.com/book/show/8507286-the-shunned-house",
-    "hidden": true
+    "description": "A total of 100 copies were bound under the Arkham House imprint in 1961. Despite bearing that imprint, this volume is not a genuine Arkham House production in the traditional sense — the actual printing was carried out by W. Paul Cook back in 1928. The printed sheets sat unbound and largely undistributed for years, with R. H. Barlow circulating a small number of copies in 1935, before Arkham House finally bound the remaining 100 sets. The book includes an introduction by Frank Belknap Long. [The spine notation and dust jacket details appear corrupted in the source text and cannot be accurately reproduced.]\n\nSometime around 1965, a forgery surfaced, believed to have originated in England. It was produced via offset printing of the original text, bound in red half leather with gold spine stamping. The forged print run is estimated at several hundred copies."
   },
   "245": {
     "goodreadsUrl": "https://www.goodreads.com/book/show/370614.Book_of_the_Dead"

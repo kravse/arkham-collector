@@ -38,6 +38,7 @@ const VIEWER_CSS_FILES = [
   "header.css",
   "attribution.css",
   "settings.css",
+  "order-dialog.css",
   "cards.css",
   "edit-dialog.css",
   "book-detail.css",
@@ -220,6 +221,16 @@ function buildStaticSite() {
     fs.writeFileSync(
       path.join(BUILD_DIR, "data", "edits.js"),
       "window.BOOK_EDITS = {};\n",
+    );
+  }
+
+  const BOOK_ORDER_JS = path.join(ROOT, "data", "book-order.js");
+  if (fs.existsSync(BOOK_ORDER_JS)) {
+    copyFile(BOOK_ORDER_JS, path.join(BUILD_DIR, "data", "book-order.js"));
+  } else {
+    fs.writeFileSync(
+      path.join(BUILD_DIR, "data", "book-order.js"),
+      "window.BOOK_ORDER = [];\n",
     );
   }
 

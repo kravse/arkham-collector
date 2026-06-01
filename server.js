@@ -7,9 +7,16 @@ const path = require("path");
 const {
   loadEdits,
   applyEditsToBook,
+  applyEditsToBooks,
   getEditForBook,
   setBookEdit,
 } = require("./scripts/lib/edits");
+const {
+  normalizeOrder,
+  validateOrder,
+  loadBookOrder,
+  saveBookOrder,
+} = require("./scripts/lib/book-order");
 const {
   htmlToPlainText,
   sanitizeSingleLineText,
@@ -346,10 +353,52 @@ app.delete("/api/books/:id", (req, res) => {
   }
 });
 
+function getMergedBooks(payload) {
+  return applyEditsToBooks(payload.books, loadEdits().edits);
+}
+
+app.get("/api/book-order", (_req, res) => {
+  try {
+    const payload = readPayload();
+    const merged = getMergedBooks(payload);
+    const saved = loadBookOrder().order;
+    const order = normalizeOrder(merged, saved);
+    res.json({ order });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.put("/api/book-order", (req, res) => {
+  try {
+    if (!Array.isArray(req.body.order)) {
+      res.status(400).json({ error: "Expected order array" });
+      return;
+    }
+
+    const payload = readPayload();
+    const merged = getMergedBooks(payload);
+    const order = req.body.order.map((id) => Number(id));
+    const error = validateOrder(merged, order);
+    if (error) {
+      res.status(400).json({ error });
+      return;
+    }
+
+    saveBookOrder(order);
+    res.json({ order });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 app.use(
   express.static(ROOT, {
     setHeaders(res, filePath) {
       if (filePath.includes(`${path.sep}data${path.sep}edits.js`)) {
+        res.setHeader("Cache-Control", "no-store");
+      }
+      if (filePath.includes(`${path.sep}data${path.sep}book-order.js`)) {
         res.setHeader("Cache-Control", "no-store");
       }
     },

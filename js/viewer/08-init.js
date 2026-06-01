@@ -153,6 +153,45 @@ if (showMagazinesInput) {
   });
 }
 
+if (bookOrderBtn) {
+  bookOrderBtn.addEventListener("click", () => {
+    if (bookOrderDialog.hidden) {
+      openBookOrderDialog();
+    } else {
+      closeBookOrderDialog();
+    }
+  });
+}
+
+if (bookOrderCloseBtn) {
+  bookOrderCloseBtn.addEventListener("click", closeBookOrderDialog);
+}
+
+if (bookOrderCancelBtn) {
+  bookOrderCancelBtn.addEventListener("click", closeBookOrderDialog);
+}
+
+if (bookOrderSaveBtn) {
+  bookOrderSaveBtn.addEventListener("click", () => {
+    saveBookOrderDialog();
+  });
+}
+
+if (bookOrderDialog) {
+  bookOrderDialog.querySelectorAll("[data-close-book-order]").forEach((element) => {
+    element.addEventListener("click", closeBookOrderDialog);
+  });
+}
+
+if (bookOrderList) {
+  bookOrderList.addEventListener("click", onBookOrderListClick);
+  bookOrderList.addEventListener("dragstart", onBookOrderDragStart);
+  bookOrderList.addEventListener("dragover", onBookOrderDragOver);
+  bookOrderList.addEventListener("dragleave", onBookOrderDragLeave);
+  bookOrderList.addEventListener("drop", onBookOrderDrop);
+  bookOrderList.addEventListener("dragend", onBookOrderDragEnd);
+}
+
 attributionBtn.addEventListener("click", () => {
   if (attributionDialog.hidden) {
     openAttributionDialog();
@@ -189,6 +228,10 @@ document.addEventListener("keydown", (event) => {
   }
   if (event.key === "Escape" && !settingsDialog.hidden) {
     closeSettingsDialog();
+    return;
+  }
+  if (event.key === "Escape" && bookOrderDialog && !bookOrderDialog.hidden) {
+    closeBookOrderDialog();
     return;
   }
   if (event.key === "Escape" && !attributionDialog.hidden) {
@@ -240,7 +283,10 @@ searchInput.addEventListener("input", onSearchInput);
 searchInput.addEventListener("search", onSearchCommit);
 searchInput.addEventListener("change", onSearchCommit);
 sortSelect.addEventListener("change", onSortChange);
-showHiddenInput.addEventListener("change", render);
+showHiddenInput.addEventListener("change", () => {
+  refreshBookOrderDialogIfOpen();
+  render();
+});
 
 loadWantList();
 restoreCollectionSourcePreference();
@@ -251,6 +297,7 @@ loadOwnCollectionIds();
 loadHeaderFiltersPreference();
 updateHeaderFiltersState();
 restoreSortPreference();
+updateSortControlVisibility();
 
 if (headerFiltersToggle) {
   headerFiltersToggle.addEventListener("click", () => {

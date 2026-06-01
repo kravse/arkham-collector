@@ -10,7 +10,7 @@ A visual catalog for collectors and readers of [Arkham House](https://en.wikiped
 
 | | |
 |---|---|
-| **Search & sort** | Full grid by title, author, or publication date |
+| **Search & sort** | Search the grid; deploy uses fixed publication-date order with same-date tiebreaks from `book-order.js` |
 | **Filters** | Collection, want list, Mycroft & Moran imprint, decade |
 | **Book detail** | Cover, description, cover artist, **W** / **G** links, **Collect** and want toggles |
 | **Your data** | Stored in `localStorage` on your device only—nothing uploaded |
@@ -61,8 +61,13 @@ npm run build && open build/index.html   # read-only static site (matches deploy
 |-------|--------|----------------|
 | Scraped | `data/books.json`, `books.js`, `descriptions.js` | Crawler & sync scripts |
 | Overrides | `data/edits.json` | Dev server (`npm run serve`) only |
+| Display order | `data/book-order.json`, `book-order.js` | Dev server **Reorder** dialog (`npm run serve`) only |
 
-At load time, [`js/book-edits.js`](js/book-edits.js) merges scraped rows with edits; only differing fields are stored in `edits.json` so re-crawls can refresh untouched fields.
+At load time, [`js/book-edits.js`](js/book-edits.js) merges scraped rows with edits; only differing fields are stored in `edits.json` so re-crawls can refresh untouched fields. The grid is sorted by publication date (season-aware); [`data/book-order.js`](data/book-order.js) breaks ties only among books with the same date. Visitors on the built site cannot change order.
+
+**Reorder books (maintainers):** With `npm run serve`, use **Reorder** in the header. The list shows all non-deleted titles (respecting **Show hidden**). Move a title up or down only within the same publication date. Save writes `data/book-order.json` and regenerates `book-order.js`; run `npm run build` to ship the order to the live site.
+
+**Dev API:** `GET /api/book-order` returns the normalized id list; `PUT /api/book-order` with `{ "order": [ … ] }` saves it (400 if order breaks date sequence or omits books).
 
 **Sample collection in builds:** [`my_collection/my_collection.csv`](my_collection/my_collection.csv) is the maintainer demo list (not visitors’ personal collections). `build` and `serve` sync it to `collection.js` and ship cache-busted `my_collection.<hash>.csv` + `collection.<hash>.js` in `build/`.
 
@@ -137,7 +142,7 @@ Entry point: `node scripts/index.js`. Common flags: `--yes`, `--local`, `--limit
 | `my_collection/` | Maintainer sample CSV + `collection.js` |
 | `scripts/` | Crawler CLI (`index.js`, `lib/`, `tasks/`) |
 | `build/` | Generated deploy output |
-| `server.js` | Dev API for edits and uploads |
+| `server.js` | Dev API for edits, uploads, and book order |
 
 Vanilla HTML/CSS/JS—no TypeScript or app framework. Dependencies: **cheerio**, **express**, **multer**.
 

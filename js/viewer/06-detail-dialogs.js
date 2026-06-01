@@ -42,6 +42,7 @@ async function checkServeSupport() {
     serveEnabled = false;
     hiddenOnly = false;
     showHiddenWrap.hidden = true;
+    updateSortControlVisibility();
     return;
   }
 
@@ -64,6 +65,7 @@ async function checkServeSupport() {
   }
 
   showHiddenWrap.hidden = !serveEnabled;
+  updateSortControlVisibility();
   refreshDetailToolbarIfOpen();
 }
 
@@ -225,19 +227,7 @@ function collectionRowsForExport() {
   const ids = activeCollectionIds();
   return getActiveBooks()
     .filter((book) => ids.has(book.id))
-    .sort((a, b) => {
-      const yearA = parseSortYear(a.publicationDate);
-      const yearB = parseSortYear(b.publicationDate);
-      if (yearA == null && yearB == null) {
-        return (a.title || "").localeCompare(b.title || "");
-      }
-      if (yearA == null) return 1;
-      if (yearB == null) return -1;
-      if (yearA !== yearB) {
-        return yearA - yearB;
-      }
-      return (a.title || "").localeCompare(b.title || "");
-    })
+    .sort(compareCanonical)
     .map((book) => [
       book.title || book.listTitle || "Untitled",
       book.author || "",

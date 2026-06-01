@@ -55,6 +55,10 @@ const PARTS = [
     end: 1726,
   },
   {
+    file: "09-order.js",
+    title: "Admin book order dialog",
+  },
+  {
     file: "08-init.js",
     title: "Event listeners and application startup",
     start: 1727,

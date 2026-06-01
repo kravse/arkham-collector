@@ -9,6 +9,13 @@ const stats = document.getElementById("stats");
 const searchInput = document.getElementById("search");
 const searchClearBtn = document.getElementById("search-clear");
 const sortSelect = document.getElementById("sort");
+const sortControlWrap = document.getElementById("sort-control-wrap");
+const bookOrderBtn = document.getElementById("book-order-btn");
+const bookOrderDialog = document.getElementById("book-order-dialog");
+const bookOrderCloseBtn = document.getElementById("book-order-close");
+const bookOrderCancelBtn = document.getElementById("book-order-cancel");
+const bookOrderSaveBtn = document.getElementById("book-order-save");
+const bookOrderList = document.getElementById("book-order-list");
 const editDialog = document.getElementById("edit-dialog");
 const editBookForm = document.getElementById("edit-book-form");
 const editCancelBtn = document.getElementById("edit-cancel");
@@ -113,6 +120,33 @@ let highlightWants = true;
 let highlightCollection = true;
 let showMagazines = false;
 let detailBookId = null;
+let bookOrderIds = Array.isArray(window.BOOK_ORDER)
+  ? window.BOOK_ORDER.map((id) => Number(id))
+  : [];
+let bookOrderIndex = new Map();
+let workingBookOrder = [];
+let bookOrderDirty = false;
+
+function rebuildBookOrderIndex() {
+  bookOrderIndex = new Map(bookOrderIds.map((id, index) => [id, index]));
+}
+
+function setBookOrderIds(next) {
+  bookOrderIds = next.map((id) => Number(id));
+  rebuildBookOrderIndex();
+  invalidateSortedCache();
+}
+
+rebuildBookOrderIndex();
+
+function updateSortControlVisibility() {
+  if (sortControlWrap) {
+    sortControlWrap.hidden = readOnly || serveEnabled;
+  }
+  if (bookOrderBtn) {
+    bookOrderBtn.hidden = !serveEnabled;
+  }
+}
 
 function useOwnCollection() {
   return collectionSource === "own";
