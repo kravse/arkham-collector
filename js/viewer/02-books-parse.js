@@ -8,17 +8,7 @@ books.forEach((book) => {
 });
 
 function prepareBookSearchIndex(book) {
-  book._searchHaystack = [
-    book.title,
-    book.author,
-    book.coverArtist,
-    book.publicationDate,
-    book.decade,
-    book.listAuthor,
-  ]
-    .filter(Boolean)
-    .join(" ")
-    .toLowerCase();
+  viewerFilters.prepareBookSearchIndex(book);
 }
 
 function getBookDescription(book) {
@@ -91,25 +81,15 @@ function decadeFromYear(year) {
   return `${Math.floor(value / 10) * 10}s`;
 }
 
-const SAMPLER_ISSUE_TITLE_RE = /^The Arkham Sampler \(Vol\. [IV]+, No\. \d+\)$/;
-const COLLECTOR_ISSUE_TITLE_RE = /^The Arkham Collector \(No\. \d+\)$/;
-
 function isMagazineIssue(book) {
-  const listTitle = String(book?.listTitle || "").trim();
-  const title = String(book?.title || "").trim();
-
-  if (listTitle === "The Arkham Sampler") {
-    return SAMPLER_ISSUE_TITLE_RE.test(title);
-  }
-  if (listTitle === "The Arkham Collector") {
-    return COLLECTOR_ISSUE_TITLE_RE.test(title);
-  }
-  return false;
+  return viewerFilters.isMagazineIssue(book);
 }
 
 function passesHiddenVisibility(book) {
-  const showHidden = showHiddenInput.checked;
-  return hiddenOnly ? book.hidden : showHidden || !book.hidden;
+  return viewerFilters.passesHiddenVisibility(book, {
+    hiddenOnly,
+    showHidden: showHiddenInput.checked,
+  });
 }
 
 function hasVisibleMagazineIssues() {
@@ -127,28 +107,23 @@ function isMycroftHiddenFilter() {
 }
 
 function passesMycroftImprintFilter(book) {
-  if (mycroftFilterMode === "only") {
-    return book.imprint === "mycroft_moran";
-  }
-  if (mycroftFilterMode === "hidden") {
-    return book.imprint !== "mycroft_moran";
-  }
-  return true;
+  return viewerFilters.passesMycroftImprintFilter(book, mycroftFilterMode);
 }
 
 function cycleMycroftFilter() {
-  if (mycroftFilterMode === null) {
-    mycroftFilterMode = "only";
-  } else if (mycroftFilterMode === "only") {
-    mycroftFilterMode = "hidden";
-  } else {
-    mycroftFilterMode = null;
-  }
+  mycroftFilterMode = viewerFilters.cycleMycroftFilter(mycroftFilterMode);
 }
 
 function hasAnyOrderedBooks() {
-  return getActiveBooks().some(
-    (book) => passesBookVisibility(book) && isOrdered(book),
+  return viewerFilters.hasAnyOrderedBooks(
+    getActiveBooks(),
+    activeCollectionIds(),
+    orderedIds,
+    {
+      hiddenOnly,
+      showHidden: showHiddenInput.checked,
+      showMagazines,
+    },
   );
 }
 
@@ -165,38 +140,27 @@ function isOrderedFilterActive() {
 }
 
 function passesCollectionFilter(book) {
-  if (collectionFilterMode === "collection") {
-    return isInCollection(book);
-  }
-  if (collectionFilterMode === "ordered") {
-    return isOrdered(book);
-  }
-  return true;
+  return viewerFilters.passesCollectionFilter(
+    book,
+    collectionFilterMode,
+    activeCollectionIds(),
+    orderedIds,
+  );
 }
 
 function cycleCollectionFilter() {
-  if (hasAnyOrderedBooks()) {
-    if (collectionFilterMode === null) {
-      collectionFilterMode = "collection";
-    } else if (collectionFilterMode === "collection") {
-      collectionFilterMode = "ordered";
-    } else {
-      collectionFilterMode = null;
-    }
-  } else {
-    collectionFilterMode =
-      collectionFilterMode === "collection" ? null : "collection";
-  }
+  collectionFilterMode = viewerFilters.cycleCollectionFilter(
+    collectionFilterMode,
+    hasAnyOrderedBooks(),
+  );
 }
 
 function passesBookVisibility(book) {
-  if (!passesHiddenVisibility(book)) {
-    return false;
-  }
-  if (isMagazineIssue(book) && !showMagazines) {
-    return false;
-  }
-  return true;
+  return viewerFilters.passesBookVisibility(book, {
+    hiddenOnly,
+    showHidden: showHiddenInput.checked,
+    showMagazines,
+  });
 }
 
 function parseCollection(csvText) {
@@ -264,11 +228,11 @@ function findCollectionMatch(book) {
 }
 
 function isCollected(book) {
-  return activeCollectionIds().has(book.id);
+  return viewerFilters.isCollected(book, activeCollectionIds());
 }
 
 function isOrdered(book) {
-  return orderedIds.has(book.id) && !isCollected(book);
+  return viewerFilters.isOrdered(book, activeCollectionIds(), orderedIds);
 }
 
 function getCollectionItem(book) {
@@ -282,7 +246,11 @@ function getCollectionItem(book) {
 }
 
 function isInCollection(book) {
-  return isCollected(book) || isOrdered(book);
+  return viewerFilters.isInCollection(
+    book,
+    activeCollectionIds(),
+    orderedIds,
+  );
 }
 
 function exportableCollectionIds() {

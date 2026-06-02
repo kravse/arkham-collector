@@ -64,11 +64,14 @@ const editIcon = `
     `;
 
 function isViewingOnDevServer() {
-  return !readOnly && window.location.protocol !== "file:";
+  return viewerMode.shouldRenderDetailEditButton({
+    readOnly,
+    protocol: window.location.protocol,
+  });
 }
 
 function renderEditButton(book, className = "edit-book-btn") {
-  if (!serveEnabled) {
+  if (!viewerMode.shouldRenderCardEditButton(serveEnabled)) {
     return "";
   }
 

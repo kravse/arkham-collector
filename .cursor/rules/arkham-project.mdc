@@ -38,6 +38,8 @@ Do not edit the plan files in `.cursor/plans/` for this — only `README.md`. Ke
 | `build.js` → `build/` | Static site (`npm run build`): read-only viewer, `css/viewer.css`, slim books + descriptions JS, no `books.json` in deploy |
 | `server.js` | Dev server with PATCH/upload (`npm run serve`, port 8742) |
 | `my_script.js` | Thin wrapper → `scripts/index.js` (backward compat only) |
+| `test/` | Node tests (`npm test`); `test/fixtures/` for small JSON fixtures |
+| `scripts/lib/viewer-*.js` | Testable viewer domain logic; synced into `js/viewer/00-viewer-*.js` on bundle |
 
 ## CSS
 
@@ -86,6 +88,34 @@ App logic lives in `js/viewer/` (eight topic files, one shared IIFE) and ships a
 
 `js/book-edits.js` merges `window.BOOKS` with `window.BOOK_EDITS` at startup. Linked from `viewer.html`, copied in `build.js` via `copyDirectory("js")`.
 
+Viewer domain logic that affects behavior (sort, filters, collection state, parsing helpers, etc.) belongs in `scripts/lib/` as pure CommonJS, tested under `test/`, then wired into the viewer via generated `js/viewer/00-*.js` partials (`scripts/sync-viewer-*.js`, run by `npm run bundle-viewer`). Do not leave behavior-only logic untested in `js/viewer/` alone.
+
+## Tests (required for relevant features)
+
+**Always add or update tests** when you change behavior in any of these areas (same task / same PR — do not defer):
+
+- `scripts/lib/` domain logic (crawler parsing, book order, edits, collection matching, viewer sort/filters, etc.)
+- `server.js` API or validation rules
+- Data transforms, merge rules, or export formats
+- Viewer features with non-trivial state machines (filters, sort modes, collection cycles, etc.)
+
+Skip tests only for purely visual/CSS tweaks, copy/markup-only edits, or one-line fixes with no behavior change. When in doubt, add a focused test.
+
+**How to test**
+
+- Runner: Node built-in `node:test` + `node:assert/strict` — no new test frameworks or devDependencies
+- Command: `npm test` (runs `test/**/*.test.js`)
+- Location: `test/<topic>.test.js`; shared fixtures in `test/fixtures/`
+- Scripts: put testable logic in `scripts/lib/<name>.js`, export pure functions, `require()` from tests
+- Viewer: shared module in `scripts/lib/viewer-*.js` → `scripts/sync-viewer-*.js` → `js/viewer/00-viewer-*.js`; viewer partials call `viewerSort` / `viewerFilters` / etc.; run `npm run bundle-viewer` after changes
+- After adding tests or scripts: update `README.md` `npm test` row if workflow changed
+
+**Test quality**
+
+- Cover happy path and important edge cases (empty input, toggles/cycles, mutually exclusive states)
+- Prefer small inline book/object fixtures over loading full `data/books.json` unless integration coverage is the point
+- Keep tests readable: one behavior per test, descriptive names
+
 ## Data and build workflow
 
 - Edit books in browser via `npm run serve` (writes `data/edits.json`, including `hidden`, `deleted`, etc.); run targeted syncs when possible
@@ -102,4 +132,4 @@ App logic lives in `js/viewer/` (eight topic files, one shared IIFE) and ships a
 - Minimize diff scope; don't refactor unrelated code
 - Match naming, formatting, and abstractions of surrounding files
 - Comments only for non-obvious logic
-- Add tests only when requested or clearly valuable
+- Add tests for relevant behavior changes (see **Tests** above); run `npm test` before finishing

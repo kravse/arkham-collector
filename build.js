@@ -306,8 +306,17 @@ function buildStaticSite() {
 }
 
 try {
-  buildStaticSite();
+  if (require.main === module) {
+    buildStaticSite();
+  }
 } catch (error) {
   console.error(error.message || error);
   process.exit(1);
 }
+
+module.exports = {
+  applyBuildHtmlTransforms,
+  buildStaticSite,
+  VIEWER_CSS_FILES,
+  DEPLOY_ORIGIN,
+};

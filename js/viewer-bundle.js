@@ -146,11 +146,8 @@ function setBookOrderIds(next) {
 rebuildBookOrderIndex();
 
 function updateSortControlVisibility() {
-  if (sortControlWrap) {
-    sortControlWrap.hidden = readOnly || serveEnabled;
-  }
   if (bookOrderBtn) {
-    bookOrderBtn.hidden = !serveEnabled;
+    bookOrderBtn.hidden = !viewerMode.shouldShowBookOrderButton(serveEnabled);
   }
 }
 
@@ -326,6 +323,271 @@ function hideResetSampleConfirm() {
 }
 
 
+/* Generated from scripts/lib/viewer-mode.js — run npm run bundle-viewer */
+
+const viewerMode = (function () {
+  const SERVE_ONLY_UI_KEYS = [
+    "bookOrderButton",
+    "showHiddenToggle",
+    "hiddenStatFilter",
+    "cardEditButton",
+    "detailEditButton",
+  ];
+  
+  function resolveServeEnabled({ readOnly, healthCheckOk = false }) {
+    if (readOnly === true) {
+      return false;
+    }
+    return healthCheckOk === true;
+  }
+  
+  function shouldShowBookOrderButton(serveEnabled) {
+    return serveEnabled === true;
+  }
+  
+  function shouldShowShowHiddenToggle(serveEnabled) {
+    return serveEnabled === true;
+  }
+  
+  function shouldShowHiddenStatFilter(serveEnabled, hiddenCount) {
+    return serveEnabled === true && hiddenCount > 0;
+  }
+  
+  function shouldRenderCardEditButton(serveEnabled) {
+    return serveEnabled === true;
+  }
+  
+  function shouldRenderDetailEditButton({ readOnly, protocol }) {
+    return readOnly !== true && protocol !== "file:";
+  }
+  
+  function serveOnlyUiVisibility(options = {}) {
+    const {
+      readOnly = false,
+      serveEnabled = false,
+      hiddenCount = 0,
+      protocol = "https:",
+    } = options;
+    const effectiveServeEnabled = resolveServeEnabled({
+      readOnly,
+      healthCheckOk: serveEnabled,
+    });
+  
+    return {
+      bookOrderButton: shouldShowBookOrderButton(effectiveServeEnabled),
+      showHiddenToggle: shouldShowShowHiddenToggle(effectiveServeEnabled),
+      hiddenStatFilter: shouldShowHiddenStatFilter(
+        effectiveServeEnabled,
+        hiddenCount,
+      ),
+      cardEditButton: shouldRenderCardEditButton(effectiveServeEnabled),
+      detailEditButton: shouldRenderDetailEditButton({ readOnly, protocol }),
+    };
+  }
+  
+  function buildUiVisibility(options = {}) {
+    return serveOnlyUiVisibility({
+      readOnly: true,
+      serveEnabled: false,
+      ...options,
+    });
+  }
+  
+  function serveUiVisibility(options = {}) {
+    return serveOnlyUiVisibility({
+      readOnly: false,
+      serveEnabled: true,
+      ...options,
+    });
+  }
+  return {
+    resolveServeEnabled,
+    shouldShowBookOrderButton,
+    shouldShowShowHiddenToggle,
+    shouldShowHiddenStatFilter,
+    shouldRenderCardEditButton,
+    shouldRenderDetailEditButton,
+    serveOnlyUiVisibility,
+    buildUiVisibility,
+    serveUiVisibility,
+  };
+})();
+
+
+/* Generated from scripts/lib/viewer-filters.js — run npm run bundle-viewer */
+
+const viewerFilters = (function () {
+  const SAMPLER_ISSUE_TITLE_RE = /^The Arkham Sampler \(Vol\. [IV]+, No\. \d+\)$/;
+  const COLLECTOR_ISSUE_TITLE_RE = /^The Arkham Collector \(No\. \d+\)$/;
+  
+  function prepareBookSearchIndex(book) {
+    book._searchHaystack = [
+      book.title,
+      book.author,
+      book.coverArtist,
+      book.publicationDate,
+      book.decade,
+      book.listAuthor,
+    ]
+      .filter(Boolean)
+      .join(" ")
+      .toLowerCase();
+  }
+  
+  function matchesSearch(book, query) {
+    if (!query) {
+      return true;
+    }
+    return (book._searchHaystack || "").includes(String(query).toLowerCase());
+  }
+  
+  function isMagazineIssue(book) {
+    const listTitle = String(book?.listTitle || "").trim();
+    const title = String(book?.title || "").trim();
+  
+    if (listTitle === "The Arkham Sampler") {
+      return SAMPLER_ISSUE_TITLE_RE.test(title);
+    }
+    if (listTitle === "The Arkham Collector") {
+      return COLLECTOR_ISSUE_TITLE_RE.test(title);
+    }
+    return false;
+  }
+  
+  function passesHiddenVisibility(book, { hiddenOnly, showHidden }) {
+    return hiddenOnly ? book.hidden : showHidden || !book.hidden;
+  }
+  
+  function passesBookVisibility(book, { hiddenOnly, showHidden, showMagazines }) {
+    if (!passesHiddenVisibility(book, { hiddenOnly, showHidden })) {
+      return false;
+    }
+    if (isMagazineIssue(book) && !showMagazines) {
+      return false;
+    }
+    return true;
+  }
+  
+  function passesMycroftImprintFilter(book, mycroftFilterMode) {
+    if (mycroftFilterMode === "only") {
+      return book.imprint === "mycroft_moran";
+    }
+    if (mycroftFilterMode === "hidden") {
+      return book.imprint !== "mycroft_moran";
+    }
+    return true;
+  }
+  
+  function isCollected(book, collectedIds) {
+    return collectedIds.has(book.id);
+  }
+  
+  function isOrdered(book, collectedIds, orderedIds) {
+    return orderedIds.has(book.id) && !isCollected(book, collectedIds);
+  }
+  
+  function isInCollection(book, collectedIds, orderedIds) {
+    return isCollected(book, collectedIds) || isOrdered(book, collectedIds, orderedIds);
+  }
+  
+  function passesCollectionFilter(
+    book,
+    collectionFilterMode,
+    collectedIds,
+    orderedIds,
+  ) {
+    if (collectionFilterMode === "collection") {
+      return isInCollection(book, collectedIds, orderedIds);
+    }
+    if (collectionFilterMode === "ordered") {
+      return isOrdered(book, collectedIds, orderedIds);
+    }
+    return true;
+  }
+  
+  function passesWantFilter(book, wantOnly, wantIds) {
+    return !wantOnly || wantIds.has(book.id);
+  }
+  
+  function filterVisibleBooks(books, options) {
+    const {
+      hiddenOnly,
+      showHidden,
+      showMagazines,
+      mycroftFilterMode,
+      collectionFilterMode,
+      wantOnly,
+      collectedIds,
+      orderedIds,
+      wantIds,
+      searchQuery = "",
+    } = options;
+  
+    return books.filter(
+      (book) =>
+        passesBookVisibility(book, { hiddenOnly, showHidden, showMagazines }) &&
+        passesMycroftImprintFilter(book, mycroftFilterMode) &&
+        passesCollectionFilter(
+          book,
+          collectionFilterMode,
+          collectedIds,
+          orderedIds,
+        ) &&
+        passesWantFilter(book, wantOnly, wantIds) &&
+        matchesSearch(book, searchQuery),
+    );
+  }
+  
+  function cycleMycroftFilter(mycroftFilterMode) {
+    if (mycroftFilterMode === null) {
+      return "only";
+    }
+    if (mycroftFilterMode === "only") {
+      return "hidden";
+    }
+    return null;
+  }
+  
+  function cycleCollectionFilter(collectionFilterMode, hasAnyOrderedBooks) {
+    if (hasAnyOrderedBooks) {
+      if (collectionFilterMode === null) {
+        return "collection";
+      }
+      if (collectionFilterMode === "collection") {
+        return "ordered";
+      }
+      return null;
+    }
+    return collectionFilterMode === "collection" ? null : "collection";
+  }
+  
+  function hasAnyOrderedBooks(books, collectedIds, orderedIds, visibilityOptions) {
+    return books.some(
+      (book) =>
+        passesBookVisibility(book, visibilityOptions) &&
+        isOrdered(book, collectedIds, orderedIds),
+    );
+  }
+  return {
+    prepareBookSearchIndex,
+    matchesSearch,
+    isMagazineIssue,
+    passesHiddenVisibility,
+    passesBookVisibility,
+    passesMycroftImprintFilter,
+    isCollected,
+    isOrdered,
+    isInCollection,
+    passesCollectionFilter,
+    passesWantFilter,
+    filterVisibleBooks,
+    cycleMycroftFilter,
+    cycleCollectionFilter,
+    hasAnyOrderedBooks,
+  };
+})();
+
+
 /* Book list helpers and CSV / title parsing */
 
 books.forEach((book) => {
@@ -336,17 +598,7 @@ books.forEach((book) => {
 });
 
 function prepareBookSearchIndex(book) {
-  book._searchHaystack = [
-    book.title,
-    book.author,
-    book.coverArtist,
-    book.publicationDate,
-    book.decade,
-    book.listAuthor,
-  ]
-    .filter(Boolean)
-    .join(" ")
-    .toLowerCase();
+  viewerFilters.prepareBookSearchIndex(book);
 }
 
 function getBookDescription(book) {
@@ -419,25 +671,15 @@ function decadeFromYear(year) {
   return `${Math.floor(value / 10) * 10}s`;
 }
 
-const SAMPLER_ISSUE_TITLE_RE = /^The Arkham Sampler \(Vol\. [IV]+, No\. \d+\)$/;
-const COLLECTOR_ISSUE_TITLE_RE = /^The Arkham Collector \(No\. \d+\)$/;
-
 function isMagazineIssue(book) {
-  const listTitle = String(book?.listTitle || "").trim();
-  const title = String(book?.title || "").trim();
-
-  if (listTitle === "The Arkham Sampler") {
-    return SAMPLER_ISSUE_TITLE_RE.test(title);
-  }
-  if (listTitle === "The Arkham Collector") {
-    return COLLECTOR_ISSUE_TITLE_RE.test(title);
-  }
-  return false;
+  return viewerFilters.isMagazineIssue(book);
 }
 
 function passesHiddenVisibility(book) {
-  const showHidden = showHiddenInput.checked;
-  return hiddenOnly ? book.hidden : showHidden || !book.hidden;
+  return viewerFilters.passesHiddenVisibility(book, {
+    hiddenOnly,
+    showHidden: showHiddenInput.checked,
+  });
 }
 
 function hasVisibleMagazineIssues() {
@@ -455,28 +697,23 @@ function isMycroftHiddenFilter() {
 }
 
 function passesMycroftImprintFilter(book) {
-  if (mycroftFilterMode === "only") {
-    return book.imprint === "mycroft_moran";
-  }
-  if (mycroftFilterMode === "hidden") {
-    return book.imprint !== "mycroft_moran";
-  }
-  return true;
+  return viewerFilters.passesMycroftImprintFilter(book, mycroftFilterMode);
 }
 
 function cycleMycroftFilter() {
-  if (mycroftFilterMode === null) {
-    mycroftFilterMode = "only";
-  } else if (mycroftFilterMode === "only") {
-    mycroftFilterMode = "hidden";
-  } else {
-    mycroftFilterMode = null;
-  }
+  mycroftFilterMode = viewerFilters.cycleMycroftFilter(mycroftFilterMode);
 }
 
 function hasAnyOrderedBooks() {
-  return getActiveBooks().some(
-    (book) => passesBookVisibility(book) && isOrdered(book),
+  return viewerFilters.hasAnyOrderedBooks(
+    getActiveBooks(),
+    activeCollectionIds(),
+    orderedIds,
+    {
+      hiddenOnly,
+      showHidden: showHiddenInput.checked,
+      showMagazines,
+    },
   );
 }
 
@@ -493,38 +730,27 @@ function isOrderedFilterActive() {
 }
 
 function passesCollectionFilter(book) {
-  if (collectionFilterMode === "collection") {
-    return isInCollection(book);
-  }
-  if (collectionFilterMode === "ordered") {
-    return isOrdered(book);
-  }
-  return true;
+  return viewerFilters.passesCollectionFilter(
+    book,
+    collectionFilterMode,
+    activeCollectionIds(),
+    orderedIds,
+  );
 }
 
 function cycleCollectionFilter() {
-  if (hasAnyOrderedBooks()) {
-    if (collectionFilterMode === null) {
-      collectionFilterMode = "collection";
-    } else if (collectionFilterMode === "collection") {
-      collectionFilterMode = "ordered";
-    } else {
-      collectionFilterMode = null;
-    }
-  } else {
-    collectionFilterMode =
-      collectionFilterMode === "collection" ? null : "collection";
-  }
+  collectionFilterMode = viewerFilters.cycleCollectionFilter(
+    collectionFilterMode,
+    hasAnyOrderedBooks(),
+  );
 }
 
 function passesBookVisibility(book) {
-  if (!passesHiddenVisibility(book)) {
-    return false;
-  }
-  if (isMagazineIssue(book) && !showMagazines) {
-    return false;
-  }
-  return true;
+  return viewerFilters.passesBookVisibility(book, {
+    hiddenOnly,
+    showHidden: showHiddenInput.checked,
+    showMagazines,
+  });
 }
 
 function parseCollection(csvText) {
@@ -592,11 +818,11 @@ function findCollectionMatch(book) {
 }
 
 function isCollected(book) {
-  return activeCollectionIds().has(book.id);
+  return viewerFilters.isCollected(book, activeCollectionIds());
 }
 
 function isOrdered(book) {
-  return orderedIds.has(book.id) && !isCollected(book);
+  return viewerFilters.isOrdered(book, activeCollectionIds(), orderedIds);
 }
 
 function getCollectionItem(book) {
@@ -610,7 +836,11 @@ function getCollectionItem(book) {
 }
 
 function isInCollection(book) {
-  return isCollected(book) || isOrdered(book);
+  return viewerFilters.isInCollection(
+    book,
+    activeCollectionIds(),
+    orderedIds,
+  );
 }
 
 function exportableCollectionIds() {
@@ -960,46 +1190,113 @@ function getCollectionCount() {
 }
 
 
+/* Generated from scripts/lib/viewer-sort.js — run npm run bundle-viewer */
+
+const viewerSort = (function () {
+  function parseYear(value) {
+    if (!value) {
+      return null;
+    }
+    const match = String(value).match(/\d{4}/);
+    return match ? match[0] : null;
+  }
+  
+  function buildBookOrderIndex(orderIds) {
+    return new Map(orderIds.map((id, index) => [Number(id), index]));
+  }
+  
+  function compareOrderTiebreak(a, b, bookOrderIndex) {
+    const indexA = bookOrderIndex.has(a.id) ? bookOrderIndex.get(a.id) : a.id;
+    const indexB = bookOrderIndex.has(b.id) ? bookOrderIndex.get(b.id) : b.id;
+    if (indexA !== indexB) {
+      return indexA - indexB;
+    }
+    return a.id - b.id;
+  }
+  
+  function compareCanonical(a, b, bookOrderIndex) {
+    const yearA = parseYear(a.publicationDate);
+    const yearB = parseYear(b.publicationDate);
+    if (yearA == null && yearB == null) {
+      return compareOrderTiebreak(a, b, bookOrderIndex);
+    }
+    if (yearA == null) {
+      return 1;
+    }
+    if (yearB == null) {
+      return -1;
+    }
+    if (yearA !== yearB) {
+      return yearA - yearB;
+    }
+    return compareOrderTiebreak(a, b, bookOrderIndex);
+  }
+  
+  function sortBooks(list, mode, bookOrderIndex) {
+    const copy = [...list];
+    if (mode === "title-asc" || mode === "title") {
+      return copy.sort((a, b) =>
+        (a.title || "").localeCompare(b.title || ""),
+      );
+    }
+    if (mode === "title-desc") {
+      return copy.sort((a, b) =>
+        (b.title || "").localeCompare(a.title || ""),
+      );
+    }
+    if (mode === "date-desc") {
+      return copy.sort((a, b) => {
+        const yearA = parseYear(a.publicationDate);
+        const yearB = parseYear(b.publicationDate);
+        if (yearA == null && yearB == null) {
+          return compareOrderTiebreak(a, b, bookOrderIndex);
+        }
+        if (yearA == null) {
+          return 1;
+        }
+        if (yearB == null) {
+          return -1;
+        }
+        if (yearA !== yearB) {
+          return yearB - yearA;
+        }
+        return compareOrderTiebreak(a, b, bookOrderIndex);
+      });
+    }
+    return copy.sort((a, b) => compareCanonical(a, b, bookOrderIndex));
+  }
+  return {
+    compareOrderTiebreak,
+    compareCanonical,
+    sortBooks,
+  };
+})();
+
+
 /* Sort, search, filters, and visible book list */
 
-let sortedActiveCache = { books: null };
+let sortedActiveCache = { mode: null, books: null };
 
 function invalidateSortedCache() {
+  sortedActiveCache.mode = null;
   sortedActiveCache.books = null;
 }
 
 function compareOrderTiebreak(a, b) {
-  const indexA = bookOrderIndex.has(a.id) ? bookOrderIndex.get(a.id) : a.id;
-  const indexB = bookOrderIndex.has(b.id) ? bookOrderIndex.get(b.id) : b.id;
-  if (indexA !== indexB) {
-    return indexA - indexB;
-  }
-  return a.id - b.id;
+  return viewerSort.compareOrderTiebreak(a, b, bookOrderIndex);
 }
 
 function compareCanonical(a, b) {
-  const yearA = parseYear(a.publicationDate);
-  const yearB = parseYear(b.publicationDate);
-  if (yearA == null && yearB == null) {
-    return compareOrderTiebreak(a, b);
-  }
-  if (yearA == null) {
-    return 1;
-  }
-  if (yearB == null) {
-    return -1;
-  }
-  if (yearA !== yearB) {
-    return yearA - yearB;
-  }
-  return compareOrderTiebreak(a, b);
+  return viewerSort.compareCanonical(a, b, bookOrderIndex);
 }
 
 function getSortedActiveBooks() {
-  if (sortedActiveCache.books) {
+  const mode = sortSelect.value;
+  if (sortedActiveCache.mode === mode && sortedActiveCache.books) {
     return sortedActiveCache.books;
   }
-  const sorted = sortBooks(getActiveBooks());
+  const sorted = sortBooks(getActiveBooks(), mode);
+  sortedActiveCache.mode = mode;
   sortedActiveCache.books = sorted;
   return sorted;
 }
@@ -1010,13 +1307,12 @@ function onSortChange() {
   render();
 }
 
-function sortBooks(list) {
-  return [...list].sort(compareCanonical);
+function sortBooks(list, mode) {
+  return viewerSort.sortBooks(list, mode, bookOrderIndex);
 }
 
 function matchesSearch(book, query) {
-  if (!query) return true;
-  return (book._searchHaystack || "").includes(query.toLowerCase());
+  return viewerFilters.matchesSearch(book, query);
 }
 
 function getStatTotal(activeBooks) {
@@ -1062,7 +1358,7 @@ function renderStats(visible, all) {
       ? `<button type="button" class="${mycroftToggleClass}" id="mycroft-filter-toggle" aria-pressed="${isMycroftOnlyFilter()}"><span class="mycroft-stat-label">MYCROFT &amp; MORAN</span></button>`
       : "",
     `<button type="button" class="stat want-stat stat-toggle${wantOnly ? " active" : ""}" id="want-filter-toggle" aria-pressed="${wantOnly}">WANT</button>`,
-    hiddenCount && serveEnabled
+    hiddenCount && viewerMode.shouldShowHiddenStatFilter(serveEnabled, hiddenCount)
       ? `<button type="button" class="stat hidden-stat stat-toggle${hiddenOnly ? " active" : ""}" id="hidden-filter-toggle" aria-pressed="${hiddenOnly}">HIDDEN</button>`
       : "",
   ]
@@ -1076,13 +1372,18 @@ function renderStats(visible, all) {
 }
 
 function getVisibleBooks() {
-  const query = searchInput.value.trim();
-  return getSortedActiveBooks()
-    .filter((book) => passesBookVisibility(book))
-    .filter((book) => passesMycroftImprintFilter(book))
-    .filter((book) => passesCollectionFilter(book))
-    .filter((book) => !wantOnly || isWanted(book))
-    .filter((book) => matchesSearch(book, query));
+  return viewerFilters.filterVisibleBooks(getSortedActiveBooks(), {
+    hiddenOnly,
+    showHidden: showHiddenInput.checked,
+    showMagazines,
+    mycroftFilterMode,
+    collectionFilterMode,
+    wantOnly,
+    collectedIds: activeCollectionIds(),
+    orderedIds,
+    wantIds,
+    searchQuery: searchInput.value.trim(),
+  });
 }
 
 
@@ -1152,11 +1453,14 @@ const editIcon = `
     `;
 
 function isViewingOnDevServer() {
-  return !readOnly && window.location.protocol !== "file:";
+  return viewerMode.shouldRenderDetailEditButton({
+    readOnly,
+    protocol: window.location.protocol,
+  });
 }
 
 function renderEditButton(book, className = "edit-book-btn") {
-  if (!serveEnabled) {
+  if (!viewerMode.shouldRenderCardEditButton(serveEnabled)) {
     return "";
   }
 
@@ -1725,7 +2029,10 @@ async function checkServeSupport() {
 
   try {
     const response = await fetch("/api/health");
-    serveEnabled = response.ok;
+    serveEnabled = viewerMode.resolveServeEnabled({
+      readOnly,
+      healthCheckOk: response.ok,
+    });
     if (serveEnabled) {
       const payload = await response.json();
       serveEditDeltas = payload.editDeltas === true;
@@ -1741,7 +2048,7 @@ async function checkServeSupport() {
     hiddenOnly = false;
   }
 
-  showHiddenWrap.hidden = !serveEnabled;
+  showHiddenWrap.hidden = !viewerMode.shouldShowShowHiddenToggle(serveEnabled);
   updateSortControlVisibility();
   refreshDetailToolbarIfOpen();
 }

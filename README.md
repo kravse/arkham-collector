@@ -10,7 +10,7 @@ A visual catalog for collectors and readers of [Arkham House](https://en.wikiped
 
 | | |
 |---|---|
-| **Search & sort** | Search the grid; deploy uses fixed year order with same-year tiebreaks from `book-order.js` |
+| **Search & sort** | Search the grid; **Sort** (oldest/newest/title) everywhere. Same-year tiebreaks from `book-order.js`; maintainers set those with **Reorder** on `npm run serve` only |
 | **Filters** | Collection, want list, Mycroft & Moran imprint, decade |
 | **Book detail** | Cover, description, cover artist, **W** / **G** links, **Collect** (Ordered → Collection), and want toggles |
 | **Your data** | Stored in `localStorage` on your device only—nothing uploaded |
@@ -98,6 +98,7 @@ Entry point: `node scripts/index.js`. Common flags: `--yes`, `--local`, `--limit
 | `serve` | Dev server on port 8742 (`PORT` to override) |
 | `build` | Static site in `build/` |
 | `bundle-viewer` | Rebuild `js/viewer-bundle.js` from `js/viewer/` |
+| `test` | Run Node tests (`test/`; sort and filter logic under `scripts/lib/`) |
 
 ### Crawl & sync
 

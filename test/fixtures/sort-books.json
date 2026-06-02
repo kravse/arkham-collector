@@ -1,0 +1,10 @@
+{
+  "books": [
+    { "id": 1, "publicationDate": "1939", "title": "Alpha 1939" },
+    { "id": 2, "publicationDate": "1939", "title": "Beta 1939" },
+    { "id": 3, "publicationDate": "1967", "title": "Summer issue" },
+    { "id": 4, "publicationDate": "1967", "title": "Fall issue" },
+    { "id": 5, "publicationDate": "1967", "title": "Winter issue" },
+    { "id": 6, "publicationDate": "1968", "title": "Only 1968" }
+  ]
+}

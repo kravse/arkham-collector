@@ -1,43 +1,27 @@
 /* Sort, search, filters, and visible book list */
 
-let sortedActiveCache = { books: null };
+let sortedActiveCache = { mode: null, books: null };
 
 function invalidateSortedCache() {
+  sortedActiveCache.mode = null;
   sortedActiveCache.books = null;
 }
 
 function compareOrderTiebreak(a, b) {
-  const indexA = bookOrderIndex.has(a.id) ? bookOrderIndex.get(a.id) : a.id;
-  const indexB = bookOrderIndex.has(b.id) ? bookOrderIndex.get(b.id) : b.id;
-  if (indexA !== indexB) {
-    return indexA - indexB;
-  }
-  return a.id - b.id;
+  return viewerSort.compareOrderTiebreak(a, b, bookOrderIndex);
 }
 
 function compareCanonical(a, b) {
-  const yearA = parseYear(a.publicationDate);
-  const yearB = parseYear(b.publicationDate);
-  if (yearA == null && yearB == null) {
-    return compareOrderTiebreak(a, b);
-  }
-  if (yearA == null) {
-    return 1;
-  }
-  if (yearB == null) {
-    return -1;
-  }
-  if (yearA !== yearB) {
-    return yearA - yearB;
-  }
-  return compareOrderTiebreak(a, b);
+  return viewerSort.compareCanonical(a, b, bookOrderIndex);
 }
 
 function getSortedActiveBooks() {
-  if (sortedActiveCache.books) {
+  const mode = sortSelect.value;
+  if (sortedActiveCache.mode === mode && sortedActiveCache.books) {
     return sortedActiveCache.books;
   }
-  const sorted = sortBooks(getActiveBooks());
+  const sorted = sortBooks(getActiveBooks(), mode);
+  sortedActiveCache.mode = mode;
   sortedActiveCache.books = sorted;
   return sorted;
 }
@@ -48,13 +32,12 @@ function onSortChange() {
   render();
 }
 
-function sortBooks(list) {
-  return [...list].sort(compareCanonical);
+function sortBooks(list, mode) {
+  return viewerSort.sortBooks(list, mode, bookOrderIndex);
 }
 
 function matchesSearch(book, query) {
-  if (!query) return true;
-  return (book._searchHaystack || "").includes(query.toLowerCase());
+  return viewerFilters.matchesSearch(book, query);
 }
 
 function getStatTotal(activeBooks) {
@@ -100,7 +83,7 @@ function renderStats(visible, all) {
       ? `<button type="button" class="${mycroftToggleClass}" id="mycroft-filter-toggle" aria-pressed="${isMycroftOnlyFilter()}"><span class="mycroft-stat-label">MYCROFT &amp; MORAN</span></button>`
       : "",
     `<button type="button" class="stat want-stat stat-toggle${wantOnly ? " active" : ""}" id="want-filter-toggle" aria-pressed="${wantOnly}">WANT</button>`,
-    hiddenCount && serveEnabled
+    hiddenCount && viewerMode.shouldShowHiddenStatFilter(serveEnabled, hiddenCount)
       ? `<button type="button" class="stat hidden-stat stat-toggle${hiddenOnly ? " active" : ""}" id="hidden-filter-toggle" aria-pressed="${hiddenOnly}">HIDDEN</button>`
       : "",
   ]
@@ -114,11 +97,16 @@ function renderStats(visible, all) {
 }
 
 function getVisibleBooks() {
-  const query = searchInput.value.trim();
-  return getSortedActiveBooks()
-    .filter((book) => passesBookVisibility(book))
-    .filter((book) => passesMycroftImprintFilter(book))
-    .filter((book) => passesCollectionFilter(book))
-    .filter((book) => !wantOnly || isWanted(book))
-    .filter((book) => matchesSearch(book, query));
+  return viewerFilters.filterVisibleBooks(getSortedActiveBooks(), {
+    hiddenOnly,
+    showHidden: showHiddenInput.checked,
+    showMagazines,
+    mycroftFilterMode,
+    collectionFilterMode,
+    wantOnly,
+    collectedIds: activeCollectionIds(),
+    orderedIds,
+    wantIds,
+    searchQuery: searchInput.value.trim(),
+  });
 }

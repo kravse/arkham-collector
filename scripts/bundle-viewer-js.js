@@ -5,6 +5,9 @@
  */
 const fs = require("fs");
 const path = require("path");
+const { syncViewerSort } = require("./sync-viewer-sort");
+const { syncViewerFilters } = require("./sync-viewer-filters");
+const { syncViewerMode } = require("./sync-viewer-mode");
 
 const ROOT = path.join(__dirname, "..");
 const VIEWER_DIR = path.join(ROOT, "js", "viewer");
@@ -19,6 +22,14 @@ const PARTS = [
     prefix: '(function () {\n  "use strict";\n\n',
   },
   {
+    file: "00-viewer-mode.js",
+    title: "Shared read-only vs serve visibility (generated from scripts/lib/viewer-mode.js)",
+  },
+  {
+    file: "00-viewer-filters.js",
+    title: "Shared filter helpers (generated from scripts/lib/viewer-filters.js)",
+  },
+  {
     file: "02-books-parse.js",
     title: "Book list helpers and CSV / title parsing",
     start: 163,
@@ -29,6 +40,10 @@ const PARTS = [
     title: "Sample and own collection, want list, localStorage",
     start: 326,
     end: 586,
+  },
+  {
+    file: "00-viewer-sort.js",
+    title: "Shared sort helpers (generated from scripts/lib/viewer-sort.js)",
   },
   {
     file: "04-catalog.js",
@@ -96,6 +111,9 @@ function writeBundle() {
 }
 
 function bundleViewerJs() {
+  syncViewerSort();
+  syncViewerFilters();
+  syncViewerMode();
   if (!fs.existsSync(BODY)) {
     const partials = PARTS.map((p) => path.join(VIEWER_DIR, p.file));
     if (partials.every((file) => fs.existsSync(file))) {

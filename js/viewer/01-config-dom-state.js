@@ -146,11 +146,8 @@ function setBookOrderIds(next) {
 rebuildBookOrderIndex();
 
 function updateSortControlVisibility() {
-  if (sortControlWrap) {
-    sortControlWrap.hidden = readOnly || serveEnabled;
-  }
   if (bookOrderBtn) {
-    bookOrderBtn.hidden = !serveEnabled;
+    bookOrderBtn.hidden = !viewerMode.shouldShowBookOrderButton(serveEnabled);
   }
 }
 

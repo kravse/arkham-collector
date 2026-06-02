@@ -48,7 +48,10 @@ async function checkServeSupport() {
 
   try {
     const response = await fetch("/api/health");
-    serveEnabled = response.ok;
+    serveEnabled = viewerMode.resolveServeEnabled({
+      readOnly,
+      healthCheckOk: response.ok,
+    });
     if (serveEnabled) {
       const payload = await response.json();
       serveEditDeltas = payload.editDeltas === true;
@@ -64,7 +67,7 @@ async function checkServeSupport() {
     hiddenOnly = false;
   }
 
-  showHiddenWrap.hidden = !serveEnabled;
+  showHiddenWrap.hidden = !viewerMode.shouldShowShowHiddenToggle(serveEnabled);
   updateSortControlVisibility();
   refreshDetailToolbarIfOpen();
 }
