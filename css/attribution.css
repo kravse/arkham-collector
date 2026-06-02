@@ -127,6 +127,12 @@ body {
   color: rgba(232, 234, 237, 0.55);
 }
 
+.attribution-dialog-feedback {
+  margin: 0;
+  font-size: 0.78rem;
+  color: rgba(232, 234, 237, 0.62);
+}
+
 .attribution-dialog-panel p {
   margin: 0 0 0.65rem;
 }
