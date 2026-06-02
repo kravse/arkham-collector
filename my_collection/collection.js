@@ -6,14 +6,14 @@ window.MY_COLLECTION = [
     "status": ""
   },
   {
-    "title": "Fearful Pleasures",
-    "author": "A. E. Coppard",
+    "title": "West India Lights",
+    "author": "Henry S. Whitehead",
     "year": "1946",
     "status": ""
   },
   {
-    "title": "West India Lights",
-    "author": "Henry S. Whitehead",
+    "title": "Fearful Pleasures",
+    "author": "A. E. Coppard",
     "year": "1946",
     "status": ""
   },
@@ -30,14 +30,14 @@ window.MY_COLLECTION = [
     "status": ""
   },
   {
-    "title": "The Fourth Book of Jorkens",
-    "author": "Lord Dunsany",
+    "title": "The Web of Easter Island",
+    "author": "Donald Wandrei",
     "year": "1948",
     "status": ""
   },
   {
-    "title": "The Web of Easter Island",
-    "author": "Donald Wandrei",
+    "title": "The Fourth Book of Jorkens",
+    "author": "Lord Dunsany",
     "year": "1948",
     "status": ""
   },
@@ -60,14 +60,14 @@ window.MY_COLLECTION = [
     "status": ""
   },
   {
-    "title": "Dark Mind, Dark Heart",
-    "author": "August Derleth",
+    "title": "Dreams and Fancies",
+    "author": "H. P. Lovecraft",
     "year": "1962",
     "status": ""
   },
   {
-    "title": "Dreams and Fancies",
-    "author": "H. P. Lovecraft",
+    "title": "Dark Mind, Dark Heart",
+    "author": "August Derleth",
     "year": "1962",
     "status": ""
   },
@@ -90,8 +90,8 @@ window.MY_COLLECTION = [
     "status": ""
   },
   {
-    "title": "At the Mountains of Madness and Other Novels",
-    "author": "H. P. Lovecraft",
+    "title": "The Inhabitant of the Lake and Less Welcome Tenants",
+    "author": "J. Ramsey Campbell",
     "year": "1964",
     "status": ""
   },
@@ -102,14 +102,14 @@ window.MY_COLLECTION = [
     "status": ""
   },
   {
-    "title": "Tales of Science and Sorcery",
-    "author": "Clark Ashton Smith",
+    "title": "At the Mountains of Madness and Other Novels",
+    "author": "H. P. Lovecraft",
     "year": "1964",
     "status": ""
   },
   {
-    "title": "The Inhabitant of the Lake and Less Welcome Tenants",
-    "author": "J. Ramsey Campbell",
+    "title": "Tales of Science and Sorcery",
+    "author": "Clark Ashton Smith",
     "year": "1964",
     "status": ""
   },
@@ -192,6 +192,18 @@ window.MY_COLLECTION = [
     "status": ""
   },
   {
+    "title": "The Horror at Oakdeene and Others",
+    "author": "Brian Lumley",
+    "year": "1977",
+    "status": ""
+  },
+  {
+    "title": "Prince Zaleski and Cummings King Monk",
+    "author": "M. P. Shiel",
+    "year": "1977",
+    "status": ""
+  },
+  {
     "title": "And Afterward, the Dark",
     "author": "Basil Copper",
     "year": "1977",
@@ -204,21 +216,15 @@ window.MY_COLLECTION = [
     "status": ""
   },
   {
-    "title": "Prince Zaleski and Cummings King Monk",
-    "author": "M. P. Shiel",
-    "year": "1977",
-    "status": ""
-  },
-  {
-    "title": "The Horror at Oakdeene and Others",
-    "author": "Brian Lumley",
-    "year": "1977",
-    "status": ""
-  },
-  {
     "title": "Half in Shadow",
     "author": "Mary Elizabeth Counselman",
     "year": "1978",
+    "status": ""
+  },
+  {
+    "title": "In the Mist and Other Uncanny Encounters",
+    "author": "Elizabeth Walter",
+    "year": "1979",
     "status": ""
   },
   {
@@ -228,14 +234,14 @@ window.MY_COLLECTION = [
     "status": ""
   },
   {
-    "title": "Dreams of Dark and Light: The Great Short Fiction of Tanith Lee",
-    "author": "Tanith Lee",
+    "title": "Tales of the Quintana Roo",
+    "author": "James Tiptree Jr.",
     "year": "1986",
     "status": ""
   },
   {
-    "title": "Tales of the Quintana Roo",
-    "author": "James Tiptree Jr.",
+    "title": "Dreams of Dark and Light: The Great Short Fiction of Tanith Lee",
+    "author": "Tanith Lee",
     "year": "1986",
     "status": ""
   },
