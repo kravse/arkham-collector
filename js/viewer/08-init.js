@@ -293,6 +293,7 @@ restoreCollectionSourcePreference();
 restoreHighlightPreferences();
 restoreShowMagazinesPreference();
 syncSettingsCollectionRadios();
+loadOrderedCollectionIds();
 loadOwnCollectionIds();
 loadHeaderFiltersPreference();
 updateHeaderFiltersState();

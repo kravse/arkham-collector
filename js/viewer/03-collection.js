@@ -157,6 +157,37 @@ function saveWantList() {
   }
 }
 
+function loadOrderedCollectionIds() {
+  try {
+    const saved = localStorage.getItem(ORDERED_STORAGE_KEY);
+    if (!saved) {
+      orderedIds = new Set();
+      return;
+    }
+    const parsed = JSON.parse(saved);
+    if (!Array.isArray(parsed)) {
+      orderedIds = new Set();
+      return;
+    }
+    orderedIds = new Set(
+      parsed.map((id) => Number(id)).filter((id) => Number.isFinite(id)),
+    );
+  } catch (_) {
+    orderedIds = new Set();
+  }
+}
+
+function saveOrderedCollectionIds() {
+  try {
+    localStorage.setItem(
+      ORDERED_STORAGE_KEY,
+      JSON.stringify([...orderedIds].sort((a, b) => a - b)),
+    );
+  } catch (_) {
+    // localStorage unavailable
+  }
+}
+
 function loadOwnCollectionIds() {
   try {
     const saved = localStorage.getItem(COLLECTION_STORAGE_KEY);
@@ -220,8 +251,16 @@ function toggleWant(bookId) {
     wantIds.delete(id);
   } else {
     wantIds.add(id);
+    let collectionChanged = false;
     if (activeCollectionIds().has(id)) {
       activeCollectionIds().delete(id);
+      collectionChanged = true;
+    }
+    if (orderedIds.has(id)) {
+      orderedIds.delete(id);
+      saveOrderedCollectionIds();
+    }
+    if (collectionChanged) {
       saveActiveCollectionIds();
     }
   }
@@ -237,15 +276,24 @@ function toggleCollection(bookId) {
   if (!Number.isFinite(id)) {
     return;
   }
-  const ids = activeCollectionIds();
-  if (ids.has(id)) {
-    ids.delete(id);
+
+  if (isCollected({ id })) {
+    activeCollectionIds().delete(id);
+    orderedIds.delete(id);
+    saveActiveCollectionIds();
+    saveOrderedCollectionIds();
+  } else if (isOrdered({ id })) {
+    orderedIds.delete(id);
+    activeCollectionIds().add(id);
+    saveOrderedCollectionIds();
+    saveActiveCollectionIds();
   } else {
-    ids.add(id);
+    orderedIds.add(id);
     wantIds.delete(id);
+    saveOrderedCollectionIds();
     saveWantList();
   }
-  saveActiveCollectionIds();
+
   render();
   if (!bookDetailDialog.hidden) {
     openBookDetail(detailBookId);

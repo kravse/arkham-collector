@@ -324,16 +324,18 @@ function renderCardWantBadge(book) {
 }
 
 function renderCollectionButton(book) {
-  const collected = isInCollection(book);
-  const label = collected ? "Collection" : "Collect";
-  const className = `collection-btn${collected ? " active" : ""}`;
+  const collected = isCollected(book);
+  const ordered = isOrdered(book);
+  const label = collected ? "Collection" : ordered ? "Ordered" : "Collect";
+  const active = collected || ordered;
+  const className = `collection-btn${active ? " active" : ""}`;
 
   return `
   <button
     type="button"
     class="${className}"
     data-book-id="${book.id}"
-    aria-pressed="${collected}"
+    aria-pressed="${active}"
   >${label}</button>
 `;
 }
@@ -344,7 +346,11 @@ function renderOwnedBadge(book) {
     return "";
   }
 
-  return `<span class="owned-badge">${owned.status === "order" ? "On order" : "Collection"}</span>`;
+  const isOrder = owned.status === "order";
+  const label = isOrder ? "Ordered" : "Collection";
+  const className = isOrder ? "owned-badge owned-badge--ordered" : "owned-badge";
+
+  return `<span class="${className}">${label}</span>`;
 }
 
 function renderWantButton(book) {
@@ -421,9 +427,14 @@ window.tryCoverFallback = function (img) {
 };
 
 function renderCard(book) {
-  const inCollection = isInCollection(book);
-  const ownedClass =
-    inCollection && shouldHighlightCollectionOnCards() ? " owned" : "";
+  let collectionClass = "";
+  if (shouldHighlightCollectionOnCards()) {
+    if (isOrdered(book)) {
+      collectionClass = " ordered";
+    } else if (isCollected(book)) {
+      collectionClass = " owned";
+    }
+  }
   const hiddenClass = book.hidden ? " hidden-book" : "";
   const imageHtml = renderCover(book, book.coverCacheKey);
   const coverActions = renderCoverActions(book);
@@ -446,7 +457,7 @@ function renderCard(book) {
     isWanted(book) && shouldHighlightWantsOnCards() ? " wanted" : "";
 
   return `
-  <article class="card${ownedClass}${wantedClass}${hiddenClass}" data-book-id="${book.id}">
+  <article class="card${collectionClass}${wantedClass}${hiddenClass}" data-book-id="${book.id}">
     <div class="cover-wrap">
       ${coverActions}
       ${imageHtml}

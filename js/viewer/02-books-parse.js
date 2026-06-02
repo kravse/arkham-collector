@@ -220,12 +220,34 @@ function findCollectionMatch(book) {
   return null;
 }
 
+function isCollected(book) {
+  return activeCollectionIds().has(book.id);
+}
+
+function isOrdered(book) {
+  return orderedIds.has(book.id) && !isCollected(book);
+}
+
 function getCollectionItem(book) {
-  return activeCollectionIds().has(book.id) ? { status: "shelf" } : null;
+  if (isCollected(book)) {
+    return { status: "shelf" };
+  }
+  if (isOrdered(book)) {
+    return { status: "order" };
+  }
+  return null;
 }
 
 function isInCollection(book) {
-  return getCollectionItem(book) != null;
+  return isCollected(book) || isOrdered(book);
+}
+
+function exportableCollectionIds() {
+  const ids = new Set(activeCollectionIds());
+  for (const id of orderedIds) {
+    ids.add(id);
+  }
+  return ids;
 }
 
 function bookCoversCollectionItem(book, item) {

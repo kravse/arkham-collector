@@ -91,6 +91,7 @@ const LOGO_MYCROFT = "images/Mycroft_moran.png";
 const SORT_STORAGE_KEY = "arkham-sort";
 const WANT_STORAGE_KEY = "arkham-want-list";
 const COLLECTION_STORAGE_KEY = "arkham-collection";
+const ORDERED_STORAGE_KEY = "arkham-collection-ordered";
 const SAMPLE_COLLECTION_STORAGE_KEY = "arkham-sample-collection";
 const COLLECTION_SOURCE_KEY = "arkham-collection-source";
 const HEADER_FILTERS_STORAGE_KEY = "arkham-header-filters-expanded";
@@ -113,6 +114,7 @@ let mycroftFilterMode = null;
 let wantOnly = false;
 let wantIds = new Set();
 let ownCollectionIds = new Set();
+let orderedIds = new Set();
 let sampleCollectionIds = new Set();
 let collectionSource = "sample";
 let headerFiltersExpanded = true;
@@ -542,12 +544,34 @@ function findCollectionMatch(book) {
   return null;
 }
 
+function isCollected(book) {
+  return activeCollectionIds().has(book.id);
+}
+
+function isOrdered(book) {
+  return orderedIds.has(book.id) && !isCollected(book);
+}
+
 function getCollectionItem(book) {
-  return activeCollectionIds().has(book.id) ? { status: "shelf" } : null;
+  if (isCollected(book)) {
+    return { status: "shelf" };
+  }
+  if (isOrdered(book)) {
+    return { status: "order" };
+  }
+  return null;
 }
 
 function isInCollection(book) {
-  return getCollectionItem(book) != null;
+  return isCollected(book) || isOrdered(book);
+}
+
+function exportableCollectionIds() {
+  const ids = new Set(activeCollectionIds());
+  for (const id of orderedIds) {
+    ids.add(id);
+  }
+  return ids;
 }
 
 function bookCoversCollectionItem(book, item) {
@@ -733,6 +757,37 @@ function saveWantList() {
   }
 }
 
+function loadOrderedCollectionIds() {
+  try {
+    const saved = localStorage.getItem(ORDERED_STORAGE_KEY);
+    if (!saved) {
+      orderedIds = new Set();
+      return;
+    }
+    const parsed = JSON.parse(saved);
+    if (!Array.isArray(parsed)) {
+      orderedIds = new Set();
+      return;
+    }
+    orderedIds = new Set(
+      parsed.map((id) => Number(id)).filter((id) => Number.isFinite(id)),
+    );
+  } catch (_) {
+    orderedIds = new Set();
+  }
+}
+
+function saveOrderedCollectionIds() {
+  try {
+    localStorage.setItem(
+      ORDERED_STORAGE_KEY,
+      JSON.stringify([...orderedIds].sort((a, b) => a - b)),
+    );
+  } catch (_) {
+    // localStorage unavailable
+  }
+}
+
 function loadOwnCollectionIds() {
   try {
     const saved = localStorage.getItem(COLLECTION_STORAGE_KEY);
@@ -796,8 +851,16 @@ function toggleWant(bookId) {
     wantIds.delete(id);
   } else {
     wantIds.add(id);
+    let collectionChanged = false;
     if (activeCollectionIds().has(id)) {
       activeCollectionIds().delete(id);
+      collectionChanged = true;
+    }
+    if (orderedIds.has(id)) {
+      orderedIds.delete(id);
+      saveOrderedCollectionIds();
+    }
+    if (collectionChanged) {
       saveActiveCollectionIds();
     }
   }
@@ -813,15 +876,24 @@ function toggleCollection(bookId) {
   if (!Number.isFinite(id)) {
     return;
   }
-  const ids = activeCollectionIds();
-  if (ids.has(id)) {
-    ids.delete(id);
+
+  if (isCollected({ id })) {
+    activeCollectionIds().delete(id);
+    orderedIds.delete(id);
+    saveActiveCollectionIds();
+    saveOrderedCollectionIds();
+  } else if (isOrdered({ id })) {
+    orderedIds.delete(id);
+    activeCollectionIds().add(id);
+    saveOrderedCollectionIds();
+    saveActiveCollectionIds();
   } else {
-    ids.add(id);
+    orderedIds.add(id);
     wantIds.delete(id);
+    saveOrderedCollectionIds();
     saveWantList();
   }
-  saveActiveCollectionIds();
+
   render();
   if (!bookDetailDialog.hidden) {
     openBookDetail(detailBookId);
@@ -1283,16 +1355,18 @@ function renderCardWantBadge(book) {
 }
 
 function renderCollectionButton(book) {
-  const collected = isInCollection(book);
-  const label = collected ? "Collection" : "Collect";
-  const className = `collection-btn${collected ? " active" : ""}`;
+  const collected = isCollected(book);
+  const ordered = isOrdered(book);
+  const label = collected ? "Collection" : ordered ? "Ordered" : "Collect";
+  const active = collected || ordered;
+  const className = `collection-btn${active ? " active" : ""}`;
 
   return `
   <button
     type="button"
     class="${className}"
     data-book-id="${book.id}"
-    aria-pressed="${collected}"
+    aria-pressed="${active}"
   >${label}</button>
 `;
 }
@@ -1303,7 +1377,11 @@ function renderOwnedBadge(book) {
     return "";
   }
 
-  return `<span class="owned-badge">${owned.status === "order" ? "On order" : "Collection"}</span>`;
+  const isOrder = owned.status === "order";
+  const label = isOrder ? "Ordered" : "Collection";
+  const className = isOrder ? "owned-badge owned-badge--ordered" : "owned-badge";
+
+  return `<span class="${className}">${label}</span>`;
 }
 
 function renderWantButton(book) {
@@ -1380,9 +1458,14 @@ window.tryCoverFallback = function (img) {
 };
 
 function renderCard(book) {
-  const inCollection = isInCollection(book);
-  const ownedClass =
-    inCollection && shouldHighlightCollectionOnCards() ? " owned" : "";
+  let collectionClass = "";
+  if (shouldHighlightCollectionOnCards()) {
+    if (isOrdered(book)) {
+      collectionClass = " ordered";
+    } else if (isCollected(book)) {
+      collectionClass = " owned";
+    }
+  }
   const hiddenClass = book.hidden ? " hidden-book" : "";
   const imageHtml = renderCover(book, book.coverCacheKey);
   const coverActions = renderCoverActions(book);
@@ -1405,7 +1488,7 @@ function renderCard(book) {
     isWanted(book) && shouldHighlightWantsOnCards() ? " wanted" : "";
 
   return `
-  <article class="card${ownedClass}${wantedClass}${hiddenClass}" data-book-id="${book.id}">
+  <article class="card${collectionClass}${wantedClass}${hiddenClass}" data-book-id="${book.id}">
     <div class="cover-wrap">
       ${coverActions}
       ${imageHtml}
@@ -1749,7 +1832,7 @@ function escapeCsvField(value) {
 }
 
 function collectionRowsForExport() {
-  const ids = activeCollectionIds();
+  const ids = exportableCollectionIds();
   return getActiveBooks()
     .filter((book) => ids.has(book.id))
     .sort(compareCanonical)
@@ -2645,6 +2728,7 @@ restoreCollectionSourcePreference();
 restoreHighlightPreferences();
 restoreShowMagazinesPreference();
 syncSettingsCollectionRadios();
+loadOrderedCollectionIds();
 loadOwnCollectionIds();
 loadHeaderFiltersPreference();
 updateHeaderFiltersState();

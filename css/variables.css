@@ -12,6 +12,13 @@
   --owned-border: rgba(210, 178, 128, 0.55);
   --owned-glow: rgba(201, 162, 39, 0.18);
   --owned-body: rgba(212, 184, 132, 0.1);
+  --ordered-bg: rgba(168, 128, 48, 0.38);
+  --ordered-bg-deep: rgba(120, 88, 32, 0.28);
+  --ordered-border: rgba(190, 145, 72, 0.62);
+  --ordered-glow: rgba(168, 120, 32, 0.24);
+  --ordered-body: rgba(176, 132, 48, 0.2);
+  --owned-badge-ordered-text: #f2e4b8;
+  --owned-badge-ordered-border: rgba(232, 210, 150, 0.4);
   --want-bg: rgba(72, 168, 118, 0.22);
   --want-bg-deep: rgba(40, 120, 82, 0.14);
   --want-border: rgba(120, 200, 150, 0.55);

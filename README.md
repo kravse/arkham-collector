@@ -12,9 +12,9 @@ A visual catalog for collectors and readers of [Arkham House](https://en.wikiped
 |---|---|
 | **Search & sort** | Search the grid; deploy uses fixed year order with same-year tiebreaks from `book-order.js` |
 | **Filters** | Collection, want list, Mycroft & Moran imprint, decade |
-| **Book detail** | Cover, description, cover artist, **W** / **G** links, **Collect** and want toggles |
+| **Book detail** | Cover, description, cover artist, **W** / **G** links, **Collect** (Ordered → Collection), and want toggles |
 | **Your data** | Stored in `localStorage` on your device only—nothing uploaded |
-| **Export** | Download your active collection as CSV from gear settings |
+| **Export** | Download your collection as CSV (ordered and collected titles; same rows, no order status column) |
 
 ### Screenshots
 

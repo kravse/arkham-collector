@@ -224,7 +224,7 @@ function escapeCsvField(value) {
 }
 
 function collectionRowsForExport() {
-  const ids = activeCollectionIds();
+  const ids = exportableCollectionIds();
   return getActiveBooks()
     .filter((book) => ids.has(book.id))
     .sort(compareCanonical)

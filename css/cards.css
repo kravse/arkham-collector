@@ -56,6 +56,43 @@ main {
   border-top: 1px solid rgba(210, 178, 128, 0.16);
 }
 
+.card.ordered {
+  position: relative;
+  background:
+    linear-gradient(
+      180deg,
+      var(--ordered-bg) 0%,
+      rgba(32, 24, 10, 0.62) 100%
+    ),
+    linear-gradient(135deg, var(--ordered-bg-deep), rgba(23, 26, 33, 0.95));
+  border: 1px dashed var(--ordered-border);
+  box-shadow:
+    inset 0 1px 0 rgba(232, 200, 140, 0.14),
+    0 8px 28px var(--ordered-glow);
+}
+
+.card.ordered::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at top right,
+    rgba(200, 160, 80, 0.2),
+    transparent 55%
+  );
+  pointer-events: none;
+}
+
+.card.ordered .cover-wrap {
+  background: rgba(176, 132, 48, 0.14);
+  box-shadow: inset 0 0 0 1px rgba(190, 145, 72, 0.18);
+}
+
+.card.ordered .card-body {
+  background: var(--ordered-body);
+  border-top: 1px solid rgba(190, 145, 72, 0.22);
+}
+
 .card.wanted {
   position: relative;
   background:
@@ -107,6 +144,12 @@ main {
   color: #e8d4a8;
   background: rgba(201, 162, 39, 0.18);
   border: 1px solid rgba(210, 178, 128, 0.25);
+}
+
+.owned-badge--ordered {
+  color: var(--owned-badge-ordered-text);
+  background: var(--panel);
+  border-color: var(--owned-badge-ordered-border);
 }
 
 .card-bottom-row {
