@@ -103,11 +103,17 @@ body {
   color: var(--muted);
 }
 
-.attribution-dialog-panel h2 {
-  margin: 0 2rem 0.75rem 0;
+.attribution-dialog-section-title {
+  margin: 0 2rem 0.55rem 0;
   font-size: 1rem;
   font-weight: 600;
   color: var(--text);
+}
+
+.attribution-dialog-section + .attribution-dialog-section {
+  margin-top: 1rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--border);
 }
 
 .attribution-dialog-subhead {
@@ -125,12 +131,6 @@ body {
   border-top: 1px solid var(--border);
   font-size: 0.76rem;
   color: rgba(232, 234, 237, 0.55);
-}
-
-.attribution-dialog-feedback {
-  margin: 0;
-  font-size: 0.78rem;
-  color: rgba(232, 234, 237, 0.62);
 }
 
 .attribution-dialog-panel p {
