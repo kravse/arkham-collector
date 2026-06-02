@@ -48,6 +48,10 @@ const bookDetailImprint = document.getElementById("book-detail-imprint");
 const settingsBtn = document.getElementById("settings-btn");
 const settingsDialog = document.getElementById("settings-dialog");
 const settingsCloseBtn = document.getElementById("settings-close");
+const settingsTabAbout = document.getElementById("settings-tab-about");
+const settingsTabSettings = document.getElementById("settings-tab-settings");
+const settingsPanelAbout = document.getElementById("settings-panel-about");
+const settingsPanelSettings = document.getElementById("settings-panel-settings");
 const collectionSourceSampleInput = document.getElementById(
   "collection-source-sample",
 );
@@ -108,7 +112,7 @@ let collection = [];
 let serveEnabled = false;
 let serveEditDeltas = false;
 let editingBookId = null;
-let collectionOnly = false;
+let collectionFilterMode = null;
 let hiddenOnly = false;
 let mycroftFilterMode = null;
 let wantOnly = false;
@@ -284,7 +288,7 @@ function shouldHighlightWantsOnCards() {
 }
 
 function shouldHighlightCollectionOnCards() {
-  return highlightCollection || collectionOnly;
+  return highlightCollection || collectionFilterMode != null;
 }
 
 function syncSettingsCollectionRadios() {
@@ -467,6 +471,49 @@ function cycleMycroftFilter() {
     mycroftFilterMode = "hidden";
   } else {
     mycroftFilterMode = null;
+  }
+}
+
+function hasAnyOrderedBooks() {
+  return getActiveBooks().some(
+    (book) => passesBookVisibility(book) && isOrdered(book),
+  );
+}
+
+function isCollectionFilterActive() {
+  return collectionFilterMode != null;
+}
+
+function isCollectionAllFilter() {
+  return collectionFilterMode === "collection";
+}
+
+function isOrderedFilterActive() {
+  return collectionFilterMode === "ordered";
+}
+
+function passesCollectionFilter(book) {
+  if (collectionFilterMode === "collection") {
+    return isInCollection(book);
+  }
+  if (collectionFilterMode === "ordered") {
+    return isOrdered(book);
+  }
+  return true;
+}
+
+function cycleCollectionFilter() {
+  if (hasAnyOrderedBooks()) {
+    if (collectionFilterMode === null) {
+      collectionFilterMode = "collection";
+    } else if (collectionFilterMode === "collection") {
+      collectionFilterMode = "ordered";
+    } else {
+      collectionFilterMode = null;
+    }
+  } else {
+    collectionFilterMode =
+      collectionFilterMode === "collection" ? null : "collection";
   }
 }
 
@@ -999,8 +1046,18 @@ function renderStats(visible, all) {
   ]
     .filter(Boolean)
     .join(" ");
+  const collectionToggleClass = [
+    "stat",
+    "owned-stat",
+    "stat-toggle",
+    isCollectionAllFilter() ? "active" : "",
+    isOrderedFilterActive() ? "ordered-filter" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+  const collectionToggleLabel = isOrderedFilterActive() ? "ORDERED" : "COLLECTION";
   const filters = [
-    `<button type="button" class="stat owned-stat stat-toggle${collectionOnly ? " active" : ""}" id="collection-filter-toggle" aria-pressed="${collectionOnly}">COLLECTION</button>`,
+    `<button type="button" class="${collectionToggleClass}" id="collection-filter-toggle" aria-pressed="${isCollectionFilterActive()}">${collectionToggleLabel}</button>`,
     hasMycroft
       ? `<button type="button" class="${mycroftToggleClass}" id="mycroft-filter-toggle" aria-pressed="${isMycroftOnlyFilter()}"><span class="mycroft-stat-label">MYCROFT &amp; MORAN</span></button>`
       : "",
@@ -1023,7 +1080,7 @@ function getVisibleBooks() {
   return getSortedActiveBooks()
     .filter((book) => passesBookVisibility(book))
     .filter((book) => passesMycroftImprintFilter(book))
-    .filter((book) => !collectionOnly || isInCollection(book))
+    .filter((book) => passesCollectionFilter(book))
     .filter((book) => !wantOnly || isWanted(book))
     .filter((book) => matchesSearch(book, query));
 }
@@ -1526,27 +1583,35 @@ function render() {
     }
   }
 
+  if (collectionFilterMode === "ordered" && !hasAnyOrderedBooks()) {
+    collectionFilterMode = null;
+  }
+
   updateHeaderLogo();
   document.body.classList.toggle(
     "viewing-collection",
-    collectionOnly && !hiddenOnly && !isMycroftOnlyFilter() && !wantOnly,
+    isCollectionFilterActive() && !hiddenOnly && !isMycroftOnlyFilter() && !wantOnly,
   );
   document.body.classList.toggle(
     "viewing-hidden",
-    hiddenOnly && !collectionOnly && !isMycroftOnlyFilter() && !wantOnly,
+    hiddenOnly && !isCollectionFilterActive() && !isMycroftOnlyFilter() && !wantOnly,
   );
   document.body.classList.toggle(
     "viewing-want",
-    wantOnly && !collectionOnly && !hiddenOnly && !isMycroftOnlyFilter(),
+    wantOnly && !isCollectionFilterActive() && !hiddenOnly && !isMycroftOnlyFilter(),
   );
   document.body.classList.toggle("viewing-mycroft-hidden", isMycroftHiddenFilter());
   if (pageSubtitle) {
-    if (collectionOnly && hiddenOnly) {
+    if (isCollectionAllFilter() && hiddenOnly) {
       pageSubtitle.textContent =
         "Viewing hidden books in your collection — click a stat again to show all books";
-    } else if (collectionOnly) {
+    } else if (isCollectionAllFilter()) {
+      pageSubtitle.textContent = hasAnyOrderedBooks()
+        ? "Viewing your collection — click again for on-order only"
+        : "Viewing your collection — click the stat again to show all books";
+    } else if (isOrderedFilterActive()) {
       pageSubtitle.textContent =
-        "Viewing your collection — click the stat again to show all books";
+        "Viewing on-order titles only — click the stat again to show all books";
     } else if (hiddenOnly) {
       pageSubtitle.textContent =
         "Viewing hidden books — click the stat again to show all books";
@@ -1569,10 +1634,14 @@ function render() {
 
   if (!visible.length) {
     let message = "No books match your search.";
-    if (collectionOnly) {
+    if (isCollectionAllFilter()) {
       message = searchInput.value.trim()
         ? "No books in your collection match your search."
         : "Your collection is empty — open a book and tap Collect to add it.";
+    } else if (isOrderedFilterActive()) {
+      message = searchInput.value.trim()
+        ? "No on-order books match your search."
+        : "No on-order books to show.";
     } else if (hiddenOnly) {
       message = searchInput.value.trim()
         ? "No hidden books match your search."
@@ -1794,9 +1863,20 @@ function closeEditDialog() {
   editBookForm.reset();
 }
 
+function selectSettingsTab(tab) {
+  const aboutActive = tab === "about";
+  settingsTabAbout.setAttribute("aria-selected", aboutActive ? "true" : "false");
+  settingsTabSettings.setAttribute("aria-selected", aboutActive ? "false" : "true");
+  settingsTabAbout.tabIndex = aboutActive ? 0 : -1;
+  settingsTabSettings.tabIndex = aboutActive ? -1 : 0;
+  settingsPanelAbout.hidden = !aboutActive;
+  settingsPanelSettings.hidden = aboutActive;
+}
+
 function openSettingsDialog() {
   hideResetSampleConfirm();
   syncSettingsCollectionRadios();
+  selectSettingsTab("about");
   settingsDialog.hidden = false;
   settingsBtn.setAttribute("aria-expanded", "true");
   settingsCloseBtn.focus();
@@ -2528,6 +2608,14 @@ settingsDialog.querySelectorAll("[data-close-settings]").forEach((element) => {
   element.addEventListener("click", closeSettingsDialog);
 });
 
+settingsTabAbout.addEventListener("click", () => {
+  selectSettingsTab("about");
+});
+
+settingsTabSettings.addEventListener("click", () => {
+  selectSettingsTab("settings");
+});
+
 collectionSourceSampleInput.addEventListener("change", () => {
   if (collectionSourceSampleInput.checked) {
     onCollectionSourceChange("sample");
@@ -2745,11 +2833,8 @@ if (headerFiltersToggle) {
 
 stats.addEventListener("click", (event) => {
   if (event.target.closest("#collection-filter-toggle")) {
-    const next = !collectionOnly;
-    collectionOnly = next;
-    if (next) {
-      wantOnly = false;
-    }
+    cycleCollectionFilter();
+    wantOnly = false;
     render();
     return;
   }
@@ -2767,7 +2852,7 @@ stats.addEventListener("click", (event) => {
     const next = !wantOnly;
     wantOnly = next;
     if (next) {
-      collectionOnly = false;
+      collectionFilterMode = null;
     }
     render();
     return;

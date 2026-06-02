@@ -84,8 +84,18 @@ function renderStats(visible, all) {
   ]
     .filter(Boolean)
     .join(" ");
+  const collectionToggleClass = [
+    "stat",
+    "owned-stat",
+    "stat-toggle",
+    isCollectionAllFilter() ? "active" : "",
+    isOrderedFilterActive() ? "ordered-filter" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+  const collectionToggleLabel = isOrderedFilterActive() ? "ORDERED" : "COLLECTION";
   const filters = [
-    `<button type="button" class="stat owned-stat stat-toggle${collectionOnly ? " active" : ""}" id="collection-filter-toggle" aria-pressed="${collectionOnly}">COLLECTION</button>`,
+    `<button type="button" class="${collectionToggleClass}" id="collection-filter-toggle" aria-pressed="${isCollectionFilterActive()}">${collectionToggleLabel}</button>`,
     hasMycroft
       ? `<button type="button" class="${mycroftToggleClass}" id="mycroft-filter-toggle" aria-pressed="${isMycroftOnlyFilter()}"><span class="mycroft-stat-label">MYCROFT &amp; MORAN</span></button>`
       : "",
@@ -108,7 +118,7 @@ function getVisibleBooks() {
   return getSortedActiveBooks()
     .filter((book) => passesBookVisibility(book))
     .filter((book) => passesMycroftImprintFilter(book))
-    .filter((book) => !collectionOnly || isInCollection(book))
+    .filter((book) => passesCollectionFilter(book))
     .filter((book) => !wantOnly || isWanted(book))
     .filter((book) => matchesSearch(book, query));
 }

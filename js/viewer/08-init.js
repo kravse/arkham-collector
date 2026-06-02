@@ -93,6 +93,14 @@ settingsDialog.querySelectorAll("[data-close-settings]").forEach((element) => {
   element.addEventListener("click", closeSettingsDialog);
 });
 
+settingsTabAbout.addEventListener("click", () => {
+  selectSettingsTab("about");
+});
+
+settingsTabSettings.addEventListener("click", () => {
+  selectSettingsTab("settings");
+});
+
 collectionSourceSampleInput.addEventListener("change", () => {
   if (collectionSourceSampleInput.checked) {
     onCollectionSourceChange("sample");
@@ -310,11 +318,8 @@ if (headerFiltersToggle) {
 
 stats.addEventListener("click", (event) => {
   if (event.target.closest("#collection-filter-toggle")) {
-    const next = !collectionOnly;
-    collectionOnly = next;
-    if (next) {
-      wantOnly = false;
-    }
+    cycleCollectionFilter();
+    wantOnly = false;
     render();
     return;
   }
@@ -332,7 +337,7 @@ stats.addEventListener("click", (event) => {
     const next = !wantOnly;
     wantOnly = next;
     if (next) {
-      collectionOnly = false;
+      collectionFilterMode = null;
     }
     render();
     return;

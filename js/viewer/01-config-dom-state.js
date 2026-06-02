@@ -48,6 +48,10 @@ const bookDetailImprint = document.getElementById("book-detail-imprint");
 const settingsBtn = document.getElementById("settings-btn");
 const settingsDialog = document.getElementById("settings-dialog");
 const settingsCloseBtn = document.getElementById("settings-close");
+const settingsTabAbout = document.getElementById("settings-tab-about");
+const settingsTabSettings = document.getElementById("settings-tab-settings");
+const settingsPanelAbout = document.getElementById("settings-panel-about");
+const settingsPanelSettings = document.getElementById("settings-panel-settings");
 const collectionSourceSampleInput = document.getElementById(
   "collection-source-sample",
 );
@@ -108,7 +112,7 @@ let collection = [];
 let serveEnabled = false;
 let serveEditDeltas = false;
 let editingBookId = null;
-let collectionOnly = false;
+let collectionFilterMode = null;
 let hiddenOnly = false;
 let mycroftFilterMode = null;
 let wantOnly = false;
@@ -284,7 +288,7 @@ function shouldHighlightWantsOnCards() {
 }
 
 function shouldHighlightCollectionOnCards() {
-  return highlightCollection || collectionOnly;
+  return highlightCollection || collectionFilterMode != null;
 }
 
 function syncSettingsCollectionRadios() {

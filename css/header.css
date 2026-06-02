@@ -257,6 +257,21 @@ input[type="search"]::-webkit-search-cancel-button {
     inset 0 1px 0 rgba(255, 255, 255, 0.07);
 }
 
+.stat.owned-stat.stat-toggle.ordered-filter {
+  color: #f2e4b8;
+  border: 1px dashed rgba(190, 145, 72, 0.72);
+  background: rgba(120, 88, 32, 0.32);
+  box-shadow:
+    0 0 0 1px rgba(168, 120, 32, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.stat.owned-stat.stat-toggle.ordered-filter:hover {
+  color: #fff3d6;
+  border-color: rgba(210, 160, 80, 0.85);
+  background: rgba(140, 100, 36, 0.38);
+}
+
 .stat.hidden-stat.stat-toggle:hover {
   color: #e8eaed;
   border-color: rgba(154, 163, 178, 0.42);

@@ -186,9 +186,20 @@ function closeEditDialog() {
   editBookForm.reset();
 }
 
+function selectSettingsTab(tab) {
+  const aboutActive = tab === "about";
+  settingsTabAbout.setAttribute("aria-selected", aboutActive ? "true" : "false");
+  settingsTabSettings.setAttribute("aria-selected", aboutActive ? "false" : "true");
+  settingsTabAbout.tabIndex = aboutActive ? 0 : -1;
+  settingsTabSettings.tabIndex = aboutActive ? -1 : 0;
+  settingsPanelAbout.hidden = !aboutActive;
+  settingsPanelSettings.hidden = aboutActive;
+}
+
 function openSettingsDialog() {
   hideResetSampleConfirm();
   syncSettingsCollectionRadios();
+  selectSettingsTab("about");
   settingsDialog.hidden = false;
   settingsBtn.setAttribute("aria-expanded", "true");
   settingsCloseBtn.focus();

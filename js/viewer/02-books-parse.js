@@ -146,6 +146,49 @@ function cycleMycroftFilter() {
   }
 }
 
+function hasAnyOrderedBooks() {
+  return getActiveBooks().some(
+    (book) => passesBookVisibility(book) && isOrdered(book),
+  );
+}
+
+function isCollectionFilterActive() {
+  return collectionFilterMode != null;
+}
+
+function isCollectionAllFilter() {
+  return collectionFilterMode === "collection";
+}
+
+function isOrderedFilterActive() {
+  return collectionFilterMode === "ordered";
+}
+
+function passesCollectionFilter(book) {
+  if (collectionFilterMode === "collection") {
+    return isInCollection(book);
+  }
+  if (collectionFilterMode === "ordered") {
+    return isOrdered(book);
+  }
+  return true;
+}
+
+function cycleCollectionFilter() {
+  if (hasAnyOrderedBooks()) {
+    if (collectionFilterMode === null) {
+      collectionFilterMode = "collection";
+    } else if (collectionFilterMode === "collection") {
+      collectionFilterMode = "ordered";
+    } else {
+      collectionFilterMode = null;
+    }
+  } else {
+    collectionFilterMode =
+      collectionFilterMode === "collection" ? null : "collection";
+  }
+}
+
 function passesBookVisibility(book) {
   if (!passesHiddenVisibility(book)) {
     return false;

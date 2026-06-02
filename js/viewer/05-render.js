@@ -495,27 +495,35 @@ function render() {
     }
   }
 
+  if (collectionFilterMode === "ordered" && !hasAnyOrderedBooks()) {
+    collectionFilterMode = null;
+  }
+
   updateHeaderLogo();
   document.body.classList.toggle(
     "viewing-collection",
-    collectionOnly && !hiddenOnly && !isMycroftOnlyFilter() && !wantOnly,
+    isCollectionFilterActive() && !hiddenOnly && !isMycroftOnlyFilter() && !wantOnly,
   );
   document.body.classList.toggle(
     "viewing-hidden",
-    hiddenOnly && !collectionOnly && !isMycroftOnlyFilter() && !wantOnly,
+    hiddenOnly && !isCollectionFilterActive() && !isMycroftOnlyFilter() && !wantOnly,
   );
   document.body.classList.toggle(
     "viewing-want",
-    wantOnly && !collectionOnly && !hiddenOnly && !isMycroftOnlyFilter(),
+    wantOnly && !isCollectionFilterActive() && !hiddenOnly && !isMycroftOnlyFilter(),
   );
   document.body.classList.toggle("viewing-mycroft-hidden", isMycroftHiddenFilter());
   if (pageSubtitle) {
-    if (collectionOnly && hiddenOnly) {
+    if (isCollectionAllFilter() && hiddenOnly) {
       pageSubtitle.textContent =
         "Viewing hidden books in your collection — click a stat again to show all books";
-    } else if (collectionOnly) {
+    } else if (isCollectionAllFilter()) {
+      pageSubtitle.textContent = hasAnyOrderedBooks()
+        ? "Viewing your collection — click again for on-order only"
+        : "Viewing your collection — click the stat again to show all books";
+    } else if (isOrderedFilterActive()) {
       pageSubtitle.textContent =
-        "Viewing your collection — click the stat again to show all books";
+        "Viewing on-order titles only — click the stat again to show all books";
     } else if (hiddenOnly) {
       pageSubtitle.textContent =
         "Viewing hidden books — click the stat again to show all books";
@@ -538,10 +546,14 @@ function render() {
 
   if (!visible.length) {
     let message = "No books match your search.";
-    if (collectionOnly) {
+    if (isCollectionAllFilter()) {
       message = searchInput.value.trim()
         ? "No books in your collection match your search."
         : "Your collection is empty — open a book and tap Collect to add it.";
+    } else if (isOrderedFilterActive()) {
+      message = searchInput.value.trim()
+        ? "No on-order books match your search."
+        : "No on-order books to show.";
     } else if (hiddenOnly) {
       message = searchInput.value.trim()
         ? "No hidden books match your search."
