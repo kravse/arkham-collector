@@ -6,6 +6,12 @@ window.MY_COLLECTION = [
     "status": ""
   },
   {
+    "title": "The Doll and One Other",
+    "author": "Algernon Blackwood",
+    "year": "1946",
+    "status": ""
+  },
+  {
     "title": "West India Lights",
     "author": "Henry S. Whitehead",
     "year": "1946",
