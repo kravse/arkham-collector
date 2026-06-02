@@ -464,9 +464,9 @@ function renderCard(book) {
 
 function updateHeaderLogo() {
   if (headerLogo) {
-    headerLogo.src = mycroftOnly ? LOGO_MYCROFT : LOGO_ARKHAM;
+    headerLogo.src = isMycroftOnlyFilter() ? LOGO_MYCROFT : LOGO_ARKHAM;
   }
-  const title = mycroftOnly ? "Mycroft & Moran" : "Arkham House";
+  const title = isMycroftOnlyFilter() ? "Mycroft & Moran" : "Arkham House";
   if (pageTitle) {
     pageTitle.textContent = title;
   }
@@ -477,19 +477,27 @@ function render() {
   const activeBooks = getActiveBooks();
   const visible = getVisibleBooks();
 
+  if (!bookDetailDialog.hidden && detailBookId) {
+    const detailBook = books.find((entry) => entry.id === detailBookId);
+    if (detailBook && !passesMycroftImprintFilter(detailBook)) {
+      closeBookDetail();
+    }
+  }
+
   updateHeaderLogo();
   document.body.classList.toggle(
     "viewing-collection",
-    collectionOnly && !hiddenOnly && !mycroftOnly && !wantOnly,
+    collectionOnly && !hiddenOnly && !isMycroftOnlyFilter() && !wantOnly,
   );
   document.body.classList.toggle(
     "viewing-hidden",
-    hiddenOnly && !collectionOnly && !mycroftOnly && !wantOnly,
+    hiddenOnly && !collectionOnly && !isMycroftOnlyFilter() && !wantOnly,
   );
   document.body.classList.toggle(
     "viewing-want",
-    wantOnly && !collectionOnly && !hiddenOnly && !mycroftOnly,
+    wantOnly && !collectionOnly && !hiddenOnly && !isMycroftOnlyFilter(),
   );
+  document.body.classList.toggle("viewing-mycroft-hidden", isMycroftHiddenFilter());
   if (pageSubtitle) {
     if (collectionOnly && hiddenOnly) {
       pageSubtitle.textContent =
@@ -500,9 +508,12 @@ function render() {
     } else if (hiddenOnly) {
       pageSubtitle.textContent =
         "Viewing hidden books — click the stat again to show all books";
-    } else if (mycroftOnly) {
+    } else if (isMycroftOnlyFilter()) {
       pageSubtitle.textContent =
         "An imprint for weird detective fiction—founded in 1945 to house August Derleth's Solar Pons.";
+    } else if (isMycroftHiddenFilter()) {
+      pageSubtitle.textContent =
+        "Mycroft & Moran titles hidden — click the stat again to show all books";
     } else if (wantOnly) {
       pageSubtitle.textContent =
         "Viewing your want list — click the stat again to show all books";
@@ -524,7 +535,7 @@ function render() {
       message = searchInput.value.trim()
         ? "No hidden books match your search."
         : "No hidden books to show.";
-    } else if (mycroftOnly) {
+    } else if (isMycroftOnlyFilter()) {
       message = searchInput.value.trim()
         ? "No Mycroft & Moran books match your search."
         : "No Mycroft & Moran books to show.";

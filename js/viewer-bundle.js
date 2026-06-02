@@ -109,7 +109,7 @@ let serveEditDeltas = false;
 let editingBookId = null;
 let collectionOnly = false;
 let hiddenOnly = false;
-let mycroftOnly = false;
+let mycroftFilterMode = null;
 let wantOnly = false;
 let wantIds = new Set();
 let ownCollectionIds = new Set();
@@ -438,6 +438,34 @@ function hasVisibleMagazineIssues() {
   return getActiveBooks().some(
     (book) => isMagazineIssue(book) && !book.hidden,
   );
+}
+
+function isMycroftOnlyFilter() {
+  return mycroftFilterMode === "only";
+}
+
+function isMycroftHiddenFilter() {
+  return mycroftFilterMode === "hidden";
+}
+
+function passesMycroftImprintFilter(book) {
+  if (mycroftFilterMode === "only") {
+    return book.imprint === "mycroft_moran";
+  }
+  if (mycroftFilterMode === "hidden") {
+    return book.imprint !== "mycroft_moran";
+  }
+  return true;
+}
+
+function cycleMycroftFilter() {
+  if (mycroftFilterMode === null) {
+    mycroftFilterMode = "only";
+  } else if (mycroftFilterMode === "only") {
+    mycroftFilterMode = "hidden";
+  } else {
+    mycroftFilterMode = null;
+  }
 }
 
 function passesBookVisibility(book) {
@@ -876,7 +904,10 @@ function getStatTotal(activeBooks) {
   if (hiddenOnly) {
     return activeBooks.filter((book) => book.hidden).length;
   }
-  return activeBooks.filter((book) => passesBookVisibility(book)).length;
+  return activeBooks
+    .filter((book) => passesBookVisibility(book))
+    .filter((book) => passesMycroftImprintFilter(book))
+    .length;
 }
 
 function renderStats(visible, all) {
@@ -887,10 +918,19 @@ function renderStats(visible, all) {
   const hasMycroft = activeBooks.some(
     (book) => book.imprint === "mycroft_moran",
   );
+  const mycroftToggleClass = [
+    "stat",
+    "mycroft-stat",
+    "stat-toggle",
+    isMycroftOnlyFilter() ? "active" : "",
+    isMycroftHiddenFilter() ? "excluded" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
   const filters = [
     `<button type="button" class="stat owned-stat stat-toggle${collectionOnly ? " active" : ""}" id="collection-filter-toggle" aria-pressed="${collectionOnly}">COLLECTION</button>`,
     hasMycroft
-      ? `<button type="button" class="stat mycroft-stat stat-toggle${mycroftOnly ? " active" : ""}" id="mycroft-filter-toggle" aria-pressed="${mycroftOnly}">MYCROFT &amp; MORAN</button>`
+      ? `<button type="button" class="${mycroftToggleClass}" id="mycroft-filter-toggle" aria-pressed="${isMycroftOnlyFilter()}"><span class="mycroft-stat-label">MYCROFT &amp; MORAN</span></button>`
       : "",
     `<button type="button" class="stat want-stat stat-toggle${wantOnly ? " active" : ""}" id="want-filter-toggle" aria-pressed="${wantOnly}">WANT</button>`,
     hiddenCount && serveEnabled
@@ -910,7 +950,7 @@ function getVisibleBooks() {
   const query = searchInput.value.trim();
   return getSortedActiveBooks()
     .filter((book) => passesBookVisibility(book))
-    .filter((book) => !mycroftOnly || book.imprint === "mycroft_moran")
+    .filter((book) => passesMycroftImprintFilter(book))
     .filter((book) => !collectionOnly || isInCollection(book))
     .filter((book) => !wantOnly || isWanted(book))
     .filter((book) => matchesSearch(book, query));
@@ -1383,9 +1423,9 @@ function renderCard(book) {
 
 function updateHeaderLogo() {
   if (headerLogo) {
-    headerLogo.src = mycroftOnly ? LOGO_MYCROFT : LOGO_ARKHAM;
+    headerLogo.src = isMycroftOnlyFilter() ? LOGO_MYCROFT : LOGO_ARKHAM;
   }
-  const title = mycroftOnly ? "Mycroft & Moran" : "Arkham House";
+  const title = isMycroftOnlyFilter() ? "Mycroft & Moran" : "Arkham House";
   if (pageTitle) {
     pageTitle.textContent = title;
   }
@@ -1396,19 +1436,27 @@ function render() {
   const activeBooks = getActiveBooks();
   const visible = getVisibleBooks();
 
+  if (!bookDetailDialog.hidden && detailBookId) {
+    const detailBook = books.find((entry) => entry.id === detailBookId);
+    if (detailBook && !passesMycroftImprintFilter(detailBook)) {
+      closeBookDetail();
+    }
+  }
+
   updateHeaderLogo();
   document.body.classList.toggle(
     "viewing-collection",
-    collectionOnly && !hiddenOnly && !mycroftOnly && !wantOnly,
+    collectionOnly && !hiddenOnly && !isMycroftOnlyFilter() && !wantOnly,
   );
   document.body.classList.toggle(
     "viewing-hidden",
-    hiddenOnly && !collectionOnly && !mycroftOnly && !wantOnly,
+    hiddenOnly && !collectionOnly && !isMycroftOnlyFilter() && !wantOnly,
   );
   document.body.classList.toggle(
     "viewing-want",
-    wantOnly && !collectionOnly && !hiddenOnly && !mycroftOnly,
+    wantOnly && !collectionOnly && !hiddenOnly && !isMycroftOnlyFilter(),
   );
+  document.body.classList.toggle("viewing-mycroft-hidden", isMycroftHiddenFilter());
   if (pageSubtitle) {
     if (collectionOnly && hiddenOnly) {
       pageSubtitle.textContent =
@@ -1419,9 +1467,12 @@ function render() {
     } else if (hiddenOnly) {
       pageSubtitle.textContent =
         "Viewing hidden books — click the stat again to show all books";
-    } else if (mycroftOnly) {
+    } else if (isMycroftOnlyFilter()) {
       pageSubtitle.textContent =
         "An imprint for weird detective fiction—founded in 1945 to house August Derleth's Solar Pons.";
+    } else if (isMycroftHiddenFilter()) {
+      pageSubtitle.textContent =
+        "Mycroft & Moran titles hidden — click the stat again to show all books";
     } else if (wantOnly) {
       pageSubtitle.textContent =
         "Viewing your want list — click the stat again to show all books";
@@ -1443,7 +1494,7 @@ function render() {
       message = searchInput.value.trim()
         ? "No hidden books match your search."
         : "No hidden books to show.";
-    } else if (mycroftOnly) {
+    } else if (isMycroftOnlyFilter()) {
       message = searchInput.value.trim()
         ? "No Mycroft & Moran books match your search."
         : "No Mycroft & Moran books to show.";
@@ -2624,7 +2675,7 @@ stats.addEventListener("click", (event) => {
     return;
   }
   if (event.target.closest("#mycroft-filter-toggle")) {
-    mycroftOnly = !mycroftOnly;
+    cycleMycroftFilter();
     render();
     return;
   }

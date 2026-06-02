@@ -61,7 +61,10 @@ function getStatTotal(activeBooks) {
   if (hiddenOnly) {
     return activeBooks.filter((book) => book.hidden).length;
   }
-  return activeBooks.filter((book) => passesBookVisibility(book)).length;
+  return activeBooks
+    .filter((book) => passesBookVisibility(book))
+    .filter((book) => passesMycroftImprintFilter(book))
+    .length;
 }
 
 function renderStats(visible, all) {
@@ -72,10 +75,19 @@ function renderStats(visible, all) {
   const hasMycroft = activeBooks.some(
     (book) => book.imprint === "mycroft_moran",
   );
+  const mycroftToggleClass = [
+    "stat",
+    "mycroft-stat",
+    "stat-toggle",
+    isMycroftOnlyFilter() ? "active" : "",
+    isMycroftHiddenFilter() ? "excluded" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
   const filters = [
     `<button type="button" class="stat owned-stat stat-toggle${collectionOnly ? " active" : ""}" id="collection-filter-toggle" aria-pressed="${collectionOnly}">COLLECTION</button>`,
     hasMycroft
-      ? `<button type="button" class="stat mycroft-stat stat-toggle${mycroftOnly ? " active" : ""}" id="mycroft-filter-toggle" aria-pressed="${mycroftOnly}">MYCROFT &amp; MORAN</button>`
+      ? `<button type="button" class="${mycroftToggleClass}" id="mycroft-filter-toggle" aria-pressed="${isMycroftOnlyFilter()}"><span class="mycroft-stat-label">MYCROFT &amp; MORAN</span></button>`
       : "",
     `<button type="button" class="stat want-stat stat-toggle${wantOnly ? " active" : ""}" id="want-filter-toggle" aria-pressed="${wantOnly}">WANT</button>`,
     hiddenCount && serveEnabled
@@ -95,7 +107,7 @@ function getVisibleBooks() {
   const query = searchInput.value.trim();
   return getSortedActiveBooks()
     .filter((book) => passesBookVisibility(book))
-    .filter((book) => !mycroftOnly || book.imprint === "mycroft_moran")
+    .filter((book) => passesMycroftImprintFilter(book))
     .filter((book) => !collectionOnly || isInCollection(book))
     .filter((book) => !wantOnly || isWanted(book))
     .filter((book) => matchesSearch(book, query));

@@ -118,6 +118,34 @@ function hasVisibleMagazineIssues() {
   );
 }
 
+function isMycroftOnlyFilter() {
+  return mycroftFilterMode === "only";
+}
+
+function isMycroftHiddenFilter() {
+  return mycroftFilterMode === "hidden";
+}
+
+function passesMycroftImprintFilter(book) {
+  if (mycroftFilterMode === "only") {
+    return book.imprint === "mycroft_moran";
+  }
+  if (mycroftFilterMode === "hidden") {
+    return book.imprint !== "mycroft_moran";
+  }
+  return true;
+}
+
+function cycleMycroftFilter() {
+  if (mycroftFilterMode === null) {
+    mycroftFilterMode = "only";
+  } else if (mycroftFilterMode === "only") {
+    mycroftFilterMode = "hidden";
+  } else {
+    mycroftFilterMode = null;
+  }
+}
+
 function passesBookVisibility(book) {
   if (!passesHiddenVisibility(book)) {
     return false;

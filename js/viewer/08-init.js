@@ -323,7 +323,7 @@ stats.addEventListener("click", (event) => {
     return;
   }
   if (event.target.closest("#mycroft-filter-toggle")) {
-    mycroftOnly = !mycroftOnly;
+    cycleMycroftFilter();
     render();
     return;
   }

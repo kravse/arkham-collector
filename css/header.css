@@ -302,3 +302,23 @@ input[type="search"]::-webkit-search-cancel-button {
     inset 0 1px 0 rgba(255, 255, 255, 0.07);
 }
 
+.stat.mycroft-stat.stat-toggle.excluded {
+  color: #f0b8b8;
+  border-color: rgba(210, 96, 96, 0.55);
+  background: rgba(120, 48, 48, 0.22);
+  box-shadow:
+    0 0 0 1px rgba(210, 96, 96, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.stat.mycroft-stat.stat-toggle.excluded:hover {
+  color: #f8cccc;
+  border-color: rgba(230, 120, 120, 0.62);
+  background: rgba(140, 56, 56, 0.28);
+}
+
+.stat.mycroft-stat.stat-toggle.excluded .mycroft-stat-label {
+  text-decoration: line-through;
+  text-decoration-color: rgba(240, 184, 184, 0.95);
+}
+
