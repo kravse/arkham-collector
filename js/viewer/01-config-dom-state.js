@@ -168,16 +168,19 @@ function defaultCollectionSource() {
 }
 
 function restoreCollectionSourcePreference() {
+  let saved = null;
   try {
-    const saved = localStorage.getItem(COLLECTION_SOURCE_KEY);
-    if (saved === "sample" || saved === "own") {
-      collectionSource = saved;
-      return;
-    }
+    saved = localStorage.getItem(COLLECTION_SOURCE_KEY);
   } catch (_) {
     // localStorage unavailable
   }
-  collectionSource = defaultCollectionSource();
+  collectionSource = viewerCollectionSource.resolveCollectionSourceOnLoad({
+    saved,
+    defaultSource: defaultCollectionSource(),
+    sampleUrlOverride: viewerCollectionSource.parseSampleUrlOverride(
+      window.location.search,
+    ),
+  });
 }
 
 function saveCollectionSourcePreference() {

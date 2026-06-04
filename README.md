@@ -35,7 +35,7 @@ A visual catalog for collectors and readers of [Arkham House](https://en.wikiped
 1. Open a card → **Collect** to mark a copy you own (tap again to remove).
 2. Toggle **want** on titles you are hunting.
 3. Filter with **COLLECTION** or **WANT** in the header. If you have on-order titles, **COLLECTION** cycles: all books → your collection → on-order only → all books.
-4. **Gear** (bottom bar): switch **Use my own collection** (default on the live site) vs **Use sample collection** (a bundled demo list). The two lists are separate; **Reset sample collection** only affects the demo.
+4. **Gear** (bottom bar): switch **Use my own collection** (default on the live site) vs **Use sample collection** (a bundled demo list). The two lists are separate; **Reset sample collection** only affects the demo. Add `?sample=true` to the URL to open with the sample collection for that visit only (does not change your saved preference).
 5. **Export collection CSV** exports whichever mode is active (title, author, year). There is no import—add books with **Collect**.
 
 ## Run it locally

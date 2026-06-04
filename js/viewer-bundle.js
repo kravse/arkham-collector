@@ -168,16 +168,19 @@ function defaultCollectionSource() {
 }
 
 function restoreCollectionSourcePreference() {
+  let saved = null;
   try {
-    const saved = localStorage.getItem(COLLECTION_SOURCE_KEY);
-    if (saved === "sample" || saved === "own") {
-      collectionSource = saved;
-      return;
-    }
+    saved = localStorage.getItem(COLLECTION_SOURCE_KEY);
   } catch (_) {
     // localStorage unavailable
   }
-  collectionSource = defaultCollectionSource();
+  collectionSource = viewerCollectionSource.resolveCollectionSourceOnLoad({
+    saved,
+    defaultSource: defaultCollectionSource(),
+    sampleUrlOverride: viewerCollectionSource.parseSampleUrlOverride(
+      window.location.search,
+    ),
+  });
 }
 
 function saveCollectionSourcePreference() {
@@ -321,6 +324,38 @@ function hideResetSampleConfirm() {
   }
   syncSettingsCollectionHint();
 }
+
+
+/* Generated from scripts/lib/viewer-collection-source.js — run npm run bundle-viewer */
+
+const viewerCollectionSource = (function () {
+  function parseSampleUrlOverride(search) {
+    try {
+      return new URLSearchParams(search).get("sample") === "true";
+    } catch (_) {
+      return false;
+    }
+  }
+  
+  function resolveCollectionSourceOnLoad({ saved, defaultSource, sampleUrlOverride }) {
+    if (saved === "sample" || saved === "own") {
+      if (sampleUrlOverride) {
+        return "sample";
+      }
+      return saved;
+    }
+    if (sampleUrlOverride) {
+      return "sample";
+    }
+    return defaultSource === "sample" || defaultSource === "own"
+      ? defaultSource
+      : "sample";
+  }
+  return {
+    parseSampleUrlOverride,
+    resolveCollectionSourceOnLoad,
+  };
+})();
 
 
 /* Generated from scripts/lib/viewer-mode.js — run npm run bundle-viewer */
