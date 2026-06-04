@@ -132,7 +132,7 @@ window.BOOK_EDITS = {
     "goodreadsUrl": "https://www.goodreads.com/book/show/3602733-something-breathing"
   },
   "359": {
-    "coverImageFile": "covers/autobiography-some-notes-on-a-nonentity-359.jpg",
+    "coverImageFile": "covers/autobiography-some-notes-on-a-nonentity-359.png",
     "goodreadsUrl": "https://www.goodreads.com/book/show/29865383-autobiography-some-notes-on-a-nonentity"
   },
   "372": {
