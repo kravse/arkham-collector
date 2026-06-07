@@ -66,6 +66,12 @@ window.MY_COLLECTION = [
     "status": ""
   },
   {
+    "title": "Strayers from Sheol",
+    "author": "H. Russel Wakefield",
+    "year": "1961",
+    "status": ""
+  },
+  {
     "title": "Dreams and Fancies",
     "author": "H. P. Lovecraft",
     "year": "1962",
