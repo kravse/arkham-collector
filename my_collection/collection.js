@@ -264,6 +264,12 @@ window.MY_COLLECTION = [
     "status": ""
   },
   {
+    "title": "Polyphemus",
+    "author": "Michael Shea",
+    "year": "1987",
+    "status": ""
+  },
+  {
     "title": "A Rendezvous in Averoigne",
     "author": "Clark Ashton Smith",
     "year": "1988",
