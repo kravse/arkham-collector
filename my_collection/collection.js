@@ -48,6 +48,12 @@ window.MY_COLLECTION = [
     "status": ""
   },
   {
+    "title": "The Survivor and Others",
+    "author": "August Derleth (inspired by notes by H.P. Lovecraft)",
+    "year": "1957",
+    "status": ""
+  },
+  {
     "title": "The Mask of Cthulhu",
     "author": "August Derleth",
     "year": "1958",
@@ -67,7 +73,7 @@ window.MY_COLLECTION = [
   },
   {
     "title": "Strayers from Sheol",
-    "author": "H. Russel Wakefield",
+    "author": "H. Russell Wakefield",
     "year": "1961",
     "status": ""
   },
