@@ -452,11 +452,189 @@ main {
   font-weight: 600;
 }
 
+.card-list-head {
+  display: contents;
+}
+
+.card-list-primary {
+  display: contents;
+}
+
 .empty {
   grid-column: 1 / -1;
   text-align: center;
   color: var(--muted);
   padding: 3rem 1rem;
   font-family: ui-sans-serif, system-ui, sans-serif;
+}
+
+body.view-mode-list .grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+body.view-mode-list .card {
+  flex-direction: row;
+  align-items: center;
+  width: 100%;
+}
+
+body.view-mode-list .cover-wrap {
+  aspect-ratio: auto;
+  width: 2rem;
+  height: 3rem;
+  flex-shrink: 0;
+  align-self: center;
+}
+
+body.view-mode-list .card-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.45rem 0.2rem 0.35rem;
+}
+
+body.view-mode-list .card.owned .card-body,
+body.view-mode-list .card.ordered .card-body,
+body.view-mode-list .card.wanted .card-body {
+  border-top: none;
+  border-left: none;
+  background: transparent;
+}
+
+body.view-mode-list .card.owned,
+body.view-mode-list .card.ordered,
+body.view-mode-list .card.wanted {
+  box-shadow: none;
+}
+
+body.view-mode-list .card.owned::before,
+body.view-mode-list .card.ordered::before,
+body.view-mode-list .card.wanted::before {
+  content: none;
+}
+
+body.view-mode-list .card.owned {
+  background: var(--owned-bg);
+}
+
+body.view-mode-list .card.ordered {
+  background: var(--ordered-bg);
+}
+
+body.view-mode-list .card.wanted {
+  background: var(--want-bg);
+}
+
+body.view-mode-list .card.owned .cover-wrap,
+body.view-mode-list .card.ordered .cover-wrap,
+body.view-mode-list .card.wanted .cover-wrap {
+  background: transparent;
+  box-shadow: none;
+}
+
+body.view-mode-list .hidden-badge {
+  display: none;
+}
+
+body.view-mode-list .card-list-head {
+  display: block;
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+}
+
+body.view-mode-list .card-list-head .title {
+  display: block;
+  min-width: 0;
+  margin: 0;
+  font-size: 0.82rem;
+  line-height: 1.15;
+  -webkit-line-clamp: unset;
+  -webkit-box-orient: unset;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+body.view-mode-list .card-list-primary {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 0.35rem;
+  width: fit-content;
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
+}
+
+body.view-mode-list .card-list-primary .date {
+  display: block;
+  flex: none;
+  font-size: 0.68rem;
+  line-height: 1.15;
+  white-space: nowrap;
+}
+
+body.view-mode-list .meta {
+  display: none;
+}
+
+body.view-mode-list .card-bottom-row {
+  display: contents;
+}
+
+body.view-mode-list .card-bottom-left,
+body.view-mode-list .card-bottom-right {
+  display: contents;
+}
+
+body.view-mode-list .card-bottom-row .owned-badge,
+body.view-mode-list .card-bottom-row .want-btn,
+body.view-mode-list .card-bottom-row .want-badge {
+  flex-shrink: 0;
+  order: 10;
+}
+
+body.view-mode-list .card-bottom-row .imprint-badge {
+  flex-shrink: 0;
+  order: 20;
+  margin-left: auto;
+  width: 2rem;
+  min-width: 2rem;
+  padding-left: 0;
+  padding-right: 0;
+  box-sizing: border-box;
+  justify-content: center;
+}
+
+body.view-mode-list .edit-book-btn,
+body.view-mode-list .hide-book-btn {
+  top: 0.15rem;
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
+body.view-mode-list .edit-book-btn {
+  right: 0.15rem;
+}
+
+body.view-mode-list .hide-book-btn {
+  left: 0.15rem;
+}
+
+body.view-mode-list .edit-book-btn svg,
+body.view-mode-list .hide-book-btn svg {
+  width: 0.65rem;
+  height: 0.65rem;
+}
+
+body.view-mode-list .empty {
+  grid-column: auto;
+  width: 100%;
 }
 

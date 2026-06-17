@@ -134,21 +134,96 @@
         </div>
       </div>
       <div class="controls">
-        <div class="search-wrap">
-          <input
-            id="search"
-            type="search"
-            placeholder="Search title, author, cover artist, date…"
-            aria-label="Search books"
-          />
+        <div class="search-row">
+          <div class="search-wrap">
+            <input
+              id="search"
+              type="search"
+              placeholder="Search title, author, cover artist, date…"
+              aria-label="Search books"
+            />
+            <button
+              type="button"
+              id="search-clear"
+              class="search-clear"
+              aria-label="Clear search"
+              hidden
+            >
+              &times;
+            </button>
+          </div>
           <button
             type="button"
-            id="search-clear"
-            class="search-clear"
-            aria-label="Clear search"
-            hidden
+            id="view-mode-toggle"
+            class="view-mode-toggle"
+            aria-pressed="false"
+            aria-label="Switch to list view"
           >
-            &times;
+            <svg
+              class="icon-list"
+              viewBox="0 0 20 20"
+              fill="none"
+              aria-hidden="true"
+            >
+              <rect
+                x="3"
+                y="4"
+                width="5"
+                height="7"
+                rx="0.75"
+                stroke="currentColor"
+                stroke-width="1.5"
+              />
+              <path
+                d="M10 5.5h7M10 10h7M10 14.5h7"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+              />
+            </svg>
+            <svg
+              class="icon-grid"
+              viewBox="0 0 20 20"
+              fill="none"
+              aria-hidden="true"
+            >
+              <rect
+                x="3"
+                y="3"
+                width="6"
+                height="6"
+                rx="1"
+                stroke="currentColor"
+                stroke-width="1.5"
+              />
+              <rect
+                x="11"
+                y="3"
+                width="6"
+                height="6"
+                rx="1"
+                stroke="currentColor"
+                stroke-width="1.5"
+              />
+              <rect
+                x="3"
+                y="11"
+                width="6"
+                height="6"
+                rx="1"
+                stroke="currentColor"
+                stroke-width="1.5"
+              />
+              <rect
+                x="11"
+                y="11"
+                width="6"
+                height="6"
+                rx="1"
+                stroke="currentColor"
+                stroke-width="1.5"
+              />
+            </svg>
           </button>
         </div>
         <div class="controls-secondary">

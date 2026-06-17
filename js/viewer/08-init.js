@@ -305,6 +305,8 @@ loadOrderedCollectionIds();
 loadOwnCollectionIds();
 loadHeaderFiltersPreference();
 updateHeaderFiltersState();
+loadViewModePreference();
+updateViewModeState();
 restoreSortPreference();
 updateSortControlVisibility();
 
@@ -313,6 +315,14 @@ if (headerFiltersToggle) {
     headerFiltersExpanded = !headerFiltersExpanded;
     saveHeaderFiltersPreference();
     updateHeaderFiltersState();
+  });
+}
+
+if (viewModeToggle) {
+  viewModeToggle.addEventListener("click", () => {
+    gridViewMode = gridViewMode === "list" ? "cards" : "list";
+    saveViewModePreference();
+    updateViewModeState();
   });
 }
 

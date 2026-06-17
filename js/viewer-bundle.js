@@ -8,6 +8,7 @@ const grid = document.getElementById("grid");
 const stats = document.getElementById("stats");
 const searchInput = document.getElementById("search");
 const searchClearBtn = document.getElementById("search-clear");
+const viewModeToggle = document.getElementById("view-mode-toggle");
 const sortSelect = document.getElementById("sort");
 const sortControlWrap = document.getElementById("sort-control-wrap");
 const bookOrderBtn = document.getElementById("book-order-btn");
@@ -99,6 +100,7 @@ const ORDERED_STORAGE_KEY = "arkham-collection-ordered";
 const SAMPLE_COLLECTION_STORAGE_KEY = "arkham-sample-collection";
 const COLLECTION_SOURCE_KEY = "arkham-collection-source";
 const HEADER_FILTERS_STORAGE_KEY = "arkham-header-filters-expanded";
+const VIEW_MODE_STORAGE_KEY = "arkham-view-mode";
 const HIGHLIGHT_WANTS_KEY = "arkham-highlight-wants";
 const HIGHLIGHT_COLLECTION_KEY = "arkham-highlight-collection";
 const SHOW_MAGAZINES_KEY = "arkham-show-magazines";
@@ -122,6 +124,7 @@ let orderedIds = new Set();
 let sampleCollectionIds = new Set();
 let collectionSource = "sample";
 let headerFiltersExpanded = true;
+let gridViewMode = "cards";
 let highlightWants = true;
 let highlightCollection = true;
 let showMagazines = false;
@@ -1038,6 +1041,38 @@ function updateHeaderFiltersState() {
   );
 }
 
+function loadViewModePreference() {
+  try {
+    const saved = localStorage.getItem(VIEW_MODE_STORAGE_KEY);
+    if (saved === "list") {
+      gridViewMode = "list";
+    }
+  } catch (_) {
+    // localStorage unavailable
+  }
+}
+
+function saveViewModePreference() {
+  try {
+    localStorage.setItem(VIEW_MODE_STORAGE_KEY, gridViewMode);
+  } catch (_) {
+    // localStorage unavailable
+  }
+}
+
+function updateViewModeState() {
+  document.body.classList.toggle("view-mode-list", gridViewMode === "list");
+  if (!viewModeToggle) {
+    return;
+  }
+  const listMode = gridViewMode === "list";
+  viewModeToggle.setAttribute("aria-pressed", String(listMode));
+  viewModeToggle.setAttribute(
+    "aria-label",
+    listMode ? "Switch to grid view" : "Switch to list view",
+  );
+}
+
 function loadWantList() {
   try {
     const saved = localStorage.getItem(WANT_STORAGE_KEY);
@@ -1891,8 +1926,12 @@ function renderCard(book) {
     </div>
     <div class="card-body">
       ${hiddenBadge}
-      <h2 class="title">${book.title || "Untitled"}</h2>
-      ${book.publicationDate ? `<div class="date">${book.publicationDate}</div>` : ""}
+      <div class="card-list-head">
+        <div class="card-list-primary">
+          <h2 class="title">${book.title || "Untitled"}</h2>
+          ${book.publicationDate ? `<div class="date">${book.publicationDate}</div>` : ""}
+        </div>
+      </div>
       ${renderBookMetaHtml(book)}
       ${bottomRow}
     </div>
@@ -3162,6 +3201,8 @@ loadOrderedCollectionIds();
 loadOwnCollectionIds();
 loadHeaderFiltersPreference();
 updateHeaderFiltersState();
+loadViewModePreference();
+updateViewModeState();
 restoreSortPreference();
 updateSortControlVisibility();
 
@@ -3170,6 +3211,14 @@ if (headerFiltersToggle) {
     headerFiltersExpanded = !headerFiltersExpanded;
     saveHeaderFiltersPreference();
     updateHeaderFiltersState();
+  });
+}
+
+if (viewModeToggle) {
+  viewModeToggle.addEventListener("click", () => {
+    gridViewMode = gridViewMode === "list" ? "cards" : "list";
+    saveViewModePreference();
+    updateViewModeState();
   });
 }
 

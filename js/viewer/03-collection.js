@@ -126,6 +126,38 @@ function updateHeaderFiltersState() {
   );
 }
 
+function loadViewModePreference() {
+  try {
+    const saved = localStorage.getItem(VIEW_MODE_STORAGE_KEY);
+    if (saved === "list") {
+      gridViewMode = "list";
+    }
+  } catch (_) {
+    // localStorage unavailable
+  }
+}
+
+function saveViewModePreference() {
+  try {
+    localStorage.setItem(VIEW_MODE_STORAGE_KEY, gridViewMode);
+  } catch (_) {
+    // localStorage unavailable
+  }
+}
+
+function updateViewModeState() {
+  document.body.classList.toggle("view-mode-list", gridViewMode === "list");
+  if (!viewModeToggle) {
+    return;
+  }
+  const listMode = gridViewMode === "list";
+  viewModeToggle.setAttribute("aria-pressed", String(listMode));
+  viewModeToggle.setAttribute(
+    "aria-label",
+    listMode ? "Switch to grid view" : "Switch to list view",
+  );
+}
+
 function loadWantList() {
   try {
     const saved = localStorage.getItem(WANT_STORAGE_KEY);

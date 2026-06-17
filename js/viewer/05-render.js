@@ -467,8 +467,12 @@ function renderCard(book) {
     </div>
     <div class="card-body">
       ${hiddenBadge}
-      <h2 class="title">${book.title || "Untitled"}</h2>
-      ${book.publicationDate ? `<div class="date">${book.publicationDate}</div>` : ""}
+      <div class="card-list-head">
+        <div class="card-list-primary">
+          <h2 class="title">${book.title || "Untitled"}</h2>
+          ${book.publicationDate ? `<div class="date">${book.publicationDate}</div>` : ""}
+        </div>
+      </div>
       ${renderBookMetaHtml(book)}
       ${bottomRow}
     </div>
