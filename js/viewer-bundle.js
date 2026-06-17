@@ -1809,6 +1809,14 @@ function renderOwnedBadge(book) {
   }
 
   const isOrder = owned.status === "order";
+  if (
+    gridViewMode === "list" &&
+    isCollectionFilterActive() &&
+    (isOrderedFilterActive() || !isOrder)
+  ) {
+    return "";
+  }
+
   const label = isOrder ? "Ordered" : "Collection";
   const className = isOrder ? "owned-badge owned-badge--ordered" : "owned-badge";
 

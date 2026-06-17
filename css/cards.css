@@ -607,6 +607,11 @@ body.view-mode-list .card-bottom-row .owned-badge {
   padding: 0.17rem 0.46rem;
 }
 
+body.view-mode-list.viewing-want .card-bottom-row .want-btn,
+body.view-mode-list.viewing-want .card-bottom-row .want-badge {
+  display: none;
+}
+
 body.view-mode-list .card-bottom-row .imprint-badge {
   flex-shrink: 0;
   order: 20;
