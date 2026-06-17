@@ -204,21 +204,21 @@
   body.view-mode-list .grid {
     display: flex;
     flex-direction: column;
-    gap: 0.2rem;
+    gap: 0.24rem;
   }
 
   body.view-mode-list .cover-wrap {
-    width: 1.75rem;
-    height: 2.65rem;
+    width: 2.1rem;
+    height: 3.18rem;
   }
 
   body.view-mode-list .card-body {
-    padding: 0.15rem 0.35rem 0.15rem 0.3rem;
-    gap: 0.25rem;
+    padding: 0.18rem 0.42rem 0.18rem 0.36rem;
+    gap: 0.3rem;
   }
 
   body.view-mode-list .card-list-head .title {
-    font-size: 0.78rem;
+    font-size: 0.94rem;
     display: block;
     -webkit-line-clamp: unset;
     -webkit-box-orient: unset;
@@ -229,7 +229,7 @@
 
   body.view-mode-list .card-list-primary .date {
     display: block;
-    font-size: 0.62rem;
+    font-size: 0.74rem;
   }
 
   .title {
