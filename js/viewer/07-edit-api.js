@@ -33,7 +33,7 @@ async function deleteBook() {
           invalidateSortedCache();
 
           if (detailBookId === editingBookId) {
-      closeBookDetail();
+      closeBookDetail({ programmatic: true });
     }
 
     closeEditDialog();
@@ -142,7 +142,7 @@ async function saveBookEdits(event) {
     closeEditDialog();
     render();
     if (detailBookId === savedBookId) {
-      openBookDetail(savedBookId);
+      openBookDetail(savedBookId, { historyMode: "none" });
     }
   } catch (error) {
     console.error(error);

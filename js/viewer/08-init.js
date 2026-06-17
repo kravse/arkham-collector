@@ -1,5 +1,7 @@
 /* Event listeners and application startup */
 
+window.addEventListener("popstate", handleDetailPopState);
+
 grid.addEventListener("click", (event) => {
   const editButton = event.target.closest(".edit-book-btn");
   if (editButton) {
@@ -355,11 +357,17 @@ stats.addEventListener("click", (event) => {
 });
 
 if (readOnly) {
-  ensureSampleCollectionIds().then(render);
+  ensureSampleCollectionIds().then(() => {
+    render();
+    openBookDetailFromLocation();
+  });
 } else {
   checkServeSupport()
     .then(() => ensureSampleCollectionIds())
-    .then(render);
+    .then(() => {
+      render();
+      openBookDetailFromLocation();
+    });
 }
 
 })();

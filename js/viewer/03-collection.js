@@ -299,7 +299,7 @@ function toggleWant(bookId) {
   saveWantList();
   render();
   if (!bookDetailDialog.hidden) {
-    openBookDetail(detailBookId);
+    openBookDetail(detailBookId, { historyMode: "none" });
   }
 }
 
@@ -328,7 +328,7 @@ function toggleCollection(bookId) {
 
   render();
   if (!bookDetailDialog.hidden) {
-    openBookDetail(detailBookId);
+    openBookDetail(detailBookId, { historyMode: "none" });
   }
 }
 

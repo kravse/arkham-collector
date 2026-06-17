@@ -1214,7 +1214,7 @@ function toggleWant(bookId) {
   saveWantList();
   render();
   if (!bookDetailDialog.hidden) {
-    openBookDetail(detailBookId);
+    openBookDetail(detailBookId, { historyMode: "none" });
   }
 }
 
@@ -1243,7 +1243,7 @@ function toggleCollection(bookId) {
 
   render();
   if (!bookDetailDialog.hidden) {
-    openBookDetail(detailBookId);
+    openBookDetail(detailBookId, { historyMode: "none" });
   }
 }
 
@@ -1965,7 +1965,7 @@ function render() {
   if (!bookDetailDialog.hidden && detailBookId) {
     const detailBook = books.find((entry) => entry.id === detailBookId);
     if (detailBook && !passesMycroftImprintFilter(detailBook)) {
-      closeBookDetail();
+      closeBookDetail({ programmatic: true });
     }
   }
 
@@ -2063,6 +2063,52 @@ function render() {
 
 /* Book detail overlay, settings, and attribution dialogs */
 
+function detailPageUrl(bookId) {
+  return `${window.location.pathname}${window.location.search}#book/${bookId}`;
+}
+
+function detailPageBaseUrl() {
+  return `${window.location.pathname}${window.location.search}`;
+}
+
+function parseDetailBookIdFromHash() {
+  const match = window.location.hash.match(/^#book\/(\d+)$/);
+  return match ? Number(match[1]) : null;
+}
+
+function isDetailHistoryActive() {
+  return history.state?.view === "detail";
+}
+
+function pushDetailHistory(bookId) {
+  history.pushState({ view: "detail", bookId }, "", detailPageUrl(bookId));
+}
+
+function replaceDetailHistory(bookId) {
+  history.replaceState({ view: "detail", bookId }, "", detailPageUrl(bookId));
+}
+
+function clearDetailHistory() {
+  history.replaceState(null, "", detailPageBaseUrl());
+}
+
+function openBookDetailFromLocation() {
+  const bookId = parseDetailBookIdFromHash();
+  if (bookId) {
+    openBookDetail(bookId, { historyMode: "replace" });
+  }
+}
+
+function handleDetailPopState() {
+  const state = history.state;
+  if (state?.view === "detail") {
+    openBookDetail(state.bookId, { historyMode: "none" });
+    return;
+  }
+  if (!bookDetailDialog.hidden) {
+    closeBookDetail({ fromPopState: true });
+  }
+}
 function getDetailNavigation() {
   const visible = getVisibleBooks();
   const index = visible.findIndex((book) => book.id === detailBookId);
@@ -2079,7 +2125,7 @@ function getDetailNavigation() {
 function updateDetailNav() {
   const book = books.find((entry) => entry.id === detailBookId);
   if (!book || isDeleted(book)) {
-    closeBookDetail();
+    closeBookDetail({ programmatic: true });
     return;
   }
 
@@ -2096,7 +2142,7 @@ function navigateDetail(direction) {
   const { prevId, nextId } = getDetailNavigation();
   const targetId = direction < 0 ? prevId : nextId;
   if (targetId) {
-    openBookDetail(targetId);
+    openBookDetail(targetId, { historyMode: "replace" });
   }
 }
 
@@ -2135,7 +2181,8 @@ async function checkServeSupport() {
   refreshDetailToolbarIfOpen();
 }
 
-function openBookDetail(bookId) {
+function openBookDetail(bookId, options = {}) {
+  let { historyMode = "push" } = options;
   const book = books.find((entry) => entry.id === bookId);
   if (!book || isDeleted(book)) {
     return;
@@ -2200,9 +2247,18 @@ function openBookDetail(bookId) {
     detailScrollBlock.scrollTop = 0;
   }
   updateDetailNav();
+
+  if (historyMode === "push" && isDetailHistoryActive()) {
+    historyMode = "replace";
+  }
+  if (historyMode === "push") {
+    pushDetailHistory(bookId);
+  } else if (historyMode === "replace") {
+    replaceDetailHistory(bookId);
+  }
 }
 
-function closeBookDetail() {
+function closeBookDetailUI() {
   detailBookId = null;
   bookDetailDialog.hidden = true;
   bookDetailCover.innerHTML = "";
@@ -2225,6 +2281,30 @@ function closeBookDetail() {
     bookDetailNextBtn.hidden = true;
   }
   document.body.classList.remove("book-detail-open");
+}
+
+function closeBookDetail(options = {}) {
+  const { fromPopState = false, programmatic = false } = options;
+
+  if (fromPopState) {
+    closeBookDetailUI();
+    return;
+  }
+
+  if (programmatic) {
+    closeBookDetailUI();
+    if (isDetailHistoryActive() || parseDetailBookIdFromHash() != null) {
+      clearDetailHistory();
+    }
+    return;
+  }
+
+  if (isDetailHistoryActive()) {
+    history.back();
+    return;
+  }
+
+  closeBookDetailUI();
 }
 
 function openEditDialog(bookId) {
@@ -2288,7 +2368,7 @@ async function onCollectionSourceChange(next) {
   syncSettingsCollectionRadios();
   render();
   if (!bookDetailDialog.hidden && detailBookId) {
-    openBookDetail(detailBookId);
+    openBookDetail(detailBookId, { historyMode: "none" });
   }
 }
 
@@ -2356,7 +2436,7 @@ async function resetSampleCollection() {
   hideResetSampleConfirm();
   render();
   if (!bookDetailDialog.hidden && detailBookId) {
-    openBookDetail(detailBookId);
+    openBookDetail(detailBookId, { historyMode: "none" });
   }
 }
 
@@ -2407,7 +2487,7 @@ async function deleteBook() {
           invalidateSortedCache();
 
           if (detailBookId === editingBookId) {
-      closeBookDetail();
+      closeBookDetail({ programmatic: true });
     }
 
     closeEditDialog();
@@ -2516,7 +2596,7 @@ async function saveBookEdits(event) {
     closeEditDialog();
     render();
     if (detailBookId === savedBookId) {
-      openBookDetail(savedBookId);
+      openBookDetail(savedBookId, { historyMode: "none" });
     }
   } catch (error) {
     console.error(error);
@@ -2904,6 +2984,8 @@ function refreshBookOrderDialogIfOpen() {
 
 /* Event listeners and application startup */
 
+window.addEventListener("popstate", handleDetailPopState);
+
 grid.addEventListener("click", (event) => {
   const editButton = event.target.closest(".edit-book-btn");
   if (editButton) {
@@ -3259,11 +3341,17 @@ stats.addEventListener("click", (event) => {
 });
 
 if (readOnly) {
-  ensureSampleCollectionIds().then(render);
+  ensureSampleCollectionIds().then(() => {
+    render();
+    openBookDetailFromLocation();
+  });
 } else {
   checkServeSupport()
     .then(() => ensureSampleCollectionIds())
-    .then(render);
+    .then(() => {
+      render();
+      openBookDetailFromLocation();
+    });
 }
 
 })();

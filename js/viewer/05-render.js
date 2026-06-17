@@ -506,7 +506,7 @@ function render() {
   if (!bookDetailDialog.hidden && detailBookId) {
     const detailBook = books.find((entry) => entry.id === detailBookId);
     if (detailBook && !passesMycroftImprintFilter(detailBook)) {
-      closeBookDetail();
+      closeBookDetail({ programmatic: true });
     }
   }
 
