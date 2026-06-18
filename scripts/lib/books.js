@@ -21,6 +21,7 @@ const {
   findLocalCoverFile,
   reconcileCoverFiles,
   downloadCover,
+  resolveCoverPathsInBooks,
 } = require("./covers-files");
 const {
   loadEdits,
@@ -258,11 +259,12 @@ function writeOutput(payload) {
     dedupedBooks,
     loadEdits().edits,
   );
-  const migratedHidden = migrateLegacyHiddenFromBooks(reconciledBooks);
+  const resolvedBooks = resolveCoverPathsInBooks(reconciledBooks);
+  const migratedHidden = migrateLegacyHiddenFromBooks(resolvedBooks);
   if (migratedHidden > 0) {
     console.log(`Migrated ${migratedHidden} hidden book(s) to data/edits.json`);
   }
-  const scrapedBooks = stripScrapedHidden(reconciledBooks);
+  const scrapedBooks = stripScrapedHidden(resolvedBooks);
   const output = { ...payload, books: scrapedBooks };
 
   const jsonPath = path.join(DATA_DIR, "books.json");

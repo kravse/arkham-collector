@@ -46,6 +46,8 @@ const bookDetailToolbarStart = document.getElementById(
   "book-detail-toolbar-start",
 );
 const bookDetailImprint = document.getElementById("book-detail-imprint");
+const coverLightbox = document.getElementById("cover-lightbox");
+const coverLightboxImg = document.getElementById("cover-lightbox-img");
 const settingsBtn = document.getElementById("settings-btn");
 const settingsDialog = document.getElementById("settings-dialog");
 const settingsCloseBtn = document.getElementById("settings-close");

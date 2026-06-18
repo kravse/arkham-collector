@@ -35,6 +35,7 @@ grid.addEventListener("click", (event) => {
 });
 
 bookDetailCloseBtn.addEventListener("click", closeBookDetail);
+bookDetailCover.addEventListener("click", handleCoverZoomTrigger);
 bookDetailPrevBtn.addEventListener("click", (event) => {
   event.stopPropagation();
   navigateDetail(-1);
@@ -101,6 +102,43 @@ settingsTabAbout.addEventListener("click", () => {
 
 settingsTabSettings.addEventListener("click", () => {
   selectSettingsTab("settings");
+});
+
+if (coverLightbox) {
+  coverLightbox.addEventListener("click", (event) => {
+    if (event.target.closest(".cover-lightbox-img")) {
+      if (isMobileCoverLightboxViewport()) {
+        closeCoverLightbox();
+      }
+      return;
+    }
+    closeCoverLightbox();
+  });
+}
+
+document.addEventListener("keydown", (event) => {
+  if (event.key !== "Escape") {
+    return;
+  }
+  if (coverLightbox && !coverLightbox.hidden) {
+    event.preventDefault();
+    closeCoverLightbox();
+  }
+});
+
+document.addEventListener("keydown", (event) => {
+  if (coverLightbox && !coverLightbox.hidden) {
+    if (event.key === "ArrowLeft") {
+      event.preventDefault();
+      navigateCoverLightbox(-1);
+      return;
+    }
+    if (event.key === "ArrowRight") {
+      event.preventDefault();
+      navigateCoverLightbox(1);
+      return;
+    }
+  }
 });
 
 if (storageModeLocalInput) {
@@ -231,7 +269,11 @@ document.addEventListener("keydown", (event) => {
     closeBookDetail();
     return;
   }
-  if (!bookDetailDialog.hidden && editDialog.hidden) {
+  if (
+    !bookDetailDialog.hidden &&
+    editDialog.hidden &&
+    (!coverLightbox || coverLightbox.hidden)
+  ) {
     if (event.key === "ArrowLeft") {
       event.preventDefault();
       navigateDetail(-1);

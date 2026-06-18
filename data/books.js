@@ -26,7 +26,7 @@ window.BOOKS = [
     "publicationDate": "2010",
     "wikipediaUrl": null,
     "coverImageUrl": null,
-    "coverImageFile": null,
+    "coverImageFile": "covers/baker-street-irregular-232.jpg",
     "error": null
   },
   {
@@ -56,7 +56,7 @@ window.BOOKS = [
     "publicationDate": "2009",
     "wikipediaUrl": null,
     "coverImageUrl": null,
-    "coverImageFile": null,
+    "coverImageFile": "covers/who-shall-i-say-is-calling-other-stories-234.jpg",
     "error": null
   },
   {
@@ -71,7 +71,7 @@ window.BOOKS = [
     "publicationDate": "2009",
     "wikipediaUrl": null,
     "coverImageUrl": null,
-    "coverImageFile": null,
+    "coverImageFile": "covers/the-sleepers-and-other-wakeful-things-235.jpg",
     "error": null
   },
   {
@@ -86,7 +86,7 @@ window.BOOKS = [
     "publicationDate": "2009",
     "wikipediaUrl": null,
     "coverImageUrl": null,
-    "coverImageFile": null,
+    "coverImageFile": "covers/that-is-not-dead-236.jpg",
     "error": null
   },
   {
@@ -101,7 +101,7 @@ window.BOOKS = [
     "publicationDate": "2009",
     "wikipediaUrl": null,
     "coverImageUrl": null,
-    "coverImageFile": null,
+    "coverImageFile": "covers/august-derleths-eerie-creatures-237.jpg",
     "error": null
   },
   {
@@ -116,7 +116,7 @@ window.BOOKS = [
     "publicationDate": "2008",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Shunned_House",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/commons/2/26/The_Shunned_House.jpg",
-    "coverImageFile": "covers/the-shunned-house-8.jpg",
+    "coverImageFile": null,
     "error": null
   },
   {
@@ -546,7 +546,7 @@ window.BOOKS = [
     "publicationDate": "1989",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Tales_of_the_Cthulhu_Mythos%3A_Golden_Anniversary_Anthology",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/7/7e/Tales_of_the_Cthulhu_Mythos.jpg",
-    "coverImageFile": "covers/tales-of-the-cthulhu-mythos-golden-anniversary-anthology-35.jpg",
+    "coverImageFile": "covers/tales-of-the-cthulhu-mythos-golden-anniversary-anthology-265.jpg",
     "error": null,
     "goodreadsUrl": "https://www.goodreads.com/book/show/36320.Tales_of_the_Cthulhu_Mythos"
   },
@@ -578,7 +578,7 @@ window.BOOKS = [
     "publicationDate": "1989",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Horror_in_the_Museum_and_Other_Revisions",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/8/82/Horror_in_the_museum.jpg",
-    "coverImageFile": "covers/the-horror-in-the-museum-and-other-revisions-37.jpg",
+    "coverImageFile": "covers/the-horror-in-the-museum-and-other-revisions-429.jpg",
     "error": null,
     "goodreadsUrl": "https://www.goodreads.com/book/show/1157900.The_Horror_in_the_Museum"
   },
@@ -690,7 +690,7 @@ window.BOOKS = [
     "publicationDate": "1986",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Dagon_and_Other_Macabre_Tales",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/8/8f/Dagon_first.jpg",
-    "coverImageFile": "covers/dagon-and-other-macabre-tales-44.jpg",
+    "coverImageFile": "covers/dagon-and-other-macabre-tales-430.jpg",
     "error": null,
     "goodreadsUrl": "https://www.goodreads.com/book/show/102575.Dagon_and_Other_Macabre_Tales"
   },
@@ -706,7 +706,7 @@ window.BOOKS = [
     "publicationDate": "1985",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/At_the_Mountains_of_Madness_and_Other_Novels",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/a/a0/At_the_mountains_of_madness.jpg",
-    "coverImageFile": "covers/at-the-mountains-of-madness-and-other-novels-45.jpg",
+    "coverImageFile": "covers/at-the-mountains-of-madness-and-other-novels-431.jpg",
     "error": null,
     "goodreadsUrl": "https://www.goodreads.com/book/show/32768.At_the_Mountains_of_Madness_and_Other_Novels"
   },
@@ -722,7 +722,7 @@ window.BOOKS = [
     "publicationDate": "1985",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Dunwich_Horror_and_Others",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/commons/6/63/Dunwich_Horror_and_Others_dust_jacket.jpg",
-    "coverImageFile": "covers/the-dunwich-horror-and-others-46.jpg",
+    "coverImageFile": "covers/the-dunwich-horror-and-others-432.webp",
     "error": null,
     "goodreadsUrl": "https://www.goodreads.com/book/show/63213.The_Dunwich_Horror_and_Others"
   },
@@ -930,7 +930,7 @@ window.BOOKS = [
     "publicationDate": "1980",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/New_Tales_of_the_Cthulhu_Mythos",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/7/7e/Tales_of_the_Cthulhu_Mythos.jpg",
-    "coverImageFile": "covers/tales-of-the-cthulhu-mythos-golden-anniversary-anthology-35.jpg",
+    "coverImageFile": "covers/new-tales-of-the-cthulhu-mythos-289.jpg",
     "error": null,
     "goodreadsUrl": "https://www.goodreads.com/book/show/36320.Tales_of_the_Cthulhu_Mythos"
   },
@@ -1202,7 +1202,7 @@ window.BOOKS = [
     "publicationDate": null,
     "wikipediaUrl": null,
     "coverImageUrl": null,
-    "coverImageFile": null,
+    "coverImageFile": "covers/the-purcell-papers-306.webp",
     "error": null,
     "goodreadsUrl": "https://www.goodreads.com/book/show/309714.The_Purcell_Papers"
   },
@@ -1426,7 +1426,7 @@ window.BOOKS = [
     "publicationDate": "1972",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Arkham_Collector%3A_Volume_I",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/f/fe/The_Arkham_Collector%2C_Volume_I_book_cover.png",
-    "coverImageFile": "covers/the-arkham-collector-volume-i-90.png",
+    "coverImageFile": "covers/the-arkham-collector-volume-i-320.jpg",
     "error": null
   },
   {
@@ -1489,7 +1489,7 @@ window.BOOKS = [
     "publicationDate": "Summer, 1971",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Arkham_Collector",
     "coverImageUrl": null,
-    "coverImageFile": null,
+    "coverImageFile": "covers/the-arkham-collector-324.jpg",
     "error": null,
     "listYear": "1971-10"
   },
@@ -1537,7 +1537,7 @@ window.BOOKS = [
     "publicationDate": "Spring, 1971",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Arkham_Collector",
     "coverImageUrl": null,
-    "coverImageFile": null,
+    "coverImageFile": "covers/the-arkham-collector-433.jpg",
     "error": null,
     "listYear": "1971-9"
   },
@@ -1585,7 +1585,7 @@ window.BOOKS = [
     "publicationDate": "Winter, 1971",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Arkham_Collector",
     "coverImageUrl": null,
-    "coverImageFile": null,
+    "coverImageFile": "covers/the-arkham-collector-434.jpg",
     "error": null,
     "listYear": "1971-8"
   },
@@ -1601,7 +1601,7 @@ window.BOOKS = [
     "publicationDate": "1970",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Horror_in_the_Museum_and_Other_Revisions",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/8/82/Horror_in_the_museum.jpg",
-    "coverImageFile": "covers/the-horror-in-the-museum-and-other-revisions-37.jpg",
+    "coverImageFile": null,
     "error": null,
     "goodreadsUrl": "https://www.goodreads.com/book/show/1157900.The_Horror_in_the_Museum"
   },
@@ -1617,7 +1617,7 @@ window.BOOKS = [
     "publicationDate": "Summer, 1970",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Arkham_Collector",
     "coverImageUrl": null,
-    "coverImageFile": null,
+    "coverImageFile": "covers/the-arkham-collector-435.jpg",
     "error": null,
     "listYear": "1970-7"
   },
@@ -1681,7 +1681,7 @@ window.BOOKS = [
     "publicationDate": "Winter, 1970",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Arkham_Collector",
     "coverImageUrl": null,
-    "coverImageFile": null,
+    "coverImageFile": "covers/the-arkham-collector-436.jpg",
     "error": null,
     "listYear": "1970-6"
   },
@@ -1713,7 +1713,7 @@ window.BOOKS = [
     "publicationDate": "1969",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Tales_of_the_Cthulhu_Mythos",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/7/7e/Tales_of_the_Cthulhu_Mythos.jpg",
-    "coverImageFile": "covers/cthulhu-mythos-anthology-108.jpg",
+    "coverImageFile": "covers/tales-of-the-cthulhu-mythos-333.jpg",
     "error": null,
     "goodreadsUrl": "https://www.goodreads.com/book/show/36320.Tales_of_the_Cthulhu_Mythos"
   },
@@ -1729,7 +1729,7 @@ window.BOOKS = [
     "publicationDate": "Summer, 1969",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Arkham_Collector",
     "coverImageUrl": null,
-    "coverImageFile": null,
+    "coverImageFile": "covers/the-arkham-collector-437.jpg",
     "error": null,
     "listYear": "1969-5"
   },
@@ -1745,7 +1745,7 @@ window.BOOKS = [
     "publicationDate": "Winter, 1969",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Arkham_Collector",
     "coverImageUrl": null,
-    "coverImageFile": null,
+    "coverImageFile": "covers/the-arkham-collector-438.jpg",
     "error": null,
     "listYear": "1969-4"
   },
@@ -1761,7 +1761,7 @@ window.BOOKS = [
     "publicationDate": "Summer, 1968",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Arkham_Collector",
     "coverImageUrl": null,
-    "coverImageFile": null,
+    "coverImageFile": "covers/the-arkham-collector-439.jpg",
     "error": null,
     "listYear": "1968-3"
   },
@@ -1825,7 +1825,7 @@ window.BOOKS = [
     "publicationDate": "Winter, 1968",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Arkham_Collector",
     "coverImageUrl": null,
-    "coverImageFile": null,
+    "coverImageFile": "covers/the-arkham-collector-440.jpg",
     "error": null,
     "listYear": "1968-2"
   },
@@ -1888,7 +1888,7 @@ window.BOOKS = [
     "publicationDate": "Summer, 1967",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Arkham_Collector",
     "coverImageUrl": null,
-    "coverImageFile": null,
+    "coverImageFile": "covers/the-arkham-collector-441.jpg",
     "error": null,
     "listYear": "1967-1"
   },
@@ -2030,7 +2030,7 @@ window.BOOKS = [
     "publicationDate": "1965",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Dagon_and_Other_Macabre_Tales",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/8/8f/Dagon_first.jpg",
-    "coverImageFile": "covers/dagon-and-other-macabre-tales-44.jpg",
+    "coverImageFile": null,
     "error": null,
     "goodreadsUrl": "https://www.goodreads.com/book/show/102575.Dagon_and_Other_Macabre_Tales"
   },
@@ -2126,7 +2126,7 @@ window.BOOKS = [
     "publicationDate": "1964",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/At_the_Mountains_of_Madness_and_Other_Novels",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/a/a0/At_the_mountains_of_madness.jpg",
-    "coverImageFile": "covers/at-the-mountains-of-madness-and-other-novels-45.jpg",
+    "coverImageFile": null,
     "error": null,
     "goodreadsUrl": "https://www.goodreads.com/book/show/32768.At_the_Mountains_of_Madness_and_Other_Novels"
   },
@@ -2238,7 +2238,7 @@ window.BOOKS = [
     "publicationDate": "1963",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Autobiography%3A_Some_Notes_on_a_Nonentity",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/9/9e/Nonentity.jpg",
-    "coverImageFile": "covers/autobiography-some-notes-on-a-nonentity-141.jpg",
+    "coverImageFile": "covers/autobiography-some-notes-on-a-nonentity-359.png",
     "error": null
   },
   {
@@ -2253,7 +2253,7 @@ window.BOOKS = [
     "publicationDate": "1963",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Dunwich_Horror_and_Others",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/commons/6/63/Dunwich_Horror_and_Others_dust_jacket.jpg",
-    "coverImageFile": "covers/the-dunwich-horror-and-others-46.jpg",
+    "coverImageFile": null,
     "error": null,
     "goodreadsUrl": "https://www.goodreads.com/book/show/63213.The_Dunwich_Horror_and_Others"
   },
@@ -2665,7 +2665,7 @@ window.BOOKS = [
     "publicationDate": "1951",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Dark_Chateau",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/c/c1/Dark_chateau.jpg",
-    "coverImageFile": "covers/the-dark-chateau-168.jpg",
+    "coverImageFile": "covers/the-dark-chateau-384.png",
     "error": null,
     "goodreadsUrl": "https://www.goodreads.com/book/show/12742049-the-dark-chateau"
   },
@@ -2681,7 +2681,7 @@ window.BOOKS = [
     "publicationDate": "1950",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/A_Hornbook_for_Witches",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/6/61/A_Hornbook_for_Witches_%28cover_art%29.jpg",
-    "coverImageFile": "covers/a-hornbook-for-witches-169.jpg",
+    "coverImageFile": "covers/a-hornbook-for-witches-385.png",
     "error": null,
     "goodreadsUrl": "https://www.goodreads.com/book/show/3904585"
   },
@@ -2713,7 +2713,7 @@ window.BOOKS = [
     "publicationDate": "Autumn, 1949",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Arkham_Sampler",
     "coverImageUrl": null,
-    "coverImageFile": null,
+    "coverImageFile": "covers/the-arkham-sampler-420.jpg",
     "error": null,
     "listYear": "1949-II-4"
   },
@@ -2729,7 +2729,7 @@ window.BOOKS = [
     "publicationDate": "Summer, 1949",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Arkham_Sampler",
     "coverImageUrl": null,
-    "coverImageFile": null,
+    "coverImageFile": "covers/the-arkham-sampler-421.jpg",
     "error": null,
     "listYear": "1949-II-3"
   },
@@ -2745,7 +2745,7 @@ window.BOOKS = [
     "publicationDate": "Spring, 1949",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Arkham_Sampler",
     "coverImageUrl": null,
-    "coverImageFile": null,
+    "coverImageFile": "covers/the-arkham-sampler-422.jpg",
     "error": null,
     "listYear": "1949-II-2"
   },
@@ -2761,7 +2761,7 @@ window.BOOKS = [
     "publicationDate": "Winter, 1949",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Arkham_Sampler",
     "coverImageUrl": null,
-    "coverImageFile": null,
+    "coverImageFile": "covers/the-arkham-sampler-423.jpg",
     "error": null,
     "listYear": "1949-II-1"
   },
@@ -2825,7 +2825,7 @@ window.BOOKS = [
     "publicationDate": "Autumn, 1948",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Arkham_Sampler",
     "coverImageUrl": null,
-    "coverImageFile": null,
+    "coverImageFile": "covers/the-arkham-sampler-424.jpg",
     "error": null,
     "listYear": "1948-I-4"
   },
@@ -2841,7 +2841,7 @@ window.BOOKS = [
     "publicationDate": "Summer, 1948",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Arkham_Sampler",
     "coverImageUrl": null,
-    "coverImageFile": null,
+    "coverImageFile": "covers/the-arkham-sampler-425.jpg",
     "error": null,
     "listYear": "1948-I-3"
   },
@@ -2857,7 +2857,7 @@ window.BOOKS = [
     "publicationDate": "Spring, 1948",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Arkham_Sampler",
     "coverImageUrl": null,
-    "coverImageFile": null,
+    "coverImageFile": "covers/the-arkham-sampler-426.jpg",
     "error": null,
     "listYear": "1948-I-2"
   },
@@ -2873,7 +2873,7 @@ window.BOOKS = [
     "publicationDate": "Winter, 1948",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Arkham_Sampler",
     "coverImageUrl": null,
-    "coverImageFile": null,
+    "coverImageFile": "covers/the-arkham-sampler-427.jpg",
     "error": null,
     "listYear": "1948-I-1"
   },
@@ -3319,7 +3319,7 @@ window.BOOKS = [
     "publicationDate": "1942",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Out_of_Space_and_Time",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/commons/d/d5/%22Out_of_Space_and_Time%22%2C_by_Clark_Ashton_Smith.jpg",
-    "coverImageFile": "covers/out-of-space-and-time-209.jpg",
+    "coverImageFile": "covers/out-of-space-and-time-417.jpg",
     "error": null,
     "goodreadsUrl": "https://www.goodreads.com/book/show/102093.Out_Of_Space_And_Time"
   },
@@ -3351,7 +3351,7 @@ window.BOOKS = [
     "publicationDate": "1939",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Outsider_and_Others",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/2/27/The_Outsider_and_Others_book_cover.jpg",
-    "coverImageFile": "covers/the-outsider-and-others-211.jpg",
+    "coverImageFile": "covers/the-outsider-and-others-419.png",
     "error": null,
     "goodreadsUrl": "https://www.goodreads.com/book/show/176155"
   },

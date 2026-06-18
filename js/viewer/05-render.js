@@ -1,59 +1,36 @@
 /* Covers, cards, stats, and main grid render */
 
-function slugify(value) {
-  return String(value || "")
-    .toLowerCase()
-    .replace(/['']/g, "")
-    .replace(/&/g, "and")
-    .replace(/[^a-z0-9\s]/g, " ")
-    .replace(/\s+/g, " ")
-    .trim()
-    .replace(/^the\s+/, "");
-}
+const coverZoomLensIcon = `
+<svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+  <circle cx="8.5" cy="8.5" r="4.75" stroke="currentColor" stroke-width="1.5" />
+  <path d="M12.5 12.5 16 16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+</svg>`;
 
-function wikiTitleFromUrl(url) {
-  if (!url) return null;
-  const match = url.match(/\/wiki\/([^#?]+)/);
-  return match ? decodeURIComponent(match[1].replace(/\+/g, " ")) : null;
-}
-
-function getCoverSources(book) {
-  if (book.coverEditPath) {
-    return [book.coverEditPath];
-  }
-
-  const sources = [];
-  if (book.coverImageFile) {
-    sources.push(book.coverImageFile);
-  }
-
-  const slugBase = slugify(
-    wikiTitleFromUrl(book.wikipediaUrl) || book.listTitle || book.title,
-  );
-  if (slugBase && book.id) {
-    ["jpg", "jpeg", "png", "webp", "gif"].forEach((ext) => {
-      sources.push(`covers/${slugBase}-${book.id}.${ext}`);
-    });
-  }
-
-  if (book.coverImageUrl) {
-    sources.push(book.coverImageUrl);
-  }
-
-  return [...new Set(sources)];
-}
-
-function renderCover(book, cacheKey) {
-  const sources = getCoverSources(book);
+function renderCover(book, cacheKey, variant = "card") {
+  const sources = viewerCovers.getCoverSources(book, variant);
   if (!sources.length) {
     return `<div class="placeholder">No cover image</div>`;
   }
 
-  const primary = cacheKey
-    ? `${sources[0]}?v=${encodeURIComponent(cacheKey)}`
-    : sources[0];
+  const primary = viewerCovers.appendCoverCacheKey(sources[0], cacheKey);
   const fallback = sources.slice(1).join("|");
-  return `<img src="${primary}" alt="Cover of ${book.title}" loading="lazy" data-fallbacks="${fallback}" onerror="tryCoverFallback(this)">`;
+  const title = escapeHtml(book.title || "this book");
+  const imgHtml = `<img src="${primary}" alt="Cover of ${title}" loading="lazy" data-fallbacks="${fallback}" onerror="tryCoverFallback(this)">`;
+
+  if (variant !== "detail") {
+    return imgHtml;
+  }
+
+  return `
+    <button
+      type="button"
+      class="cover-zoom-trigger"
+      data-book-id="${book.id}"
+      aria-label="View cover of ${title} larger"
+    >
+      ${imgHtml}
+      <span class="cover-zoom-lens">${coverZoomLensIcon}</span>
+    </button>`;
 }
 
 const editIcon = `

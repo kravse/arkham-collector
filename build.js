@@ -9,6 +9,10 @@ const {
   findLocalCoverForBook,
   resolveCoverPathsInBooks,
 } = require("./scripts/lib/covers-files");
+const {
+  optimizeCoverPaths,
+  applyOptimizedCoverPaths,
+} = require("./scripts/lib/cover-optimize");
 const { bundleViewerJs } = require("./scripts/bundle-viewer-js");
 const { syncCollectionFromCsv } = require("./scripts/lib/collection");
 
@@ -42,6 +46,7 @@ const VIEWER_CSS_FILES = [
   "cards.css",
   "edit-dialog.css",
   "book-detail.css",
+  "cover-lightbox.css",
   "mobile.css",
 ];
 
@@ -155,6 +160,10 @@ Disallow: /
 const DEPLOY_ORIGIN = "https://arkhamcollector.org";
 
 function buildStaticSite() {
+  return buildStaticSiteAsync();
+}
+
+async function buildStaticSiteAsync() {
   bundleViewerJs();
 
   if (!fs.existsSync(BOOKS_JSON)) {
@@ -202,7 +211,30 @@ function buildStaticSite() {
 
   const buildDataDir = path.join(BUILD_DIR, "data");
   fs.mkdirSync(buildDataDir, { recursive: true });
-  writeViewerBookScripts(mergedBooks, buildDataDir);
+
+  const coverPaths = collectCoverPaths(publicBooks);
+  let optimizedCovers = 0;
+  let missingCovers = 0;
+  let coverCardBytes = 0;
+  let coverDetailBytes = 0;
+  let booksForDeploy = mergedBooks;
+
+  if (coverPaths.size) {
+    const { optimizedBySource, stats } = await optimizeCoverPaths(
+      [...coverPaths],
+      {
+        root: ROOT,
+        destRoot: BUILD_DIR,
+      },
+    );
+    booksForDeploy = applyOptimizedCoverPaths(mergedBooks, optimizedBySource);
+    optimizedCovers = stats.processed;
+    missingCovers = stats.missing;
+    coverCardBytes = stats.cardBytes;
+    coverDetailBytes = stats.detailBytes;
+  }
+
+  writeViewerBookScripts(booksForDeploy, buildDataDir);
 
   if (fs.existsSync(EDITS_JS)) {
     copyFile(EDITS_JS, path.join(BUILD_DIR, "data", "edits.js"));
@@ -262,28 +294,14 @@ function buildStaticSite() {
     copiedAssets += 1;
   }
 
-  const coverPaths = collectCoverPaths(publicBooks);
-  let copiedCovers = 0;
-  let missingCovers = 0;
-
-  for (const relativePath of coverPaths) {
-    const src = path.join(ROOT, relativePath);
-    const dest = path.join(BUILD_DIR, relativePath);
-    if (fs.existsSync(src)) {
-      copyFile(src, dest);
-      copiedCovers += 1;
-    } else {
-      missingCovers += 1;
-      console.warn(`Missing cover file: ${relativePath}`);
-    }
-  }
-
   console.log(`Built static site in ${BUILD_DIR}`);
   console.log(
     `Books: ${publicBooks.length} visible (${mergedBooks.length - publicBooks.length} hidden excluded from covers)`
   );
   console.log(`Static assets copied: ${copiedAssets}`);
-  console.log(`Covers copied: ${copiedCovers}`);
+  console.log(
+    `Covers optimized: ${optimizedCovers} (${(coverCardBytes / 1024).toFixed(1)} KB card + ${(coverDetailBytes / 1024).toFixed(1)} KB detail WebP)`,
+  );
   if (missingCovers) {
     console.log(`Covers missing on disk: ${missingCovers}`);
   }
@@ -296,7 +314,10 @@ function buildStaticSite() {
 
 try {
   if (require.main === module) {
-    buildStaticSite();
+    buildStaticSiteAsync().catch((error) => {
+      console.error(error.message || error);
+      process.exit(1);
+    });
   }
 } catch (error) {
   console.error(error.message || error);
@@ -306,6 +327,7 @@ try {
 module.exports = {
   applyBuildHtmlTransforms,
   buildStaticSite,
+  buildStaticSiteAsync,
   VIEWER_CSS_FILES,
   DEPLOY_ORIGIN,
 };

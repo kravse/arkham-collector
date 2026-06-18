@@ -11,6 +11,7 @@ const { syncViewerMode } = require("./sync-viewer-mode");
 const { syncViewerUserState } = require("./sync-viewer-user-state");
 const { syncViewerGistSync } = require("./sync-viewer-gist-sync");
 const { syncViewerCollectionImport } = require("./sync-viewer-collection-import");
+const { syncViewerCovers } = require("./sync-viewer-covers");
 
 const ROOT = path.join(__dirname, "..");
 const VIEWER_DIR = path.join(ROOT, "js", "viewer");
@@ -38,6 +39,10 @@ const PARTS = [
     file: "00-viewer-collection-import.js",
     title:
       "Collection CSV import (generated from scripts/lib/viewer-collection-import.js)",
+  },
+  {
+    file: "00-viewer-covers.js",
+    title: "Cover source helpers (generated from scripts/lib/viewer-covers.js)",
   },
   {
     file: "00-viewer-mode.js",
@@ -135,6 +140,7 @@ function bundleViewerJs() {
   syncViewerUserState();
   syncViewerGistSync();
   syncViewerCollectionImport();
+  syncViewerCovers();
   if (!fs.existsSync(BODY)) {
     const partials = PARTS.map((p) => path.join(VIEWER_DIR, p.file));
     if (partials.every((file) => fs.existsSync(file))) {

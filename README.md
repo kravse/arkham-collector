@@ -12,7 +12,7 @@ A visual catalog for collectors and readers of [Arkham House](https://en.wikiped
 |---|---|
 | **Search & sort** | Search the grid; **list/grid toggle** beside search (saved in browser); **Sort** (oldest/newest/title) everywhere. Same-year tiebreaks from `book-order.js`; maintainers set those with **Reorder** on `npm run serve` only |
 | **Filters** | Collection, want list, Mycroft & Moran imprint, decade |
-| **Book detail** | Cover, description, cover artist, **W** / **G** links, **Collect** (Ordered → Collection), and want toggles |
+| **Book detail** | Cover, description, cover artist, **W** / **G** links, **Collect** (Ordered → Collection), and want toggles. In the detail overlay, tap the cover (mobile) or hover and click the magnifier (desktop) for a full-screen view |
 | **Your data** | Stored in the browser (`arkham-user-state` v2; older keys migrate automatically). Default is **This device only**; optional **Sync with GitHub Gist** saves full state to a private GitHub Gist using a throwaway bot account PAT (`arkham-gist-sync`) |
 | **Export** | Download your collection as CSV (ordered and collected titles; same rows, no order status column). **Import collection CSV** replaces collected titles for the active storage mode only and clears on-order titles for that mode; your want list is unchanged |
 
@@ -62,7 +62,9 @@ npm run build && open build/index.html   # read-only static site (matches deploy
 
 **`npm run serve`** — edit metadata, upload covers, hide or soft-delete titles; changes go to `data/edits.json` only.
 
-**`npm run build`** — writes `build/` for static hosting (`READ_ONLY`, bundled CSS/JS, `noindex`). Deploy that folder to any static host.
+**`npm run build`** — writes `build/` for static hosting (`READ_ONLY`, bundled CSS/JS, `noindex`). Cover images in `covers/` are resized to WebP at build time (480px card thumbnails + 960px detail images); masters stay in the repo but only optimized files ship in `build/`.
+
+**Cover images:** Drop high-resolution scans into `covers/` using the existing `{slug}-{id}.{ext}` naming (or set `coverImageFile` via edits). `npm run serve` uses the originals for local dev. `npm run build` generates `*.card.webp` and `*.detail.webp` derivatives for the deploy site.
 
 ## Customize the catalog (maintainers)
 
@@ -105,7 +107,7 @@ Entry point: `node scripts/index.js`. Common flags: `--yes`, `--local`, `--limit
 | Script | Purpose |
 |--------|---------|
 | `serve` | Dev server on port 8742 (`PORT` to override) |
-| `build` | Static site in `build/` |
+| `build` | Static site in `build/` (optimizes cover images to WebP) |
 | `bundle-viewer` | Rebuild `js/viewer-bundle.js` from `js/viewer/` |
 | `test` | Run Node tests (`test/`; sort and filter logic under `scripts/lib/`) |
 

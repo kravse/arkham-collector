@@ -12,11 +12,12 @@ function applyBookEdits(books, editsById) {
     if (!edit) {
       return { ...base, hidden: false, deleted: false };
     }
-    const merged = { ...base, ...edit };
+    const { coverImageFile: editCoverPath, ...editFields } = edit;
+    const merged = { ...base, ...editFields };
     merged.hidden = edit.hidden === true;
     merged.deleted = edit.deleted === true;
-    if (edit.coverImageFile) {
-      merged.coverEditPath = edit.coverImageFile;
+    if (editCoverPath) {
+      merged.coverEditPath = editCoverPath;
     }
     return merged;
   });

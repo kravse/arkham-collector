@@ -129,7 +129,7 @@ function openBookDetail(bookId, options = {}) {
 
   refreshDetailToolbar(book);
 
-  bookDetailCover.innerHTML = renderCover(book, book.coverCacheKey);
+  bookDetailCover.innerHTML = renderCover(book, book.coverCacheKey, "detail");
   const hiddenBadge = book.hidden
     ? `<span class="hidden-badge">Hidden</span>`
     : "";
@@ -196,6 +196,7 @@ function openBookDetail(bookId, options = {}) {
 }
 
 function closeBookDetailUI() {
+  closeCoverLightbox();
   detailBookId = null;
   bookDetailDialog.hidden = true;
   bookDetailCover.innerHTML = "";
@@ -242,6 +243,84 @@ function closeBookDetail(options = {}) {
   }
 
   closeBookDetailUI();
+}
+
+function isMobileCoverLightboxViewport() {
+  return window.matchMedia("(max-width: 640px)").matches;
+}
+
+function updateCoverLightboxImage(book) {
+  if (!coverLightbox || !coverLightboxImg || !book) {
+    return false;
+  }
+  const sources = viewerCovers.getCoverSources(book, "detail");
+  if (!sources.length) {
+    return false;
+  }
+
+  coverLightboxImg.src = viewerCovers.appendCoverCacheKey(
+    sources[0],
+    book.coverCacheKey,
+  );
+  coverLightboxImg.alt = `Cover of ${book.title || "book"}`;
+  coverLightboxImg.dataset.fallbacks = sources.slice(1).join("|");
+  return true;
+}
+
+function openCoverLightbox(book) {
+  if (!updateCoverLightboxImage(book)) {
+    return;
+  }
+  coverLightbox.hidden = false;
+  document.body.classList.add("cover-lightbox-open");
+}
+
+function navigateCoverLightbox(direction) {
+  if (!coverLightbox || coverLightbox.hidden || detailBookId == null) {
+    return;
+  }
+
+  const visible = getVisibleBooks();
+  const index = visible.findIndex((book) => book.id === detailBookId);
+  if (index < 0) {
+    return;
+  }
+
+  const step = direction < 0 ? -1 : 1;
+  for (let i = index + step; i >= 0 && i < visible.length; i += step) {
+    const book = visible[i];
+    if (!viewerCovers.getCoverSources(book, "detail").length) {
+      continue;
+    }
+    openBookDetail(book.id, { historyMode: "replace" });
+    updateCoverLightboxImage(book);
+    return;
+  }
+}
+
+function closeCoverLightbox() {
+  if (!coverLightbox || !coverLightboxImg) {
+    return;
+  }
+  coverLightbox.hidden = true;
+  document.body.classList.remove("cover-lightbox-open");
+  coverLightboxImg.removeAttribute("src");
+  coverLightboxImg.dataset.fallbacks = "";
+}
+
+function handleCoverZoomTrigger(event) {
+  const trigger = event.target.closest(".cover-zoom-trigger");
+  if (!trigger) {
+    return false;
+  }
+  event.preventDefault();
+  event.stopPropagation();
+  const bookId = Number(trigger.dataset.bookId);
+  const book = books.find((entry) => entry.id === bookId);
+  if (book) {
+    openCoverLightbox(book);
+  }
+  return true;
 }
 
 function openEditDialog(bookId) {

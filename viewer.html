@@ -58,6 +58,7 @@
     <link rel="stylesheet" href="css/cards.css" />
     <link rel="stylesheet" href="css/edit-dialog.css" />
     <link rel="stylesheet" href="css/book-detail.css" />
+    <link rel="stylesheet" href="css/cover-lightbox.css" />
     <link rel="stylesheet" href="css/mobile.css" />
   </head>
   <body>
@@ -850,6 +851,26 @@
           />
         </svg>
       </button>
+    </div>
+
+    <div id="cover-lightbox" class="cover-lightbox" hidden>
+      <div
+        class="cover-lightbox-backdrop"
+        data-close-cover-lightbox
+      ></div>
+      <div
+        class="cover-lightbox-panel"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Cover image"
+      >
+        <img
+          id="cover-lightbox-img"
+          class="cover-lightbox-img"
+          alt=""
+          data-fallbacks=""
+        />
+      </div>
     </div>
 
     <script src="data/books.js"></script>

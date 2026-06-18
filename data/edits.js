@@ -92,6 +92,18 @@ window.BOOK_EDITS = {
     "coverImageFile": "covers/tales-of-the-cthulhu-mythos-golden-anniversary-anthology-265.jpg",
     "description": "Arkham House released a revised edition of Tales of the Cthulhu Mythos in November 1990, edited by Jim Turner with a substantially different selection of stories, reflecting the editor's disdain for \"Mythos pastiches in which eccentric New England recluses utter the right incantations in the wrong books and are promptly eaten by a giant frog named Cthulhu.\" It was released in an edition of 7,015 copies.\n\nTurner eliminates some authors from the earlier edition (totalling four stories, those by Wade, Shea and two by Lumley) --while still suggesting that \"a few of the earliest pieces in this volume.now seem like pop-cultural kitsch.\"\n\nThe added seven stories, he writes, are from \"the relative handful of successful works that have been influenced by the Cthulhu Mythos.exemplifying the darkly enduring power of H. P. Lovecraft over a disparate group of writers who have made their own inimitable contributions to the Mythos.\""
   },
+  "267": {
+    "coverImageFile": "covers/the-horror-in-the-museum-and-other-revisions-267.jpg"
+  },
+  "274": {
+    "coverImageFile": "covers/dagon-and-other-macabre-tales-274.png"
+  },
+  "275": {
+    "coverImageFile": "covers/at-the-mountains-of-madness-and-other-novels-275.jpg"
+  },
+  "276": {
+    "coverImageFile": "covers/the-dunwich-horror-and-others-276.jpg"
+  },
   "289": {
     "title": "New Tales of the Cthulhu Mythos",
     "author": "Ramsey Campbell (Ed.)",
@@ -159,12 +171,18 @@ window.BOOK_EDITS = {
   "412": {
     "goodreadsUrl": "https://www.goodreads.com/book/show/5743058-marginalia"
   },
+  "416": {
+    "coverImageFile": "covers/beyond-the-wall-of-sleep-collection-416.jpg"
+  },
   "417": {
     "coverImageFile": "covers/out-of-space-and-time-417.jpg"
   },
+  "418": {
+    "coverImageFile": "covers/someone-in-the-dark-418.jpg"
+  },
   "419": {
     "goodreadsUrl": "https://www.goodreads.com/book/show/11399579-the-outsider-and-others",
-    "coverImageFile": "covers/the-outsider-and-others-419.png"
+    "coverImageFile": "covers/the-outsider-and-others-419.webp"
   },
   "420": {
     "coverImageFile": "covers/the-arkham-sampler-420.jpg"
