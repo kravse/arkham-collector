@@ -99,6 +99,7 @@ let wantIds = new Set();
 let collectionIds = new Set();
 let orderedIds = new Set();
 let storageMode = "local";
+let pendingGistSetup = false;
 let headerFiltersExpanded = true;
 let gridViewMode = "cards";
 let highlightWants = true;
@@ -157,15 +158,26 @@ function shouldHighlightCollectionOnCards() {
   return highlightCollection || collectionFilterMode != null;
 }
 
+function isGistStorageActive() {
+  return (
+    storageMode === "gist" &&
+    viewerGistSync.isConnectedGistConfig(readGistSyncConfig())
+  );
+}
+
+function gistSettingsPanelVisible() {
+  return isGistStorageActive() || pendingGistSetup;
+}
+
 function syncSettingsStorageMode() {
   if (storageModeLocalInput) {
-    storageModeLocalInput.checked = storageMode === "local";
+    storageModeLocalInput.checked = storageMode === "local" && !pendingGistSetup;
   }
   if (storageModeGistInput) {
-    storageModeGistInput.checked = storageMode === "gist";
+    storageModeGistInput.checked = storageMode === "gist" || pendingGistSetup;
   }
   if (gistSyncPanel) {
-    gistSyncPanel.hidden = storageMode !== "gist";
+    gistSyncPanel.hidden = !gistSettingsPanelVisible();
   }
   syncSettingsHighlightCheckboxes();
   syncGistConnectUi();
@@ -173,17 +185,16 @@ function syncSettingsStorageMode() {
 }
 
 function hasSavedGistCredentials() {
-  const config = readGistSyncConfig();
-  return Boolean(config?.token);
+  return viewerGistSync.isConnectedGistConfig(readGistSyncConfig());
 }
 
 function syncGistConnectUi() {
-  const saved = storageMode === "gist" && hasSavedGistCredentials();
+  const connected = isGistStorageActive();
   if (gistSyncSaved) {
-    gistSyncSaved.hidden = !saved;
+    gistSyncSaved.hidden = !connected;
   }
   if (gistConnectForm) {
-    gistConnectForm.hidden = saved;
+    gistConnectForm.hidden = connected;
   }
 }
 
@@ -191,23 +202,18 @@ function refreshGistSyncStatus() {
   if (!gistSyncStatus) {
     return;
   }
-  if (storageMode !== "gist") {
+  if (!gistSettingsPanelVisible()) {
     gistSyncStatus.textContent = "";
     gistSyncStatus.classList.remove("settings-gist-status--error");
     return;
   }
-  const config = readGistSyncConfig();
-  if (viewerGistSync.isConnectedGistConfig(config)) {
+  if (isGistStorageActive()) {
     gistSyncStatus.textContent = "Syncing to your private gist.";
     gistSyncStatus.classList.remove("settings-gist-status--error");
     return;
   }
-  if (config?.token) {
-    gistSyncStatus.textContent = "Reconnect to resume gist sync.";
-    gistSyncStatus.classList.remove("settings-gist-status--error");
-    return;
-  }
-  gistSyncStatus.textContent = "Paste a GitHub token and connect to sync.";
+  gistSyncStatus.textContent =
+    "Paste a GitHub token and click Connect to enable gist sync.";
   gistSyncStatus.classList.remove("settings-gist-status--error");
 }
 
@@ -1664,6 +1670,7 @@ async function connectGistSync(token) {
   writeGistSyncConfig({ token: trimmed, gistId });
   persistUserState(nextState);
   applyRuntimeSnapshot(viewerUserState.applyUserStateToRuntime(nextState));
+  pendingGistSetup = false;
   storageMode = "gist";
   syncSettingsStorageMode();
   return { token: trimmed, gistId };
@@ -1733,6 +1740,67 @@ async function pullGistStateIfConfigured(options = {}) {
   return gistPullInFlight;
 }
 
+function enforceStorageModeConsistency() {
+  if (storageMode === "gist" && !viewerGistSync.isConnectedGistConfig(readGistSyncConfig())) {
+    const collections = swapCollectionForStorageMode("local");
+    storageMode = "local";
+    persistUserState(
+      viewerUserState.buildUserStateFromRuntime(collectRuntimeSnapshot(), {
+        existingCollections: collections,
+      }),
+    );
+  }
+  pendingGistSetup = false;
+}
+
+function activateLocalStorageMode(options = {}) {
+  pendingGistSetup = false;
+  if (storageMode === "gist") {
+    const collections = swapCollectionForStorageMode("local");
+    storageMode = "local";
+    persistUserState(
+      viewerUserState.buildUserStateFromRuntime(collectRuntimeSnapshot(), {
+        existingCollections: collections,
+      }),
+    );
+  }
+  syncSettingsStorageMode();
+  if (options.render !== false) {
+    render();
+  }
+  if (options.render !== false && !bookDetailDialog.hidden && detailBookId) {
+    openBookDetail(detailBookId, { historyMode: "none" });
+  }
+}
+
+async function activateGistStorageMode(options = {}) {
+  if (!viewerGistSync.isConnectedGistConfig(readGistSyncConfig())) {
+    pendingGistSetup = true;
+    syncSettingsStorageMode();
+    return false;
+  }
+
+  pendingGistSetup = false;
+  if (storageMode !== "gist") {
+    const collections = swapCollectionForStorageMode("gist");
+    storageMode = "gist";
+    persistUserState(
+      viewerUserState.buildUserStateFromRuntime(collectRuntimeSnapshot(), {
+        existingCollections: collections,
+      }),
+    );
+    await pullGistStateIfConfigured({ reRender: false });
+  }
+  syncSettingsStorageMode();
+  if (options.render !== false) {
+    render();
+  }
+  if (options.render !== false && !bookDetailDialog.hidden && detailBookId) {
+    openBookDetail(detailBookId, { historyMode: "none" });
+  }
+  return true;
+}
+
 function loadUserState() {
   let state = null;
   try {
@@ -1747,6 +1815,7 @@ function loadUserState() {
   }
 
   applyRuntimeSnapshot(viewerUserState.applyUserStateToRuntime(state));
+  enforceStorageModeConsistency();
   syncSettingsHighlightCheckboxes();
   updateHeaderFiltersState();
   updateViewModeState();
@@ -1759,6 +1828,13 @@ async function loadUserStateAsync() {
 }
 
 function saveUserState() {
+  if (
+    storageMode === "gist" &&
+    !viewerGistSync.isConnectedGistConfig(readGistSyncConfig())
+  ) {
+    storageMode = "local";
+    pendingGistSetup = false;
+  }
   persistUserState(buildStateForPersistence());
   scheduleGistPush();
 }
@@ -1778,13 +1854,11 @@ async function importCollectionFromCsvText(csvText) {
   saveUserState();
 
   let syncedToGist = false;
-  if (storageMode === "gist") {
+  if (isGistStorageActive()) {
     const config = readGistSyncConfig();
-    if (viewerGistSync.isConnectedGistConfig(config)) {
-      await pushGistState(config, buildStateForPersistence());
-      syncedToGist = true;
-      updateGistSyncStatus("Synced to gist.");
-    }
+    await pushGistState(config, buildStateForPersistence());
+    syncedToGist = true;
+    updateGistSyncStatus("Synced to gist.");
   }
 
   return {
@@ -2975,6 +3049,7 @@ function selectSettingsTab(tab) {
 }
 
 function openSettingsDialog() {
+  pendingGistSetup = false;
   syncSettingsStorageMode();
   selectSettingsTab("about");
   settingsDialog.hidden = false;
@@ -2983,38 +3058,32 @@ function openSettingsDialog() {
 }
 
 function closeSettingsDialog() {
+  if (!viewerGistSync.isConnectedGistConfig(readGistSyncConfig())) {
+    activateLocalStorageMode({ render: false });
+  } else {
+    pendingGistSetup = false;
+    syncSettingsStorageMode();
+  }
   settingsDialog.hidden = true;
   settingsBtn.setAttribute("aria-expanded", "false");
 }
 
 async function onStorageModeChange(next) {
-  if (next !== "local" && next !== "gist") {
+  if (next !== "local") {
     return;
   }
-  if (storageMode === next) {
-    syncSettingsStorageMode();
-    return;
-  }
+  activateLocalStorageMode();
+}
 
-  const collections = swapCollectionForStorageMode(next);
-  storageMode = next;
-  persistUserState(
-    viewerUserState.buildUserStateFromRuntime(collectRuntimeSnapshot(), {
-      existingCollections: collections,
-    }),
-  );
+async function onGistSetupSelected() {
+  if (viewerGistSync.isConnectedGistConfig(readGistSyncConfig())) {
+    await activateGistStorageMode();
+    return;
+  }
+  pendingGistSetup = true;
   syncSettingsStorageMode();
-
-  if (storageMode === "gist") {
-    const config = readGistSyncConfig();
-    if (viewerGistSync.isConnectedGistConfig(config)) {
-      await pullGistStateIfConfigured();
-    }
-  }
-
-  render();
-  if (!bookDetailDialog.hidden && detailBookId) {
-    openBookDetail(detailBookId, { historyMode: "none" });
+  if (gistTokenInput) {
+    gistTokenInput.focus();
   }
 }
 
@@ -3026,10 +3095,10 @@ async function onGistConnectClick() {
     gistConnectBtn.disabled = true;
     await connectGistSync(gistTokenInput.value);
     gistTokenInput.value = "";
-    syncGistConnectUi();
     updateGistSyncStatus("Connected to gist sync.");
     render();
   } catch (error) {
+    activateLocalStorageMode({ render: false });
     updateGistSyncStatus(error.message || "Could not connect to gist.", true);
   } finally {
     if (gistConnectBtn) {
@@ -3040,6 +3109,7 @@ async function onGistConnectClick() {
 
 function onGistClearClick() {
   clearGistSyncConfig();
+  activateLocalStorageMode();
 }
 
 function escapeCsvField(value) {
@@ -3098,8 +3168,8 @@ async function onImportCollectionFileSelected(input) {
     if (result.unmatchedCount) {
       message += ` ${result.unmatchedCount} row(s) could not be matched.`;
     }
-    if (storageMode === "gist" && !result.syncedToGist) {
-      message += " Connect gist sync to upload.";
+    if (isGistStorageActive() && !result.syncedToGist) {
+      message += " Gist sync is unavailable.";
     } else if (result.syncedToGist) {
       message += " Synced to gist.";
     }
@@ -3776,7 +3846,7 @@ if (storageModeLocalInput) {
 if (storageModeGistInput) {
   storageModeGistInput.addEventListener("change", () => {
     if (storageModeGistInput.checked) {
-      onStorageModeChange("gist");
+      onGistSetupSelected();
     }
   });
 }

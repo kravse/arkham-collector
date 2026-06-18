@@ -35,7 +35,7 @@ A visual catalog for collectors and readers of [Arkham House](https://en.wikiped
 1. Open a card → **Collect** to mark a copy you own (tap again to remove).
 2. Toggle **want** on titles you are hunting.
 3. Filter with **COLLECTION** or **WANT** in the header. If you have on-order titles, **COLLECTION** cycles: all books → your collection → on-order only → all books.
-4. **Gear** (bottom bar): choose **Store Collection Locally** (default) or **Store Collection in gist**. Gist mode needs a fine-grained GitHub PAT with gist access on a throwaway account—paste it when prompted and click **Connect**. Connecting loads existing gist data if present (replacing gist-mode collection, wants, and on-order titles) or creates an empty gist. Local and gist collections are separate; to move local data to gist, export CSV locally then import after connecting.
+4. **Gear** (bottom bar): choose **Store Collection Locally** (default) or **Store Collection in gist**. Gist mode only activates after a successful **Connect**; until then you stay on local storage. Connecting loads existing gist data if present, or creates an empty gist. **Clear** or closing settings without a working token returns you to local mode. To move local data to gist, export CSV locally then import after connecting.
 5. **Import collection CSV** / **Export collection CSV** (gear → Settings): import replaces collected titles for the **active storage mode only** (local and gist keep separate collections), clears on-order titles for that mode, and leaves your want list alone. Works in local mode or gist mode (gist upload happens immediately when connected).
 
 ### Browser storage keys

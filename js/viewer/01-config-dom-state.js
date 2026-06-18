@@ -99,6 +99,7 @@ let wantIds = new Set();
 let collectionIds = new Set();
 let orderedIds = new Set();
 let storageMode = "local";
+let pendingGistSetup = false;
 let headerFiltersExpanded = true;
 let gridViewMode = "cards";
 let highlightWants = true;
@@ -157,15 +158,26 @@ function shouldHighlightCollectionOnCards() {
   return highlightCollection || collectionFilterMode != null;
 }
 
+function isGistStorageActive() {
+  return (
+    storageMode === "gist" &&
+    viewerGistSync.isConnectedGistConfig(readGistSyncConfig())
+  );
+}
+
+function gistSettingsPanelVisible() {
+  return isGistStorageActive() || pendingGistSetup;
+}
+
 function syncSettingsStorageMode() {
   if (storageModeLocalInput) {
-    storageModeLocalInput.checked = storageMode === "local";
+    storageModeLocalInput.checked = storageMode === "local" && !pendingGistSetup;
   }
   if (storageModeGistInput) {
-    storageModeGistInput.checked = storageMode === "gist";
+    storageModeGistInput.checked = storageMode === "gist" || pendingGistSetup;
   }
   if (gistSyncPanel) {
-    gistSyncPanel.hidden = storageMode !== "gist";
+    gistSyncPanel.hidden = !gistSettingsPanelVisible();
   }
   syncSettingsHighlightCheckboxes();
   syncGistConnectUi();
@@ -173,17 +185,16 @@ function syncSettingsStorageMode() {
 }
 
 function hasSavedGistCredentials() {
-  const config = readGistSyncConfig();
-  return Boolean(config?.token);
+  return viewerGistSync.isConnectedGistConfig(readGistSyncConfig());
 }
 
 function syncGistConnectUi() {
-  const saved = storageMode === "gist" && hasSavedGistCredentials();
+  const connected = isGistStorageActive();
   if (gistSyncSaved) {
-    gistSyncSaved.hidden = !saved;
+    gistSyncSaved.hidden = !connected;
   }
   if (gistConnectForm) {
-    gistConnectForm.hidden = saved;
+    gistConnectForm.hidden = connected;
   }
 }
 
@@ -191,23 +202,18 @@ function refreshGistSyncStatus() {
   if (!gistSyncStatus) {
     return;
   }
-  if (storageMode !== "gist") {
+  if (!gistSettingsPanelVisible()) {
     gistSyncStatus.textContent = "";
     gistSyncStatus.classList.remove("settings-gist-status--error");
     return;
   }
-  const config = readGistSyncConfig();
-  if (viewerGistSync.isConnectedGistConfig(config)) {
+  if (isGistStorageActive()) {
     gistSyncStatus.textContent = "Syncing to your private gist.";
     gistSyncStatus.classList.remove("settings-gist-status--error");
     return;
   }
-  if (config?.token) {
-    gistSyncStatus.textContent = "Reconnect to resume gist sync.";
-    gistSyncStatus.classList.remove("settings-gist-status--error");
-    return;
-  }
-  gistSyncStatus.textContent = "Paste a GitHub token and connect to sync.";
+  gistSyncStatus.textContent =
+    "Paste a GitHub token and click Connect to enable gist sync.";
   gistSyncStatus.classList.remove("settings-gist-status--error");
 }
 

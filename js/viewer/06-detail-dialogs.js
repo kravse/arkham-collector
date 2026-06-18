@@ -280,6 +280,7 @@ function selectSettingsTab(tab) {
 }
 
 function openSettingsDialog() {
+  pendingGistSetup = false;
   syncSettingsStorageMode();
   selectSettingsTab("about");
   settingsDialog.hidden = false;
@@ -288,38 +289,32 @@ function openSettingsDialog() {
 }
 
 function closeSettingsDialog() {
+  if (!viewerGistSync.isConnectedGistConfig(readGistSyncConfig())) {
+    activateLocalStorageMode({ render: false });
+  } else {
+    pendingGistSetup = false;
+    syncSettingsStorageMode();
+  }
   settingsDialog.hidden = true;
   settingsBtn.setAttribute("aria-expanded", "false");
 }
 
 async function onStorageModeChange(next) {
-  if (next !== "local" && next !== "gist") {
+  if (next !== "local") {
     return;
   }
-  if (storageMode === next) {
-    syncSettingsStorageMode();
-    return;
-  }
+  activateLocalStorageMode();
+}
 
-  const collections = swapCollectionForStorageMode(next);
-  storageMode = next;
-  persistUserState(
-    viewerUserState.buildUserStateFromRuntime(collectRuntimeSnapshot(), {
-      existingCollections: collections,
-    }),
-  );
+async function onGistSetupSelected() {
+  if (viewerGistSync.isConnectedGistConfig(readGistSyncConfig())) {
+    await activateGistStorageMode();
+    return;
+  }
+  pendingGistSetup = true;
   syncSettingsStorageMode();
-
-  if (storageMode === "gist") {
-    const config = readGistSyncConfig();
-    if (viewerGistSync.isConnectedGistConfig(config)) {
-      await pullGistStateIfConfigured();
-    }
-  }
-
-  render();
-  if (!bookDetailDialog.hidden && detailBookId) {
-    openBookDetail(detailBookId, { historyMode: "none" });
+  if (gistTokenInput) {
+    gistTokenInput.focus();
   }
 }
 
@@ -331,10 +326,10 @@ async function onGistConnectClick() {
     gistConnectBtn.disabled = true;
     await connectGistSync(gistTokenInput.value);
     gistTokenInput.value = "";
-    syncGistConnectUi();
     updateGistSyncStatus("Connected to gist sync.");
     render();
   } catch (error) {
+    activateLocalStorageMode({ render: false });
     updateGistSyncStatus(error.message || "Could not connect to gist.", true);
   } finally {
     if (gistConnectBtn) {
@@ -345,6 +340,7 @@ async function onGistConnectClick() {
 
 function onGistClearClick() {
   clearGistSyncConfig();
+  activateLocalStorageMode();
 }
 
 function escapeCsvField(value) {
@@ -403,8 +399,8 @@ async function onImportCollectionFileSelected(input) {
     if (result.unmatchedCount) {
       message += ` ${result.unmatchedCount} row(s) could not be matched.`;
     }
-    if (storageMode === "gist" && !result.syncedToGist) {
-      message += " Connect gist sync to upload.";
+    if (isGistStorageActive() && !result.syncedToGist) {
+      message += " Gist sync is unavailable.";
     } else if (result.syncedToGist) {
       message += " Synced to gist.";
     }

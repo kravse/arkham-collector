@@ -114,7 +114,7 @@ if (storageModeLocalInput) {
 if (storageModeGistInput) {
   storageModeGistInput.addEventListener("change", () => {
     if (storageModeGistInput.checked) {
-      onStorageModeChange("gist");
+      onGistSetupSelected();
     }
   });
 }
