@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 
 const express = require("express");
-const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
 const {
@@ -24,6 +23,12 @@ const {
 } = require("./scripts/lib/text");
 const { syncCollectionFromCsv } = require("./scripts/lib/collection");
 const { COLLECTION_CSV } = require("./scripts/config");
+const {
+  saveBookCoverUpload,
+  createCoverUploadMiddleware,
+  extensionFromMime,
+  removeLocalCovers,
+} = require("./scripts/lib/cover-upload");
 
 const ROOT = __dirname;
 const DATA_DIR = path.join(ROOT, "data");
@@ -50,18 +55,6 @@ function wikiTitleFromHref(href) {
     return null;
   }
   return decodeURIComponent(match[1].replace(/\+/g, " "));
-}
-
-function expectedCoverPaths(book) {
-  const wikiTitle = wikiTitleFromHref(book.wikipediaUrl);
-  const slugBase = slugify(wikiTitle || book.listTitle || book.title);
-  const id = book.id;
-  if (!slugBase || !id) {
-    return [];
-  }
-  return [".jpg", ".jpeg", ".png", ".webp", ".gif"].map((ext) =>
-    path.join("covers", `${slugBase}-${id}${ext}`)
-  );
 }
 
 function readPayload() {
@@ -97,44 +90,11 @@ function bookEditResponse(payload, bookId, merged) {
   };
 }
 
-function removeLocalCovers(book) {
-  const relativePaths = new Set();
-  if (book.coverImageFile && book.coverImageFile.startsWith("covers/")) {
-    relativePaths.add(book.coverImageFile);
-  }
-  expectedCoverPaths(book).forEach((relativePath) => {
-    relativePaths.add(relativePath.replace(/\\/g, "/"));
-  });
-
-  relativePaths.forEach((relativePath) => {
-    const fullPath = path.join(ROOT, relativePath);
-    if (fs.existsSync(fullPath)) {
-      fs.unlinkSync(fullPath);
-    }
-  });
+function removeLocalCoversForBook(book) {
+  removeLocalCovers(book, ROOT);
 }
 
-function extensionFromMime(mime) {
-  const map = {
-    "image/jpeg": ".jpg",
-    "image/png": ".png",
-    "image/webp": ".webp",
-    "image/gif": ".gif",
-  };
-  return map[mime] || ".jpg";
-}
-
-const upload = multer({
-  storage: multer.memoryStorage(),
-  limits: { fileSize: 10 * 1024 * 1024 },
-  fileFilter(_req, file, callback) {
-    if (file.mimetype.startsWith("image/")) {
-      callback(null, true);
-      return;
-    }
-    callback(new Error("Only image uploads are allowed"));
-  },
-});
+const upload = createCoverUploadMiddleware();
 
 const app = express();
 
@@ -147,42 +107,21 @@ app.get("/api/health", (_req, res) => {
 app.post("/api/books/:id/cover", upload.single("cover"), (req, res) => {
   try {
     const bookId = Number(req.params.id);
-    if (!Number.isInteger(bookId) || bookId < 1) {
-      res.status(400).json({ error: "Invalid book id" });
-      return;
-    }
-
-    if (!req.file) {
-      res.status(400).json({ error: "No image uploaded" });
-      return;
-    }
-
+    const result = saveBookCoverUpload(bookId, {
+      buffer: req.file?.buffer,
+      mimetype: req.file?.mimetype,
+    });
     const payload = readPayload();
-    const scraped = getScrapedBook(payload, bookId);
-    if (!scraped) {
-      res.status(404).json({ error: "Book not found" });
-      return;
-    }
-
-    const book = getMergedBook(payload, bookId);
-    removeLocalCovers(book);
-
-    const slugBase = slugify(
-      wikiTitleFromHref(book.wikipediaUrl) || book.listTitle || book.title
-    );
-    const extension = extensionFromMime(req.file.mimetype);
-    const relativePath = `covers/${slugBase}-${bookId}${extension}`;
-    const fullPath = path.join(ROOT, relativePath);
-
-    fs.mkdirSync(COVERS_DIR, { recursive: true });
-    fs.writeFileSync(fullPath, req.file.buffer);
-
-    setBookEdit(bookId, { coverImageFile: relativePath }, scraped);
-    const merged = getMergedBook(payload, bookId);
-
-    res.json(bookEditResponse(payload, bookId, merged));
+    const merged = getMergedBook(payload, result.bookId);
+    res.json(bookEditResponse(payload, result.bookId, merged));
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    const status =
+      error.message === "Book not found"
+        ? 404
+        : error.message === "Invalid book id" || error.message === "No image uploaded"
+          ? 400
+          : 500;
+    res.status(status).json({ error: error.message });
   }
 });
 
@@ -305,7 +244,7 @@ app.patch("/api/books/:id", upload.single("cover"), (req, res) => {
     }
 
     if (req.file) {
-      removeLocalCovers(book);
+      removeLocalCoversForBook(book);
 
       const slugBase = slugify(
         wikiTitleFromHref(patch.wikipediaUrl || book.wikipediaUrl) ||

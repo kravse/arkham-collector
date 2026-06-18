@@ -79,8 +79,12 @@ window.BOOK_EDITS = {
   "246": {
     "description": "Arkham's Masters of Horror is an anthology of fantasy and horror stories edited by Peter Ruber. It was released by Arkham House in an edition of approximately 4,000 copies in 2000. The book includes an introductory essay by Ruber before each story and about its author.\n\nRuber drew criticism from the horror/fantasy community for the hostility with which he introduced some authors within the volume - for instance, his accusation that H.P. Lovecraft \"had a schizoid personality\" and could be labelled \"a genuine crackpot.\""
   },
+  "255": {
+    "coverImageFile": "covers/cthulhu-2000-255.jpg"
+  },
   "256": {
-    "publicationDate": "1995"
+    "publicationDate": "1995",
+    "coverImageFile": "covers/miscellaneous-writings-256.jpg"
   },
   "263": {
     "publicationDate": "1991"
@@ -110,6 +114,12 @@ window.BOOK_EDITS = {
     "coverImageFile": "covers/new-tales-of-the-cthulhu-mythos-289.jpg",
     "description": "New Tales of the Cthulhu Mythos was edited by Ramsey Campbell and published by Arkham House in 1980 in an edition of 3,647 copies. In his introduction, Campbell noted that \"in recent years the Mythos at times has seemed in danger of becoming conventionalized,\" despite the fact that \"Lovecraft's intention and achievement was precisely to avoid the predictability and resultant lack of terror which beset the conventional macabre fiction of his day.\" Therefore, Campbell wrote, \"in this anthology I have tended to favor less familiar treatments or uses of the Mythos. They contain few erudite occultists, decaying towns, or stylistic pastiches. Indeed, one of our tales hints at the ultimate event of the Mythos without ever referring to the traditional names.\"\n\nOne story in the book is an expansion, by Martin S. Warnes, of Lovecraft's fragment \"The Book\".",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Cthulhu_Mythos_anthology#New_Tales_of_the_Cthulhu_Mythos"
+  },
+  "296": {
+    "coverImageFile": "covers/in-mayan-splendor-296.jpg"
+  },
+  "305": {
+    "coverImageFile": "covers/dreams-from-rlyeh-305.jpg"
   },
   "306": {
     "coverImageFile": "covers/the-purcell-papers-306.webp",
@@ -147,8 +157,18 @@ window.BOOK_EDITS = {
     "coverImageFile": "covers/autobiography-some-notes-on-a-nonentity-359.png",
     "goodreadsUrl": "https://www.goodreads.com/book/show/29865383-autobiography-some-notes-on-a-nonentity"
   },
+  "366": {
+    "coverImageFile": "covers/dreams-and-fancies-366.jpg"
+  },
+  "367": {
+    "coverImageFile": "covers/fire-and-sleet-and-candlelight-367.jpg"
+  },
+  "369": {
+    "coverImageFile": "covers/invaders-from-the-dark-369.jpg"
+  },
   "372": {
-    "goodreadsUrl": "https://www.goodreads.com/book/show/10049265-the-shuttered-room-and-other-pieces"
+    "goodreadsUrl": "https://www.goodreads.com/book/show/10049265-the-shuttered-room-and-other-pieces",
+    "coverImageFile": "covers/the-shuttered-room-and-other-pieces-372.webp"
   },
   "373": {
     "goodreadsUrl": "https://www.goodreads.com/book/show/5743580-some-notes-on-h-p-lovecraft"
@@ -157,7 +177,8 @@ window.BOOK_EDITS = {
     "deleted": true
   },
   "378": {
-    "goodreadsUrl": "https://www.goodreads.com/book/show/1512252.Always_Comes_Evening"
+    "goodreadsUrl": "https://www.goodreads.com/book/show/1512252.Always_Comes_Evening",
+    "coverImageFile": "covers/always-comes-evening-378.jpg"
   },
   "384": {
     "coverImageFile": "covers/the-dark-chateau-384.png"
@@ -165,11 +186,33 @@ window.BOOK_EDITS = {
   "385": {
     "coverImageFile": "covers/a-hornbook-for-witches-385.png"
   },
+  "393": {
+    "coverImageFile": "covers/the-travelling-grave-and-other-stories-393.jpg"
+  },
   "396": {
     "goodreadsUrl": "https://www.goodreads.com/book/show/1794059.Dark_Carnival"
   },
+  "405": {
+    "coverImageFile": "covers/the-doll-and-one-other-405.jpg"
+  },
+  "408": {
+    "coverImageFile": "covers/green-tea-and-other-ghost-stories-408.jpg"
+  },
+  "409": {
+    "coverImageFile": "covers/witch-house-409.jpg"
+  },
+  "410": {
+    "coverImageFile": "covers/the-opener-of-the-way-410.jpg"
+  },
   "412": {
-    "goodreadsUrl": "https://www.goodreads.com/book/show/5743058-marginalia"
+    "goodreadsUrl": "https://www.goodreads.com/book/show/5743058-marginalia",
+    "coverImageFile": "covers/marginalia-collection-412.jpg"
+  },
+  "413": {
+    "coverImageFile": "covers/lost-worlds-smith-collection-413.jpg"
+  },
+  "414": {
+    "coverImageFile": "covers/jumbee-and-other-uncanny-tales-414.jpg"
   },
   "416": {
     "coverImageFile": "covers/beyond-the-wall-of-sleep-collection-416.jpg"
