@@ -479,6 +479,7 @@ body.view-mode-list .card {
   flex-direction: row;
   align-items: center;
   width: 100%;
+  border-radius: 0 12px 12px 0;
 }
 
 body.view-mode-list .cover-wrap {
