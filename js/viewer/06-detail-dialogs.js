@@ -332,7 +332,7 @@ async function onGistConnectClick() {
     await connectGistSync(gistTokenInput.value);
     gistTokenInput.value = "";
     syncGistConnectUi();
-    updateGistSyncStatus("Syncing to your private gist.");
+    updateGistSyncStatus("Connected to gist sync.");
     render();
   } catch (error) {
     updateGistSyncStatus(error.message || "Could not connect to gist.", true);

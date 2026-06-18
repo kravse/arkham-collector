@@ -6,6 +6,7 @@ const {
   mergeUserStateByUpdatedAt,
   mergeGistUserState,
   extractStateJsonFromGistResponse,
+  findArkhamGistId,
   buildGistCreatePayload,
   buildGistUpdatePayload,
   parseGistSyncConfig,
@@ -74,6 +75,17 @@ test("mergeGistUserState preserves local collection when remote wins", () => {
   });
   assert.deepEqual(merged.collections.local.collectionIds, [10]);
   assert.deepEqual(merged.collections.gist.collectionIds, [2]);
+});
+
+test("findArkhamGistId picks gist with state.json", () => {
+  assert.equal(
+    findArkhamGistId([
+      { id: "a", files: { "notes.txt": {} } },
+      { id: "b", files: { "state.json": { content: "{}" } } },
+    ]),
+    "b",
+  );
+  assert.equal(findArkhamGistId([]), null);
 });
 
 test("extractStateJsonFromGistResponse reads state.json content", () => {

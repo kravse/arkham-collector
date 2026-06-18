@@ -27,6 +27,7 @@ ${body
     mergeUserStateByUpdatedAt,
     mergeGistUserState,
     extractStateJsonFromGistResponse,
+    findArkhamGistId,
     buildGistCreatePayload,
     buildGistUpdatePayload,
   };

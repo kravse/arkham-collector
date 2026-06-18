@@ -99,6 +99,58 @@ const viewerUserState = (function () {
     return collections[mode];
   }
   
+  function localCollectionSlotFromPersisted(localPersisted) {
+    return normalizeCollectionSlot(localPersisted?.collections?.local, {
+      collectionIds: localPersisted?.collectionIds || [],
+      orderedIds: localPersisted?.orderedIds || [],
+    });
+  }
+  
+  function buildEmptyGistConnectState(localPersisted) {
+    const base = defaultUserState();
+    const localSlot = localCollectionSlotFromPersisted(localPersisted);
+    return {
+      ...base,
+      updatedAt: new Date().toISOString(),
+      storageMode: "gist",
+      collectionIds: [],
+      orderedIds: [],
+      wantIds: [],
+      collections: {
+        local: localSlot,
+        gist: emptyCollectionSlot(),
+      },
+    };
+  }
+  
+  function adoptRemoteGistState(remoteState, localPersisted) {
+    const parsed =
+      typeof remoteState === "string"
+        ? parseUserState(remoteState)
+        : parseUserState(serializeUserState(remoteState));
+    if (!parsed) {
+      return null;
+    }
+    const localSlot = localCollectionSlotFromPersisted(localPersisted);
+    const gistSlot = activeCollectionSlot({
+      ...parsed,
+      storageMode: "gist",
+    });
+    return {
+      ...parsed,
+      storageMode: "gist",
+      collectionIds: gistSlot.collectionIds,
+      orderedIds: gistSlot.orderedIds,
+      collections: {
+        local: localSlot,
+        gist: {
+          collectionIds: gistSlot.collectionIds,
+          orderedIds: gistSlot.orderedIds,
+        },
+      },
+    };
+  }
+  
   function normalizeIdArray(raw) {
     if (raw == null || raw === "") {
       return [];
@@ -389,6 +441,10 @@ const viewerUserState = (function () {
     emptyCollectionSlot,
     normalizeCollections,
     normalizeCollectionSlot,
+    activeCollectionSlot,
+    localCollectionSlotFromPersisted,
+    buildEmptyGistConnectState,
+    adoptRemoteGistState,
     normalizeIdArray,
     normalizeStorageMode,
     migrateFromLegacy,

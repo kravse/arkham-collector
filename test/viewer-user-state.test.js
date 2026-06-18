@@ -12,6 +12,8 @@ const {
   buildUserStateFromRuntime,
   applyUserStateToRuntime,
   serializeUserState,
+  adoptRemoteGistState,
+  buildEmptyGistConnectState,
 } = require("../scripts/lib/viewer-user-state");
 
 test("migrateFromLegacy maps own collection and drops sample ids", () => {
@@ -152,6 +154,46 @@ test("applyUserStateToRuntime uses active storage collection slot", () => {
   );
   assert.deepEqual(runtime.collectionIds, [1, 2]);
   assert.deepEqual(runtime.orderedIds, [3]);
+});
+
+test("adoptRemoteGistState replaces gist data but keeps local collection slot", () => {
+  const adopted = adoptRemoteGistState(
+    {
+      version: USER_STATE_VERSION,
+      updatedAt: "2026-06-02T00:00:00.000Z",
+      storageMode: "gist",
+      collectionIds: [5, 6],
+      orderedIds: [7],
+      wantIds: [8],
+      preferences: {
+        ...defaultUserState().preferences,
+        sort: "title-desc",
+      },
+    },
+    {
+      collections: {
+        local: { collectionIds: [1], orderedIds: [2] },
+        gist: { collectionIds: [99], orderedIds: [] },
+      },
+    },
+  );
+  assert.deepEqual(adopted.collections.local.collectionIds, [1]);
+  assert.deepEqual(adopted.collections.local.orderedIds, [2]);
+  assert.deepEqual(adopted.collections.gist.collectionIds, [5, 6]);
+  assert.deepEqual(adopted.wantIds, [8]);
+  assert.equal(adopted.preferences.sort, "title-desc");
+});
+
+test("buildEmptyGistConnectState starts empty gist data and keeps local slot", () => {
+  const empty = buildEmptyGistConnectState({
+    collections: {
+      local: { collectionIds: [3], orderedIds: [] },
+      gist: { collectionIds: [9], orderedIds: [4] },
+    },
+  });
+  assert.deepEqual(empty.collections.local.collectionIds, [3]);
+  assert.deepEqual(empty.collections.gist.collectionIds, []);
+  assert.deepEqual(empty.wantIds, []);
 });
 
 test("defaultUserState matches first-visit defaults", () => {

@@ -91,6 +91,16 @@ function extractStateJsonFromGistResponse(body) {
   return file.content;
 }
 
+function findArkhamGistId(gists, stateFilename = GIST_STATE_FILENAME) {
+  if (!Array.isArray(gists)) {
+    return null;
+  }
+  const match = gists.find(
+    (gist) => gist?.files && gist.files[stateFilename],
+  );
+  return match?.id || null;
+}
+
 function buildGistCreatePayload(stateJson) {
   return {
     description: "Arkham Collector sync",
@@ -123,6 +133,7 @@ module.exports = {
   mergeUserStateByUpdatedAt,
   mergeGistUserState,
   extractStateJsonFromGistResponse,
+  findArkhamGistId,
   buildGistCreatePayload,
   buildGistUpdatePayload,
 };

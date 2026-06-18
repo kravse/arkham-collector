@@ -333,6 +333,58 @@ const viewerUserState = (function () {
     return collections[mode];
   }
   
+  function localCollectionSlotFromPersisted(localPersisted) {
+    return normalizeCollectionSlot(localPersisted?.collections?.local, {
+      collectionIds: localPersisted?.collectionIds || [],
+      orderedIds: localPersisted?.orderedIds || [],
+    });
+  }
+  
+  function buildEmptyGistConnectState(localPersisted) {
+    const base = defaultUserState();
+    const localSlot = localCollectionSlotFromPersisted(localPersisted);
+    return {
+      ...base,
+      updatedAt: new Date().toISOString(),
+      storageMode: "gist",
+      collectionIds: [],
+      orderedIds: [],
+      wantIds: [],
+      collections: {
+        local: localSlot,
+        gist: emptyCollectionSlot(),
+      },
+    };
+  }
+  
+  function adoptRemoteGistState(remoteState, localPersisted) {
+    const parsed =
+      typeof remoteState === "string"
+        ? parseUserState(remoteState)
+        : parseUserState(serializeUserState(remoteState));
+    if (!parsed) {
+      return null;
+    }
+    const localSlot = localCollectionSlotFromPersisted(localPersisted);
+    const gistSlot = activeCollectionSlot({
+      ...parsed,
+      storageMode: "gist",
+    });
+    return {
+      ...parsed,
+      storageMode: "gist",
+      collectionIds: gistSlot.collectionIds,
+      orderedIds: gistSlot.orderedIds,
+      collections: {
+        local: localSlot,
+        gist: {
+          collectionIds: gistSlot.collectionIds,
+          orderedIds: gistSlot.orderedIds,
+        },
+      },
+    };
+  }
+  
   function normalizeIdArray(raw) {
     if (raw == null || raw === "") {
       return [];
@@ -623,6 +675,10 @@ const viewerUserState = (function () {
     emptyCollectionSlot,
     normalizeCollections,
     normalizeCollectionSlot,
+    activeCollectionSlot,
+    localCollectionSlotFromPersisted,
+    buildEmptyGistConnectState,
+    adoptRemoteGistState,
     normalizeIdArray,
     normalizeStorageMode,
     migrateFromLegacy,
@@ -731,6 +787,16 @@ const viewerGistSync = (function () {
     return file.content;
   }
   
+  function findArkhamGistId(gists, stateFilename = GIST_STATE_FILENAME) {
+    if (!Array.isArray(gists)) {
+      return null;
+    }
+    const match = gists.find(
+      (gist) => gist?.files && gist.files[stateFilename],
+    );
+    return match?.id || null;
+  }
+  
   function buildGistCreatePayload(stateJson) {
     return {
       description: "Arkham Collector sync",
@@ -762,6 +828,7 @@ const viewerGistSync = (function () {
     mergeUserStateByUpdatedAt,
     mergeGistUserState,
     extractStateJsonFromGistResponse,
+    findArkhamGistId,
     buildGistCreatePayload,
     buildGistUpdatePayload,
   };
@@ -1488,6 +1555,9 @@ async function fetchGistState(config) {
     `${viewerGistSync.GITHUB_API}/gists/${config.gistId}`,
     { headers: githubHeaders(config.token) },
   );
+  if (response.status === 404) {
+    throw new Error("Gist fetch failed (404)");
+  }
   if (!response.ok) {
     throw new Error(`Gist fetch failed (${response.status})`);
   }
@@ -1497,6 +1567,17 @@ async function fetchGistState(config) {
     return null;
   }
   return viewerUserState.parseUserState(content);
+}
+
+async function findExistingArkhamGistId(token) {
+  const response = await fetch(`${viewerGistSync.GITHUB_API}/gists?per_page=100`, {
+    headers: githubHeaders(token),
+  });
+  if (!response.ok) {
+    return null;
+  }
+  const gists = await response.json();
+  return viewerGistSync.findArkhamGistId(gists);
 }
 
 async function pushGistState(config, state) {
@@ -1540,24 +1621,52 @@ async function connectGistSync(token) {
     throw new Error("Enter a GitHub token with gist access.");
   }
 
-  const existing = readGistSyncConfig();
-  const config = {
-    token: trimmed,
-    gistId: existing?.gistId || "",
-  };
-  const state = buildStateForPersistence();
-
-  if (!config.gistId) {
-    config.gistId = await createGistWithState(config, state);
-  } else {
-    await pushGistState(config, state);
+  const existingConfig = readGistSyncConfig();
+  let gistId = existingConfig?.gistId || "";
+  if (!gistId) {
+    gistId = (await findExistingArkhamGistId(trimmed)) || "";
   }
 
-  writeGistSyncConfig(config);
+  const localPersisted = readPersistedUserState();
+  let nextState = null;
+
+  if (gistId) {
+    let remoteState = null;
+    try {
+      remoteState = await fetchGistState({ token: trimmed, gistId });
+    } catch (error) {
+      if (String(error.message || "").includes("404")) {
+        gistId = "";
+      } else {
+        throw error;
+      }
+    }
+    if (gistId && remoteState) {
+      nextState = viewerUserState.adoptRemoteGistState(
+        remoteState,
+        localPersisted,
+      );
+    }
+  }
+
+  if (!nextState) {
+    nextState = viewerUserState.buildEmptyGistConnectState(localPersisted);
+    if (!gistId) {
+      gistId = await createGistWithState(
+        { token: trimmed, gistId: "" },
+        nextState,
+      );
+    } else {
+      await pushGistState({ token: trimmed, gistId }, nextState);
+    }
+  }
+
+  writeGistSyncConfig({ token: trimmed, gistId });
+  persistUserState(nextState);
+  applyRuntimeSnapshot(viewerUserState.applyUserStateToRuntime(nextState));
   storageMode = "gist";
-  saveUserState();
   syncSettingsStorageMode();
-  return config;
+  return { token: trimmed, gistId };
 }
 
 function scheduleGistPush() {
@@ -2918,7 +3027,7 @@ async function onGistConnectClick() {
     await connectGistSync(gistTokenInput.value);
     gistTokenInput.value = "";
     syncGistConnectUi();
-    updateGistSyncStatus("Syncing to your private gist.");
+    updateGistSyncStatus("Connected to gist sync.");
     render();
   } catch (error) {
     updateGistSyncStatus(error.message || "Could not connect to gist.", true);
