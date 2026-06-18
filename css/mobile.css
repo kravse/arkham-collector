@@ -208,7 +208,7 @@
   }
 
   body.view-mode-list .card {
-    min-height: 3.18rem;
+    min-height: calc(3.18rem + 5px);
   }
 
   body.view-mode-list .card-body {

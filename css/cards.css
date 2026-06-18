@@ -470,9 +470,9 @@ main {
 }
 
 body.view-mode-list {
-  --list-cover-bg-opacity: 0.42;
+  --list-cover-bg-opacity: 0.5;
   --list-cover-bg-scale: 1.45;
-  --list-cover-bg-wash: 0.56;
+  --list-cover-bg-wash: 0.48;
   --list-row-pad: 0.42rem;
   --list-action-gap: 0.22rem;
   --list-imprint-width: 2.4rem;
@@ -497,7 +497,7 @@ body.view-mode-list .card {
   flex-direction: row;
   align-items: stretch;
   width: 100%;
-  min-height: 3.6rem;
+  min-height: calc(3.6rem + 5px);
   background: var(--panel);
   isolation: isolate;
 }
@@ -651,11 +651,11 @@ body.view-mode-list .card-list-head .title {
 }
 
 body.view-mode-list .card-list-primary {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: baseline;
-  gap: 0.42rem;
-  width: fit-content;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.1rem;
+  width: 100%;
   max-width: 100%;
   min-width: 0;
   overflow: hidden;
@@ -663,9 +663,8 @@ body.view-mode-list .card-list-primary {
 
 body.view-mode-list .card-list-primary .date {
   display: block;
-  flex: none;
-  font-size: 0.82rem;
-  line-height: 1.15;
+  font-size: 0.74rem;
+  line-height: 1.1;
   white-space: nowrap;
 }
 
@@ -747,5 +746,15 @@ body.view-mode-list .hide-book-btn svg {
 body.view-mode-list .empty {
   grid-column: auto;
   width: 100%;
+}
+
+@media (min-width: 641px) {
+  body.view-mode-list .card {
+    transition: border-color 0.15s ease;
+  }
+
+  body.view-mode-list .card:hover {
+    border-color: color-mix(in srgb, var(--accent) 72%, var(--border));
+  }
 }
 
