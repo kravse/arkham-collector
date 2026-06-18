@@ -469,6 +469,22 @@ main {
   font-family: ui-sans-serif, system-ui, sans-serif;
 }
 
+body.view-mode-list {
+  --list-cover-bg-opacity: 0.42;
+  --list-cover-bg-scale: 1.45;
+  --list-cover-bg-wash: 0.56;
+  --list-row-pad: 0.42rem;
+  --list-action-gap: 0.22rem;
+  --list-imprint-width: 2.4rem;
+  --list-edit-width: 1.44rem;
+  --list-right-rail: calc(
+    var(--list-row-pad) + var(--list-imprint-width) + var(--list-action-gap)
+  );
+  --list-right-rail-edit: calc(
+    var(--list-right-rail) + var(--list-edit-width) + var(--list-action-gap)
+  );
+}
+
 body.view-mode-list .grid {
   display: flex;
   flex-direction: column;
@@ -476,28 +492,86 @@ body.view-mode-list .grid {
 }
 
 body.view-mode-list .card {
+  position: relative;
+  overflow: hidden;
   flex-direction: row;
-  align-items: center;
+  align-items: stretch;
   width: 100%;
-  border-radius: 0 12px 12px 0;
+  min-height: 3.6rem;
+  background: var(--panel);
+  isolation: isolate;
+}
+
+body.view-mode-list .card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: color-mix(
+    in srgb,
+    var(--panel) calc(var(--list-cover-bg-wash) * 100%),
+    transparent
+  );
 }
 
 body.view-mode-list .cover-wrap {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: auto;
+  height: auto;
   aspect-ratio: auto;
-  width: 2.4rem;
-  height: 3.6rem;
-  flex-shrink: 0;
-  align-self: center;
+  flex-shrink: 1;
+  align-self: stretch;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+body.view-mode-list .cover-wrap img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  transform: scale(var(--list-cover-bg-scale));
+  transform-origin: center center;
+  opacity: var(--list-cover-bg-opacity);
+}
+
+body.view-mode-list .cover-wrap .placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem;
+  font-size: 0.62rem;
+  opacity: 0.35;
 }
 
 body.view-mode-list .card-body {
+  position: relative;
+  z-index: 2;
   flex: 1;
   min-width: 0;
+  width: 100%;
   display: flex;
   flex-direction: row;
   align-items: center;
   gap: 0.42rem;
-  padding: 0.24rem 0.54rem 0.24rem 0.42rem;
+  padding: 0.24rem var(--list-right-rail) 0.24rem 0.42rem;
+  background: transparent;
+  pointer-events: none;
+}
+
+body.view-mode-list .card:has(.edit-book-btn) .card-body {
+  padding-right: var(--list-right-rail-edit);
+}
+
+body.view-mode-list .card-body .want-btn {
+  pointer-events: auto;
 }
 
 body.view-mode-list .card.owned .card-body,
@@ -512,6 +586,7 @@ body.view-mode-list .card.owned,
 body.view-mode-list .card.ordered,
 body.view-mode-list .card.wanted {
   box-shadow: none;
+  background: transparent;
 }
 
 body.view-mode-list .card.owned::before,
@@ -520,16 +595,28 @@ body.view-mode-list .card.wanted::before {
   content: none;
 }
 
-body.view-mode-list .card.owned {
-  background: var(--owned-bg);
+body.view-mode-list .card.owned::after {
+  background: color-mix(
+    in srgb,
+    color-mix(in srgb, var(--panel) 72%, var(--owned-bg)) calc(var(--list-cover-bg-wash) * 100%),
+    transparent
+  );
 }
 
-body.view-mode-list .card.ordered {
-  background: var(--ordered-bg);
+body.view-mode-list .card.ordered::after {
+  background: color-mix(
+    in srgb,
+    color-mix(in srgb, var(--panel) 72%, var(--ordered-bg)) calc(var(--list-cover-bg-wash) * 100%),
+    transparent
+  );
 }
 
-body.view-mode-list .card.wanted {
-  background: var(--want-bg);
+body.view-mode-list .card.wanted::after {
+  background: color-mix(
+    in srgb,
+    color-mix(in srgb, var(--panel) 72%, var(--want-bg)) calc(var(--list-cover-bg-wash) * 100%),
+    transparent
+  );
 }
 
 body.view-mode-list .card.owned .cover-wrap,
@@ -599,9 +686,10 @@ body.view-mode-list .card-bottom-row .owned-badge,
 body.view-mode-list .card-bottom-row .want-btn,
 body.view-mode-list .card-bottom-row .want-badge {
   flex-shrink: 0;
-  order: 10;
+  order: 15;
   font-size: 0.62rem;
   padding: 0.14rem 0.46rem;
+  margin-left: auto;
 }
 
 body.view-mode-list .card-bottom-row .owned-badge {
@@ -615,30 +703,39 @@ body.view-mode-list.viewing-want .card-bottom-row .want-badge {
 }
 
 body.view-mode-list .card-bottom-row .imprint-badge {
-  flex-shrink: 0;
-  order: 20;
-  margin-left: auto;
-  width: 2.4rem;
-  min-width: 2.4rem;
+  position: absolute;
+  top: 50%;
+  right: var(--list-row-pad);
+  z-index: 2;
+  order: 30;
+  margin-left: 0;
+  width: var(--list-imprint-width);
+  min-width: var(--list-imprint-width);
   font-size: 0.62rem;
   padding: 0.14rem 0;
   box-sizing: border-box;
   justify-content: center;
+  transform: translateY(-50%);
 }
 
 body.view-mode-list .edit-book-btn,
 body.view-mode-list .hide-book-btn {
-  top: 0.18rem;
-  width: 1.44rem;
+  z-index: 3;
+  pointer-events: auto;
+  width: var(--list-edit-width);
   height: 1.44rem;
 }
 
 body.view-mode-list .edit-book-btn {
-  right: 0.18rem;
+  top: 50%;
+  right: var(--list-right-rail);
+  transform: translateY(-50%);
 }
 
 body.view-mode-list .hide-book-btn {
+  top: 50%;
   left: 0.18rem;
+  transform: translateY(-50%);
 }
 
 body.view-mode-list .edit-book-btn svg,
