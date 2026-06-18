@@ -174,7 +174,9 @@ window.BOOK_EDITS = {
     "goodreadsUrl": "https://www.goodreads.com/book/show/5743580-some-notes-on-h-p-lovecraft"
   },
   "374": {
-    "deleted": true
+    "title": "Arkham House: The First 20 Years",
+    "coverImageFile": "covers/arkham-house-the-first-20-years-374.jpg",
+    "goodreadsUrl": "https://www.goodreads.com/book/show/133432742-arkham-house"
   },
   "378": {
     "goodreadsUrl": "https://www.goodreads.com/book/show/1512252.Always_Comes_Evening",
