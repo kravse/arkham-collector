@@ -208,7 +208,7 @@ function refreshGistSyncStatus() {
     return;
   }
   if (isGistStorageActive()) {
-    gistSyncStatus.textContent = "Syncing with your private GitHub Gist.";
+    gistSyncStatus.textContent = "";
     gistSyncStatus.classList.remove("settings-gist-status--error");
     return;
   }
