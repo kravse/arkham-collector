@@ -22,32 +22,31 @@ test("coverDerivativePaths adds card and detail webp suffixes", () => {
 });
 
 test("applyOptimizedCoverPaths rewrites cover paths for optimized sources", () => {
+  const masterPath = "covers/baker-street-irregular-232.jpg";
   const books = [
     {
-      id: 1,
-      coverEditPath: "covers/a-1.jpg",
-      coverImageFile: "covers/a-1.jpg",
+      id: 232,
+      coverImageFile: masterPath,
     },
     {
       id: 2,
-      coverImageFile: "covers/b-2.png",
+      coverImageFile: "covers/missing-book-2.png",
     },
   ];
   const optimizedBySource = new Map([
     [
-      "covers/a-1.jpg",
+      masterPath,
       {
-        card: "covers/a-1.card.webp",
-        detail: "covers/a-1.detail.webp",
+        card: "covers/baker-street-irregular-232.card.webp",
+        detail: "covers/baker-street-irregular-232.detail.webp",
       },
     ],
   ]);
 
   const next = applyOptimizedCoverPaths(books, optimizedBySource);
-  assert.equal(next[0].coverImageFile, "covers/a-1.card.webp");
-  assert.equal(next[0].coverImageDetailFile, "covers/a-1.detail.webp");
-  assert.equal(next[0].coverEditPath, undefined);
-  assert.equal(next[1].coverImageFile, "covers/b-2.png");
+  assert.equal(next[0].coverImageFile, "covers/baker-street-irregular-232.card.webp");
+  assert.equal(next[0].coverImageDetailFile, "covers/baker-street-irregular-232.detail.webp");
+  assert.equal(next[1].coverImageFile, "covers/missing-book-2.png");
   assert.equal(next[1].coverImageDetailFile, undefined);
 });
 

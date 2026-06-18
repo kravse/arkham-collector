@@ -1,29 +1,6 @@
 /* Generated from scripts/lib/viewer-covers.js — run npm run bundle-viewer */
 
 const viewerCovers = (function () {
-  function slugifyCover(value) {
-    return String(value || "")
-      .toLowerCase()
-      .replace(/['']/g, "")
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-+|-+$/g, "")
-      .slice(0, 120);
-  }
-  
-  function wikiTitleFromUrl(url) {
-    if (!url) {
-      return null;
-    }
-    const match = url.match(/\/wiki\/([^#?]+)/);
-    return match ? decodeURIComponent(match[1].replace(/\+/g, " ")) : null;
-  }
-  
-  function coverSlugFromBook(book) {
-    return slugifyCover(
-      wikiTitleFromUrl(book.wikipediaUrl) || book.listTitle || book.title,
-    );
-  }
-  
   function appendCoverCacheKey(url, cacheKey) {
     if (!cacheKey) {
       return url;
@@ -31,46 +8,17 @@ const viewerCovers = (function () {
     return `${url}?v=${encodeURIComponent(cacheKey)}`;
   }
   
-  function hasDeployOptimizedCovers(book) {
-    return Boolean(book.coverImageDetailFile);
-  }
-  
-  function getCoverSources(book, variant = "card") {
-    const sources = [];
-    const deployOptimized = hasDeployOptimizedCovers(book);
-  
-    if (book.coverEditPath && !deployOptimized) {
-      sources.push(book.coverEditPath);
+  function getCoverPath(book, variant = "card") {
+    if (!book) {
+      return null;
     }
-    if (variant === "detail" && book.coverImageDetailFile) {
-      sources.push(book.coverImageDetailFile);
+    if (variant === "lightbox") {
+      return book.coverImageDetailFile || book.coverImageFile || null;
     }
-    if (book.coverImageFile) {
-      sources.push(book.coverImageFile);
-    }
-  
-    const slugBase = coverSlugFromBook(book);
-    if (slugBase && book.id && !deployOptimized) {
-      if (variant === "detail") {
-        sources.push(`covers/${slugBase}-${book.id}.detail.webp`);
-      }
-      sources.push(`covers/${slugBase}-${book.id}.card.webp`);
-      ["jpg", "jpeg", "png", "webp", "gif"].forEach((ext) => {
-        sources.push(`covers/${slugBase}-${book.id}.${ext}`);
-      });
-    }
-  
-    if (book.coverImageUrl) {
-      sources.push(book.coverImageUrl);
-    }
-  
-    return [...new Set(sources)];
+    return book.coverImageFile || null;
   }
   return {
-    slugifyCover,
-    wikiTitleFromUrl,
-    coverSlugFromBook,
     appendCoverCacheKey,
-    getCoverSources,
+    getCoverPath,
   };
 })();

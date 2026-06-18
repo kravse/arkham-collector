@@ -988,29 +988,6 @@ const viewerCollectionImport = (function () {
 /* Generated from scripts/lib/viewer-covers.js — run npm run bundle-viewer */
 
 const viewerCovers = (function () {
-  function slugifyCover(value) {
-    return String(value || "")
-      .toLowerCase()
-      .replace(/['']/g, "")
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-+|-+$/g, "")
-      .slice(0, 120);
-  }
-  
-  function wikiTitleFromUrl(url) {
-    if (!url) {
-      return null;
-    }
-    const match = url.match(/\/wiki\/([^#?]+)/);
-    return match ? decodeURIComponent(match[1].replace(/\+/g, " ")) : null;
-  }
-  
-  function coverSlugFromBook(book) {
-    return slugifyCover(
-      wikiTitleFromUrl(book.wikipediaUrl) || book.listTitle || book.title,
-    );
-  }
-  
   function appendCoverCacheKey(url, cacheKey) {
     if (!cacheKey) {
       return url;
@@ -1018,47 +995,18 @@ const viewerCovers = (function () {
     return `${url}?v=${encodeURIComponent(cacheKey)}`;
   }
   
-  function hasDeployOptimizedCovers(book) {
-    return Boolean(book.coverImageDetailFile);
-  }
-  
-  function getCoverSources(book, variant = "card") {
-    const sources = [];
-    const deployOptimized = hasDeployOptimizedCovers(book);
-  
-    if (book.coverEditPath && !deployOptimized) {
-      sources.push(book.coverEditPath);
+  function getCoverPath(book, variant = "card") {
+    if (!book) {
+      return null;
     }
-    if (variant === "detail" && book.coverImageDetailFile) {
-      sources.push(book.coverImageDetailFile);
+    if (variant === "lightbox") {
+      return book.coverImageDetailFile || book.coverImageFile || null;
     }
-    if (book.coverImageFile) {
-      sources.push(book.coverImageFile);
-    }
-  
-    const slugBase = coverSlugFromBook(book);
-    if (slugBase && book.id && !deployOptimized) {
-      if (variant === "detail") {
-        sources.push(`covers/${slugBase}-${book.id}.detail.webp`);
-      }
-      sources.push(`covers/${slugBase}-${book.id}.card.webp`);
-      ["jpg", "jpeg", "png", "webp", "gif"].forEach((ext) => {
-        sources.push(`covers/${slugBase}-${book.id}.${ext}`);
-      });
-    }
-  
-    if (book.coverImageUrl) {
-      sources.push(book.coverImageUrl);
-    }
-  
-    return [...new Set(sources)];
+    return book.coverImageFile || null;
   }
   return {
-    slugifyCover,
-    wikiTitleFromUrl,
-    coverSlugFromBook,
     appendCoverCacheKey,
-    getCoverSources,
+    getCoverPath,
   };
 })();
 
@@ -2264,15 +2212,14 @@ const coverZoomLensIcon = `
 </svg>`;
 
 function renderCover(book, cacheKey, variant = "card") {
-  const sources = viewerCovers.getCoverSources(book, variant);
-  if (!sources.length) {
+  const coverPath = viewerCovers.getCoverPath(book, variant);
+  if (!coverPath) {
     return `<div class="placeholder">No cover image</div>`;
   }
 
-  const primary = viewerCovers.appendCoverCacheKey(sources[0], cacheKey);
-  const fallback = sources.slice(1).join("|");
+  const src = viewerCovers.appendCoverCacheKey(coverPath, cacheKey);
   const title = escapeHtml(book.title || "this book");
-  const imgHtml = `<img src="${primary}" alt="Cover of ${title}" loading="lazy" data-fallbacks="${fallback}" onerror="tryCoverFallback(this)">`;
+  const imgHtml = `<img src="${src}" alt="Cover of ${title}" loading="lazy" onerror="onCoverImageError(this)">`;
 
   if (variant !== "detail") {
     return imgHtml;
@@ -2653,22 +2600,13 @@ function resolveGoodreadsUrl(book) {
   return fromData || null;
 }
 
-window.tryCoverFallback = function (img) {
-  const remaining = img.dataset.fallbacks
-    ? img.dataset.fallbacks.split("|").filter(Boolean)
-    : [];
-  if (!remaining.length) {
-    img.replaceWith(
-      Object.assign(document.createElement("div"), {
-        className: "placeholder",
-        textContent: "No cover image",
-      }),
-    );
-    return;
-  }
-
-  img.dataset.fallbacks = remaining.slice(1).join("|");
-  img.src = remaining[0];
+window.onCoverImageError = function (img) {
+  img.replaceWith(
+    Object.assign(document.createElement("div"), {
+      className: "placeholder",
+      textContent: "No cover image",
+    }),
+  );
 };
 
 function renderCard(book) {
@@ -3091,17 +3029,16 @@ function updateCoverLightboxImage(book) {
   if (!coverLightbox || !coverLightboxImg || !book) {
     return false;
   }
-  const sources = viewerCovers.getCoverSources(book, "detail");
-  if (!sources.length) {
+  const coverPath = viewerCovers.getCoverPath(book, "lightbox");
+  if (!coverPath) {
     return false;
   }
 
   coverLightboxImg.src = viewerCovers.appendCoverCacheKey(
-    sources[0],
+    coverPath,
     book.coverCacheKey,
   );
   coverLightboxImg.alt = `Cover of ${book.title || "book"}`;
-  coverLightboxImg.dataset.fallbacks = sources.slice(1).join("|");
   return true;
 }
 
@@ -3127,7 +3064,7 @@ function navigateCoverLightbox(direction) {
   const step = direction < 0 ? -1 : 1;
   for (let i = index + step; i >= 0 && i < visible.length; i += step) {
     const book = visible[i];
-    if (!viewerCovers.getCoverSources(book, "detail").length) {
+    if (!viewerCovers.getCoverPath(book, "lightbox")) {
       continue;
     }
     openBookDetail(book.id, { historyMode: "replace" });
@@ -3143,7 +3080,6 @@ function closeCoverLightbox() {
   coverLightbox.hidden = true;
   document.body.classList.remove("cover-lightbox-open");
   coverLightboxImg.removeAttribute("src");
-  coverLightboxImg.dataset.fallbacks = "";
 }
 
 function handleCoverZoomTrigger(event) {
@@ -3419,7 +3355,6 @@ function applyEditResponseToBook(bookId, payload) {
   }
   if (payload.coverImageFile) {
     book.coverImageFile = payload.coverImageFile;
-    book.coverEditPath = payload.coverImageFile;
     book.coverCacheKey = Date.now();
   }
   const key = String(bookId);

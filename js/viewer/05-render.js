@@ -7,15 +7,14 @@ const coverZoomLensIcon = `
 </svg>`;
 
 function renderCover(book, cacheKey, variant = "card") {
-  const sources = viewerCovers.getCoverSources(book, variant);
-  if (!sources.length) {
+  const coverPath = viewerCovers.getCoverPath(book, variant);
+  if (!coverPath) {
     return `<div class="placeholder">No cover image</div>`;
   }
 
-  const primary = viewerCovers.appendCoverCacheKey(sources[0], cacheKey);
-  const fallback = sources.slice(1).join("|");
+  const src = viewerCovers.appendCoverCacheKey(coverPath, cacheKey);
   const title = escapeHtml(book.title || "this book");
-  const imgHtml = `<img src="${primary}" alt="Cover of ${title}" loading="lazy" data-fallbacks="${fallback}" onerror="tryCoverFallback(this)">`;
+  const imgHtml = `<img src="${src}" alt="Cover of ${title}" loading="lazy" onerror="onCoverImageError(this)">`;
 
   if (variant !== "detail") {
     return imgHtml;
@@ -396,22 +395,13 @@ function resolveGoodreadsUrl(book) {
   return fromData || null;
 }
 
-window.tryCoverFallback = function (img) {
-  const remaining = img.dataset.fallbacks
-    ? img.dataset.fallbacks.split("|").filter(Boolean)
-    : [];
-  if (!remaining.length) {
-    img.replaceWith(
-      Object.assign(document.createElement("div"), {
-        className: "placeholder",
-        textContent: "No cover image",
-      }),
-    );
-    return;
-  }
-
-  img.dataset.fallbacks = remaining.slice(1).join("|");
-  img.src = remaining[0];
+window.onCoverImageError = function (img) {
+  img.replaceWith(
+    Object.assign(document.createElement("div"), {
+      className: "placeholder",
+      textContent: "No cover image",
+    }),
+  );
 };
 
 function renderCard(book) {

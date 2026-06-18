@@ -8,9 +8,13 @@ const { throttle } = require("./http");
 
 function expectedCoverPaths(book) {
   const wikiTitle = wikiTitleFromHref(book.wikipediaUrl);
-  const slugBase = slugify(wikiTitle || book.listTitle || book.title);
+  const rawTitle = wikiTitle || book.listTitle || book.title;
   const id = book.id;
-  if (!slugBase || !id) {
+  if (!rawTitle || !id) {
+    return [];
+  }
+  const slugBase = slugify(rawTitle);
+  if (!slugBase) {
     return [];
   }
   return [".jpg", ".jpeg", ".png", ".webp", ".gif"].map((ext) =>
@@ -35,13 +39,77 @@ function findLocalCoverFile(book) {
   if (book.id && fs.existsSync(COVERS_DIR)) {
     const idSuffix = `-${book.id}.`;
     for (const name of fs.readdirSync(COVERS_DIR)) {
-      if (name.includes(idSuffix)) {
-        return `covers/${name}`.replace(/\\/g, "/");
+      if (!name.includes(idSuffix)) {
+        continue;
+      }
+      if (name.endsWith(".card.webp") || name.endsWith(".detail.webp")) {
+        continue;
+      }
+      return `covers/${name}`.replace(/\\/g, "/");
+    }
+  }
+
+  return null;
+}
+
+function isCoverDerivativePath(relativePath) {
+  return (
+    typeof relativePath === "string" &&
+    (relativePath.endsWith(".card.webp") || relativePath.endsWith(".detail.webp"))
+  );
+}
+
+function findCoverMasterPath(book, books) {
+  if (book.coverImageFile && !isCoverDerivativePath(book.coverImageFile)) {
+    const filePath = path.join(ROOT, book.coverImageFile);
+    if (fs.existsSync(filePath)) {
+      return book.coverImageFile.replace(/\\/g, "/");
+    }
+  }
+
+  for (const relativePath of expectedCoverPaths(book)) {
+    if (fs.existsSync(path.join(ROOT, relativePath))) {
+      return relativePath.replace(/\\/g, "/");
+    }
+  }
+
+  if (book.id && fs.existsSync(COVERS_DIR)) {
+    const idSuffix = `-${book.id}.`;
+    for (const name of fs.readdirSync(COVERS_DIR)) {
+      if (!name.includes(idSuffix)) {
+        continue;
+      }
+      if (name.endsWith(".card.webp") || name.endsWith(".detail.webp")) {
+        continue;
+      }
+      return `covers/${name}`.replace(/\\/g, "/");
+    }
+  }
+
+  if (Array.isArray(books)) {
+    for (const other of books) {
+      if (other.id === book.id || !booksMatchTitleAndYear(book, other)) {
+        continue;
+      }
+      const siblingCover = findCoverMasterPath(other, null);
+      if (siblingCover) {
+        return siblingCover;
       }
     }
   }
 
   return null;
+}
+
+function collectCoverMasterPaths(books) {
+  const files = new Set();
+  for (const book of books) {
+    const resolved = findCoverMasterPath(book, books);
+    if (resolved) {
+      files.add(resolved);
+    }
+  }
+  return files;
 }
 
 function booksMatchTitleAndYear(a, b) {
@@ -207,6 +275,9 @@ function bookHasCover(book) {
 module.exports = {
   expectedCoverPaths,
   findLocalCoverFile,
+  isCoverDerivativePath,
+  findCoverMasterPath,
+  collectCoverMasterPaths,
   booksMatchTitleAndYear,
   findLocalCoverForBook,
   resolveCoverPathsInBooks,

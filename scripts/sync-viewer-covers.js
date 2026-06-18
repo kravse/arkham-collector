@@ -21,11 +21,8 @@ ${body.trimEnd()
   .map((line) => `  ${line}`)
   .join("\n")}
   return {
-    slugifyCover,
-    wikiTitleFromUrl,
-    coverSlugFromBook,
     appendCoverCacheKey,
-    getCoverSources,
+    getCoverPath,
   };
 })();
 `;

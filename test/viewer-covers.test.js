@@ -3,10 +3,8 @@ const assert = require("node:assert/strict");
 
 const {
   appendCoverCacheKey,
-  coverSlugFromBook,
-  getCoverSources,
+  getCoverPath,
 } = require("../scripts/lib/viewer-covers");
-const { slugify: slugifyCoverOnDisk } = require("../scripts/lib/text");
 
 const book = {
   id: 42,
@@ -14,82 +12,41 @@ const book = {
   coverImageDetailFile: "covers/the-dunwich-horror-42.detail.webp",
 };
 
-test("coverSlugFromBook matches on-disk cover naming", () => {
-  const book = {
-    id: 276,
-    listTitle: "The Dunwich Horror and Others",
-    wikipediaUrl: "https://en.wikipedia.org/wiki/The_Dunwich_Horror_and_Others",
-  };
-  assert.equal(coverSlugFromBook(book), "the-dunwich-horror-and-others");
+test("getCoverPath returns coverImageFile for card and detail", () => {
+  assert.equal(getCoverPath(book, "card"), "covers/the-dunwich-horror-42.card.webp");
+  assert.equal(getCoverPath(book, "detail"), "covers/the-dunwich-horror-42.card.webp");
+});
+
+test("getCoverPath returns detail derivative for lightbox", () => {
   assert.equal(
-    coverSlugFromBook(book),
-    slugifyCoverOnDisk(
-      "The Dunwich Horror and Others",
-    ),
-  );
-});
-
-test("getCoverSources uses hyphenated slug fallbacks", () => {
-  const book = {
-    id: 276,
-    listTitle: "The Dunwich Horror and Others",
-    wikipediaUrl: "https://en.wikipedia.org/wiki/The_Dunwich_Horror_and_Others",
-  };
-  assert.ok(
-    getCoverSources(book, "card").includes(
-      "covers/the-dunwich-horror-and-others-276.jpg",
-    ),
-  );
-});
-
-test("getCoverSources falls back from coverEditPath to optimized card webp in local dev", () => {
-  assert.deepEqual(
-    getCoverSources(
-      {
-        id: 419,
-        coverEditPath: "covers/the-outsider-and-others-419.png",
-        coverImageFile: "covers/the-outsider-and-others-419.card.webp",
-      },
-      "card",
-    ),
-    [
-      "covers/the-outsider-and-others-419.png",
-      "covers/the-outsider-and-others-419.card.webp",
-    ],
-  );
-});
-
-test("getCoverSources prefers card derivative for grid covers", () => {
-  assert.deepEqual(getCoverSources(book, "card"), [
-    "covers/the-dunwich-horror-42.card.webp",
-  ]);
-});
-
-test("getCoverSources prefers detail derivative for detail overlay", () => {
-  assert.deepEqual(getCoverSources(book, "detail"), [
+    getCoverPath(book, "lightbox"),
     "covers/the-dunwich-horror-42.detail.webp",
-    "covers/the-dunwich-horror-42.card.webp",
-  ]);
+  );
 });
 
-test("getCoverSources uses deploy derivatives instead of missing edit originals", () => {
-  assert.deepEqual(
-    getCoverSources(
+test("getCoverPath lightbox falls back to coverImageFile when no detail file", () => {
+  assert.equal(
+    getCoverPath(
       {
         id: 419,
-        coverEditPath: "covers/the-outsider-and-others-419.webp",
-        coverImageFile: "covers/the-outsider-and-others-419.card.webp",
-        coverImageDetailFile: "covers/the-outsider-and-others-419.detail.webp",
-        coverImageUrl: "https://example.com/cover.jpg",
+        coverImageFile: "covers/the-outsider-and-others-419.webp",
       },
-      "detail",
+      "lightbox",
     ),
-    [
-      "covers/the-outsider-and-others-419.detail.webp",
-      "covers/the-outsider-and-others-419.card.webp",
-      "https://example.com/cover.jpg",
-    ],
+    "covers/the-outsider-and-others-419.webp",
   );
+});
+
+test("getCoverPath ignores remote coverImageUrl", () => {
+  const remote =
+    "https://upload.wikimedia.org/wikipedia/en/2/27/The_Outsider_and_Others_book_cover.jpg";
+  assert.equal(getCoverPath({ id: 419, coverImageUrl: remote }, "card"), null);
+  assert.equal(getCoverPath({ id: 419, coverImageUrl: remote }, "lightbox"), null);
+});
+
+test("getCoverPath returns null when book has no local cover", () => {
+  assert.equal(getCoverPath({ id: 1 }, "card"), null);
+  assert.equal(getCoverPath(null, "card"), null);
 });
 
 test("appendCoverCacheKey adds a cache-busting query param", () => {

@@ -253,17 +253,16 @@ function updateCoverLightboxImage(book) {
   if (!coverLightbox || !coverLightboxImg || !book) {
     return false;
   }
-  const sources = viewerCovers.getCoverSources(book, "detail");
-  if (!sources.length) {
+  const coverPath = viewerCovers.getCoverPath(book, "lightbox");
+  if (!coverPath) {
     return false;
   }
 
   coverLightboxImg.src = viewerCovers.appendCoverCacheKey(
-    sources[0],
+    coverPath,
     book.coverCacheKey,
   );
   coverLightboxImg.alt = `Cover of ${book.title || "book"}`;
-  coverLightboxImg.dataset.fallbacks = sources.slice(1).join("|");
   return true;
 }
 
@@ -289,7 +288,7 @@ function navigateCoverLightbox(direction) {
   const step = direction < 0 ? -1 : 1;
   for (let i = index + step; i >= 0 && i < visible.length; i += step) {
     const book = visible[i];
-    if (!viewerCovers.getCoverSources(book, "detail").length) {
+    if (!viewerCovers.getCoverPath(book, "lightbox")) {
       continue;
     }
     openBookDetail(book.id, { historyMode: "replace" });
@@ -305,7 +304,6 @@ function closeCoverLightbox() {
   coverLightbox.hidden = true;
   document.body.classList.remove("cover-lightbox-open");
   coverLightboxImg.removeAttribute("src");
-  coverLightboxImg.dataset.fallbacks = "";
 }
 
 function handleCoverZoomTrigger(event) {

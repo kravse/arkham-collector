@@ -6,8 +6,8 @@ const path = require("path");
 const { loadEdits, applyEditsToBooks } = require("./scripts/lib/edits");
 const { writeViewerBookScripts } = require("./scripts/lib/books");
 const {
-  findLocalCoverForBook,
   resolveCoverPathsInBooks,
+  collectCoverMasterPaths,
 } = require("./scripts/lib/covers-files");
 const {
   optimizeCoverPaths,
@@ -56,14 +56,7 @@ function copyFile(src, dest) {
 }
 
 function collectCoverPaths(books) {
-  const files = new Set();
-  for (const book of books) {
-    const resolved = findLocalCoverForBook(book, books);
-    if (resolved) {
-      files.add(resolved.replace(/\\/g, "/"));
-    }
-  }
-  return files;
+  return collectCoverMasterPaths(books);
 }
 
 function copyDirectory(relativeDir, options = {}) {

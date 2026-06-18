@@ -66,7 +66,6 @@ function applyEditResponseToBook(bookId, payload) {
   }
   if (payload.coverImageFile) {
     book.coverImageFile = payload.coverImageFile;
-    book.coverEditPath = payload.coverImageFile;
     book.coverCacheKey = Date.now();
   }
   const key = String(bookId);

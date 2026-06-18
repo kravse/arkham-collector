@@ -1,5 +1,6 @@
 const fs = require("fs");
 const path = require("path");
+const { findCoverMasterPath } = require("./covers-files");
 
 const CARD_MAX_WIDTH = 480;
 const DETAIL_MAX_WIDTH = 960;
@@ -19,6 +20,13 @@ function coverSourceKey(relativePath) {
   return String(relativePath || "").replace(/\\/g, "/");
 }
 
+function isCoverDerivativePath(relativePath) {
+  return (
+    typeof relativePath === "string" &&
+    (relativePath.endsWith(".card.webp") || relativePath.endsWith(".detail.webp"))
+  );
+}
+
 function applyOptimizedCoverPaths(books, optimizedBySource) {
   const lookup =
     optimizedBySource instanceof Map
@@ -26,17 +34,16 @@ function applyOptimizedCoverPaths(books, optimizedBySource) {
       : new Map(Object.entries(optimizedBySource || {}));
 
   return books.map((book) => {
-    const source = book.coverEditPath || book.coverImageFile;
-    if (!source) {
+    const master = findCoverMasterPath(book, books);
+    if (!master) {
       return book;
     }
-    const optimized = lookup.get(coverSourceKey(source));
+    const optimized = lookup.get(coverSourceKey(master));
     if (!optimized) {
       return book;
     }
-    const { coverEditPath: _coverEditPath, ...rest } = book;
     return {
-      ...rest,
+      ...book,
       coverImageFile: optimized.card,
       coverImageDetailFile: optimized.detail,
     };
