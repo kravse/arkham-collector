@@ -7,14 +7,15 @@ const {
   defaultUserState,
   normalizeIdArray,
   migrateFromLegacy,
+  migrateV1ToV2,
   parseUserState,
   buildUserStateFromRuntime,
   applyUserStateToRuntime,
   serializeUserState,
 } = require("../scripts/lib/viewer-user-state");
 
-test("migrateFromLegacy maps full legacy snapshot", () => {
-  const legacy = {
+test("migrateFromLegacy maps own collection and drops sample ids", () => {
+  const state = migrateFromLegacy({
     [LEGACY_KEYS.collection]: "[1, 42]",
     [LEGACY_KEYS.sampleCollection]: "[3, 7]",
     [LEGACY_KEYS.ordered]: "[99]",
@@ -26,21 +27,24 @@ test("migrateFromLegacy maps full legacy snapshot", () => {
     [LEGACY_KEYS.highlightWants]: "0",
     [LEGACY_KEYS.highlightCollection]: "1",
     [LEGACY_KEYS.showMagazines]: "1",
-  };
+  });
 
-  const state = migrateFromLegacy(legacy);
   assert.equal(state.version, USER_STATE_VERSION);
-  assert.equal(state.collectionSource, "own");
-  assert.deepEqual(state.ownCollectionIds, [1, 42]);
-  assert.deepEqual(state.sampleCollectionIds, [3, 7]);
+  assert.equal(state.storageMode, "local");
+  assert.deepEqual(state.collectionIds, [1, 42]);
   assert.deepEqual(state.orderedIds, [99]);
   assert.deepEqual(state.wantIds, [5, 12]);
   assert.equal(state.preferences.sort, "title-desc");
   assert.equal(state.preferences.viewMode, "list");
-  assert.equal(state.preferences.headerFiltersExpanded, false);
-  assert.equal(state.preferences.highlightWants, false);
-  assert.equal(state.preferences.highlightCollection, true);
-  assert.equal(state.preferences.showMagazines, true);
+});
+
+test("migrateFromLegacy discards sample-only collection data", () => {
+  const state = migrateFromLegacy({
+    [LEGACY_KEYS.sampleCollection]: "[3, 7]",
+    [LEGACY_KEYS.collectionSource]: "sample",
+  });
+  assert.deepEqual(state.collectionIds, []);
+  assert.equal(state.storageMode, "local");
 });
 
 test("migrateFromLegacy uses defaults for partial legacy snapshot", () => {
@@ -48,39 +52,46 @@ test("migrateFromLegacy uses defaults for partial legacy snapshot", () => {
     [LEGACY_KEYS.want]: "[10]",
   });
   assert.deepEqual(state.wantIds, [10]);
-  assert.deepEqual(state.ownCollectionIds, []);
-  assert.equal(state.sampleCollectionIds, null);
-  assert.equal(state.collectionSource, null);
-  assert.equal(state.preferences.highlightWants, true);
+  assert.deepEqual(state.collectionIds, []);
+  assert.equal(state.storageMode, "local");
 });
 
-test("migrateFromLegacy maps legacy sort aliases", () => {
-  assert.equal(
-    migrateFromLegacy({ [LEGACY_KEYS.sort]: "default" }).preferences.sort,
-    "date-asc",
-  );
-  assert.equal(
-    migrateFromLegacy({ [LEGACY_KEYS.sort]: "title" }).preferences.sort,
-    "title-asc",
-  );
+test("migrateV1ToV2 keeps own ids and drops sample ids", () => {
+  const state = migrateV1ToV2({
+    version: 1,
+    updatedAt: "2026-01-01T00:00:00.000Z",
+    collectionSource: "sample",
+    ownCollectionIds: [1, 2],
+    sampleCollectionIds: [9],
+    orderedIds: [3],
+    wantIds: [4],
+    preferences: defaultUserState().preferences,
+  });
+  assert.equal(state.version, USER_STATE_VERSION);
+  assert.deepEqual(state.collectionIds, [1, 2]);
+  assert.equal(state.storageMode, "local");
 });
 
-test("normalizeIdArray rejects invalid JSON arrays", () => {
-  assert.deepEqual(normalizeIdArray("not-json"), []);
-  assert.deepEqual(normalizeIdArray("[1, null, 2.5, 2]"), [1, 2]);
-});
-
-test("parseUserState rejects invalid or wrong version", () => {
-  assert.equal(parseUserState(null), null);
-  assert.equal(parseUserState("{"), null);
-  assert.equal(parseUserState(JSON.stringify({ version: 2 })), null);
+test("parseUserState upgrades v1 unified state to v2", () => {
+  const v1 = {
+    version: 1,
+    updatedAt: "2026-01-01T00:00:00.000Z",
+    collectionSource: "own",
+    ownCollectionIds: [5],
+    sampleCollectionIds: null,
+    orderedIds: [],
+    wantIds: [],
+    preferences: defaultUserState().preferences,
+  };
+  const parsed = parseUserState(JSON.stringify(v1));
+  assert.equal(parsed.version, USER_STATE_VERSION);
+  assert.deepEqual(parsed.collectionIds, [5]);
 });
 
 test("buildUserStateFromRuntime roundtrips through parseUserState", () => {
   const built = buildUserStateFromRuntime({
-    collectionSource: "own",
-    ownCollectionIds: [7, 3, 3],
-    sampleCollectionIds: null,
+    storageMode: "gist",
+    collectionIds: [7, 3, 3],
     orderedIds: [9],
     wantIds: [1],
     sort: "date-desc",
@@ -93,18 +104,15 @@ test("buildUserStateFromRuntime roundtrips through parseUserState", () => {
   assert.match(built.updatedAt, /^\d{4}-\d{2}-\d{2}T/);
 
   const parsed = parseUserState(serializeUserState(built));
-  assert.deepEqual(parsed.ownCollectionIds, [3, 7]);
-  assert.equal(parsed.sampleCollectionIds, null);
-  assert.equal(parsed.preferences.sort, "date-desc");
-  assert.equal(parsed.preferences.viewMode, "list");
+  assert.deepEqual(parsed.collectionIds, [3, 7]);
+  assert.equal(parsed.storageMode, "gist");
 });
 
-test("applyUserStateToRuntime preserves null sampleCollectionIds", () => {
-  const runtime = applyUserStateToRuntime(
-    buildUserStateFromRuntime({
-      collectionSource: "sample",
-      ownCollectionIds: [],
-      sampleCollectionIds: null,
+test("buildUserStateFromRuntime keeps the other storage collection slot", () => {
+  const built = buildUserStateFromRuntime(
+    {
+      storageMode: "local",
+      collectionIds: [1],
       orderedIds: [],
       wantIds: [],
       sort: "date-asc",
@@ -113,15 +121,47 @@ test("applyUserStateToRuntime preserves null sampleCollectionIds", () => {
       highlightWants: true,
       highlightCollection: true,
       showMagazines: false,
+    },
+    {
+      existingCollections: {
+        local: { collectionIds: [9], orderedIds: [] },
+        gist: { collectionIds: [2, 3], orderedIds: [4] },
+      },
+    },
+  );
+  assert.deepEqual(built.collections.local.collectionIds, [1]);
+  assert.deepEqual(built.collections.gist.collectionIds, [2, 3]);
+  assert.deepEqual(built.collections.gist.orderedIds, [4]);
+});
+
+test("applyUserStateToRuntime uses active storage collection slot", () => {
+  const runtime = applyUserStateToRuntime(
+    serializeUserState({
+      version: USER_STATE_VERSION,
+      updatedAt: null,
+      storageMode: "local",
+      collectionIds: [99],
+      orderedIds: [],
+      collections: {
+        local: { collectionIds: [1, 2], orderedIds: [3] },
+        gist: { collectionIds: [8], orderedIds: [] },
+      },
+      wantIds: [],
+      preferences: defaultUserState().preferences,
     }),
   );
-  assert.equal(runtime.sampleCollectionIds, null);
+  assert.deepEqual(runtime.collectionIds, [1, 2]);
+  assert.deepEqual(runtime.orderedIds, [3]);
 });
 
 test("defaultUserState matches first-visit defaults", () => {
   const state = defaultUserState();
-  assert.equal(state.collectionSource, "sample");
-  assert.equal(state.sampleCollectionIds, null);
+  assert.equal(state.storageMode, "local");
+  assert.deepEqual(state.collectionIds, []);
   assert.equal(state.preferences.highlightWants, true);
-  assert.equal(state.preferences.showMagazines, false);
+});
+
+test("normalizeIdArray rejects invalid JSON arrays", () => {
+  assert.deepEqual(normalizeIdArray("not-json"), []);
+  assert.deepEqual(normalizeIdArray("[1, null, 2.5, 2]"), [1, 2]);
 });

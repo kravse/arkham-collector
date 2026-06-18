@@ -8,8 +8,9 @@ const path = require("path");
 const { syncViewerSort } = require("./sync-viewer-sort");
 const { syncViewerFilters } = require("./sync-viewer-filters");
 const { syncViewerMode } = require("./sync-viewer-mode");
-const { syncViewerCollectionSource } = require("./sync-viewer-collection-source");
 const { syncViewerUserState } = require("./sync-viewer-user-state");
+const { syncViewerGistSync } = require("./sync-viewer-gist-sync");
+const { syncViewerCollectionImport } = require("./sync-viewer-collection-import");
 
 const ROOT = path.join(__dirname, "..");
 const VIEWER_DIR = path.join(ROOT, "js", "viewer");
@@ -24,14 +25,19 @@ const PARTS = [
     prefix: '(function () {\n  "use strict";\n\n',
   },
   {
-    file: "00-viewer-collection-source.js",
-    title:
-      "Collection source URL override (generated from scripts/lib/viewer-collection-source.js)",
-  },
-  {
     file: "00-viewer-user-state.js",
     title:
       "Unified user state persistence (generated from scripts/lib/viewer-user-state.js)",
+  },
+  {
+    file: "00-viewer-gist-sync.js",
+    title:
+      "GitHub gist sync helpers (generated from scripts/lib/viewer-gist-sync.js)",
+  },
+  {
+    file: "00-viewer-collection-import.js",
+    title:
+      "Collection CSV import (generated from scripts/lib/viewer-collection-import.js)",
   },
   {
     file: "00-viewer-mode.js",
@@ -49,7 +55,7 @@ const PARTS = [
   },
   {
     file: "03-collection.js",
-    title: "Sample and own collection, want list, localStorage",
+    title: "Collection, want list, storage, and user state",
     start: 326,
     end: 586,
   },
@@ -126,8 +132,9 @@ function bundleViewerJs() {
   syncViewerSort();
   syncViewerFilters();
   syncViewerMode();
-  syncViewerCollectionSource();
   syncViewerUserState();
+  syncViewerGistSync();
+  syncViewerCollectionImport();
   if (!fs.existsSync(BODY)) {
     const partials = PARTS.map((p) => path.join(VIEWER_DIR, p.file));
     if (partials.every((file) => fs.existsSync(file))) {

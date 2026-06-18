@@ -53,30 +53,19 @@ const settingsTabAbout = document.getElementById("settings-tab-about");
 const settingsTabSettings = document.getElementById("settings-tab-settings");
 const settingsPanelAbout = document.getElementById("settings-panel-about");
 const settingsPanelSettings = document.getElementById("settings-panel-settings");
-const collectionSourceSampleInput = document.getElementById(
-  "collection-source-sample",
-);
-const collectionSourceOwnInput =
-  document.getElementById("collection-source-own");
+const storageModeLocalInput = document.getElementById("storage-mode-local");
+const storageModeGistInput = document.getElementById("storage-mode-gist");
+const gistSyncPanel = document.getElementById("gist-sync-panel");
+const gistSyncSaved = document.getElementById("gist-sync-saved");
+const gistConnectForm = document.getElementById("gist-sync-connect-form");
+const gistTokenInput = document.getElementById("gist-token-input");
+const gistConnectBtn = document.getElementById("gist-connect-btn");
+const gistClearBtn = document.getElementById("gist-clear-btn");
+const gistSyncStatus = document.getElementById("gist-sync-status");
 const exportCollectionBtn = document.getElementById("export-collection-btn");
-const resetSampleCollectionBtn = document.getElementById(
-  "reset-sample-collection-btn",
-);
-const resetSampleConfirmPanel = document.getElementById(
-  "reset-sample-confirm",
-);
-const resetSampleCancelBtn = document.getElementById(
-  "reset-sample-cancel-btn",
-);
-const resetSampleConfirmBtn = document.getElementById(
-  "reset-sample-confirm-btn",
-);
-const settingsCollectionHintSample = document.getElementById(
-  "settings-collection-hint-sample",
-);
-const settingsCollectionHintOwn = document.getElementById(
-  "settings-collection-hint-own",
-);
+const importCollectionBtn = document.getElementById("import-collection-btn");
+const importCollectionInput = document.getElementById("import-collection-input");
+const importCollectionStatus = document.getElementById("import-collection-status");
 const highlightWantsInput = document.getElementById("highlight-wants");
 const highlightCollectionInput = document.getElementById("highlight-collection");
 const showMagazinesInput = document.getElementById("show-magazines");
@@ -99,7 +88,6 @@ const SORT_MODES = new Set([
   "title-asc",
   "title-desc",
 ]);
-let collection = [];
 let serveEnabled = false;
 let serveEditDeltas = false;
 let editingBookId = null;
@@ -108,10 +96,9 @@ let hiddenOnly = false;
 let mycroftFilterMode = null;
 let wantOnly = false;
 let wantIds = new Set();
-let ownCollectionIds = new Set();
+let collectionIds = new Set();
 let orderedIds = new Set();
-let sampleCollectionIds = new Set();
-let collectionSource = "sample";
+let storageMode = "local";
 let headerFiltersExpanded = true;
 let gridViewMode = "cards";
 let highlightWants = true;
@@ -143,37 +130,8 @@ function updateSortControlVisibility() {
   }
 }
 
-function useOwnCollection() {
-  return collectionSource === "own";
-}
-
 function activeCollectionIds() {
-  return useOwnCollection() ? ownCollectionIds : sampleCollectionIds;
-}
-
-function defaultCollectionSource() {
-  const fromBuild = window.DEFAULT_COLLECTION_SOURCE;
-  if (fromBuild === "own" || fromBuild === "sample") {
-    return fromBuild;
-  }
-  return readOnly ? "own" : "sample";
-}
-
-function syncSettingsCollectionHint() {
-  const inConfirm =
-    resetSampleConfirmPanel && !resetSampleConfirmPanel.hidden;
-  const showSampleHint =
-    !inConfirm &&
-    collectionSource === "sample" &&
-    resetSampleCollectionBtn &&
-    !resetSampleCollectionBtn.hidden;
-
-  if (settingsCollectionHintSample) {
-    settingsCollectionHintSample.hidden = !showSampleHint;
-  }
-  if (settingsCollectionHintOwn) {
-    settingsCollectionHintOwn.hidden = showSampleHint;
-  }
+  return collectionIds;
 }
 
 function syncSettingsHighlightCheckboxes() {
@@ -199,78 +157,87 @@ function shouldHighlightCollectionOnCards() {
   return highlightCollection || collectionFilterMode != null;
 }
 
-function syncSettingsCollectionRadios() {
-  if (collectionSourceSampleInput) {
-    collectionSourceSampleInput.checked = collectionSource === "sample";
+function syncSettingsStorageMode() {
+  if (storageModeLocalInput) {
+    storageModeLocalInput.checked = storageMode === "local";
   }
-  if (collectionSourceOwnInput) {
-    collectionSourceOwnInput.checked = collectionSource === "own";
+  if (storageModeGistInput) {
+    storageModeGistInput.checked = storageMode === "gist";
   }
-  if (resetSampleCollectionBtn) {
-    resetSampleCollectionBtn.hidden = collectionSource !== "sample";
+  if (gistSyncPanel) {
+    gistSyncPanel.hidden = storageMode !== "gist";
   }
-  hideResetSampleConfirm();
-  syncSettingsCollectionHint();
   syncSettingsHighlightCheckboxes();
+  syncGistConnectUi();
+  refreshGistSyncStatus();
 }
 
-function showResetSampleConfirm() {
-  if (!resetSampleConfirmPanel || !resetSampleCollectionBtn) {
+function hasSavedGistCredentials() {
+  const config = readGistSyncConfig();
+  return Boolean(config?.token);
+}
+
+function syncGistConnectUi() {
+  const saved = storageMode === "gist" && hasSavedGistCredentials();
+  if (gistSyncSaved) {
+    gistSyncSaved.hidden = !saved;
+  }
+  if (gistConnectForm) {
+    gistConnectForm.hidden = saved;
+  }
+}
+
+function refreshGistSyncStatus() {
+  if (!gistSyncStatus) {
     return;
   }
-  resetSampleCollectionBtn.hidden = true;
-  resetSampleConfirmPanel.hidden = false;
-  syncSettingsCollectionHint();
+  if (storageMode !== "gist") {
+    gistSyncStatus.textContent = "";
+    gistSyncStatus.classList.remove("settings-gist-status--error");
+    return;
+  }
+  const config = readGistSyncConfig();
+  if (viewerGistSync.isConnectedGistConfig(config)) {
+    gistSyncStatus.textContent = "Syncing to your private gist.";
+    gistSyncStatus.classList.remove("settings-gist-status--error");
+    return;
+  }
+  if (config?.token) {
+    gistSyncStatus.textContent = "Reconnect to resume gist sync.";
+    gistSyncStatus.classList.remove("settings-gist-status--error");
+    return;
+  }
+  gistSyncStatus.textContent = "Paste a GitHub token and connect to sync.";
+  gistSyncStatus.classList.remove("settings-gist-status--error");
 }
 
-function hideResetSampleConfirm() {
-  if (resetSampleConfirmPanel) {
-    resetSampleConfirmPanel.hidden = true;
+function updateGistSyncStatus(message, isError) {
+  if (!gistSyncStatus) {
+    return;
   }
-  if (resetSampleCollectionBtn && collectionSource === "sample") {
-    resetSampleCollectionBtn.hidden = false;
-  }
-  syncSettingsCollectionHint();
+  gistSyncStatus.textContent = message;
+  gistSyncStatus.classList.toggle("settings-gist-status--error", Boolean(isError));
 }
 
-
-/* Generated from scripts/lib/viewer-collection-source.js — run npm run bundle-viewer */
-
-const viewerCollectionSource = (function () {
-  function parseSampleUrlOverride(search) {
-    try {
-      return new URLSearchParams(search).get("sample") === "true";
-    } catch (_) {
-      return false;
-    }
+function updateImportCollectionStatus(message, isError) {
+  if (!importCollectionStatus) {
+    return;
   }
-  
-  function resolveCollectionSourceOnLoad({ saved, defaultSource, sampleUrlOverride }) {
-    if (saved === "sample" || saved === "own") {
-      if (sampleUrlOverride) {
-        return "sample";
-      }
-      return saved;
-    }
-    if (sampleUrlOverride) {
-      return "sample";
-    }
-    return defaultSource === "sample" || defaultSource === "own"
-      ? defaultSource
-      : "sample";
-  }
-  return {
-    parseSampleUrlOverride,
-    resolveCollectionSourceOnLoad,
-  };
-})();
+  importCollectionStatus.hidden = !message;
+  importCollectionStatus.textContent = message;
+  importCollectionStatus.classList.toggle(
+    "settings-gist-status--error",
+    Boolean(isError),
+  );
+}
 
 
 /* Generated from scripts/lib/viewer-user-state.js — run npm run bundle-viewer */
 
 const viewerUserState = (function () {
   const USER_STATE_KEY = "arkham-user-state";
-  const USER_STATE_VERSION = 1;
+  const USER_STATE_VERSION = 2;
+  const USER_STATE_VERSION_V1 = 1;
   
   const LEGACY_KEYS = {
     collection: "arkham-collection",
@@ -299,10 +266,10 @@ const viewerUserState = (function () {
     return {
       version: USER_STATE_VERSION,
       updatedAt: null,
-      collectionSource: "sample",
-      ownCollectionIds: [],
-      sampleCollectionIds: null,
+      storageMode: "local",
+      collectionIds: [],
       orderedIds: [],
+      collections: defaultCollections(),
       wantIds: [],
       preferences: {
         sort: "date-asc",
@@ -313,6 +280,57 @@ const viewerUserState = (function () {
         showMagazines: false,
       },
     };
+  }
+  
+  function emptyCollectionSlot() {
+    return { collectionIds: [], orderedIds: [] };
+  }
+  
+  function defaultCollections() {
+    return {
+      local: emptyCollectionSlot(),
+      gist: emptyCollectionSlot(),
+    };
+  }
+  
+  function normalizeCollectionSlot(raw, fallback = emptyCollectionSlot()) {
+    if (!raw || typeof raw !== "object") {
+      return {
+        collectionIds: [...fallback.collectionIds],
+        orderedIds: [...fallback.orderedIds],
+      };
+    }
+    return {
+      collectionIds: normalizeIdArray(raw.collectionIds),
+      orderedIds: normalizeIdArray(raw.orderedIds),
+    };
+  }
+  
+  function normalizeCollections(raw, topLevelIds = [], topLevelOrdered = []) {
+    const fallback = {
+      collectionIds: normalizeIdArray(topLevelIds),
+      orderedIds: normalizeIdArray(topLevelOrdered),
+    };
+    if (!raw || typeof raw !== "object") {
+      return {
+        local: normalizeCollectionSlot(null, fallback),
+        gist: normalizeCollectionSlot(null, fallback),
+      };
+    }
+    return {
+      local: normalizeCollectionSlot(raw.local, fallback),
+      gist: normalizeCollectionSlot(raw.gist, fallback),
+    };
+  }
+  
+  function activeCollectionSlot(state) {
+    const mode = normalizeStorageMode(state.storageMode);
+    const collections = normalizeCollections(
+      state.collections,
+      state.collectionIds,
+      state.orderedIds,
+    );
+    return collections[mode];
   }
   
   function normalizeIdArray(raw) {
@@ -359,11 +377,11 @@ const viewerUserState = (function () {
     return defaultVal;
   }
   
-  function normalizeCollectionSource(raw) {
-    if (raw === "own" || raw === "sample") {
-      return raw;
+  function normalizeStorageMode(raw) {
+    if (raw === "gist") {
+      return "gist";
     }
-    return null;
+    return "local";
   }
   
   function normalizeViewMode(raw, fallback = "cards") {
@@ -373,25 +391,54 @@ const viewerUserState = (function () {
     return fallback;
   }
   
+  function normalizePreferences(raw, base) {
+    return {
+      sort: normalizeSort(raw?.sort, base.preferences.sort),
+      viewMode: normalizeViewMode(raw?.viewMode, base.preferences.viewMode),
+      headerFiltersExpanded:
+        typeof raw?.headerFiltersExpanded === "boolean"
+          ? raw.headerFiltersExpanded
+          : base.preferences.headerFiltersExpanded,
+      highlightWants:
+        typeof raw?.highlightWants === "boolean"
+          ? raw.highlightWants
+          : base.preferences.highlightWants,
+      highlightCollection:
+        typeof raw?.highlightCollection === "boolean"
+          ? raw.highlightCollection
+          : base.preferences.highlightCollection,
+      showMagazines:
+        typeof raw?.showMagazines === "boolean"
+          ? raw.showMagazines
+          : base.preferences.showMagazines,
+    };
+  }
+  
+  function legacyStorageModeFromSource(sourceRaw) {
+    return "local";
+  }
+  
+  function legacyCollectionIds(snapshot) {
+    return normalizeIdArray(snapshot[LEGACY_KEYS.collection]);
+  }
+  
   function migrateFromLegacy(legacy) {
     const base = defaultUserState();
     const snapshot = legacy || {};
   
-    const sampleRaw = snapshot[LEGACY_KEYS.sampleCollection];
-    let sampleCollectionIds = null;
-    if (sampleRaw !== null && sampleRaw !== undefined) {
-      sampleCollectionIds = normalizeIdArray(sampleRaw);
-    }
-  
     return {
       version: USER_STATE_VERSION,
       updatedAt: null,
-      collectionSource: normalizeCollectionSource(
+      storageMode: legacyStorageModeFromSource(
         snapshot[LEGACY_KEYS.collectionSource],
       ),
-      ownCollectionIds: normalizeIdArray(snapshot[LEGACY_KEYS.collection]),
-      sampleCollectionIds,
+      collectionIds: legacyCollectionIds(snapshot),
       orderedIds: normalizeIdArray(snapshot[LEGACY_KEYS.ordered]),
+      collections: normalizeCollections(
+        null,
+        legacyCollectionIds(snapshot),
+        normalizeIdArray(snapshot[LEGACY_KEYS.ordered]),
+      ),
       wantIds: normalizeIdArray(snapshot[LEGACY_KEYS.want]),
       preferences: {
         sort: normalizeSort(
@@ -422,13 +469,29 @@ const viewerUserState = (function () {
     };
   }
   
-  function parseUserState(json) {
+  function migrateV1ToV2(v1) {
+    const base = defaultUserState();
+    const collectionIds = normalizeIdArray(v1.ownCollectionIds);
+    const orderedIds = normalizeIdArray(v1.orderedIds);
+    return {
+      version: USER_STATE_VERSION,
+      updatedAt: v1.updatedAt || null,
+      storageMode: "local",
+      collectionIds,
+      orderedIds,
+      collections: normalizeCollections(null, collectionIds, orderedIds),
+      wantIds: normalizeIdArray(v1.wantIds),
+      preferences: normalizePreferences(v1.preferences, base),
+    };
+  }
+  
+  function parseUserStateV1(json) {
     if (json == null || json === "") {
       return null;
     }
     try {
       const parsed = typeof json === "string" ? JSON.parse(json) : json;
-      if (!parsed || parsed.version !== USER_STATE_VERSION) {
+      if (!parsed || parsed.version !== USER_STATE_VERSION_V1) {
         return null;
       }
   
@@ -440,56 +503,86 @@ const viewerUserState = (function () {
       }
   
       return {
-        version: USER_STATE_VERSION,
+        version: USER_STATE_VERSION_V1,
         updatedAt:
           typeof parsed.updatedAt === "string" ? parsed.updatedAt : null,
-        collectionSource: normalizeCollectionSource(parsed.collectionSource),
+        collectionSource:
+          parsed.collectionSource === "own" || parsed.collectionSource === "sample"
+            ? parsed.collectionSource
+            : null,
         ownCollectionIds: normalizeIdArray(parsed.ownCollectionIds),
         sampleCollectionIds,
         orderedIds: normalizeIdArray(parsed.orderedIds),
         wantIds: normalizeIdArray(parsed.wantIds),
-        preferences: {
-          sort: normalizeSort(parsed.preferences?.sort, base.preferences.sort),
-          viewMode: normalizeViewMode(
-            parsed.preferences?.viewMode,
-            base.preferences.viewMode,
-          ),
-          headerFiltersExpanded:
-            typeof parsed.preferences?.headerFiltersExpanded === "boolean"
-              ? parsed.preferences.headerFiltersExpanded
-              : base.preferences.headerFiltersExpanded,
-          highlightWants:
-            typeof parsed.preferences?.highlightWants === "boolean"
-              ? parsed.preferences.highlightWants
-              : base.preferences.highlightWants,
-          highlightCollection:
-            typeof parsed.preferences?.highlightCollection === "boolean"
-              ? parsed.preferences.highlightCollection
-              : base.preferences.highlightCollection,
-          showMagazines:
-            typeof parsed.preferences?.showMagazines === "boolean"
-              ? parsed.preferences.showMagazines
-              : base.preferences.showMagazines,
-        },
+        preferences: normalizePreferences(parsed.preferences, base),
       };
     } catch (_) {
       return null;
     }
   }
   
-  function buildUserStateFromRuntime(snapshot) {
-    const sampleIds = snapshot.sampleCollectionIds;
+  function parseUserStateV2(json) {
+    if (json == null || json === "") {
+      return null;
+    }
+    try {
+      const parsed = typeof json === "string" ? JSON.parse(json) : json;
+      if (!parsed || parsed.version !== USER_STATE_VERSION) {
+        return null;
+      }
+  
+      const base = defaultUserState();
+      const collectionIds = normalizeIdArray(parsed.collectionIds);
+      const orderedIds = normalizeIdArray(parsed.orderedIds);
+      return {
+        version: USER_STATE_VERSION,
+        updatedAt:
+          typeof parsed.updatedAt === "string" ? parsed.updatedAt : null,
+        storageMode: normalizeStorageMode(parsed.storageMode),
+        collectionIds,
+        orderedIds,
+        collections: normalizeCollections(
+          parsed.collections,
+          collectionIds,
+          orderedIds,
+        ),
+        wantIds: normalizeIdArray(parsed.wantIds),
+        preferences: normalizePreferences(parsed.preferences, base),
+      };
+    } catch (_) {
+      return null;
+    }
+  }
+  
+  function parseUserState(json) {
+    const v2 = parseUserStateV2(json);
+    if (v2) {
+      return v2;
+    }
+    const v1 = parseUserStateV1(json);
+    if (v1) {
+      return migrateV1ToV2(v1);
+    }
+    return null;
+  }
+  
+  function buildUserStateFromRuntime(snapshot, options = {}) {
+    const mode = normalizeStorageMode(snapshot.storageMode);
+    const collectionIds = normalizeIdArray(snapshot.collectionIds);
+    const orderedIds = normalizeIdArray(snapshot.orderedIds);
+    const collections = normalizeCollections(
+      options.existingCollections,
+      collectionIds,
+      orderedIds,
+    );
+    collections[mode] = { collectionIds, orderedIds };
     return {
       version: USER_STATE_VERSION,
       updatedAt: new Date().toISOString(),
-      collectionSource:
-        normalizeCollectionSource(snapshot.collectionSource) ?? "sample",
-      ownCollectionIds: normalizeIdArray(snapshot.ownCollectionIds),
-      sampleCollectionIds:
-        sampleIds === null || sampleIds === undefined
-          ? null
-          : normalizeIdArray(sampleIds),
-      orderedIds: normalizeIdArray(snapshot.orderedIds),
+      storageMode: mode,
+      collectionIds,
+      orderedIds,
+      collections,
       wantIds: normalizeIdArray(snapshot.wantIds),
       preferences: {
         sort: normalizeSort(snapshot.sort),
@@ -503,19 +596,12 @@ const viewerUserState = (function () {
   }
   
   function applyUserStateToRuntime(state) {
-    let parsed = null;
-    if (state != null) {
-      parsed =
-        typeof state === "string" ? parseUserState(state) : parseUserState(state);
-    }
-    if (!parsed) {
-      parsed = migrateFromLegacy(null);
-    }
+    const parsed = parseUserState(state) || migrateFromLegacy(null);
+    const active = activeCollectionSlot(parsed);
     return {
-      collectionSource: parsed.collectionSource,
-      ownCollectionIds: parsed.ownCollectionIds,
-      sampleCollectionIds: parsed.sampleCollectionIds,
-      orderedIds: parsed.orderedIds,
+      storageMode: parsed.storageMode,
+      collectionIds: active.collectionIds,
+      orderedIds: active.orderedIds,
       wantIds: parsed.wantIds,
       sort: parsed.preferences.sort,
       viewMode: parsed.preferences.viewMode,
@@ -534,12 +620,292 @@ const viewerUserState = (function () {
     USER_STATE_VERSION,
     LEGACY_KEYS,
     defaultUserState,
+    emptyCollectionSlot,
+    normalizeCollections,
+    normalizeCollectionSlot,
     normalizeIdArray,
+    normalizeStorageMode,
     migrateFromLegacy,
+    migrateV1ToV2,
     parseUserState,
     buildUserStateFromRuntime,
     applyUserStateToRuntime,
     serializeUserState,
+  };
+})();
+
+
+/* Generated from scripts/lib/viewer-gist-sync.js — run npm run bundle-viewer */
+
+const viewerGistSync = (function () {
+  const GIST_SYNC_KEY = "arkham-gist-sync";
+  const GIST_STATE_FILENAME = "state.json";
+  const GITHUB_API = "https://api.github.com";
+  
+  function parseGistSyncConfig(json) {
+    if (json == null || json === "") {
+      return null;
+    }
+    try {
+      const parsed = typeof json === "string" ? JSON.parse(json) : json;
+      const token = typeof parsed.token === "string" ? parsed.token.trim() : "";
+      const gistId = typeof parsed.gistId === "string" ? parsed.gistId.trim() : "";
+      if (!token) {
+        return null;
+      }
+      return { token, gistId };
+    } catch (_) {
+      return null;
+    }
+  }
+  
+  function serializeGistSyncConfig(config) {
+    return JSON.stringify({
+      token: config.token,
+      gistId: config.gistId || "",
+    });
+  }
+  
+  function isConnectedGistConfig(config) {
+    return Boolean(config?.token && config?.gistId);
+  }
+  
+  function mergeUserStateByUpdatedAt(localState, remoteState) {
+    if (!remoteState) {
+      return localState;
+    }
+    if (!localState) {
+      return remoteState;
+    }
+    const localTime = Date.parse(localState.updatedAt || "");
+    const remoteTime = Date.parse(remoteState.updatedAt || "");
+    if (!Number.isFinite(localTime) && Number.isFinite(remoteTime)) {
+      return remoteState;
+    }
+    if (Number.isFinite(localTime) && !Number.isFinite(remoteTime)) {
+      return localState;
+    }
+    if (remoteTime > localTime) {
+      return remoteState;
+    }
+    return localState;
+  }
+  
+  function mergeGistUserState(localState, remoteState, helpers) {
+    const merged = mergeUserStateByUpdatedAt(localState, remoteState);
+    if (!merged || !localState || !helpers) {
+      return merged;
+    }
+    const {
+      normalizeCollections,
+      normalizeCollectionSlot,
+      emptyCollectionSlot,
+    } = helpers;
+    const localSlot = normalizeCollectionSlot(
+      localState.collections?.local,
+      {
+        collectionIds: localState.collectionIds || [],
+        orderedIds: localState.orderedIds || [],
+      },
+    );
+    merged.collections = normalizeCollections(
+      merged.collections,
+      merged.collectionIds,
+      merged.orderedIds,
+    );
+    merged.collections.local = localSlot;
+    if (!merged.collections.gist) {
+      merged.collections.gist = emptyCollectionSlot();
+    }
+    return merged;
+  }
+  
+  function extractStateJsonFromGistResponse(body) {
+    if (!body || typeof body !== "object") {
+      return null;
+    }
+    const file = body.files?.[GIST_STATE_FILENAME];
+    if (!file || typeof file.content !== "string") {
+      return null;
+    }
+    return file.content;
+  }
+  
+  function buildGistCreatePayload(stateJson) {
+    return {
+      description: "Arkham Collector sync",
+      public: false,
+      files: {
+        [GIST_STATE_FILENAME]: {
+          content: stateJson,
+        },
+      },
+    };
+  }
+  
+  function buildGistUpdatePayload(stateJson) {
+    return {
+      files: {
+        [GIST_STATE_FILENAME]: {
+          content: stateJson,
+        },
+      },
+    };
+  }
+  return {
+    GIST_SYNC_KEY,
+    GIST_STATE_FILENAME,
+    GITHUB_API,
+    parseGistSyncConfig,
+    serializeGistSyncConfig,
+    isConnectedGistConfig,
+    mergeUserStateByUpdatedAt,
+    mergeGistUserState,
+    extractStateJsonFromGistResponse,
+    buildGistCreatePayload,
+    buildGistUpdatePayload,
+  };
+})();
+
+
+/* Generated from scripts/lib/viewer-collection-import.js — run npm run bundle-viewer */
+
+const viewerCollectionImport = (function () {
+  function parseYear(value) {
+    if (!value) {
+      return null;
+    }
+    const match = String(value).match(/\d{4}/);
+    return match ? match[0] : null;
+  }
+  
+  function parseCsvLine(line) {
+    const values = [];
+    let current = "";
+    let inQuotes = false;
+  
+    for (let i = 0; i < line.length; i += 1) {
+      const char = line[i];
+      if (char === '"') {
+        if (inQuotes && line[i + 1] === '"') {
+          current += '"';
+          i += 1;
+        } else {
+          inQuotes = !inQuotes;
+        }
+      } else if (char === "," && !inQuotes) {
+        values.push(current);
+        current = "";
+      } else {
+        current += char;
+      }
+    }
+  
+    values.push(current);
+    return values;
+  }
+  
+  function normalizeForMatch(value) {
+    return String(value || "")
+      .toLowerCase()
+      .normalize("NFKD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[''""]/g, "")
+      .replace(/[^a-z0-9]+/g, " ")
+      .trim();
+  }
+  
+  function titlesMatch(a, b) {
+    const left = normalizeForMatch(a);
+    const right = normalizeForMatch(b);
+    if (!left || !right) {
+      return false;
+    }
+    return left === right || left.includes(right) || right.includes(left);
+  }
+  
+  function parseCollectionCsv(csvText) {
+    return csvText
+      .trim()
+      .split(/\r?\n/)
+      .map(parseCsvLine)
+      .filter((cols) => cols.length >= 3)
+      .map((cols) => ({
+        title: cols[0].trim(),
+        author: cols[1]?.trim() || "",
+        year: parseYear(cols[2]),
+        status: cols[3]?.trim() || "",
+      }))
+      .filter((item) => {
+        if (!item.title || !item.year) {
+          return false;
+        }
+        if (item.title.toUpperCase() === "ARKHAM HOUSE") {
+          return false;
+        }
+        if (/^\d+ on order/i.test(item.title)) {
+          return false;
+        }
+        return true;
+      });
+  }
+  
+  function bookTitleCandidates(book) {
+    return [book.title, book.listTitle].filter(Boolean);
+  }
+  
+  function rowMatchesBook(row, book) {
+    const titles = bookTitleCandidates(book);
+    if (!titles.some((candidate) => titlesMatch(candidate, row.title))) {
+      return false;
+    }
+    if (row.year) {
+      const bookYear = parseYear(book.publicationDate);
+      if (bookYear && bookYear !== row.year) {
+        return false;
+      }
+    }
+    return true;
+  }
+  
+  function matchBookIdForRow(books, row) {
+    const matches = books.filter((book) => rowMatchesBook(row, book));
+    if (matches.length === 1) {
+      return matches[0].id;
+    }
+    if (row.year && matches.length > 1) {
+      const exact = matches.filter(
+        (book) => parseYear(book.publicationDate) === row.year,
+      );
+      if (exact.length === 1) {
+        return exact[0].id;
+      }
+    }
+    return null;
+  }
+  
+  function matchCollectionImportRows(books, rows) {
+    const matchedIds = [];
+    const unmatchedRows = [];
+  
+    for (const row of rows) {
+      const id = matchBookIdForRow(books, row);
+      if (id == null) {
+        unmatchedRows.push(row);
+      } else {
+        matchedIds.push(id);
+      }
+    }
+  
+    return {
+      matchedIds: [...new Set(matchedIds)],
+      unmatchedRows,
+    };
+  }
+  return {
+    parseCollectionCsv,
+    matchCollectionImportRows,
+    matchBookIdForRow,
   };
 })();
 
@@ -838,43 +1204,6 @@ function getActiveBooks() {
   return books.filter((book) => !isDeleted(book));
 }
 
-function parseCsvLine(line) {
-  const values = [];
-  let current = "";
-  let inQuotes = false;
-
-  for (let i = 0; i < line.length; i += 1) {
-    const char = line[i];
-    if (char === '"') {
-      if (inQuotes && line[i + 1] === '"') {
-        current += '"';
-        i += 1;
-      } else {
-        inQuotes = !inQuotes;
-      }
-    } else if (char === "," && !inQuotes) {
-      values.push(current);
-      current = "";
-    } else {
-      current += char;
-    }
-  }
-
-  values.push(current);
-  return values;
-}
-
-function normalizeTitle(title) {
-  return String(title || "")
-    .toLowerCase()
-    .replace(/[’']/g, "")
-    .replace(/&/g, "and")
-    .replace(/[^a-z0-9\s]/g, " ")
-    .replace(/\s+/g, " ")
-    .trim()
-    .replace(/^the\s+/, "");
-}
-
 function parseYear(value) {
   if (!value) return null;
   const match = String(value).match(/\d{4}/);
@@ -974,70 +1303,6 @@ function passesBookVisibility(book) {
   });
 }
 
-function parseCollection(csvText) {
-  return csvText
-    .trim()
-    .split(/\r?\n/)
-    .map(parseCsvLine)
-    .filter((cols) => cols.length >= 3)
-    .map((cols) => ({
-      title: cols[0].trim(),
-      author: cols[1]?.trim() || "",
-      year: parseYear(cols[2]),
-      status: cols[3]?.trim() || "",
-    }))
-    .filter((item) => {
-      if (!item.title || !item.year) return false;
-      if (item.title.toUpperCase() === "ARKHAM HOUSE") return false;
-      if (/^\d+ on order/i.test(item.title)) return false;
-      return true;
-    });
-}
-
-function titlesMatch(bookTitle, collectionTitle) {
-  const book = normalizeTitle(bookTitle);
-  const owned = normalizeTitle(collectionTitle);
-  if (!book || !owned) return false;
-  if (book === owned) return true;
-  if (book.includes(owned) || owned.includes(book)) return true;
-  return false;
-}
-
-function collectionItemsMatchingBook(book) {
-  const bookYear = parseYear(book.publicationDate);
-  const candidates = [book.title, book.listTitle].filter(Boolean);
-  return collection.filter((item) => {
-    if (!candidates.some((candidate) => titlesMatch(candidate, item.title))) {
-      return false;
-    }
-    if (item.year && bookYear) {
-      return item.year === bookYear;
-    }
-    return true;
-  });
-}
-
-function findCollectionMatch(book) {
-  const matches = collectionItemsMatchingBook(book);
-  if (!matches.length) {
-    return null;
-  }
-
-  const bookYear = parseYear(book.publicationDate);
-  if (bookYear) {
-    const exact = matches.find((item) => item.year === bookYear);
-    if (exact) {
-      return exact;
-    }
-  }
-
-  if (matches.length === 1) {
-    return matches[0];
-  }
-
-  return null;
-}
-
 function isCollected(book) {
   return viewerFilters.isCollected(book, activeCollectionIds());
 }
@@ -1072,35 +1337,12 @@ function exportableCollectionIds() {
   return ids;
 }
 
-function bookCoversCollectionItem(book, item) {
-  const bookYear = parseYear(book.publicationDate);
-  const candidates = [book.title, book.listTitle].filter(Boolean);
-  if (!candidates.some((candidate) => titlesMatch(candidate, item.title))) {
-    return false;
-  }
-  if (item.year && bookYear && item.year === bookYear) {
-    return true;
-  }
-  const titleRows = collection.filter((row) =>
-    candidates.some((candidate) => titlesMatch(candidate, row.title)),
-  );
-  return titleRows.length === 1;
-}
 
-function countCollectionRowsCovered(books, includeHidden) {
-  const eligible = books.filter(
-    (book) => !isDeleted(book) && (includeHidden || !book.hidden),
-  );
-  return eligible.filter((book) => activeCollectionIds().has(book.id))
-    .length;
-}
+/* Collection, want list, storage mode, and user state */
 
-
-/* Sample and own collection, want list, unified user state */
-
-const DEFAULT_COLLECTION_CSV = "my_collection/my_collection.csv";
-
-let sampleCollectionSeeded = true;
+const GIST_PUSH_DELAY_MS = 1500;
+let gistPushTimer = null;
+let gistPullInFlight = null;
 
 function readLegacyStorageSnapshot() {
   const snapshot = {};
@@ -1112,6 +1354,84 @@ function readLegacyStorageSnapshot() {
     // localStorage unavailable
   }
   return snapshot;
+}
+
+function readGistSyncConfig() {
+  try {
+    const saved = localStorage.getItem(viewerGistSync.GIST_SYNC_KEY);
+    return viewerGistSync.parseGistSyncConfig(saved);
+  } catch (_) {
+    return null;
+  }
+}
+
+function writeGistSyncConfig(config) {
+  try {
+    localStorage.setItem(
+      viewerGistSync.GIST_SYNC_KEY,
+      viewerGistSync.serializeGistSyncConfig(config),
+    );
+  } catch (_) {
+    // localStorage unavailable
+  }
+}
+
+function clearGistSyncConfig() {
+  if (gistPushTimer) {
+    clearTimeout(gistPushTimer);
+    gistPushTimer = null;
+  }
+  try {
+    localStorage.removeItem(viewerGistSync.GIST_SYNC_KEY);
+  } catch (_) {
+    // localStorage unavailable
+  }
+  if (gistTokenInput) {
+    gistTokenInput.value = "";
+  }
+  syncGistConnectUi();
+  refreshGistSyncStatus();
+}
+
+function readPersistedUserState() {
+  try {
+    const saved = localStorage.getItem(viewerUserState.USER_STATE_KEY);
+    return viewerUserState.parseUserState(saved);
+  } catch (_) {
+    return null;
+  }
+}
+
+function buildStateForPersistence() {
+  const existing = readPersistedUserState();
+  return viewerUserState.buildUserStateFromRuntime(collectRuntimeSnapshot(), {
+    existingCollections: existing?.collections,
+  });
+}
+
+function gistMergeHelpers() {
+  return {
+    normalizeCollections: viewerUserState.normalizeCollections,
+    normalizeCollectionSlot: viewerUserState.normalizeCollectionSlot,
+    emptyCollectionSlot: viewerUserState.emptyCollectionSlot,
+  };
+}
+
+function swapCollectionForStorageMode(nextMode) {
+  const existing = readPersistedUserState();
+  const collections = viewerUserState.normalizeCollections(
+    existing?.collections,
+    existing?.collectionIds,
+    existing?.orderedIds,
+  );
+  collections[storageMode] = {
+    collectionIds: [...collectionIds],
+    orderedIds: [...orderedIds],
+  };
+  const nextSlot = collections[nextMode] || viewerUserState.emptyCollectionSlot();
+  collectionIds = new Set(nextSlot.collectionIds);
+  orderedIds = new Set(nextSlot.orderedIds);
+  return collections;
 }
 
 function persistUserState(state) {
@@ -1127,11 +1447,8 @@ function persistUserState(state) {
 
 function collectRuntimeSnapshot() {
   return {
-    collectionSource,
-    ownCollectionIds: [...ownCollectionIds],
-    sampleCollectionIds: sampleCollectionSeeded
-      ? [...sampleCollectionIds]
-      : null,
+    storageMode,
+    collectionIds: [...collectionIds],
     orderedIds: [...orderedIds],
     wantIds: [...wantIds],
     sort: sortSelect.value,
@@ -1144,16 +1461,10 @@ function collectRuntimeSnapshot() {
 }
 
 function applyRuntimeSnapshot(runtime) {
+  storageMode = viewerUserState.normalizeStorageMode(runtime.storageMode);
   wantIds = new Set(runtime.wantIds);
-  ownCollectionIds = new Set(runtime.ownCollectionIds);
+  collectionIds = new Set(runtime.collectionIds);
   orderedIds = new Set(runtime.orderedIds);
-  if (runtime.sampleCollectionIds === null) {
-    sampleCollectionSeeded = false;
-    sampleCollectionIds = new Set();
-  } else {
-    sampleCollectionSeeded = true;
-    sampleCollectionIds = new Set(runtime.sampleCollectionIds);
-  }
   gridViewMode = runtime.viewMode;
   headerFiltersExpanded = runtime.headerFiltersExpanded;
   highlightWants = runtime.highlightWants;
@@ -1164,18 +1475,153 @@ function applyRuntimeSnapshot(runtime) {
   }
 }
 
-function applyCollectionSourcePreference() {
-  const saved =
-    collectionSource === "own" || collectionSource === "sample"
-      ? collectionSource
-      : null;
-  collectionSource = viewerCollectionSource.resolveCollectionSourceOnLoad({
-    saved,
-    defaultSource: defaultCollectionSource(),
-    sampleUrlOverride: viewerCollectionSource.parseSampleUrlOverride(
-      window.location.search,
-    ),
+function githubHeaders(token) {
+  return {
+    Accept: "application/vnd.github+json",
+    Authorization: `Bearer ${token}`,
+    "X-GitHub-Api-Version": "2022-11-28",
+  };
+}
+
+async function fetchGistState(config) {
+  const response = await fetch(
+    `${viewerGistSync.GITHUB_API}/gists/${config.gistId}`,
+    { headers: githubHeaders(config.token) },
+  );
+  if (!response.ok) {
+    throw new Error(`Gist fetch failed (${response.status})`);
+  }
+  const body = await response.json();
+  const content = viewerGistSync.extractStateJsonFromGistResponse(body);
+  if (!content) {
+    return null;
+  }
+  return viewerUserState.parseUserState(content);
+}
+
+async function pushGistState(config, state) {
+  const stateJson = viewerUserState.serializeUserState(state);
+  const response = await fetch(
+    `${viewerGistSync.GITHUB_API}/gists/${config.gistId}`,
+    {
+      method: "PATCH",
+      headers: {
+        ...githubHeaders(config.token),
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(viewerGistSync.buildGistUpdatePayload(stateJson)),
+    },
+  );
+  if (!response.ok) {
+    throw new Error(`Gist update failed (${response.status})`);
+  }
+}
+
+async function createGistWithState(config, state) {
+  const stateJson = viewerUserState.serializeUserState(state);
+  const response = await fetch(`${viewerGistSync.GITHUB_API}/gists`, {
+    method: "POST",
+    headers: {
+      ...githubHeaders(config.token),
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(viewerGistSync.buildGistCreatePayload(stateJson)),
   });
+  if (!response.ok) {
+    throw new Error(`Gist create failed (${response.status})`);
+  }
+  const body = await response.json();
+  return body.id;
+}
+
+async function connectGistSync(token) {
+  const trimmed = String(token || "").trim();
+  if (!trimmed) {
+    throw new Error("Enter a GitHub token with gist access.");
+  }
+
+  const existing = readGistSyncConfig();
+  const config = {
+    token: trimmed,
+    gistId: existing?.gistId || "",
+  };
+  const state = buildStateForPersistence();
+
+  if (!config.gistId) {
+    config.gistId = await createGistWithState(config, state);
+  } else {
+    await pushGistState(config, state);
+  }
+
+  writeGistSyncConfig(config);
+  storageMode = "gist";
+  saveUserState();
+  syncSettingsStorageMode();
+  return config;
+}
+
+function scheduleGistPush() {
+  if (storageMode !== "gist") {
+    return;
+  }
+  const config = readGistSyncConfig();
+  if (!viewerGistSync.isConnectedGistConfig(config)) {
+    return;
+  }
+  if (gistPushTimer) {
+    clearTimeout(gistPushTimer);
+  }
+  gistPushTimer = setTimeout(async () => {
+    gistPushTimer = null;
+    try {
+      await pushGistState(config, buildStateForPersistence());
+      updateGistSyncStatus("Synced to gist.");
+    } catch (error) {
+      updateGistSyncStatus(error.message || "Gist sync failed.", true);
+    }
+  }, GIST_PUSH_DELAY_MS);
+}
+
+async function pullGistStateIfConfigured(options = {}) {
+  if (storageMode !== "gist") {
+    return;
+  }
+  const config = readGistSyncConfig();
+  if (!viewerGistSync.isConnectedGistConfig(config)) {
+    return;
+  }
+  if (gistPullInFlight) {
+    return gistPullInFlight;
+  }
+
+  gistPullInFlight = (async () => {
+    try {
+      const localRaw = localStorage.getItem(viewerUserState.USER_STATE_KEY);
+      const localState = viewerUserState.parseUserState(localRaw);
+      const remoteState = await fetchGistState(config);
+      const merged = viewerGistSync.mergeGistUserState(
+        localState,
+        remoteState,
+        gistMergeHelpers(),
+      );
+      if (merged && merged.updatedAt !== localState?.updatedAt) {
+        persistUserState(merged);
+        applyRuntimeSnapshot(viewerUserState.applyUserStateToRuntime(merged));
+        syncSettingsStorageMode();
+        if (options.reRender !== false) {
+          render();
+        }
+      } else {
+        refreshGistSyncStatus();
+      }
+    } catch (error) {
+      updateGistSyncStatus(error.message || "Gist pull failed.", true);
+    } finally {
+      gistPullInFlight = null;
+    }
+  })();
+
+  return gistPullInFlight;
 }
 
 function loadUserState() {
@@ -1191,66 +1637,53 @@ function loadUserState() {
     state = viewerUserState.defaultUserState();
   }
 
-  const runtime = viewerUserState.applyUserStateToRuntime(state);
-  applyRuntimeSnapshot(runtime);
-  collectionSource =
-    runtime.collectionSource === "own" || runtime.collectionSource === "sample"
-      ? runtime.collectionSource
-      : defaultCollectionSource();
-  applyCollectionSourcePreference();
+  applyRuntimeSnapshot(viewerUserState.applyUserStateToRuntime(state));
   syncSettingsHighlightCheckboxes();
   updateHeaderFiltersState();
   updateViewModeState();
+  syncSettingsStorageMode();
+}
+
+async function loadUserStateAsync() {
+  loadUserState();
+  await pullGistStateIfConfigured({ reRender: false });
 }
 
 function saveUserState() {
-  persistUserState(
-    viewerUserState.buildUserStateFromRuntime(collectRuntimeSnapshot()),
+  persistUserState(buildStateForPersistence());
+  scheduleGistPush();
+}
+
+async function importCollectionFromCsvText(csvText) {
+  const rows = viewerCollectionImport.parseCollectionCsv(csvText);
+  if (!rows.length) {
+    throw new Error("No collection rows found in that file.");
+  }
+
+  const result = viewerCollectionImport.matchCollectionImportRows(
+    getActiveBooks(),
+    rows,
   );
-}
-
-async function loadCollectionCsvItems(options = {}) {
-  const forceCsv = options.forceCsv === true;
-  const csvPath = window.SAMPLE_COLLECTION_CSV || DEFAULT_COLLECTION_CSV;
-
-  if (!forceCsv && readOnly && window.MY_COLLECTION?.length) {
-    return window.MY_COLLECTION;
-  }
-
-  try {
-    const response = await fetch(csvPath);
-    if (response.ok) {
-      return parseCollection(await response.text());
-    }
-  } catch (_) {
-    // fetch fails on file://; fall back to collection.js
-  }
-
-  return window.MY_COLLECTION || [];
-}
-
-async function buildSampleIdsFromCsv(options = {}) {
-  const items = await loadCollectionCsvItems(options);
-  const savedRows = collection;
-  collection = items;
-  const ids = new Set();
-  for (const book of getActiveBooks()) {
-    if (findCollectionMatch(book)) {
-      ids.add(book.id);
-    }
-  }
-  collection = savedRows;
-  return ids;
-}
-
-async function ensureSampleCollectionIds() {
-  if (sampleCollectionSeeded) {
-    return;
-  }
-
-  sampleCollectionIds = await buildSampleIdsFromCsv();
-  sampleCollectionSeeded = true;
+  collectionIds = new Set(result.matchedIds);
+  orderedIds = new Set();
   saveUserState();
+
+  let syncedToGist = false;
+  if (storageMode === "gist") {
+    const config = readGistSyncConfig();
+    if (viewerGistSync.isConnectedGistConfig(config)) {
+      await pushGistState(config, buildStateForPersistence());
+      syncedToGist = true;
+      updateGistSyncStatus("Synced to gist.");
+    }
+  }
+
+  return {
+    rowCount: rows.length,
+    matchedCount: result.matchedIds.length,
+    unmatchedCount: result.unmatchedRows.length,
+    syncedToGist,
+  };
 }
 
 function updateHeaderFiltersState() {
@@ -1299,8 +1732,8 @@ function toggleWant(bookId) {
     wantIds.delete(id);
   } else {
     wantIds.add(id);
-    if (activeCollectionIds().has(id)) {
-      activeCollectionIds().delete(id);
+    if (collectionIds.has(id)) {
+      collectionIds.delete(id);
     }
     if (orderedIds.has(id)) {
       orderedIds.delete(id);
@@ -1320,11 +1753,11 @@ function toggleCollection(bookId) {
   }
 
   if (isCollected({ id })) {
-    activeCollectionIds().delete(id);
+    collectionIds.delete(id);
     orderedIds.delete(id);
   } else if (isOrdered({ id })) {
     orderedIds.delete(id);
-    activeCollectionIds().add(id);
+    collectionIds.add(id);
   } else {
     orderedIds.add(id);
     wantIds.delete(id);
@@ -2433,8 +2866,7 @@ function selectSettingsTab(tab) {
 }
 
 function openSettingsDialog() {
-  hideResetSampleConfirm();
-  syncSettingsCollectionRadios();
+  syncSettingsStorageMode();
   selectSettingsTab("about");
   settingsDialog.hidden = false;
   settingsBtn.setAttribute("aria-expanded", "true");
@@ -2446,20 +2878,59 @@ function closeSettingsDialog() {
   settingsBtn.setAttribute("aria-expanded", "false");
 }
 
-async function onCollectionSourceChange(next) {
-  if (next !== "sample" && next !== "own") {
+async function onStorageModeChange(next) {
+  if (next !== "local" && next !== "gist") {
     return;
   }
-  if (collectionSource === next) {
+  if (storageMode === next) {
+    syncSettingsStorageMode();
     return;
   }
-  collectionSource = next;
-  saveUserState();
-  syncSettingsCollectionRadios();
+
+  const collections = swapCollectionForStorageMode(next);
+  storageMode = next;
+  persistUserState(
+    viewerUserState.buildUserStateFromRuntime(collectRuntimeSnapshot(), {
+      existingCollections: collections,
+    }),
+  );
+  syncSettingsStorageMode();
+
+  if (storageMode === "gist") {
+    const config = readGistSyncConfig();
+    if (viewerGistSync.isConnectedGistConfig(config)) {
+      await pullGistStateIfConfigured();
+    }
+  }
+
   render();
   if (!bookDetailDialog.hidden && detailBookId) {
     openBookDetail(detailBookId, { historyMode: "none" });
   }
+}
+
+async function onGistConnectClick() {
+  if (!gistTokenInput) {
+    return;
+  }
+  try {
+    gistConnectBtn.disabled = true;
+    await connectGistSync(gistTokenInput.value);
+    gistTokenInput.value = "";
+    syncGistConnectUi();
+    updateGistSyncStatus("Syncing to your private gist.");
+    render();
+  } catch (error) {
+    updateGistSyncStatus(error.message || "Could not connect to gist.", true);
+  } finally {
+    if (gistConnectBtn) {
+      gistConnectBtn.disabled = false;
+    }
+  }
+}
+
+function onGistClearClick() {
+  clearGistSyncConfig();
 }
 
 function escapeCsvField(value) {
@@ -2503,19 +2974,38 @@ function exportCollectionCsv() {
   URL.revokeObjectURL(url);
 }
 
-async function resetSampleCollection() {
-  sampleCollectionIds = await buildSampleIdsFromCsv({
-    forceCsv: Boolean(window.SAMPLE_COLLECTION_CSV),
-  });
-  sampleCollectionSeeded = true;
-  for (const id of sampleCollectionIds) {
-    wantIds.delete(id);
+async function onImportCollectionFileSelected(input) {
+  const file = input?.files?.[0];
+  if (!file) {
+    return;
   }
-  saveUserState();
-  hideResetSampleConfirm();
-  render();
-  if (!bookDetailDialog.hidden && detailBookId) {
-    openBookDetail(detailBookId, { historyMode: "none" });
+
+  try {
+    if (importCollectionBtn) {
+      importCollectionBtn.disabled = true;
+    }
+    const result = await importCollectionFromCsvText(await file.text());
+    let message = `Imported ${result.matchedCount} of ${result.rowCount} titles.`;
+    if (result.unmatchedCount) {
+      message += ` ${result.unmatchedCount} row(s) could not be matched.`;
+    }
+    if (storageMode === "gist" && !result.syncedToGist) {
+      message += " Connect gist sync to upload.";
+    } else if (result.syncedToGist) {
+      message += " Synced to gist.";
+    }
+    updateImportCollectionStatus(message, false);
+    render();
+  } catch (error) {
+    updateImportCollectionStatus(
+      error.message || "Could not import collection CSV.",
+      true,
+    );
+  } finally {
+    if (importCollectionBtn) {
+      importCollectionBtn.disabled = false;
+    }
+    input.value = "";
   }
 }
 
@@ -3166,17 +3656,33 @@ settingsTabSettings.addEventListener("click", () => {
   selectSettingsTab("settings");
 });
 
-collectionSourceSampleInput.addEventListener("change", () => {
-  if (collectionSourceSampleInput.checked) {
-    onCollectionSourceChange("sample");
-  }
-});
+if (storageModeLocalInput) {
+  storageModeLocalInput.addEventListener("change", () => {
+    if (storageModeLocalInput.checked) {
+      onStorageModeChange("local");
+    }
+  });
+}
 
-collectionSourceOwnInput.addEventListener("change", () => {
-  if (collectionSourceOwnInput.checked) {
-    onCollectionSourceChange("own");
-  }
-});
+if (storageModeGistInput) {
+  storageModeGistInput.addEventListener("change", () => {
+    if (storageModeGistInput.checked) {
+      onStorageModeChange("gist");
+    }
+  });
+}
+
+if (gistConnectBtn) {
+  gistConnectBtn.addEventListener("click", () => {
+    onGistConnectClick();
+  });
+}
+
+if (gistClearBtn) {
+  gistClearBtn.addEventListener("click", () => {
+    onGistClearClick();
+  });
+}
 
 if (exportCollectionBtn) {
   exportCollectionBtn.addEventListener("click", () => {
@@ -3184,21 +3690,12 @@ if (exportCollectionBtn) {
   });
 }
 
-if (resetSampleCollectionBtn) {
-  resetSampleCollectionBtn.addEventListener("click", () => {
-    showResetSampleConfirm();
+if (importCollectionBtn && importCollectionInput) {
+  importCollectionBtn.addEventListener("click", () => {
+    importCollectionInput.click();
   });
-}
-
-if (resetSampleCancelBtn) {
-  resetSampleCancelBtn.addEventListener("click", () => {
-    hideResetSampleConfirm();
-  });
-}
-
-if (resetSampleConfirmBtn) {
-  resetSampleConfirmBtn.addEventListener("click", () => {
-    resetSampleCollection();
+  importCollectionInput.addEventListener("change", () => {
+    onImportCollectionFileSelected(importCollectionInput);
   });
 }
 
@@ -3361,9 +3858,14 @@ showHiddenInput.addEventListener("change", () => {
   render();
 });
 
-loadUserState();
-syncSettingsCollectionRadios();
+syncSettingsStorageMode();
 updateSortControlVisibility();
+
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible") {
+    pullGistStateIfConfigured();
+  }
+});
 
 if (headerFiltersToggle) {
   headerFiltersToggle.addEventListener("click", () => {
@@ -3409,18 +3911,19 @@ stats.addEventListener("click", (event) => {
   }
 });
 
-if (readOnly) {
-  ensureSampleCollectionIds().then(() => {
+function startViewer() {
+  loadUserStateAsync().then(() => {
     render();
     openBookDetailFromLocation();
   });
+}
+
+if (readOnly) {
+  startViewer();
 } else {
-  checkServeSupport()
-    .then(() => ensureSampleCollectionIds())
-    .then(() => {
-      render();
-      openBookDetailFromLocation();
-    });
+  checkServeSupport().then(() => {
+    startViewer();
+  });
 }
 
 })();

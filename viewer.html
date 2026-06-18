@@ -380,7 +380,7 @@
             </ul>
             <p>
               Search narrows the grid; filters combine with search. Your lists
-              are saved on this device only.
+              stay in the browser, or sync via an optional private GitHub gist.
             </p>
           </div>
         </div>
@@ -394,26 +394,122 @@
           <section class="settings-section">
             <h3 class="settings-section-title">Collection</h3>
             <fieldset class="settings-collection-options">
-              <legend class="visually-hidden">Collection source</legend>
+              <legend class="visually-hidden">Collection storage</legend>
               <label class="settings-collection-option">
                 <input
                   type="radio"
-                  name="collection-source"
-                  id="collection-source-own"
-                  value="own"
+                  name="storage-mode"
+                  id="storage-mode-local"
+                  value="local"
+                  checked
                 />
-                Use my own collection
+                Store Collection Locally
               </label>
               <label class="settings-collection-option">
                 <input
                   type="radio"
-                  name="collection-source"
-                  id="collection-source-sample"
-                  value="sample"
+                  name="storage-mode"
+                  id="storage-mode-gist"
+                  value="gist"
                 />
-                Use sample collection
+                Store Collection in gist
               </label>
             </fieldset>
+            <div id="gist-sync-panel" class="settings-gist-panel" hidden>
+              <div class="settings-gist-warning" role="note">
+                <p class="settings-gist-warning-title">Security note</p>
+                <p>
+                  Your token is saved in this browser—anyone with device access
+                  can read it and use your gists. Use a throwaway account with a
+                  gist-only PAT, not your main GitHub. Use at your own risk.
+                </p>
+              </div>
+              <details class="settings-gist-steps">
+                <summary class="settings-gist-steps-summary">
+                  How to set up gist sync
+                </summary>
+                <ol class="settings-gist-steps-list">
+                  <li>
+                    Create a throwaway GitHub account (recommended; not your
+                    personal one).
+                  </li>
+                  <li>
+                    On GitHub: Settings → Developer settings → Fine-grained
+                    personal access tokens → Generate new token.
+                  </li>
+                  <li>
+                    Grant <strong>Gists</strong> read and write only; generate
+                    and copy the token (shown once).
+                  </li>
+                  <li>
+                    Select <strong>Store Collection in gist</strong> above,
+                    paste the token below, and click <strong>Connect</strong>.
+                  </li>
+                  <li>
+                    On another browser or device, repeat with the same token to
+                    sync. Use <strong>Clear</strong> here to remove the saved
+                    token from this browser.
+                  </li>
+                </ol>
+              </details>
+              <div
+                id="gist-sync-saved"
+                class="settings-gist-saved"
+                hidden
+              >
+                <span class="settings-gist-saved-badge">
+                  <span class="settings-gist-saved-icon" aria-hidden="true"
+                    >✓</span
+                  >
+                  Token saved
+                </span>
+                <button
+                  type="button"
+                  id="gist-clear-btn"
+                  class="settings-gist-clear-btn"
+                  aria-label="Clear saved token"
+                >
+                  <span aria-hidden="true">×</span> Clear
+                </button>
+              </div>
+              <div id="gist-sync-connect-form" class="settings-gist-connect-form">
+                <label class="settings-gist-token-label">
+                  GitHub token (gist access)
+                  <input
+                    type="password"
+                    id="gist-token-input"
+                    class="settings-gist-token-input"
+                    autocomplete="off"
+                  />
+                </label>
+                <button
+                  type="button"
+                  id="gist-connect-btn"
+                  class="settings-collection-action"
+                >
+                  Connect
+                </button>
+              </div>
+              <p id="gist-sync-status" class="settings-collection-hint"></p>
+            </div>
+            <button
+              type="button"
+              id="import-collection-btn"
+              class="settings-collection-action"
+            >
+              Import collection CSV
+            </button>
+            <input
+              type="file"
+              id="import-collection-input"
+              accept=".csv,text/csv"
+              hidden
+            />
+            <p
+              id="import-collection-status"
+              class="settings-collection-hint"
+              hidden
+            ></p>
             <button
               type="button"
               id="export-collection-btn"
@@ -421,58 +517,6 @@
             >
               Export collection CSV
             </button>
-            <button
-              type="button"
-              id="reset-sample-collection-btn"
-              class="settings-collection-action settings-reset-sample"
-              hidden
-            >
-              Reset sample collection
-            </button>
-            <div
-              id="reset-sample-confirm"
-              class="settings-reset-confirm"
-              hidden
-            >
-              <p class="settings-reset-warning">
-                This replaces your sample collection with the default sample
-                list. Any books you added or removed in sample mode will be
-                lost.
-              </p>
-              <div class="settings-reset-confirm-actions">
-                <button
-                  type="button"
-                  id="reset-sample-cancel-btn"
-                  class="settings-collection-action"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="button"
-                  id="reset-sample-confirm-btn"
-                  class="settings-collection-action settings-reset-sample"
-                >
-                  Yes, reset sample
-                </button>
-              </div>
-            </div>
-            <p
-              id="settings-collection-hint-sample"
-              class="settings-collection-hint"
-              hidden
-            >
-              Your own collection and the sample collection are saved
-              separately. Reset sample restores the default sample collection.
-              It won&apos;t wipe your own collection.
-            </p>
-            <p
-              id="settings-collection-hint-own"
-              class="settings-collection-hint"
-            >
-              Your own collection and the sample collection are saved
-              separately. Try the sample collection anytime—switch back to your
-              own collection when you want it back.
-            </p>
           </section>
           <hr class="settings-divider" aria-hidden="true" />
           <section class="settings-section">
@@ -790,7 +834,6 @@
       </button>
     </div>
 
-    <script src="my_collection/collection.js"></script>
     <script src="data/books.js"></script>
     <script src="data/descriptions.js"></script>
     <script src="data/book-order.js"></script>

@@ -1,5 +1,6 @@
 const USER_STATE_KEY = "arkham-user-state";
-const USER_STATE_VERSION = 1;
+const USER_STATE_VERSION = 2;
+const USER_STATE_VERSION_V1 = 1;
 
 const LEGACY_KEYS = {
   collection: "arkham-collection",
@@ -28,10 +29,10 @@ function defaultUserState() {
   return {
     version: USER_STATE_VERSION,
     updatedAt: null,
-    collectionSource: "sample",
-    ownCollectionIds: [],
-    sampleCollectionIds: null,
+    storageMode: "local",
+    collectionIds: [],
     orderedIds: [],
+    collections: defaultCollections(),
     wantIds: [],
     preferences: {
       sort: "date-asc",
@@ -42,6 +43,57 @@ function defaultUserState() {
       showMagazines: false,
     },
   };
+}
+
+function emptyCollectionSlot() {
+  return { collectionIds: [], orderedIds: [] };
+}
+
+function defaultCollections() {
+  return {
+    local: emptyCollectionSlot(),
+    gist: emptyCollectionSlot(),
+  };
+}
+
+function normalizeCollectionSlot(raw, fallback = emptyCollectionSlot()) {
+  if (!raw || typeof raw !== "object") {
+    return {
+      collectionIds: [...fallback.collectionIds],
+      orderedIds: [...fallback.orderedIds],
+    };
+  }
+  return {
+    collectionIds: normalizeIdArray(raw.collectionIds),
+    orderedIds: normalizeIdArray(raw.orderedIds),
+  };
+}
+
+function normalizeCollections(raw, topLevelIds = [], topLevelOrdered = []) {
+  const fallback = {
+    collectionIds: normalizeIdArray(topLevelIds),
+    orderedIds: normalizeIdArray(topLevelOrdered),
+  };
+  if (!raw || typeof raw !== "object") {
+    return {
+      local: normalizeCollectionSlot(null, fallback),
+      gist: normalizeCollectionSlot(null, fallback),
+    };
+  }
+  return {
+    local: normalizeCollectionSlot(raw.local, fallback),
+    gist: normalizeCollectionSlot(raw.gist, fallback),
+  };
+}
+
+function activeCollectionSlot(state) {
+  const mode = normalizeStorageMode(state.storageMode);
+  const collections = normalizeCollections(
+    state.collections,
+    state.collectionIds,
+    state.orderedIds,
+  );
+  return collections[mode];
 }
 
 function normalizeIdArray(raw) {
@@ -88,11 +140,11 @@ function normalizeBoolFlag(raw, defaultVal) {
   return defaultVal;
 }
 
-function normalizeCollectionSource(raw) {
-  if (raw === "own" || raw === "sample") {
-    return raw;
+function normalizeStorageMode(raw) {
+  if (raw === "gist") {
+    return "gist";
   }
-  return null;
+  return "local";
 }
 
 function normalizeViewMode(raw, fallback = "cards") {
@@ -102,25 +154,54 @@ function normalizeViewMode(raw, fallback = "cards") {
   return fallback;
 }
 
+function normalizePreferences(raw, base) {
+  return {
+    sort: normalizeSort(raw?.sort, base.preferences.sort),
+    viewMode: normalizeViewMode(raw?.viewMode, base.preferences.viewMode),
+    headerFiltersExpanded:
+      typeof raw?.headerFiltersExpanded === "boolean"
+        ? raw.headerFiltersExpanded
+        : base.preferences.headerFiltersExpanded,
+    highlightWants:
+      typeof raw?.highlightWants === "boolean"
+        ? raw.highlightWants
+        : base.preferences.highlightWants,
+    highlightCollection:
+      typeof raw?.highlightCollection === "boolean"
+        ? raw.highlightCollection
+        : base.preferences.highlightCollection,
+    showMagazines:
+      typeof raw?.showMagazines === "boolean"
+        ? raw.showMagazines
+        : base.preferences.showMagazines,
+  };
+}
+
+function legacyStorageModeFromSource(sourceRaw) {
+  return "local";
+}
+
+function legacyCollectionIds(snapshot) {
+  return normalizeIdArray(snapshot[LEGACY_KEYS.collection]);
+}
+
 function migrateFromLegacy(legacy) {
   const base = defaultUserState();
   const snapshot = legacy || {};
 
-  const sampleRaw = snapshot[LEGACY_KEYS.sampleCollection];
-  let sampleCollectionIds = null;
-  if (sampleRaw !== null && sampleRaw !== undefined) {
-    sampleCollectionIds = normalizeIdArray(sampleRaw);
-  }
-
   return {
     version: USER_STATE_VERSION,
     updatedAt: null,
-    collectionSource: normalizeCollectionSource(
+    storageMode: legacyStorageModeFromSource(
       snapshot[LEGACY_KEYS.collectionSource],
     ),
-    ownCollectionIds: normalizeIdArray(snapshot[LEGACY_KEYS.collection]),
-    sampleCollectionIds,
+    collectionIds: legacyCollectionIds(snapshot),
     orderedIds: normalizeIdArray(snapshot[LEGACY_KEYS.ordered]),
+    collections: normalizeCollections(
+      null,
+      legacyCollectionIds(snapshot),
+      normalizeIdArray(snapshot[LEGACY_KEYS.ordered]),
+    ),
     wantIds: normalizeIdArray(snapshot[LEGACY_KEYS.want]),
     preferences: {
       sort: normalizeSort(
@@ -151,13 +232,29 @@ function migrateFromLegacy(legacy) {
   };
 }
 
-function parseUserState(json) {
+function migrateV1ToV2(v1) {
+  const base = defaultUserState();
+  const collectionIds = normalizeIdArray(v1.ownCollectionIds);
+  const orderedIds = normalizeIdArray(v1.orderedIds);
+  return {
+    version: USER_STATE_VERSION,
+    updatedAt: v1.updatedAt || null,
+    storageMode: "local",
+    collectionIds,
+    orderedIds,
+    collections: normalizeCollections(null, collectionIds, orderedIds),
+    wantIds: normalizeIdArray(v1.wantIds),
+    preferences: normalizePreferences(v1.preferences, base),
+  };
+}
+
+function parseUserStateV1(json) {
   if (json == null || json === "") {
     return null;
   }
   try {
     const parsed = typeof json === "string" ? JSON.parse(json) : json;
-    if (!parsed || parsed.version !== USER_STATE_VERSION) {
+    if (!parsed || parsed.version !== USER_STATE_VERSION_V1) {
       return null;
     }
 
@@ -169,56 +266,86 @@ function parseUserState(json) {
     }
 
     return {
-      version: USER_STATE_VERSION,
+      version: USER_STATE_VERSION_V1,
       updatedAt:
         typeof parsed.updatedAt === "string" ? parsed.updatedAt : null,
-      collectionSource: normalizeCollectionSource(parsed.collectionSource),
+      collectionSource:
+        parsed.collectionSource === "own" || parsed.collectionSource === "sample"
+          ? parsed.collectionSource
+          : null,
       ownCollectionIds: normalizeIdArray(parsed.ownCollectionIds),
       sampleCollectionIds,
       orderedIds: normalizeIdArray(parsed.orderedIds),
       wantIds: normalizeIdArray(parsed.wantIds),
-      preferences: {
-        sort: normalizeSort(parsed.preferences?.sort, base.preferences.sort),
-        viewMode: normalizeViewMode(
-          parsed.preferences?.viewMode,
-          base.preferences.viewMode,
-        ),
-        headerFiltersExpanded:
-          typeof parsed.preferences?.headerFiltersExpanded === "boolean"
-            ? parsed.preferences.headerFiltersExpanded
-            : base.preferences.headerFiltersExpanded,
-        highlightWants:
-          typeof parsed.preferences?.highlightWants === "boolean"
-            ? parsed.preferences.highlightWants
-            : base.preferences.highlightWants,
-        highlightCollection:
-          typeof parsed.preferences?.highlightCollection === "boolean"
-            ? parsed.preferences.highlightCollection
-            : base.preferences.highlightCollection,
-        showMagazines:
-          typeof parsed.preferences?.showMagazines === "boolean"
-            ? parsed.preferences.showMagazines
-            : base.preferences.showMagazines,
-      },
+      preferences: normalizePreferences(parsed.preferences, base),
     };
   } catch (_) {
     return null;
   }
 }
 
-function buildUserStateFromRuntime(snapshot) {
-  const sampleIds = snapshot.sampleCollectionIds;
+function parseUserStateV2(json) {
+  if (json == null || json === "") {
+    return null;
+  }
+  try {
+    const parsed = typeof json === "string" ? JSON.parse(json) : json;
+    if (!parsed || parsed.version !== USER_STATE_VERSION) {
+      return null;
+    }
+
+    const base = defaultUserState();
+    const collectionIds = normalizeIdArray(parsed.collectionIds);
+    const orderedIds = normalizeIdArray(parsed.orderedIds);
+    return {
+      version: USER_STATE_VERSION,
+      updatedAt:
+        typeof parsed.updatedAt === "string" ? parsed.updatedAt : null,
+      storageMode: normalizeStorageMode(parsed.storageMode),
+      collectionIds,
+      orderedIds,
+      collections: normalizeCollections(
+        parsed.collections,
+        collectionIds,
+        orderedIds,
+      ),
+      wantIds: normalizeIdArray(parsed.wantIds),
+      preferences: normalizePreferences(parsed.preferences, base),
+    };
+  } catch (_) {
+    return null;
+  }
+}
+
+function parseUserState(json) {
+  const v2 = parseUserStateV2(json);
+  if (v2) {
+    return v2;
+  }
+  const v1 = parseUserStateV1(json);
+  if (v1) {
+    return migrateV1ToV2(v1);
+  }
+  return null;
+}
+
+function buildUserStateFromRuntime(snapshot, options = {}) {
+  const mode = normalizeStorageMode(snapshot.storageMode);
+  const collectionIds = normalizeIdArray(snapshot.collectionIds);
+  const orderedIds = normalizeIdArray(snapshot.orderedIds);
+  const collections = normalizeCollections(
+    options.existingCollections,
+    collectionIds,
+    orderedIds,
+  );
+  collections[mode] = { collectionIds, orderedIds };
   return {
     version: USER_STATE_VERSION,
     updatedAt: new Date().toISOString(),
-    collectionSource:
-      normalizeCollectionSource(snapshot.collectionSource) ?? "sample",
-    ownCollectionIds: normalizeIdArray(snapshot.ownCollectionIds),
-    sampleCollectionIds:
-      sampleIds === null || sampleIds === undefined
-        ? null
-        : normalizeIdArray(sampleIds),
-    orderedIds: normalizeIdArray(snapshot.orderedIds),
+    storageMode: mode,
+    collectionIds,
+    orderedIds,
+    collections,
     wantIds: normalizeIdArray(snapshot.wantIds),
     preferences: {
       sort: normalizeSort(snapshot.sort),
@@ -232,19 +359,12 @@ function buildUserStateFromRuntime(snapshot) {
 }
 
 function applyUserStateToRuntime(state) {
-  let parsed = null;
-  if (state != null) {
-    parsed =
-      typeof state === "string" ? parseUserState(state) : parseUserState(state);
-  }
-  if (!parsed) {
-    parsed = migrateFromLegacy(null);
-  }
+  const parsed = parseUserState(state) || migrateFromLegacy(null);
+  const active = activeCollectionSlot(parsed);
   return {
-    collectionSource: parsed.collectionSource,
-    ownCollectionIds: parsed.ownCollectionIds,
-    sampleCollectionIds: parsed.sampleCollectionIds,
-    orderedIds: parsed.orderedIds,
+    storageMode: parsed.storageMode,
+    collectionIds: active.collectionIds,
+    orderedIds: active.orderedIds,
     wantIds: parsed.wantIds,
     sort: parsed.preferences.sort,
     viewMode: parsed.preferences.viewMode,
@@ -262,14 +382,24 @@ function serializeUserState(state) {
 module.exports = {
   USER_STATE_KEY,
   USER_STATE_VERSION,
+  USER_STATE_VERSION_V1,
   LEGACY_KEYS,
   SORT_MODES,
   defaultUserState,
+  emptyCollectionSlot,
+  defaultCollections,
+  normalizeCollections,
+  normalizeCollectionSlot,
+  activeCollectionSlot,
   normalizeIdArray,
   normalizeSort,
   normalizeBoolFlag,
+  normalizeStorageMode,
   migrateFromLegacy,
+  migrateV1ToV2,
   parseUserState,
+  parseUserStateV1,
+  parseUserStateV2,
   buildUserStateFromRuntime,
   applyUserStateToRuntime,
   serializeUserState,
