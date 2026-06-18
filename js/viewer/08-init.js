@@ -314,6 +314,12 @@ document.addEventListener("visibilitychange", () => {
   }
 });
 
+window.addEventListener("pageshow", (event) => {
+  if (event.persisted) {
+    pullGistStateIfConfigured();
+  }
+});
+
 if (headerFiltersToggle) {
   headerFiltersToggle.addEventListener("click", () => {
     headerFiltersExpanded = !headerFiltersExpanded;

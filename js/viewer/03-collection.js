@@ -1,7 +1,8 @@
 /* Collection, want list, storage mode, and user state */
 
-const GIST_PUSH_DELAY_MS = 1500;
+const GIST_PUSH_DELAY_MS = 1000;
 let gistPushTimer = null;
+let gistPushInFlight = null;
 let gistPullInFlight = null;
 
 function readLegacyStorageSnapshot() {
@@ -41,6 +42,7 @@ function clearGistSyncConfig() {
     clearTimeout(gistPushTimer);
     gistPushTimer = null;
   }
+  gistPushInFlight = null;
   try {
     localStorage.removeItem(viewerGistSync.GIST_SYNC_KEY);
   } catch (_) {
@@ -146,7 +148,10 @@ function githubHeaders(token) {
 async function fetchGistState(config) {
   const response = await fetch(
     `${viewerGistSync.GITHUB_API}/gists/${config.gistId}`,
-    { headers: githubHeaders(config.token) },
+    {
+      headers: githubHeaders(config.token),
+      cache: "no-store",
+    },
   );
   if (response.status === 404) {
     throw new Error("Gist fetch failed (404)");
@@ -165,6 +170,7 @@ async function fetchGistState(config) {
 async function findExistingArkhamGistId(token) {
   const response = await fetch(`${viewerGistSync.GITHUB_API}/gists?per_page=100`, {
     headers: githubHeaders(token),
+    cache: "no-store",
   });
   if (!response.ok) {
     return null;
@@ -277,10 +283,13 @@ function scheduleGistPush() {
   gistPushTimer = setTimeout(async () => {
     gistPushTimer = null;
     try {
-      await pushGistState(config, buildStateForPersistence());
+      gistPushInFlight = pushGistState(config, buildStateForPersistence());
+      await gistPushInFlight;
       updateGistSyncStatus("Synced to GitHub Gist.");
     } catch (error) {
       updateGistSyncStatus(error.message || "Gist sync failed.", true);
+    } finally {
+      gistPushInFlight = null;
     }
   }, GIST_PUSH_DELAY_MS);
 }
@@ -291,6 +300,9 @@ async function pullGistStateIfConfigured(options = {}) {
   }
   const config = readGistSyncConfig();
   if (!viewerGistSync.isConnectedGistConfig(config)) {
+    return;
+  }
+  if (gistPushTimer || gistPushInFlight) {
     return;
   }
   if (gistPullInFlight) {
