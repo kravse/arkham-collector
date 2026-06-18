@@ -34,8 +34,9 @@ function applyOptimizedCoverPaths(books, optimizedBySource) {
     if (!optimized) {
       return book;
     }
+    const { coverEditPath: _coverEditPath, ...rest } = book;
     return {
-      ...book,
+      ...rest,
       coverImageFile: optimized.card,
       coverImageDetailFile: optimized.detail,
     };

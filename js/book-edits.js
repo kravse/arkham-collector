@@ -16,7 +16,7 @@ function applyBookEdits(books, editsById) {
     const merged = { ...base, ...editFields };
     merged.hidden = edit.hidden === true;
     merged.deleted = edit.deleted === true;
-    if (editCoverPath) {
+    if (editCoverPath && !merged.coverImageDetailFile) {
       merged.coverEditPath = editCoverPath;
     }
     return merged;

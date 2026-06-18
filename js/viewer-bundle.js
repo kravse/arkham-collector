@@ -1018,10 +1018,15 @@ const viewerCovers = (function () {
     return `${url}?v=${encodeURIComponent(cacheKey)}`;
   }
   
+  function hasDeployOptimizedCovers(book) {
+    return Boolean(book.coverImageDetailFile);
+  }
+  
   function getCoverSources(book, variant = "card") {
     const sources = [];
+    const deployOptimized = hasDeployOptimizedCovers(book);
   
-    if (book.coverEditPath) {
+    if (book.coverEditPath && !deployOptimized) {
       sources.push(book.coverEditPath);
     }
     if (variant === "detail" && book.coverImageDetailFile) {
@@ -1032,7 +1037,7 @@ const viewerCovers = (function () {
     }
   
     const slugBase = coverSlugFromBook(book);
-    if (slugBase && book.id) {
+    if (slugBase && book.id && !deployOptimized) {
       if (variant === "detail") {
         sources.push(`covers/${slugBase}-${book.id}.detail.webp`);
       }

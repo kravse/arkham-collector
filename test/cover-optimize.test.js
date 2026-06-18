@@ -25,6 +25,7 @@ test("applyOptimizedCoverPaths rewrites cover paths for optimized sources", () =
   const books = [
     {
       id: 1,
+      coverEditPath: "covers/a-1.jpg",
       coverImageFile: "covers/a-1.jpg",
     },
     {
@@ -45,6 +46,7 @@ test("applyOptimizedCoverPaths rewrites cover paths for optimized sources", () =
   const next = applyOptimizedCoverPaths(books, optimizedBySource);
   assert.equal(next[0].coverImageFile, "covers/a-1.card.webp");
   assert.equal(next[0].coverImageDetailFile, "covers/a-1.detail.webp");
+  assert.equal(next[0].coverEditPath, undefined);
   assert.equal(next[1].coverImageFile, "covers/b-2.png");
   assert.equal(next[1].coverImageDetailFile, undefined);
 });

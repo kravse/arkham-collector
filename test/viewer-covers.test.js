@@ -42,14 +42,13 @@ test("getCoverSources uses hyphenated slug fallbacks", () => {
   );
 });
 
-test("getCoverSources falls back from coverEditPath to optimized card webp", () => {
+test("getCoverSources falls back from coverEditPath to optimized card webp in local dev", () => {
   assert.deepEqual(
     getCoverSources(
       {
         id: 419,
         coverEditPath: "covers/the-outsider-and-others-419.png",
         coverImageFile: "covers/the-outsider-and-others-419.card.webp",
-        coverImageDetailFile: "covers/the-outsider-and-others-419.detail.webp",
       },
       "card",
     ),
@@ -71,6 +70,26 @@ test("getCoverSources prefers detail derivative for detail overlay", () => {
     "covers/the-dunwich-horror-42.detail.webp",
     "covers/the-dunwich-horror-42.card.webp",
   ]);
+});
+
+test("getCoverSources uses deploy derivatives instead of missing edit originals", () => {
+  assert.deepEqual(
+    getCoverSources(
+      {
+        id: 419,
+        coverEditPath: "covers/the-outsider-and-others-419.webp",
+        coverImageFile: "covers/the-outsider-and-others-419.card.webp",
+        coverImageDetailFile: "covers/the-outsider-and-others-419.detail.webp",
+        coverImageUrl: "https://example.com/cover.jpg",
+      },
+      "detail",
+    ),
+    [
+      "covers/the-outsider-and-others-419.detail.webp",
+      "covers/the-outsider-and-others-419.card.webp",
+      "https://example.com/cover.jpg",
+    ],
+  );
 });
 
 test("appendCoverCacheKey adds a cache-busting query param", () => {
