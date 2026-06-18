@@ -280,8 +280,7 @@ function selectSettingsTab(tab) {
 }
 
 function openSettingsDialog() {
-  hideResetSampleConfirm();
-  syncSettingsCollectionRadios();
+  syncSettingsStorageMode();
   selectSettingsTab("about");
   settingsDialog.hidden = false;
   settingsBtn.setAttribute("aria-expanded", "true");
@@ -293,20 +292,59 @@ function closeSettingsDialog() {
   settingsBtn.setAttribute("aria-expanded", "false");
 }
 
-async function onCollectionSourceChange(next) {
-  if (next !== "sample" && next !== "own") {
+async function onStorageModeChange(next) {
+  if (next !== "local" && next !== "gist") {
     return;
   }
-  if (collectionSource === next) {
+  if (storageMode === next) {
+    syncSettingsStorageMode();
     return;
   }
-  collectionSource = next;
-  saveUserState();
-  syncSettingsCollectionRadios();
+
+  const collections = swapCollectionForStorageMode(next);
+  storageMode = next;
+  persistUserState(
+    viewerUserState.buildUserStateFromRuntime(collectRuntimeSnapshot(), {
+      existingCollections: collections,
+    }),
+  );
+  syncSettingsStorageMode();
+
+  if (storageMode === "gist") {
+    const config = readGistSyncConfig();
+    if (viewerGistSync.isConnectedGistConfig(config)) {
+      await pullGistStateIfConfigured();
+    }
+  }
+
   render();
   if (!bookDetailDialog.hidden && detailBookId) {
     openBookDetail(detailBookId, { historyMode: "none" });
   }
+}
+
+async function onGistConnectClick() {
+  if (!gistTokenInput) {
+    return;
+  }
+  try {
+    gistConnectBtn.disabled = true;
+    await connectGistSync(gistTokenInput.value);
+    gistTokenInput.value = "";
+    syncGistConnectUi();
+    updateGistSyncStatus("Syncing to your private gist.");
+    render();
+  } catch (error) {
+    updateGistSyncStatus(error.message || "Could not connect to gist.", true);
+  } finally {
+    if (gistConnectBtn) {
+      gistConnectBtn.disabled = false;
+    }
+  }
+}
+
+function onGistClearClick() {
+  clearGistSyncConfig();
 }
 
 function escapeCsvField(value) {
@@ -350,19 +388,38 @@ function exportCollectionCsv() {
   URL.revokeObjectURL(url);
 }
 
-async function resetSampleCollection() {
-  sampleCollectionIds = await buildSampleIdsFromCsv({
-    forceCsv: Boolean(window.SAMPLE_COLLECTION_CSV),
-  });
-  sampleCollectionSeeded = true;
-  for (const id of sampleCollectionIds) {
-    wantIds.delete(id);
+async function onImportCollectionFileSelected(input) {
+  const file = input?.files?.[0];
+  if (!file) {
+    return;
   }
-  saveUserState();
-  hideResetSampleConfirm();
-  render();
-  if (!bookDetailDialog.hidden && detailBookId) {
-    openBookDetail(detailBookId, { historyMode: "none" });
+
+  try {
+    if (importCollectionBtn) {
+      importCollectionBtn.disabled = true;
+    }
+    const result = await importCollectionFromCsvText(await file.text());
+    let message = `Imported ${result.matchedCount} of ${result.rowCount} titles.`;
+    if (result.unmatchedCount) {
+      message += ` ${result.unmatchedCount} row(s) could not be matched.`;
+    }
+    if (storageMode === "gist" && !result.syncedToGist) {
+      message += " Connect gist sync to upload.";
+    } else if (result.syncedToGist) {
+      message += " Synced to gist.";
+    }
+    updateImportCollectionStatus(message, false);
+    render();
+  } catch (error) {
+    updateImportCollectionStatus(
+      error.message || "Could not import collection CSV.",
+      true,
+    );
+  } finally {
+    if (importCollectionBtn) {
+      importCollectionBtn.disabled = false;
+    }
+    input.value = "";
   }
 }
 

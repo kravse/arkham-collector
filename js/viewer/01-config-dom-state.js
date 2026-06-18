@@ -53,30 +53,19 @@ const settingsTabAbout = document.getElementById("settings-tab-about");
 const settingsTabSettings = document.getElementById("settings-tab-settings");
 const settingsPanelAbout = document.getElementById("settings-panel-about");
 const settingsPanelSettings = document.getElementById("settings-panel-settings");
-const collectionSourceSampleInput = document.getElementById(
-  "collection-source-sample",
-);
-const collectionSourceOwnInput =
-  document.getElementById("collection-source-own");
+const storageModeLocalInput = document.getElementById("storage-mode-local");
+const storageModeGistInput = document.getElementById("storage-mode-gist");
+const gistSyncPanel = document.getElementById("gist-sync-panel");
+const gistSyncSaved = document.getElementById("gist-sync-saved");
+const gistConnectForm = document.getElementById("gist-sync-connect-form");
+const gistTokenInput = document.getElementById("gist-token-input");
+const gistConnectBtn = document.getElementById("gist-connect-btn");
+const gistClearBtn = document.getElementById("gist-clear-btn");
+const gistSyncStatus = document.getElementById("gist-sync-status");
 const exportCollectionBtn = document.getElementById("export-collection-btn");
-const resetSampleCollectionBtn = document.getElementById(
-  "reset-sample-collection-btn",
-);
-const resetSampleConfirmPanel = document.getElementById(
-  "reset-sample-confirm",
-);
-const resetSampleCancelBtn = document.getElementById(
-  "reset-sample-cancel-btn",
-);
-const resetSampleConfirmBtn = document.getElementById(
-  "reset-sample-confirm-btn",
-);
-const settingsCollectionHintSample = document.getElementById(
-  "settings-collection-hint-sample",
-);
-const settingsCollectionHintOwn = document.getElementById(
-  "settings-collection-hint-own",
-);
+const importCollectionBtn = document.getElementById("import-collection-btn");
+const importCollectionInput = document.getElementById("import-collection-input");
+const importCollectionStatus = document.getElementById("import-collection-status");
 const highlightWantsInput = document.getElementById("highlight-wants");
 const highlightCollectionInput = document.getElementById("highlight-collection");
 const showMagazinesInput = document.getElementById("show-magazines");
@@ -99,7 +88,6 @@ const SORT_MODES = new Set([
   "title-asc",
   "title-desc",
 ]);
-let collection = [];
 let serveEnabled = false;
 let serveEditDeltas = false;
 let editingBookId = null;
@@ -108,10 +96,9 @@ let hiddenOnly = false;
 let mycroftFilterMode = null;
 let wantOnly = false;
 let wantIds = new Set();
-let ownCollectionIds = new Set();
+let collectionIds = new Set();
 let orderedIds = new Set();
-let sampleCollectionIds = new Set();
-let collectionSource = "sample";
+let storageMode = "local";
 let headerFiltersExpanded = true;
 let gridViewMode = "cards";
 let highlightWants = true;
@@ -143,37 +130,8 @@ function updateSortControlVisibility() {
   }
 }
 
-function useOwnCollection() {
-  return collectionSource === "own";
-}
-
 function activeCollectionIds() {
-  return useOwnCollection() ? ownCollectionIds : sampleCollectionIds;
-}
-
-function defaultCollectionSource() {
-  const fromBuild = window.DEFAULT_COLLECTION_SOURCE;
-  if (fromBuild === "own" || fromBuild === "sample") {
-    return fromBuild;
-  }
-  return readOnly ? "own" : "sample";
-}
-
-function syncSettingsCollectionHint() {
-  const inConfirm =
-    resetSampleConfirmPanel && !resetSampleConfirmPanel.hidden;
-  const showSampleHint =
-    !inConfirm &&
-    collectionSource === "sample" &&
-    resetSampleCollectionBtn &&
-    !resetSampleCollectionBtn.hidden;
-
-  if (settingsCollectionHintSample) {
-    settingsCollectionHintSample.hidden = !showSampleHint;
-  }
-  if (settingsCollectionHintOwn) {
-    settingsCollectionHintOwn.hidden = showSampleHint;
-  }
+  return collectionIds;
 }
 
 function syncSettingsHighlightCheckboxes() {
@@ -199,36 +157,76 @@ function shouldHighlightCollectionOnCards() {
   return highlightCollection || collectionFilterMode != null;
 }
 
-function syncSettingsCollectionRadios() {
-  if (collectionSourceSampleInput) {
-    collectionSourceSampleInput.checked = collectionSource === "sample";
+function syncSettingsStorageMode() {
+  if (storageModeLocalInput) {
+    storageModeLocalInput.checked = storageMode === "local";
   }
-  if (collectionSourceOwnInput) {
-    collectionSourceOwnInput.checked = collectionSource === "own";
+  if (storageModeGistInput) {
+    storageModeGistInput.checked = storageMode === "gist";
   }
-  if (resetSampleCollectionBtn) {
-    resetSampleCollectionBtn.hidden = collectionSource !== "sample";
+  if (gistSyncPanel) {
+    gistSyncPanel.hidden = storageMode !== "gist";
   }
-  hideResetSampleConfirm();
-  syncSettingsCollectionHint();
   syncSettingsHighlightCheckboxes();
+  syncGistConnectUi();
+  refreshGistSyncStatus();
 }
 
-function showResetSampleConfirm() {
-  if (!resetSampleConfirmPanel || !resetSampleCollectionBtn) {
+function hasSavedGistCredentials() {
+  const config = readGistSyncConfig();
+  return Boolean(config?.token);
+}
+
+function syncGistConnectUi() {
+  const saved = storageMode === "gist" && hasSavedGistCredentials();
+  if (gistSyncSaved) {
+    gistSyncSaved.hidden = !saved;
+  }
+  if (gistConnectForm) {
+    gistConnectForm.hidden = saved;
+  }
+}
+
+function refreshGistSyncStatus() {
+  if (!gistSyncStatus) {
     return;
   }
-  resetSampleCollectionBtn.hidden = true;
-  resetSampleConfirmPanel.hidden = false;
-  syncSettingsCollectionHint();
+  if (storageMode !== "gist") {
+    gistSyncStatus.textContent = "";
+    gistSyncStatus.classList.remove("settings-gist-status--error");
+    return;
+  }
+  const config = readGistSyncConfig();
+  if (viewerGistSync.isConnectedGistConfig(config)) {
+    gistSyncStatus.textContent = "Syncing to your private gist.";
+    gistSyncStatus.classList.remove("settings-gist-status--error");
+    return;
+  }
+  if (config?.token) {
+    gistSyncStatus.textContent = "Reconnect to resume gist sync.";
+    gistSyncStatus.classList.remove("settings-gist-status--error");
+    return;
+  }
+  gistSyncStatus.textContent = "Paste a GitHub token and connect to sync.";
+  gistSyncStatus.classList.remove("settings-gist-status--error");
 }
 
-function hideResetSampleConfirm() {
-  if (resetSampleConfirmPanel) {
-    resetSampleConfirmPanel.hidden = true;
+function updateGistSyncStatus(message, isError) {
+  if (!gistSyncStatus) {
+    return;
   }
-  if (resetSampleCollectionBtn && collectionSource === "sample") {
-    resetSampleCollectionBtn.hidden = false;
+  gistSyncStatus.textContent = message;
+  gistSyncStatus.classList.toggle("settings-gist-status--error", Boolean(isError));
+}
+
+function updateImportCollectionStatus(message, isError) {
+  if (!importCollectionStatus) {
+    return;
   }
-  syncSettingsCollectionHint();
+  importCollectionStatus.hidden = !message;
+  importCollectionStatus.textContent = message;
+  importCollectionStatus.classList.toggle(
+    "settings-gist-status--error",
+    Boolean(isError),
+  );
 }

@@ -103,17 +103,33 @@ settingsTabSettings.addEventListener("click", () => {
   selectSettingsTab("settings");
 });
 
-collectionSourceSampleInput.addEventListener("change", () => {
-  if (collectionSourceSampleInput.checked) {
-    onCollectionSourceChange("sample");
-  }
-});
+if (storageModeLocalInput) {
+  storageModeLocalInput.addEventListener("change", () => {
+    if (storageModeLocalInput.checked) {
+      onStorageModeChange("local");
+    }
+  });
+}
 
-collectionSourceOwnInput.addEventListener("change", () => {
-  if (collectionSourceOwnInput.checked) {
-    onCollectionSourceChange("own");
-  }
-});
+if (storageModeGistInput) {
+  storageModeGistInput.addEventListener("change", () => {
+    if (storageModeGistInput.checked) {
+      onStorageModeChange("gist");
+    }
+  });
+}
+
+if (gistConnectBtn) {
+  gistConnectBtn.addEventListener("click", () => {
+    onGistConnectClick();
+  });
+}
+
+if (gistClearBtn) {
+  gistClearBtn.addEventListener("click", () => {
+    onGistClearClick();
+  });
+}
 
 if (exportCollectionBtn) {
   exportCollectionBtn.addEventListener("click", () => {
@@ -121,21 +137,12 @@ if (exportCollectionBtn) {
   });
 }
 
-if (resetSampleCollectionBtn) {
-  resetSampleCollectionBtn.addEventListener("click", () => {
-    showResetSampleConfirm();
+if (importCollectionBtn && importCollectionInput) {
+  importCollectionBtn.addEventListener("click", () => {
+    importCollectionInput.click();
   });
-}
-
-if (resetSampleCancelBtn) {
-  resetSampleCancelBtn.addEventListener("click", () => {
-    hideResetSampleConfirm();
-  });
-}
-
-if (resetSampleConfirmBtn) {
-  resetSampleConfirmBtn.addEventListener("click", () => {
-    resetSampleCollection();
+  importCollectionInput.addEventListener("change", () => {
+    onImportCollectionFileSelected(importCollectionInput);
   });
 }
 
@@ -298,9 +305,14 @@ showHiddenInput.addEventListener("change", () => {
   render();
 });
 
-loadUserState();
-syncSettingsCollectionRadios();
+syncSettingsStorageMode();
 updateSortControlVisibility();
+
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible") {
+    pullGistStateIfConfigured();
+  }
+});
 
 if (headerFiltersToggle) {
   headerFiltersToggle.addEventListener("click", () => {
@@ -346,18 +358,19 @@ stats.addEventListener("click", (event) => {
   }
 });
 
-if (readOnly) {
-  ensureSampleCollectionIds().then(() => {
+function startViewer() {
+  loadUserStateAsync().then(() => {
     render();
     openBookDetailFromLocation();
   });
+}
+
+if (readOnly) {
+  startViewer();
 } else {
-  checkServeSupport()
-    .then(() => ensureSampleCollectionIds())
-    .then(() => {
-      render();
-      openBookDetailFromLocation();
-    });
+  checkServeSupport().then(() => {
+    startViewer();
+  });
 }
 
 })();

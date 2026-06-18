@@ -13,8 +13,8 @@ A visual catalog for collectors and readers of [Arkham House](https://en.wikiped
 | **Search & sort** | Search the grid; **list/grid toggle** beside search (saved in browser); **Sort** (oldest/newest/title) everywhere. Same-year tiebreaks from `book-order.js`; maintainers set those with **Reorder** on `npm run serve` only |
 | **Filters** | Collection, want list, Mycroft & Moran imprint, decade |
 | **Book detail** | Cover, description, cover artist, **W** / **G** links, **Collect** (Ordered → Collection), and want toggles |
-| **Your data** | Stored in `localStorage` on your device only (`arkham-user-state`; older per-key entries migrate automatically)—nothing uploaded |
-| **Export** | Download your collection as CSV (ordered and collected titles; same rows, no order status column) |
+| **Your data** | Stored in the browser (`arkham-user-state` v2; older keys migrate automatically). Default is local-only; optional **Store Collection in gist** syncs full state to a private GitHub gist using a throwaway bot account PAT (`arkham-gist-sync`) |
+| **Export** | Download your collection as CSV (ordered and collected titles; same rows, no order status column). **Import collection CSV** replaces collected titles for the active storage mode only and clears on-order titles for that mode; your want list is unchanged |
 
 ### Screenshots
 
@@ -35,8 +35,17 @@ A visual catalog for collectors and readers of [Arkham House](https://en.wikiped
 1. Open a card → **Collect** to mark a copy you own (tap again to remove).
 2. Toggle **want** on titles you are hunting.
 3. Filter with **COLLECTION** or **WANT** in the header. If you have on-order titles, **COLLECTION** cycles: all books → your collection → on-order only → all books.
-4. **Gear** (bottom bar): switch **Use my own collection** (default on the live site) vs **Use sample collection** (a bundled demo list). The two lists are separate; **Reset sample collection** only affects the demo. Add `?sample=true` to the URL to open with the sample collection for that visit only (does not change your saved preference).
-5. **Export collection CSV** exports whichever mode is active (title, author, year). There is no import—add books with **Collect**.
+4. **Gear** (bottom bar): choose **Store Collection Locally** (default) or **Store Collection in gist**. Gist mode needs a fine-grained GitHub PAT with gist access on a throwaway account—paste it when prompted and click **Connect**. Syncs collection, want list, ordered titles, and display preferences across browsers.
+5. **Import collection CSV** / **Export collection CSV** (gear → Settings): import replaces collected titles for the **active storage mode only** (local and gist keep separate collections), clears on-order titles for that mode, and leaves your want list alone. Works in local mode or gist mode (gist upload happens immediately when connected).
+
+### Browser storage keys
+
+| Key | Contents |
+|-----|----------|
+| `arkham-user-state` | Unified v2 state: collection ids, want list, ordered titles, display preferences, and `storageMode` (`local` or `gist`). Older per-key entries migrate on first load. |
+| `arkham-gist-sync` | Gist credentials only (`token`, `gistId`) when gist mode is connected—not included in the synced gist file. |
+
+**Gist sync security:** The PAT is stored in your browser’s `localStorage`. Use a throwaway GitHub account and a fine-grained PAT limited to gist read/write. Local mode never sends data to GitHub.
 
 ## Run it locally
 
@@ -69,7 +78,7 @@ At load time, [`js/book-edits.js`](js/book-edits.js) merges scraped rows with ed
 
 **Dev API:** `GET /api/book-order` returns the normalized id list; `PUT /api/book-order` with `{ "order": [ … ] }` saves it (400 if order breaks year sequence or omits books).
 
-**Sample collection in builds:** [`my_collection/my_collection.csv`](my_collection/my_collection.csv) is the maintainer demo list (not visitors’ personal collections). `build` and `serve` sync it to `collection.js` and ship cache-busted `my_collection.<hash>.csv` + `collection.<hash>.js` in `build/`.
+**Maintainer sample CSV:** [`my_collection/my_collection.csv`](my_collection/my_collection.csv) is synced by `npm run sync-collection` for script/testing use; it is not loaded in the visitor viewer.
 
 **First-time scrape** (optional, overwrites scraped data):
 

@@ -95,10 +95,7 @@ test("detail edit stays hidden on file:// even when serve is enabled", () => {
 
 test("applyBuildHtmlTransforms injects READ_ONLY for deploy builds", () => {
   const html = fs.readFileSync(VIEWER_HTML, "utf8");
-  const built = applyBuildHtmlTransforms(html, {
-    collectionJsPath: "my_collection/collection.abc123.js",
-    collectionCsvPath: "my_collection/my_collection.abc123.csv",
-  });
+  const built = applyBuildHtmlTransforms(html);
 
   assert.match(built, /<script>window\.READ_ONLY = true;<\/script>/);
   assert.doesNotMatch(built, /window\.READ_ONLY = false/);

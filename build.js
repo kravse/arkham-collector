@@ -122,19 +122,11 @@ function applyBuildHtmlTransforms(html, options = {}) {
   const bundledStylesheet = '    <link rel="stylesheet" href="css/viewer.css" />';
   let next = html.replace(stylesheetBlock, bundledStylesheet);
 
-  const collectionScript =
-    '<script src="my_collection/collection.js"></script>';
-  const collectionScriptOut = options.collectionJsPath
-    ? `<script src="${options.collectionJsPath}"></script>`
-    : collectionScript;
   const injectParts = ["<script>window.READ_ONLY = true;</script>"];
-  if (options.collectionCsvPath) {
-    injectParts.push(
-      `<script>window.SAMPLE_COLLECTION_CSV = ${JSON.stringify(options.collectionCsvPath)};</script>`,
-    );
-  }
-  injectParts.push(collectionScriptOut);
-  next = next.replace(collectionScript, injectParts.join("\n  "));
+  next = next.replace(
+    '<script src="data/books.js"></script>',
+    `${injectParts.join("\n  ")}\n    <script src="data/books.js"></script>`,
+  );
 
   const shareImage = `${DEPLOY_ORIGIN}/images/share.png`;
   next = next.replaceAll('content="images/share.png"', `content="${shareImage}"`);
@@ -204,10 +196,7 @@ function buildStaticSite() {
     }
   }
 
-  const html = applyBuildHtmlTransforms(fs.readFileSync(VIEWER_HTML, "utf8"), {
-    collectionCsvPath: collectionCsvBuildPath,
-    collectionJsPath: collectionJsBuildPath,
-  });
+  const html = applyBuildHtmlTransforms(fs.readFileSync(VIEWER_HTML, "utf8"));
   fs.writeFileSync(path.join(BUILD_DIR, "robots.txt"), ROBOTS_NO_CRAWL);
   fs.writeFileSync(path.join(BUILD_DIR, "index.html"), html);
 
