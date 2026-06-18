@@ -380,7 +380,7 @@
             </ul>
             <p>
               Search narrows the grid; filters combine with search. Your lists
-              stay in the browser, or sync via an optional private GitHub gist.
+              stay in the browser, or sync via an optional private GitHub Gist.
             </p>
           </div>
         </div>
@@ -392,7 +392,7 @@
           hidden
         >
           <section class="settings-section">
-            <h3 class="settings-section-title">Collection</h3>
+            <h3 class="settings-section-title">Collection storage</h3>
             <fieldset class="settings-collection-options">
               <legend class="visually-hidden">Collection storage</legend>
               <label class="settings-collection-option">
@@ -403,7 +403,7 @@
                   value="local"
                   checked
                 />
-                Store Collection Locally
+                This device only
               </label>
               <label class="settings-collection-option">
                 <input
@@ -412,21 +412,26 @@
                   id="storage-mode-gist"
                   value="gist"
                 />
-                Store Collection in gist
+                Sync with GitHub Gist
               </label>
             </fieldset>
             <div id="gist-sync-panel" class="settings-gist-panel" hidden>
+              <p class="settings-gist-intro settings-collection-hint">
+                Saves your collection to a private GitHub Gist so you can open it
+                on another browser. Requires a GitHub token.
+              </p>
               <div class="settings-gist-warning" role="note">
                 <p class="settings-gist-warning-title">Security note</p>
                 <p>
                   Your token is saved in this browser—anyone with device access
-                  can read it and use your gists. Use a throwaway account with a
-                  gist-only PAT, not your main GitHub. Use at your own risk.
+                  can read it and use your GitHub Gist. Use a throwaway account
+                  with a gist-only PAT, not your main GitHub. Use at your own
+                  risk.
                 </p>
               </div>
               <details class="settings-gist-steps">
                 <summary class="settings-gist-steps-summary">
-                  How to set up gist sync
+                  How to set up GitHub Gist sync
                 </summary>
                 <ol class="settings-gist-steps-list">
                   <li>
@@ -442,20 +447,20 @@
                     and copy the token (shown once).
                   </li>
                   <li>
-                    Select <strong>Store Collection in gist</strong>, paste the
-                    token, and click <strong>Connect</strong>. Gist mode stays
-                    off until connect succeeds. If that account already has
-                    sync data, it loads from the gist. Closing settings or a
-                    failed connect returns you to local mode.
+                    Select <strong>Sync with GitHub Gist</strong>, paste the
+                    token, and click <strong>Connect</strong>. Sync stays off
+                    until connect succeeds. If that account already has sync
+                    data, it loads from the Gist. Closing settings or a failed
+                    connect returns you to this device only.
                   </li>
                   <li>
-                    To move a local collection to gist: stay on
-                    <strong>Store Collection Locally</strong>, export CSV,
-                    switch to gist, connect, then import CSV.
+                    To move a local collection to GitHub Gist: stay on
+                    <strong>This device only</strong>, export CSV, switch to
+                    GitHub Gist sync, connect, then import CSV.
                   </li>
                   <li>
                     On another browser or device, connect with the same token to
-                    load the same gist. Use <strong>Clear</strong> to remove
+                    load the same Gist. Use <strong>Clear</strong> to remove
                     the saved token from this browser.
                   </li>
                 </ol>

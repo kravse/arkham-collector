@@ -326,11 +326,14 @@ async function onGistConnectClick() {
     gistConnectBtn.disabled = true;
     await connectGistSync(gistTokenInput.value);
     gistTokenInput.value = "";
-    updateGistSyncStatus("Connected to gist sync.");
+    updateGistSyncStatus("Connected to GitHub Gist sync.");
     render();
   } catch (error) {
     activateLocalStorageMode({ render: false });
-    updateGistSyncStatus(error.message || "Could not connect to gist.", true);
+    updateGistSyncStatus(
+      error.message || "Could not connect to GitHub Gist.",
+      true,
+    );
   } finally {
     if (gistConnectBtn) {
       gistConnectBtn.disabled = false;
@@ -400,9 +403,9 @@ async function onImportCollectionFileSelected(input) {
       message += ` ${result.unmatchedCount} row(s) could not be matched.`;
     }
     if (isGistStorageActive() && !result.syncedToGist) {
-      message += " Gist sync is unavailable.";
+      message += " GitHub Gist sync is unavailable.";
     } else if (result.syncedToGist) {
-      message += " Synced to gist.";
+      message += " Synced to GitHub Gist.";
     }
     updateImportCollectionStatus(message, false);
     render();

@@ -208,12 +208,12 @@ function refreshGistSyncStatus() {
     return;
   }
   if (isGistStorageActive()) {
-    gistSyncStatus.textContent = "Syncing to your private gist.";
+    gistSyncStatus.textContent = "Syncing with your private GitHub Gist.";
     gistSyncStatus.classList.remove("settings-gist-status--error");
     return;
   }
   gistSyncStatus.textContent =
-    "Paste a GitHub token and click Connect to enable gist sync.";
+    "Paste a GitHub token and click Connect.";
   gistSyncStatus.classList.remove("settings-gist-status--error");
 }
 
@@ -1691,7 +1691,7 @@ function scheduleGistPush() {
     gistPushTimer = null;
     try {
       await pushGistState(config, buildStateForPersistence());
-      updateGistSyncStatus("Synced to gist.");
+      updateGistSyncStatus("Synced to GitHub Gist.");
     } catch (error) {
       updateGistSyncStatus(error.message || "Gist sync failed.", true);
     }
@@ -1858,7 +1858,7 @@ async function importCollectionFromCsvText(csvText) {
     const config = readGistSyncConfig();
     await pushGistState(config, buildStateForPersistence());
     syncedToGist = true;
-    updateGistSyncStatus("Synced to gist.");
+      updateGistSyncStatus("Synced to GitHub Gist.");
   }
 
   return {
@@ -3095,11 +3095,14 @@ async function onGistConnectClick() {
     gistConnectBtn.disabled = true;
     await connectGistSync(gistTokenInput.value);
     gistTokenInput.value = "";
-    updateGistSyncStatus("Connected to gist sync.");
+    updateGistSyncStatus("Connected to GitHub Gist sync.");
     render();
   } catch (error) {
     activateLocalStorageMode({ render: false });
-    updateGistSyncStatus(error.message || "Could not connect to gist.", true);
+    updateGistSyncStatus(
+      error.message || "Could not connect to GitHub Gist.",
+      true,
+    );
   } finally {
     if (gistConnectBtn) {
       gistConnectBtn.disabled = false;
@@ -3169,9 +3172,9 @@ async function onImportCollectionFileSelected(input) {
       message += ` ${result.unmatchedCount} row(s) could not be matched.`;
     }
     if (isGistStorageActive() && !result.syncedToGist) {
-      message += " Gist sync is unavailable.";
+      message += " GitHub Gist sync is unavailable.";
     } else if (result.syncedToGist) {
-      message += " Synced to gist.";
+      message += " Synced to GitHub Gist.";
     }
     updateImportCollectionStatus(message, false);
     render();

@@ -241,6 +241,10 @@
   display: none;
 }
 
+.settings-gist-intro {
+  margin: 0;
+}
+
 .settings-gist-warning {
   padding: 0.55rem 0.65rem;
   border: 1px solid rgba(240, 120, 120, 0.45);

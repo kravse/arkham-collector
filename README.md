@@ -13,7 +13,7 @@ A visual catalog for collectors and readers of [Arkham House](https://en.wikiped
 | **Search & sort** | Search the grid; **list/grid toggle** beside search (saved in browser); **Sort** (oldest/newest/title) everywhere. Same-year tiebreaks from `book-order.js`; maintainers set those with **Reorder** on `npm run serve` only |
 | **Filters** | Collection, want list, Mycroft & Moran imprint, decade |
 | **Book detail** | Cover, description, cover artist, **W** / **G** links, **Collect** (Ordered → Collection), and want toggles |
-| **Your data** | Stored in the browser (`arkham-user-state` v2; older keys migrate automatically). Default is local-only; optional **Store Collection in gist** syncs full state to a private GitHub gist using a throwaway bot account PAT (`arkham-gist-sync`) |
+| **Your data** | Stored in the browser (`arkham-user-state` v2; older keys migrate automatically). Default is **This device only**; optional **Sync with GitHub Gist** saves full state to a private GitHub Gist using a throwaway bot account PAT (`arkham-gist-sync`) |
 | **Export** | Download your collection as CSV (ordered and collected titles; same rows, no order status column). **Import collection CSV** replaces collected titles for the active storage mode only and clears on-order titles for that mode; your want list is unchanged |
 
 ### Screenshots
@@ -35,17 +35,17 @@ A visual catalog for collectors and readers of [Arkham House](https://en.wikiped
 1. Open a card → **Collect** to mark a copy you own (tap again to remove).
 2. Toggle **want** on titles you are hunting.
 3. Filter with **COLLECTION** or **WANT** in the header. If you have on-order titles, **COLLECTION** cycles: all books → your collection → on-order only → all books.
-4. **Gear** (bottom bar): choose **Store Collection Locally** (default) or **Store Collection in gist**. Gist mode only activates after a successful **Connect**; until then you stay on local storage. Connecting loads existing gist data if present, or creates an empty gist. **Clear** or closing settings without a working token returns you to local mode. To move local data to gist, export CSV locally then import after connecting.
-5. **Import collection CSV** / **Export collection CSV** (gear → Settings): import replaces collected titles for the **active storage mode only** (local and gist keep separate collections), clears on-order titles for that mode, and leaves your want list alone. Works in local mode or gist mode (gist upload happens immediately when connected).
+4. **Gear** (bottom bar): under **Collection storage**, choose **This device only** (default) or **Sync with GitHub Gist**. GitHub Gist sync only activates after a successful **Connect**; until then you stay on this device. Connecting loads existing Gist data if present, or creates an empty Gist. **Clear** or closing settings without a working token returns you to this device only. To move local data to GitHub Gist, export CSV locally then import after connecting.
+5. **Import collection CSV** / **Export collection CSV** (gear → Settings): import replaces collected titles for the **active storage option only** (this device and GitHub Gist keep separate collections), clears on-order titles for that option, and leaves your want list alone. Works on this device or with GitHub Gist sync (Gist upload happens immediately when connected).
 
 ### Browser storage keys
 
 | Key | Contents |
 |-----|----------|
 | `arkham-user-state` | Unified v2 state: collection ids, want list, ordered titles, display preferences, and `storageMode` (`local` or `gist`). Older per-key entries migrate on first load. |
-| `arkham-gist-sync` | Gist credentials only (`token`, `gistId`) when gist mode is connected—not included in the synced gist file. |
+| `arkham-gist-sync` | GitHub Gist credentials only (`token`, `gistId`) when GitHub Gist sync is connected—not included in the synced Gist file. |
 
-**Gist sync security:** The PAT is stored in your browser’s `localStorage`. Use a throwaway GitHub account and a fine-grained PAT limited to gist read/write. Local mode never sends data to GitHub.
+**Gist sync security:** The PAT is stored in your browser’s `localStorage`. Use a throwaway GitHub account and a fine-grained PAT limited to gist read/write. This device only never sends data to GitHub.
 
 ## Run it locally
 

@@ -278,7 +278,7 @@ function scheduleGistPush() {
     gistPushTimer = null;
     try {
       await pushGistState(config, buildStateForPersistence());
-      updateGistSyncStatus("Synced to gist.");
+      updateGistSyncStatus("Synced to GitHub Gist.");
     } catch (error) {
       updateGistSyncStatus(error.message || "Gist sync failed.", true);
     }
@@ -445,7 +445,7 @@ async function importCollectionFromCsvText(csvText) {
     const config = readGistSyncConfig();
     await pushGistState(config, buildStateForPersistence());
     syncedToGist = true;
-    updateGistSyncStatus("Synced to gist.");
+      updateGistSyncStatus("Synced to GitHub Gist.");
   }
 
   return {
