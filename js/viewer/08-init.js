@@ -142,7 +142,7 @@ if (resetSampleConfirmBtn) {
 if (highlightWantsInput) {
   highlightWantsInput.addEventListener("change", () => {
     highlightWants = highlightWantsInput.checked;
-    saveHighlightWantsPreference();
+    saveUserState();
     render();
   });
 }
@@ -150,7 +150,7 @@ if (highlightWantsInput) {
 if (highlightCollectionInput) {
   highlightCollectionInput.addEventListener("change", () => {
     highlightCollection = highlightCollectionInput.checked;
-    saveHighlightCollectionPreference();
+    saveUserState();
     render();
   });
 }
@@ -158,7 +158,7 @@ if (highlightCollectionInput) {
 if (showMagazinesInput) {
   showMagazinesInput.addEventListener("change", () => {
     showMagazines = showMagazinesInput.checked;
-    saveShowMagazinesPreference();
+    saveUserState();
     render();
   });
 }
@@ -298,24 +298,14 @@ showHiddenInput.addEventListener("change", () => {
   render();
 });
 
-loadWantList();
-restoreCollectionSourcePreference();
-restoreHighlightPreferences();
-restoreShowMagazinesPreference();
+loadUserState();
 syncSettingsCollectionRadios();
-loadOrderedCollectionIds();
-loadOwnCollectionIds();
-loadHeaderFiltersPreference();
-updateHeaderFiltersState();
-loadViewModePreference();
-updateViewModeState();
-restoreSortPreference();
 updateSortControlVisibility();
 
 if (headerFiltersToggle) {
   headerFiltersToggle.addEventListener("click", () => {
     headerFiltersExpanded = !headerFiltersExpanded;
-    saveHeaderFiltersPreference();
+    saveUserState();
     updateHeaderFiltersState();
   });
 }
@@ -323,7 +313,7 @@ if (headerFiltersToggle) {
 if (viewModeToggle) {
   viewModeToggle.addEventListener("click", () => {
     gridViewMode = gridViewMode === "list" ? "cards" : "list";
-    saveViewModePreference();
+    saveUserState();
     updateViewModeState();
   });
 }

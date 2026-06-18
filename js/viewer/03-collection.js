@@ -1,6 +1,115 @@
-/* Sample and own collection, want list, localStorage */
+/* Sample and own collection, want list, unified user state */
 
 const DEFAULT_COLLECTION_CSV = "my_collection/my_collection.csv";
+
+let sampleCollectionSeeded = true;
+
+function readLegacyStorageSnapshot() {
+  const snapshot = {};
+  try {
+    for (const key of Object.values(viewerUserState.LEGACY_KEYS)) {
+      snapshot[key] = localStorage.getItem(key);
+    }
+  } catch (_) {
+    // localStorage unavailable
+  }
+  return snapshot;
+}
+
+function persistUserState(state) {
+  try {
+    localStorage.setItem(
+      viewerUserState.USER_STATE_KEY,
+      viewerUserState.serializeUserState(state),
+    );
+  } catch (_) {
+    // localStorage unavailable
+  }
+}
+
+function collectRuntimeSnapshot() {
+  return {
+    collectionSource,
+    ownCollectionIds: [...ownCollectionIds],
+    sampleCollectionIds: sampleCollectionSeeded
+      ? [...sampleCollectionIds]
+      : null,
+    orderedIds: [...orderedIds],
+    wantIds: [...wantIds],
+    sort: sortSelect.value,
+    viewMode: gridViewMode,
+    headerFiltersExpanded,
+    highlightWants,
+    highlightCollection,
+    showMagazines,
+  };
+}
+
+function applyRuntimeSnapshot(runtime) {
+  wantIds = new Set(runtime.wantIds);
+  ownCollectionIds = new Set(runtime.ownCollectionIds);
+  orderedIds = new Set(runtime.orderedIds);
+  if (runtime.sampleCollectionIds === null) {
+    sampleCollectionSeeded = false;
+    sampleCollectionIds = new Set();
+  } else {
+    sampleCollectionSeeded = true;
+    sampleCollectionIds = new Set(runtime.sampleCollectionIds);
+  }
+  gridViewMode = runtime.viewMode;
+  headerFiltersExpanded = runtime.headerFiltersExpanded;
+  highlightWants = runtime.highlightWants;
+  highlightCollection = runtime.highlightCollection;
+  showMagazines = runtime.showMagazines;
+  if (sortSelect && runtime.sort) {
+    sortSelect.value = runtime.sort;
+  }
+}
+
+function applyCollectionSourcePreference() {
+  const saved =
+    collectionSource === "own" || collectionSource === "sample"
+      ? collectionSource
+      : null;
+  collectionSource = viewerCollectionSource.resolveCollectionSourceOnLoad({
+    saved,
+    defaultSource: defaultCollectionSource(),
+    sampleUrlOverride: viewerCollectionSource.parseSampleUrlOverride(
+      window.location.search,
+    ),
+  });
+}
+
+function loadUserState() {
+  let state = null;
+  try {
+    const saved = localStorage.getItem(viewerUserState.USER_STATE_KEY);
+    state = viewerUserState.parseUserState(saved);
+    if (!state) {
+      state = viewerUserState.migrateFromLegacy(readLegacyStorageSnapshot());
+      persistUserState(state);
+    }
+  } catch (_) {
+    state = viewerUserState.defaultUserState();
+  }
+
+  const runtime = viewerUserState.applyUserStateToRuntime(state);
+  applyRuntimeSnapshot(runtime);
+  collectionSource =
+    runtime.collectionSource === "own" || runtime.collectionSource === "sample"
+      ? runtime.collectionSource
+      : defaultCollectionSource();
+  applyCollectionSourcePreference();
+  syncSettingsHighlightCheckboxes();
+  updateHeaderFiltersState();
+  updateViewModeState();
+}
+
+function saveUserState() {
+  persistUserState(
+    viewerUserState.buildUserStateFromRuntime(collectRuntimeSnapshot()),
+  );
+}
 
 async function loadCollectionCsvItems(options = {}) {
   const forceCsv = options.forceCsv === true;
@@ -37,73 +146,13 @@ async function buildSampleIdsFromCsv(options = {}) {
 }
 
 async function ensureSampleCollectionIds() {
-  try {
-    const saved = localStorage.getItem(SAMPLE_COLLECTION_STORAGE_KEY);
-    if (saved !== null) {
-      const parsed = JSON.parse(saved);
-      if (Array.isArray(parsed)) {
-        sampleCollectionIds = new Set(
-          parsed
-            .map((id) => Number(id))
-            .filter((id) => Number.isFinite(id)),
-        );
-        return;
-      }
-    }
-  } catch (_) {
-    // localStorage unavailable or invalid JSON
+  if (sampleCollectionSeeded) {
+    return;
   }
 
   sampleCollectionIds = await buildSampleIdsFromCsv();
-  saveSampleCollectionIds();
-}
-
-function restoreSortPreference() {
-  try {
-    const saved = localStorage.getItem(SORT_STORAGE_KEY);
-    const legacy = { default: "date-asc", title: "title-asc" };
-    const mode =
-      saved && SORT_MODES.has(saved)
-        ? saved
-        : saved && legacy[saved]
-          ? legacy[saved]
-          : null;
-    if (mode) {
-      sortSelect.value = mode;
-    }
-  } catch (_) {
-    // localStorage unavailable
-  }
-}
-
-function saveSortPreference() {
-  try {
-    localStorage.setItem(SORT_STORAGE_KEY, sortSelect.value);
-  } catch (_) {
-    // localStorage unavailable
-  }
-}
-
-function loadHeaderFiltersPreference() {
-  try {
-    const saved = localStorage.getItem(HEADER_FILTERS_STORAGE_KEY);
-    if (saved === "0") {
-      headerFiltersExpanded = false;
-    }
-  } catch (_) {
-    // localStorage unavailable
-  }
-}
-
-function saveHeaderFiltersPreference() {
-  try {
-    localStorage.setItem(
-      HEADER_FILTERS_STORAGE_KEY,
-      headerFiltersExpanded ? "1" : "0",
-    );
-  } catch (_) {
-    // localStorage unavailable
-  }
+  sampleCollectionSeeded = true;
+  saveUserState();
 }
 
 function updateHeaderFiltersState() {
@@ -126,25 +175,6 @@ function updateHeaderFiltersState() {
   );
 }
 
-function loadViewModePreference() {
-  try {
-    const saved = localStorage.getItem(VIEW_MODE_STORAGE_KEY);
-    if (saved === "list") {
-      gridViewMode = "list";
-    }
-  } catch (_) {
-    // localStorage unavailable
-  }
-}
-
-function saveViewModePreference() {
-  try {
-    localStorage.setItem(VIEW_MODE_STORAGE_KEY, gridViewMode);
-  } catch (_) {
-    // localStorage unavailable
-  }
-}
-
 function updateViewModeState() {
   document.body.classList.toggle("view-mode-list", gridViewMode === "list");
   if (!viewModeToggle) {
@@ -156,118 +186,6 @@ function updateViewModeState() {
     "aria-label",
     listMode ? "Switch to grid view" : "Switch to list view",
   );
-}
-
-function loadWantList() {
-  try {
-    const saved = localStorage.getItem(WANT_STORAGE_KEY);
-    if (!saved) {
-      wantIds = new Set();
-      return;
-    }
-    const parsed = JSON.parse(saved);
-    if (!Array.isArray(parsed)) {
-      wantIds = new Set();
-      return;
-    }
-    wantIds = new Set(
-      parsed.map((id) => Number(id)).filter((id) => Number.isFinite(id)),
-    );
-  } catch (_) {
-    wantIds = new Set();
-  }
-}
-
-function saveWantList() {
-  try {
-    localStorage.setItem(
-      WANT_STORAGE_KEY,
-      JSON.stringify([...wantIds].sort((a, b) => a - b)),
-    );
-  } catch (_) {
-    // localStorage unavailable
-  }
-}
-
-function loadOrderedCollectionIds() {
-  try {
-    const saved = localStorage.getItem(ORDERED_STORAGE_KEY);
-    if (!saved) {
-      orderedIds = new Set();
-      return;
-    }
-    const parsed = JSON.parse(saved);
-    if (!Array.isArray(parsed)) {
-      orderedIds = new Set();
-      return;
-    }
-    orderedIds = new Set(
-      parsed.map((id) => Number(id)).filter((id) => Number.isFinite(id)),
-    );
-  } catch (_) {
-    orderedIds = new Set();
-  }
-}
-
-function saveOrderedCollectionIds() {
-  try {
-    localStorage.setItem(
-      ORDERED_STORAGE_KEY,
-      JSON.stringify([...orderedIds].sort((a, b) => a - b)),
-    );
-  } catch (_) {
-    // localStorage unavailable
-  }
-}
-
-function loadOwnCollectionIds() {
-  try {
-    const saved = localStorage.getItem(COLLECTION_STORAGE_KEY);
-    if (!saved) {
-      ownCollectionIds = new Set();
-      return;
-    }
-    const parsed = JSON.parse(saved);
-    if (!Array.isArray(parsed)) {
-      ownCollectionIds = new Set();
-      return;
-    }
-    ownCollectionIds = new Set(
-      parsed.map((id) => Number(id)).filter((id) => Number.isFinite(id)),
-    );
-  } catch (_) {
-    ownCollectionIds = new Set();
-  }
-}
-
-function saveOwnCollectionIds() {
-  try {
-    localStorage.setItem(
-      COLLECTION_STORAGE_KEY,
-      JSON.stringify([...ownCollectionIds].sort((a, b) => a - b)),
-    );
-  } catch (_) {
-    // localStorage unavailable
-  }
-}
-
-function saveSampleCollectionIds() {
-  try {
-    localStorage.setItem(
-      SAMPLE_COLLECTION_STORAGE_KEY,
-      JSON.stringify([...sampleCollectionIds].sort((a, b) => a - b)),
-    );
-  } catch (_) {
-    // localStorage unavailable
-  }
-}
-
-function saveActiveCollectionIds() {
-  if (useOwnCollection()) {
-    saveOwnCollectionIds();
-  } else {
-    saveSampleCollectionIds();
-  }
 }
 
 function isWanted(book) {
@@ -283,20 +201,14 @@ function toggleWant(bookId) {
     wantIds.delete(id);
   } else {
     wantIds.add(id);
-    let collectionChanged = false;
     if (activeCollectionIds().has(id)) {
       activeCollectionIds().delete(id);
-      collectionChanged = true;
     }
     if (orderedIds.has(id)) {
       orderedIds.delete(id);
-      saveOrderedCollectionIds();
-    }
-    if (collectionChanged) {
-      saveActiveCollectionIds();
     }
   }
-  saveWantList();
+  saveUserState();
   render();
   if (!bookDetailDialog.hidden) {
     openBookDetail(detailBookId, { historyMode: "none" });
@@ -312,20 +224,15 @@ function toggleCollection(bookId) {
   if (isCollected({ id })) {
     activeCollectionIds().delete(id);
     orderedIds.delete(id);
-    saveActiveCollectionIds();
-    saveOrderedCollectionIds();
   } else if (isOrdered({ id })) {
     orderedIds.delete(id);
     activeCollectionIds().add(id);
-    saveOrderedCollectionIds();
-    saveActiveCollectionIds();
   } else {
     orderedIds.add(id);
     wantIds.delete(id);
-    saveOrderedCollectionIds();
-    saveWantList();
   }
 
+  saveUserState();
   render();
   if (!bookDetailDialog.hidden) {
     openBookDetail(detailBookId, { historyMode: "none" });

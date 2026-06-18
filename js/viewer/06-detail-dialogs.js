@@ -301,7 +301,7 @@ async function onCollectionSourceChange(next) {
     return;
   }
   collectionSource = next;
-  saveCollectionSourcePreference();
+  saveUserState();
   syncSettingsCollectionRadios();
   render();
   if (!bookDetailDialog.hidden && detailBookId) {
@@ -351,25 +351,14 @@ function exportCollectionCsv() {
 }
 
 async function resetSampleCollection() {
-  try {
-    localStorage.removeItem(SAMPLE_COLLECTION_STORAGE_KEY);
-  } catch (_) {
-    // localStorage unavailable
-  }
-
   sampleCollectionIds = await buildSampleIdsFromCsv({
     forceCsv: Boolean(window.SAMPLE_COLLECTION_CSV),
   });
-  let wantChanged = false;
+  sampleCollectionSeeded = true;
   for (const id of sampleCollectionIds) {
-    if (wantIds.delete(id)) {
-      wantChanged = true;
-    }
+    wantIds.delete(id);
   }
-  if (wantChanged) {
-    saveWantList();
-  }
-  saveSampleCollectionIds();
+  saveUserState();
   hideResetSampleConfirm();
   render();
   if (!bookDetailDialog.hidden && detailBookId) {

@@ -13,7 +13,7 @@ A visual catalog for collectors and readers of [Arkham House](https://en.wikiped
 | **Search & sort** | Search the grid; **list/grid toggle** beside search (saved in browser); **Sort** (oldest/newest/title) everywhere. Same-year tiebreaks from `book-order.js`; maintainers set those with **Reorder** on `npm run serve` only |
 | **Filters** | Collection, want list, Mycroft & Moran imprint, decade |
 | **Book detail** | Cover, description, cover artist, **W** / **G** links, **Collect** (Ordered → Collection), and want toggles |
-| **Your data** | Stored in `localStorage` on your device only—nothing uploaded |
+| **Your data** | Stored in `localStorage` on your device only (`arkham-user-state`; older per-key entries migrate automatically)—nothing uploaded |
 | **Export** | Download your collection as CSV (ordered and collected titles; same rows, no order status column) |
 
 ### Screenshots

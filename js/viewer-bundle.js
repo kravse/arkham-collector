@@ -93,17 +93,6 @@ const headerFiltersToggle = document.getElementById("header-filters-toggle");
 const readOnly = window.READ_ONLY === true;
 const LOGO_ARKHAM = "images/arkham-house.jpg";
 const LOGO_MYCROFT = "images/Mycroft_moran.png";
-const SORT_STORAGE_KEY = "arkham-sort";
-const WANT_STORAGE_KEY = "arkham-want-list";
-const COLLECTION_STORAGE_KEY = "arkham-collection";
-const ORDERED_STORAGE_KEY = "arkham-collection-ordered";
-const SAMPLE_COLLECTION_STORAGE_KEY = "arkham-sample-collection";
-const COLLECTION_SOURCE_KEY = "arkham-collection-source";
-const HEADER_FILTERS_STORAGE_KEY = "arkham-header-filters-expanded";
-const VIEW_MODE_STORAGE_KEY = "arkham-view-mode";
-const HIGHLIGHT_WANTS_KEY = "arkham-highlight-wants";
-const HIGHLIGHT_COLLECTION_KEY = "arkham-highlight-collection";
-const SHOW_MAGAZINES_KEY = "arkham-show-magazines";
 const SORT_MODES = new Set([
   "date-desc",
   "date-asc",
@@ -170,30 +159,6 @@ function defaultCollectionSource() {
   return readOnly ? "own" : "sample";
 }
 
-function restoreCollectionSourcePreference() {
-  let saved = null;
-  try {
-    saved = localStorage.getItem(COLLECTION_SOURCE_KEY);
-  } catch (_) {
-    // localStorage unavailable
-  }
-  collectionSource = viewerCollectionSource.resolveCollectionSourceOnLoad({
-    saved,
-    defaultSource: defaultCollectionSource(),
-    sampleUrlOverride: viewerCollectionSource.parseSampleUrlOverride(
-      window.location.search,
-    ),
-  });
-}
-
-function saveCollectionSourcePreference() {
-  try {
-    localStorage.setItem(COLLECTION_SOURCE_KEY, collectionSource);
-  } catch (_) {
-    // localStorage unavailable
-  }
-}
-
 function syncSettingsCollectionHint() {
   const inConfirm =
     resetSampleConfirmPanel && !resetSampleConfirmPanel.hidden;
@@ -208,66 +173,6 @@ function syncSettingsCollectionHint() {
   }
   if (settingsCollectionHintOwn) {
     settingsCollectionHintOwn.hidden = showSampleHint;
-  }
-}
-
-function restoreHighlightPreferences() {
-  try {
-    const savedWants = localStorage.getItem(HIGHLIGHT_WANTS_KEY);
-    if (savedWants === "0") {
-      highlightWants = false;
-    } else if (savedWants === "1") {
-      highlightWants = true;
-    }
-
-    const savedCollection = localStorage.getItem(HIGHLIGHT_COLLECTION_KEY);
-    if (savedCollection === "0") {
-      highlightCollection = false;
-    } else if (savedCollection === "1") {
-      highlightCollection = true;
-    }
-  } catch (_) {
-    // localStorage unavailable
-  }
-}
-
-function saveHighlightWantsPreference() {
-  try {
-    localStorage.setItem(HIGHLIGHT_WANTS_KEY, highlightWants ? "1" : "0");
-  } catch (_) {
-    // localStorage unavailable
-  }
-}
-
-function saveHighlightCollectionPreference() {
-  try {
-    localStorage.setItem(
-      HIGHLIGHT_COLLECTION_KEY,
-      highlightCollection ? "1" : "0",
-    );
-  } catch (_) {
-    // localStorage unavailable
-  }
-}
-
-function restoreShowMagazinesPreference() {
-  try {
-    const saved = localStorage.getItem(SHOW_MAGAZINES_KEY);
-    if (saved === "0") {
-      showMagazines = false;
-    } else if (saved === "1") {
-      showMagazines = true;
-    }
-  } catch (_) {
-    // localStorage unavailable
-  }
-}
-
-function saveShowMagazinesPreference() {
-  try {
-    localStorage.setItem(SHOW_MAGAZINES_KEY, showMagazines ? "1" : "0");
-  } catch (_) {
-    // localStorage unavailable
   }
 }
 
@@ -357,6 +262,284 @@ const viewerCollectionSource = (function () {
   return {
     parseSampleUrlOverride,
     resolveCollectionSourceOnLoad,
+  };
+})();
+
+
+/* Generated from scripts/lib/viewer-user-state.js — run npm run bundle-viewer */
+
+const viewerUserState = (function () {
+  const USER_STATE_KEY = "arkham-user-state";
+  const USER_STATE_VERSION = 1;
+  
+  const LEGACY_KEYS = {
+    collection: "arkham-collection",
+    sampleCollection: "arkham-sample-collection",
+    ordered: "arkham-collection-ordered",
+    want: "arkham-want-list",
+    collectionSource: "arkham-collection-source",
+    sort: "arkham-sort",
+    viewMode: "arkham-view-mode",
+    headerFiltersExpanded: "arkham-header-filters-expanded",
+    highlightWants: "arkham-highlight-wants",
+    highlightCollection: "arkham-highlight-collection",
+    showMagazines: "arkham-show-magazines",
+  };
+  
+  const SORT_MODES = new Set([
+    "date-desc",
+    "date-asc",
+    "title-asc",
+    "title-desc",
+  ]);
+  
+  const SORT_LEGACY = { default: "date-asc", title: "title-asc" };
+  
+  function defaultUserState() {
+    return {
+      version: USER_STATE_VERSION,
+      updatedAt: null,
+      collectionSource: "sample",
+      ownCollectionIds: [],
+      sampleCollectionIds: null,
+      orderedIds: [],
+      wantIds: [],
+      preferences: {
+        sort: "date-asc",
+        viewMode: "cards",
+        headerFiltersExpanded: true,
+        highlightWants: true,
+        highlightCollection: true,
+        showMagazines: false,
+      },
+    };
+  }
+  
+  function normalizeIdArray(raw) {
+    if (raw == null || raw === "") {
+      return [];
+    }
+    try {
+      const parsed = typeof raw === "string" ? JSON.parse(raw) : raw;
+      if (!Array.isArray(parsed)) {
+        return [];
+      }
+      const ids = [
+        ...new Set(
+          parsed
+            .filter((id) => id != null && id !== "")
+            .map((id) => Number(id))
+            .filter((id) => Number.isFinite(id) && Number.isInteger(id)),
+        ),
+      ];
+      ids.sort((a, b) => a - b);
+      return ids;
+    } catch (_) {
+      return [];
+    }
+  }
+  
+  function normalizeSort(raw, fallback = "date-asc") {
+    if (raw && SORT_MODES.has(raw)) {
+      return raw;
+    }
+    if (raw && SORT_LEGACY[raw]) {
+      return SORT_LEGACY[raw];
+    }
+    return fallback;
+  }
+  
+  function normalizeBoolFlag(raw, defaultVal) {
+    if (raw === "0") {
+      return false;
+    }
+    if (raw === "1") {
+      return true;
+    }
+    return defaultVal;
+  }
+  
+  function normalizeCollectionSource(raw) {
+    if (raw === "own" || raw === "sample") {
+      return raw;
+    }
+    return null;
+  }
+  
+  function normalizeViewMode(raw, fallback = "cards") {
+    if (raw === "list") {
+      return "list";
+    }
+    return fallback;
+  }
+  
+  function migrateFromLegacy(legacy) {
+    const base = defaultUserState();
+    const snapshot = legacy || {};
+  
+    const sampleRaw = snapshot[LEGACY_KEYS.sampleCollection];
+    let sampleCollectionIds = null;
+    if (sampleRaw !== null && sampleRaw !== undefined) {
+      sampleCollectionIds = normalizeIdArray(sampleRaw);
+    }
+  
+    return {
+      version: USER_STATE_VERSION,
+      updatedAt: null,
+      collectionSource: normalizeCollectionSource(
+        snapshot[LEGACY_KEYS.collectionSource],
+      ),
+      ownCollectionIds: normalizeIdArray(snapshot[LEGACY_KEYS.collection]),
+      sampleCollectionIds,
+      orderedIds: normalizeIdArray(snapshot[LEGACY_KEYS.ordered]),
+      wantIds: normalizeIdArray(snapshot[LEGACY_KEYS.want]),
+      preferences: {
+        sort: normalizeSort(
+          snapshot[LEGACY_KEYS.sort],
+          base.preferences.sort,
+        ),
+        viewMode: normalizeViewMode(
+          snapshot[LEGACY_KEYS.viewMode],
+          base.preferences.viewMode,
+        ),
+        headerFiltersExpanded: normalizeBoolFlag(
+          snapshot[LEGACY_KEYS.headerFiltersExpanded],
+          base.preferences.headerFiltersExpanded,
+        ),
+        highlightWants: normalizeBoolFlag(
+          snapshot[LEGACY_KEYS.highlightWants],
+          base.preferences.highlightWants,
+        ),
+        highlightCollection: normalizeBoolFlag(
+          snapshot[LEGACY_KEYS.highlightCollection],
+          base.preferences.highlightCollection,
+        ),
+        showMagazines: normalizeBoolFlag(
+          snapshot[LEGACY_KEYS.showMagazines],
+          base.preferences.showMagazines,
+        ),
+      },
+    };
+  }
+  
+  function parseUserState(json) {
+    if (json == null || json === "") {
+      return null;
+    }
+    try {
+      const parsed = typeof json === "string" ? JSON.parse(json) : json;
+      if (!parsed || parsed.version !== USER_STATE_VERSION) {
+        return null;
+      }
+  
+      const base = defaultUserState();
+      const sampleRaw = parsed.sampleCollectionIds;
+      let sampleCollectionIds = null;
+      if (sampleRaw !== null && sampleRaw !== undefined) {
+        sampleCollectionIds = normalizeIdArray(sampleRaw);
+      }
+  
+      return {
+        version: USER_STATE_VERSION,
+        updatedAt:
+          typeof parsed.updatedAt === "string" ? parsed.updatedAt : null,
+        collectionSource: normalizeCollectionSource(parsed.collectionSource),
+        ownCollectionIds: normalizeIdArray(parsed.ownCollectionIds),
+        sampleCollectionIds,
+        orderedIds: normalizeIdArray(parsed.orderedIds),
+        wantIds: normalizeIdArray(parsed.wantIds),
+        preferences: {
+          sort: normalizeSort(parsed.preferences?.sort, base.preferences.sort),
+          viewMode: normalizeViewMode(
+            parsed.preferences?.viewMode,
+            base.preferences.viewMode,
+          ),
+          headerFiltersExpanded:
+            typeof parsed.preferences?.headerFiltersExpanded === "boolean"
+              ? parsed.preferences.headerFiltersExpanded
+              : base.preferences.headerFiltersExpanded,
+          highlightWants:
+            typeof parsed.preferences?.highlightWants === "boolean"
+              ? parsed.preferences.highlightWants
+              : base.preferences.highlightWants,
+          highlightCollection:
+            typeof parsed.preferences?.highlightCollection === "boolean"
+              ? parsed.preferences.highlightCollection
+              : base.preferences.highlightCollection,
+          showMagazines:
+            typeof parsed.preferences?.showMagazines === "boolean"
+              ? parsed.preferences.showMagazines
+              : base.preferences.showMagazines,
+        },
+      };
+    } catch (_) {
+      return null;
+    }
+  }
+  
+  function buildUserStateFromRuntime(snapshot) {
+    const sampleIds = snapshot.sampleCollectionIds;
+    return {
+      version: USER_STATE_VERSION,
+      updatedAt: new Date().toISOString(),
+      collectionSource:
+        normalizeCollectionSource(snapshot.collectionSource) ?? "sample",
+      ownCollectionIds: normalizeIdArray(snapshot.ownCollectionIds),
+      sampleCollectionIds:
+        sampleIds === null || sampleIds === undefined
+          ? null
+          : normalizeIdArray(sampleIds),
+      orderedIds: normalizeIdArray(snapshot.orderedIds),
+      wantIds: normalizeIdArray(snapshot.wantIds),
+      preferences: {
+        sort: normalizeSort(snapshot.sort),
+        viewMode: normalizeViewMode(snapshot.viewMode),
+        headerFiltersExpanded: Boolean(snapshot.headerFiltersExpanded),
+        highlightWants: Boolean(snapshot.highlightWants),
+        highlightCollection: Boolean(snapshot.highlightCollection),
+        showMagazines: Boolean(snapshot.showMagazines),
+      },
+    };
+  }
+  
+  function applyUserStateToRuntime(state) {
+    let parsed = null;
+    if (state != null) {
+      parsed =
+        typeof state === "string" ? parseUserState(state) : parseUserState(state);
+    }
+    if (!parsed) {
+      parsed = migrateFromLegacy(null);
+    }
+    return {
+      collectionSource: parsed.collectionSource,
+      ownCollectionIds: parsed.ownCollectionIds,
+      sampleCollectionIds: parsed.sampleCollectionIds,
+      orderedIds: parsed.orderedIds,
+      wantIds: parsed.wantIds,
+      sort: parsed.preferences.sort,
+      viewMode: parsed.preferences.viewMode,
+      headerFiltersExpanded: parsed.preferences.headerFiltersExpanded,
+      highlightWants: parsed.preferences.highlightWants,
+      highlightCollection: parsed.preferences.highlightCollection,
+      showMagazines: parsed.preferences.showMagazines,
+    };
+  }
+  
+  function serializeUserState(state) {
+    return JSON.stringify(state);
+  }
+  return {
+    USER_STATE_KEY,
+    USER_STATE_VERSION,
+    LEGACY_KEYS,
+    defaultUserState,
+    normalizeIdArray,
+    migrateFromLegacy,
+    parseUserState,
+    buildUserStateFromRuntime,
+    applyUserStateToRuntime,
+    serializeUserState,
   };
 })();
 
@@ -913,9 +1096,118 @@ function countCollectionRowsCovered(books, includeHidden) {
 }
 
 
-/* Sample and own collection, want list, localStorage */
+/* Sample and own collection, want list, unified user state */
 
 const DEFAULT_COLLECTION_CSV = "my_collection/my_collection.csv";
+
+let sampleCollectionSeeded = true;
+
+function readLegacyStorageSnapshot() {
+  const snapshot = {};
+  try {
+    for (const key of Object.values(viewerUserState.LEGACY_KEYS)) {
+      snapshot[key] = localStorage.getItem(key);
+    }
+  } catch (_) {
+    // localStorage unavailable
+  }
+  return snapshot;
+}
+
+function persistUserState(state) {
+  try {
+    localStorage.setItem(
+      viewerUserState.USER_STATE_KEY,
+      viewerUserState.serializeUserState(state),
+    );
+  } catch (_) {
+    // localStorage unavailable
+  }
+}
+
+function collectRuntimeSnapshot() {
+  return {
+    collectionSource,
+    ownCollectionIds: [...ownCollectionIds],
+    sampleCollectionIds: sampleCollectionSeeded
+      ? [...sampleCollectionIds]
+      : null,
+    orderedIds: [...orderedIds],
+    wantIds: [...wantIds],
+    sort: sortSelect.value,
+    viewMode: gridViewMode,
+    headerFiltersExpanded,
+    highlightWants,
+    highlightCollection,
+    showMagazines,
+  };
+}
+
+function applyRuntimeSnapshot(runtime) {
+  wantIds = new Set(runtime.wantIds);
+  ownCollectionIds = new Set(runtime.ownCollectionIds);
+  orderedIds = new Set(runtime.orderedIds);
+  if (runtime.sampleCollectionIds === null) {
+    sampleCollectionSeeded = false;
+    sampleCollectionIds = new Set();
+  } else {
+    sampleCollectionSeeded = true;
+    sampleCollectionIds = new Set(runtime.sampleCollectionIds);
+  }
+  gridViewMode = runtime.viewMode;
+  headerFiltersExpanded = runtime.headerFiltersExpanded;
+  highlightWants = runtime.highlightWants;
+  highlightCollection = runtime.highlightCollection;
+  showMagazines = runtime.showMagazines;
+  if (sortSelect && runtime.sort) {
+    sortSelect.value = runtime.sort;
+  }
+}
+
+function applyCollectionSourcePreference() {
+  const saved =
+    collectionSource === "own" || collectionSource === "sample"
+      ? collectionSource
+      : null;
+  collectionSource = viewerCollectionSource.resolveCollectionSourceOnLoad({
+    saved,
+    defaultSource: defaultCollectionSource(),
+    sampleUrlOverride: viewerCollectionSource.parseSampleUrlOverride(
+      window.location.search,
+    ),
+  });
+}
+
+function loadUserState() {
+  let state = null;
+  try {
+    const saved = localStorage.getItem(viewerUserState.USER_STATE_KEY);
+    state = viewerUserState.parseUserState(saved);
+    if (!state) {
+      state = viewerUserState.migrateFromLegacy(readLegacyStorageSnapshot());
+      persistUserState(state);
+    }
+  } catch (_) {
+    state = viewerUserState.defaultUserState();
+  }
+
+  const runtime = viewerUserState.applyUserStateToRuntime(state);
+  applyRuntimeSnapshot(runtime);
+  collectionSource =
+    runtime.collectionSource === "own" || runtime.collectionSource === "sample"
+      ? runtime.collectionSource
+      : defaultCollectionSource();
+  applyCollectionSourcePreference();
+  syncSettingsHighlightCheckboxes();
+  updateHeaderFiltersState();
+  updateViewModeState();
+}
+
+function saveUserState() {
+  persistUserState(
+    viewerUserState.buildUserStateFromRuntime(collectRuntimeSnapshot()),
+  );
+}
 
 async function loadCollectionCsvItems(options = {}) {
   const forceCsv = options.forceCsv === true;
@@ -952,73 +1244,13 @@ async function buildSampleIdsFromCsv(options = {}) {
 }
 
 async function ensureSampleCollectionIds() {
-  try {
-    const saved = localStorage.getItem(SAMPLE_COLLECTION_STORAGE_KEY);
-    if (saved !== null) {
-      const parsed = JSON.parse(saved);
-      if (Array.isArray(parsed)) {
-        sampleCollectionIds = new Set(
-          parsed
-            .map((id) => Number(id))
-            .filter((id) => Number.isFinite(id)),
-        );
-        return;
-      }
-    }
-  } catch (_) {
-    // localStorage unavailable or invalid JSON
+  if (sampleCollectionSeeded) {
+    return;
   }
 
   sampleCollectionIds = await buildSampleIdsFromCsv();
-  saveSampleCollectionIds();
-}
-
-function restoreSortPreference() {
-  try {
-    const saved = localStorage.getItem(SORT_STORAGE_KEY);
-    const legacy = { default: "date-asc", title: "title-asc" };
-    const mode =
-      saved && SORT_MODES.has(saved)
-        ? saved
-        : saved && legacy[saved]
-          ? legacy[saved]
-          : null;
-    if (mode) {
-      sortSelect.value = mode;
-    }
-  } catch (_) {
-    // localStorage unavailable
-  }
-}
-
-function saveSortPreference() {
-  try {
-    localStorage.setItem(SORT_STORAGE_KEY, sortSelect.value);
-  } catch (_) {
-    // localStorage unavailable
-  }
-}
-
-function loadHeaderFiltersPreference() {
-  try {
-    const saved = localStorage.getItem(HEADER_FILTERS_STORAGE_KEY);
-    if (saved === "0") {
-      headerFiltersExpanded = false;
-    }
-  } catch (_) {
-    // localStorage unavailable
-  }
-}
-
-function saveHeaderFiltersPreference() {
-  try {
-    localStorage.setItem(
-      HEADER_FILTERS_STORAGE_KEY,
-      headerFiltersExpanded ? "1" : "0",
-    );
-  } catch (_) {
-    // localStorage unavailable
-  }
+  sampleCollectionSeeded = true;
+  saveUserState();
 }
 
 function updateHeaderFiltersState() {
@@ -1041,25 +1273,6 @@ function updateHeaderFiltersState() {
   );
 }
 
-function loadViewModePreference() {
-  try {
-    const saved = localStorage.getItem(VIEW_MODE_STORAGE_KEY);
-    if (saved === "list") {
-      gridViewMode = "list";
-    }
-  } catch (_) {
-    // localStorage unavailable
-  }
-}
-
-function saveViewModePreference() {
-  try {
-    localStorage.setItem(VIEW_MODE_STORAGE_KEY, gridViewMode);
-  } catch (_) {
-    // localStorage unavailable
-  }
-}
-
 function updateViewModeState() {
   document.body.classList.toggle("view-mode-list", gridViewMode === "list");
   if (!viewModeToggle) {
@@ -1071,118 +1284,6 @@ function updateViewModeState() {
     "aria-label",
     listMode ? "Switch to grid view" : "Switch to list view",
   );
-}
-
-function loadWantList() {
-  try {
-    const saved = localStorage.getItem(WANT_STORAGE_KEY);
-    if (!saved) {
-      wantIds = new Set();
-      return;
-    }
-    const parsed = JSON.parse(saved);
-    if (!Array.isArray(parsed)) {
-      wantIds = new Set();
-      return;
-    }
-    wantIds = new Set(
-      parsed.map((id) => Number(id)).filter((id) => Number.isFinite(id)),
-    );
-  } catch (_) {
-    wantIds = new Set();
-  }
-}
-
-function saveWantList() {
-  try {
-    localStorage.setItem(
-      WANT_STORAGE_KEY,
-      JSON.stringify([...wantIds].sort((a, b) => a - b)),
-    );
-  } catch (_) {
-    // localStorage unavailable
-  }
-}
-
-function loadOrderedCollectionIds() {
-  try {
-    const saved = localStorage.getItem(ORDERED_STORAGE_KEY);
-    if (!saved) {
-      orderedIds = new Set();
-      return;
-    }
-    const parsed = JSON.parse(saved);
-    if (!Array.isArray(parsed)) {
-      orderedIds = new Set();
-      return;
-    }
-    orderedIds = new Set(
-      parsed.map((id) => Number(id)).filter((id) => Number.isFinite(id)),
-    );
-  } catch (_) {
-    orderedIds = new Set();
-  }
-}
-
-function saveOrderedCollectionIds() {
-  try {
-    localStorage.setItem(
-      ORDERED_STORAGE_KEY,
-      JSON.stringify([...orderedIds].sort((a, b) => a - b)),
-    );
-  } catch (_) {
-    // localStorage unavailable
-  }
-}
-
-function loadOwnCollectionIds() {
-  try {
-    const saved = localStorage.getItem(COLLECTION_STORAGE_KEY);
-    if (!saved) {
-      ownCollectionIds = new Set();
-      return;
-    }
-    const parsed = JSON.parse(saved);
-    if (!Array.isArray(parsed)) {
-      ownCollectionIds = new Set();
-      return;
-    }
-    ownCollectionIds = new Set(
-      parsed.map((id) => Number(id)).filter((id) => Number.isFinite(id)),
-    );
-  } catch (_) {
-    ownCollectionIds = new Set();
-  }
-}
-
-function saveOwnCollectionIds() {
-  try {
-    localStorage.setItem(
-      COLLECTION_STORAGE_KEY,
-      JSON.stringify([...ownCollectionIds].sort((a, b) => a - b)),
-    );
-  } catch (_) {
-    // localStorage unavailable
-  }
-}
-
-function saveSampleCollectionIds() {
-  try {
-    localStorage.setItem(
-      SAMPLE_COLLECTION_STORAGE_KEY,
-      JSON.stringify([...sampleCollectionIds].sort((a, b) => a - b)),
-    );
-  } catch (_) {
-    // localStorage unavailable
-  }
-}
-
-function saveActiveCollectionIds() {
-  if (useOwnCollection()) {
-    saveOwnCollectionIds();
-  } else {
-    saveSampleCollectionIds();
-  }
 }
 
 function isWanted(book) {
@@ -1198,20 +1299,14 @@ function toggleWant(bookId) {
     wantIds.delete(id);
   } else {
     wantIds.add(id);
-    let collectionChanged = false;
     if (activeCollectionIds().has(id)) {
       activeCollectionIds().delete(id);
-      collectionChanged = true;
     }
     if (orderedIds.has(id)) {
       orderedIds.delete(id);
-      saveOrderedCollectionIds();
-    }
-    if (collectionChanged) {
-      saveActiveCollectionIds();
     }
   }
-  saveWantList();
+  saveUserState();
   render();
   if (!bookDetailDialog.hidden) {
     openBookDetail(detailBookId, { historyMode: "none" });
@@ -1227,20 +1322,15 @@ function toggleCollection(bookId) {
   if (isCollected({ id })) {
     activeCollectionIds().delete(id);
     orderedIds.delete(id);
-    saveActiveCollectionIds();
-    saveOrderedCollectionIds();
   } else if (isOrdered({ id })) {
     orderedIds.delete(id);
     activeCollectionIds().add(id);
-    saveOrderedCollectionIds();
-    saveActiveCollectionIds();
   } else {
     orderedIds.add(id);
     wantIds.delete(id);
-    saveOrderedCollectionIds();
-    saveWantList();
   }
 
+  saveUserState();
   render();
   if (!bookDetailDialog.hidden) {
     openBookDetail(detailBookId, { historyMode: "none" });
@@ -1373,7 +1463,7 @@ function getSortedActiveBooks() {
 
 function onSortChange() {
   invalidateSortedCache();
-  saveSortPreference();
+  saveUserState();
   render();
 }
 
@@ -2364,7 +2454,7 @@ async function onCollectionSourceChange(next) {
     return;
   }
   collectionSource = next;
-  saveCollectionSourcePreference();
+  saveUserState();
   syncSettingsCollectionRadios();
   render();
   if (!bookDetailDialog.hidden && detailBookId) {
@@ -2414,25 +2504,14 @@ function exportCollectionCsv() {
 }
 
 async function resetSampleCollection() {
-  try {
-    localStorage.removeItem(SAMPLE_COLLECTION_STORAGE_KEY);
-  } catch (_) {
-    // localStorage unavailable
-  }
-
   sampleCollectionIds = await buildSampleIdsFromCsv({
     forceCsv: Boolean(window.SAMPLE_COLLECTION_CSV),
   });
-  let wantChanged = false;
+  sampleCollectionSeeded = true;
   for (const id of sampleCollectionIds) {
-    if (wantIds.delete(id)) {
-      wantChanged = true;
-    }
+    wantIds.delete(id);
   }
-  if (wantChanged) {
-    saveWantList();
-  }
-  saveSampleCollectionIds();
+  saveUserState();
   hideResetSampleConfirm();
   render();
   if (!bookDetailDialog.hidden && detailBookId) {
@@ -3126,7 +3205,7 @@ if (resetSampleConfirmBtn) {
 if (highlightWantsInput) {
   highlightWantsInput.addEventListener("change", () => {
     highlightWants = highlightWantsInput.checked;
-    saveHighlightWantsPreference();
+    saveUserState();
     render();
   });
 }
@@ -3134,7 +3213,7 @@ if (highlightWantsInput) {
 if (highlightCollectionInput) {
   highlightCollectionInput.addEventListener("change", () => {
     highlightCollection = highlightCollectionInput.checked;
-    saveHighlightCollectionPreference();
+    saveUserState();
     render();
   });
 }
@@ -3142,7 +3221,7 @@ if (highlightCollectionInput) {
 if (showMagazinesInput) {
   showMagazinesInput.addEventListener("change", () => {
     showMagazines = showMagazinesInput.checked;
-    saveShowMagazinesPreference();
+    saveUserState();
     render();
   });
 }
@@ -3282,24 +3361,14 @@ showHiddenInput.addEventListener("change", () => {
   render();
 });
 
-loadWantList();
-restoreCollectionSourcePreference();
-restoreHighlightPreferences();
-restoreShowMagazinesPreference();
+loadUserState();
 syncSettingsCollectionRadios();
-loadOrderedCollectionIds();
-loadOwnCollectionIds();
-loadHeaderFiltersPreference();
-updateHeaderFiltersState();
-loadViewModePreference();
-updateViewModeState();
-restoreSortPreference();
 updateSortControlVisibility();
 
 if (headerFiltersToggle) {
   headerFiltersToggle.addEventListener("click", () => {
     headerFiltersExpanded = !headerFiltersExpanded;
-    saveHeaderFiltersPreference();
+    saveUserState();
     updateHeaderFiltersState();
   });
 }
@@ -3307,7 +3376,7 @@ if (headerFiltersToggle) {
 if (viewModeToggle) {
   viewModeToggle.addEventListener("click", () => {
     gridViewMode = gridViewMode === "list" ? "cards" : "list";
-    saveViewModePreference();
+    saveUserState();
     updateViewModeState();
   });
 }

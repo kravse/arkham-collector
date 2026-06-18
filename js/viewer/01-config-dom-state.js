@@ -93,17 +93,6 @@ const headerFiltersToggle = document.getElementById("header-filters-toggle");
 const readOnly = window.READ_ONLY === true;
 const LOGO_ARKHAM = "images/arkham-house.jpg";
 const LOGO_MYCROFT = "images/Mycroft_moran.png";
-const SORT_STORAGE_KEY = "arkham-sort";
-const WANT_STORAGE_KEY = "arkham-want-list";
-const COLLECTION_STORAGE_KEY = "arkham-collection";
-const ORDERED_STORAGE_KEY = "arkham-collection-ordered";
-const SAMPLE_COLLECTION_STORAGE_KEY = "arkham-sample-collection";
-const COLLECTION_SOURCE_KEY = "arkham-collection-source";
-const HEADER_FILTERS_STORAGE_KEY = "arkham-header-filters-expanded";
-const VIEW_MODE_STORAGE_KEY = "arkham-view-mode";
-const HIGHLIGHT_WANTS_KEY = "arkham-highlight-wants";
-const HIGHLIGHT_COLLECTION_KEY = "arkham-highlight-collection";
-const SHOW_MAGAZINES_KEY = "arkham-show-magazines";
 const SORT_MODES = new Set([
   "date-desc",
   "date-asc",
@@ -170,30 +159,6 @@ function defaultCollectionSource() {
   return readOnly ? "own" : "sample";
 }
 
-function restoreCollectionSourcePreference() {
-  let saved = null;
-  try {
-    saved = localStorage.getItem(COLLECTION_SOURCE_KEY);
-  } catch (_) {
-    // localStorage unavailable
-  }
-  collectionSource = viewerCollectionSource.resolveCollectionSourceOnLoad({
-    saved,
-    defaultSource: defaultCollectionSource(),
-    sampleUrlOverride: viewerCollectionSource.parseSampleUrlOverride(
-      window.location.search,
-    ),
-  });
-}
-
-function saveCollectionSourcePreference() {
-  try {
-    localStorage.setItem(COLLECTION_SOURCE_KEY, collectionSource);
-  } catch (_) {
-    // localStorage unavailable
-  }
-}
-
 function syncSettingsCollectionHint() {
   const inConfirm =
     resetSampleConfirmPanel && !resetSampleConfirmPanel.hidden;
@@ -208,66 +173,6 @@ function syncSettingsCollectionHint() {
   }
   if (settingsCollectionHintOwn) {
     settingsCollectionHintOwn.hidden = showSampleHint;
-  }
-}
-
-function restoreHighlightPreferences() {
-  try {
-    const savedWants = localStorage.getItem(HIGHLIGHT_WANTS_KEY);
-    if (savedWants === "0") {
-      highlightWants = false;
-    } else if (savedWants === "1") {
-      highlightWants = true;
-    }
-
-    const savedCollection = localStorage.getItem(HIGHLIGHT_COLLECTION_KEY);
-    if (savedCollection === "0") {
-      highlightCollection = false;
-    } else if (savedCollection === "1") {
-      highlightCollection = true;
-    }
-  } catch (_) {
-    // localStorage unavailable
-  }
-}
-
-function saveHighlightWantsPreference() {
-  try {
-    localStorage.setItem(HIGHLIGHT_WANTS_KEY, highlightWants ? "1" : "0");
-  } catch (_) {
-    // localStorage unavailable
-  }
-}
-
-function saveHighlightCollectionPreference() {
-  try {
-    localStorage.setItem(
-      HIGHLIGHT_COLLECTION_KEY,
-      highlightCollection ? "1" : "0",
-    );
-  } catch (_) {
-    // localStorage unavailable
-  }
-}
-
-function restoreShowMagazinesPreference() {
-  try {
-    const saved = localStorage.getItem(SHOW_MAGAZINES_KEY);
-    if (saved === "0") {
-      showMagazines = false;
-    } else if (saved === "1") {
-      showMagazines = true;
-    }
-  } catch (_) {
-    // localStorage unavailable
-  }
-}
-
-function saveShowMagazinesPreference() {
-  try {
-    localStorage.setItem(SHOW_MAGAZINES_KEY, showMagazines ? "1" : "0");
-  } catch (_) {
-    // localStorage unavailable
   }
 }
 

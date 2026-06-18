@@ -9,6 +9,7 @@ const { syncViewerSort } = require("./sync-viewer-sort");
 const { syncViewerFilters } = require("./sync-viewer-filters");
 const { syncViewerMode } = require("./sync-viewer-mode");
 const { syncViewerCollectionSource } = require("./sync-viewer-collection-source");
+const { syncViewerUserState } = require("./sync-viewer-user-state");
 
 const ROOT = path.join(__dirname, "..");
 const VIEWER_DIR = path.join(ROOT, "js", "viewer");
@@ -26,6 +27,11 @@ const PARTS = [
     file: "00-viewer-collection-source.js",
     title:
       "Collection source URL override (generated from scripts/lib/viewer-collection-source.js)",
+  },
+  {
+    file: "00-viewer-user-state.js",
+    title:
+      "Unified user state persistence (generated from scripts/lib/viewer-user-state.js)",
   },
   {
     file: "00-viewer-mode.js",
@@ -121,6 +127,7 @@ function bundleViewerJs() {
   syncViewerFilters();
   syncViewerMode();
   syncViewerCollectionSource();
+  syncViewerUserState();
   if (!fs.existsSync(BODY)) {
     const partials = PARTS.map((p) => path.join(VIEWER_DIR, p.file));
     if (partials.every((file) => fs.existsSync(file))) {

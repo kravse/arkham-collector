@@ -28,7 +28,7 @@ function getSortedActiveBooks() {
 
 function onSortChange() {
   invalidateSortedCache();
-  saveSortPreference();
+  saveUserState();
   render();
 }
 
