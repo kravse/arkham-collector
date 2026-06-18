@@ -2626,11 +2626,24 @@ function renderCard(book) {
   const wantBadge = renderCardWantBadge(book);
   const ownedBadge = renderOwnedBadge(book);
   const bottomRow = renderCardBottomRow(
-    imprintBadge,
+    gridViewMode === "list" ? "" : imprintBadge,
     wantBadge,
     "",
     ownedBadge,
   );
+  const listPrimaryHtml =
+    gridViewMode === "list"
+      ? `<div class="card-list-primary">
+          <h2 class="title">${book.title || "Untitled"}</h2>
+          <div class="card-list-meta">
+            ${book.publicationDate ? `<div class="date">${book.publicationDate}</div>` : ""}
+            ${imprintBadge}
+          </div>
+        </div>`
+      : `<div class="card-list-primary">
+          <h2 class="title">${book.title || "Untitled"}</h2>
+          ${book.publicationDate ? `<div class="date">${book.publicationDate}</div>` : ""}
+        </div>`;
 
   const hiddenBadge = book.hidden
     ? `<span class="hidden-badge">Hidden</span>`
@@ -2648,10 +2661,7 @@ function renderCard(book) {
     <div class="card-body">
       ${hiddenBadge}
       <div class="card-list-head">
-        <div class="card-list-primary">
-          <h2 class="title">${book.title || "Untitled"}</h2>
-          ${book.publicationDate ? `<div class="date">${book.publicationDate}</div>` : ""}
-        </div>
+        ${listPrimaryHtml}
       </div>
       ${renderBookMetaHtml(book)}
       ${bottomRow}
