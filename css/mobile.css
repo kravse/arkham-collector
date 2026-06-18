@@ -220,9 +220,12 @@
     padding-right: var(--list-right-rail-edit);
   }
 
-  body.view-mode-list .card-list-head .title {
-    font-size: 0.94rem;
+  body.view-mode-list .card-list-primary .title {
     display: block;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    font-size: 0.94rem;
     -webkit-line-clamp: unset;
     -webkit-box-orient: unset;
     white-space: nowrap;
