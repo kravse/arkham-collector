@@ -42,7 +42,7 @@ function findLocalCoverFile(book) {
       if (!name.includes(idSuffix)) {
         continue;
       }
-      if (name.endsWith(".card.webp") || name.endsWith(".detail.webp")) {
+      if (isCoverDerivativePath(`covers/${name}`)) {
         continue;
       }
       return `covers/${name}`.replace(/\\/g, "/");
@@ -55,7 +55,9 @@ function findLocalCoverFile(book) {
 function isCoverDerivativePath(relativePath) {
   return (
     typeof relativePath === "string" &&
-    (relativePath.endsWith(".card.webp") || relativePath.endsWith(".detail.webp"))
+    (relativePath.endsWith(".card.webp") ||
+      relativePath.endsWith(".detail.webp") ||
+      relativePath.endsWith(".list.webp"))
   );
 }
 
@@ -79,7 +81,7 @@ function findCoverMasterPath(book, books) {
       if (!name.includes(idSuffix)) {
         continue;
       }
-      if (name.endsWith(".card.webp") || name.endsWith(".detail.webp")) {
+      if (isCoverDerivativePath(`covers/${name}`)) {
         continue;
       }
       return `covers/${name}`.replace(/\\/g, "/");

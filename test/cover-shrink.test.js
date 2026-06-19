@@ -16,6 +16,7 @@ test("isCoverMasterFilename skips build derivatives", () => {
   assert.equal(isCoverMasterFilename("the-outsider-419.jpg"), true);
   assert.equal(isCoverMasterFilename("the-outsider-419.card.webp"), false);
   assert.equal(isCoverMasterFilename("the-outsider-419.detail.webp"), false);
+  assert.equal(isCoverMasterFilename("the-outsider-419.list.webp"), false);
   assert.equal(isCoverMasterFilename("notes.txt"), false);
 });
 

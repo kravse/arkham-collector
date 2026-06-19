@@ -1002,6 +1002,14 @@ const viewerCovers = (function () {
     if (variant === "lightbox") {
       return book.coverImageDetailFile || book.coverImageFile || null;
     }
+    if (variant === "list") {
+      return (
+        book.coverImageListFile ||
+        book.coverImageDetailFile ||
+        book.coverImageFile ||
+        null
+      );
+    }
     return book.coverImageFile || null;
   }
   return {
@@ -2219,7 +2227,8 @@ function renderCover(book, cacheKey, variant = "card") {
 
   const src = viewerCovers.appendCoverCacheKey(coverPath, cacheKey);
   const title = escapeHtml(book.title || "this book");
-  const imgHtml = `<img src="${src}" alt="Cover of ${title}" loading="lazy" onerror="onCoverImageError(this)">`;
+  const listClass = variant === "list" ? ' class="cover-list-strip"' : "";
+  const imgHtml = `<img${listClass} src="${src}" alt="Cover of ${title}" loading="lazy" onerror="onCoverImageError(this)">`;
 
   if (variant !== "detail") {
     return imgHtml;
@@ -2619,7 +2628,8 @@ function renderCard(book) {
     }
   }
   const hiddenClass = book.hidden ? " hidden-book" : "";
-  const imageHtml = renderCover(book, book.coverCacheKey);
+  const coverVariant = gridViewMode === "list" ? "list" : "card";
+  const imageHtml = renderCover(book, book.coverCacheKey, coverVariant);
   const coverActions = renderCoverActions(book);
 
   const imprintBadge = renderImprintBadge(book, "card");

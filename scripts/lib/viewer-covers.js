@@ -12,6 +12,14 @@ function getCoverPath(book, variant = "card") {
   if (variant === "lightbox") {
     return book.coverImageDetailFile || book.coverImageFile || null;
   }
+  if (variant === "list") {
+    return (
+      book.coverImageListFile ||
+      book.coverImageDetailFile ||
+      book.coverImageFile ||
+      null
+    );
+  }
   return book.coverImageFile || null;
 }
 
