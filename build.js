@@ -13,6 +13,7 @@ const {
   optimizeCoverPaths,
   applyOptimizedCoverPaths,
 } = require("./scripts/lib/cover-optimize");
+const { buildListFocalByMaster } = require("./scripts/lib/cover-list-crop");
 const { bundleViewerJs } = require("./scripts/bundle-viewer-js");
 const { syncCollectionFromCsv } = require("./scripts/lib/collection");
 
@@ -214,11 +215,13 @@ async function buildStaticSiteAsync() {
   let booksForDeploy = mergedBooks;
 
   if (coverPaths.size) {
+    const focalBySource = buildListFocalByMaster(publicBooks, edits);
     const { optimizedBySource, stats } = await optimizeCoverPaths(
       [...coverPaths],
       {
         root: ROOT,
         destRoot: BUILD_DIR,
+        focalBySource,
       },
     );
     booksForDeploy = applyOptimizedCoverPaths(mergedBooks, optimizedBySource);

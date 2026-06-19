@@ -49,7 +49,7 @@ test("saveBookCoverUpload writes cover file and edits entry", () => {
       ],
     })}\n`,
   );
-  fs.writeFileSync(path.join(dataDir, "edits.json"), '{"edits":{}}\n');
+  fs.writeFileSync(path.join(dataDir, "edits.json"), '{"edits":{"42":{"listCoverFocusX":0.2,"listCoverFocusY":0.35}}}\n');
   fs.writeFileSync(path.join(tempRoot, "covers/old-cover-42.jpg"), "old");
 
   const config = require("../scripts/config");
@@ -73,6 +73,8 @@ test("saveBookCoverUpload writes cover file and edits entry", () => {
   assert.ok(fs.existsSync(path.join(tempRoot, result.coverImageFile)));
   assert.equal(fs.existsSync(path.join(tempRoot, "covers/old-cover-42.jpg")), false);
   assert.equal(loadTempEdits().edits["42"].coverImageFile, result.coverImageFile);
+  assert.equal(loadTempEdits().edits["42"].listCoverFocusX, undefined);
+  assert.equal(loadTempEdits().edits["42"].listCoverFocusY, undefined);
 
   config.DATA_DIR = previousDataDir;
   delete require.cache[require.resolve("../scripts/lib/edits")];

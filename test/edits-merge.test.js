@@ -59,3 +59,18 @@ test("applyEditsToBook applies edit cover path in dev when no detail derivative 
   assert.equal(merged.coverImageFile, "covers/the-shunned-house-238.jpg");
   assert.equal(merged.coverImageDetailFile, undefined);
 });
+
+test("applyEditsToBook merges list cover focus from edits", () => {
+  const merged = applyEditsToBook(
+    {
+      id: 317,
+      title: "Demons by Daylight",
+      coverImageFile: "covers/demons-by-daylight-317.png",
+    },
+    {
+      317: { listCoverFocusX: 0.25, listCoverFocusY: 0.55 },
+    },
+  );
+  assert.equal(merged.listCoverFocusX, 0.25);
+  assert.equal(merged.listCoverFocusY, 0.55);
+});

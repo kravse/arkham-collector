@@ -68,6 +68,16 @@ function applyEditResponseToBook(bookId, payload) {
     book.coverImageFile = payload.coverImageFile;
     book.coverCacheKey = Date.now();
   }
+  if (Object.prototype.hasOwnProperty.call(payload, "listCoverFocusX")) {
+    book.listCoverFocusX = payload.listCoverFocusX;
+  } else {
+    delete book.listCoverFocusX;
+  }
+  if (Object.prototype.hasOwnProperty.call(payload, "listCoverFocusY")) {
+    book.listCoverFocusY = payload.listCoverFocusY;
+  } else {
+    delete book.listCoverFocusY;
+  }
   const key = String(bookId);
   const storedEdit = payload.edit || {};
   book.hidden = storedEdit.hidden === true;
@@ -125,6 +135,7 @@ async function saveBookEdits(event) {
     if (editCoverFileInput.files?.[0]) {
       formData.append("cover", editCoverFileInput.files[0]);
     }
+    appendListCoverFocusToFormData(formData);
 
     const response = await fetch(`/api/books/${editingBookId}`, {
       method: "PATCH",

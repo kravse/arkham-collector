@@ -34,6 +34,15 @@ const editGoodreadsUrlInput =
   document.getElementById("edit-goodreads-url");
 const editDescriptionInput = document.getElementById("edit-description");
 const editCoverFileInput = document.getElementById("edit-cover-file");
+const editTabDetails = document.getElementById("edit-tab-details");
+const editTabListCrop = document.getElementById("edit-tab-list-crop");
+const editPanelDetails = document.getElementById("edit-panel-details");
+const editPanelListCrop = document.getElementById("edit-panel-list-crop");
+const editListCoverPicker = document.getElementById("edit-list-cover-picker");
+const editListCoverImage = document.getElementById("edit-list-cover-image");
+const editListCoverOverlay = document.getElementById("edit-list-cover-overlay");
+const editListCoverFocalMarker = document.getElementById("edit-list-cover-focal");
+const editListCoverResetBtn = document.getElementById("edit-list-cover-reset");
 const bookDetailDialog = document.getElementById("book-detail-dialog");
 const bookDetailCloseBtn = document.getElementById("book-detail-close");
 const bookDetailPrevBtn = document.getElementById("book-detail-prev");
@@ -1015,6 +1024,142 @@ const viewerCovers = (function () {
   return {
     appendCoverCacheKey,
     getCoverPath,
+  };
+})();
+
+
+/* Generated from scripts/lib/cover-list-crop.js — run npm run bundle-viewer */
+
+const viewerListCrop = (function () {
+  
+  const LIST_WIDTH = 1200;
+  const LIST_HEIGHT = 80;
+  const LIST_FOCAL_X = 0.5;
+  const LIST_FOCAL_Y = 0.7;
+  
+  function isDefaultListCoverFocus(x, y) {
+    return x === LIST_FOCAL_X && y === LIST_FOCAL_Y;
+  }
+  
+  function resolveListCoverFocus(edit) {
+    const x =
+      typeof edit?.listCoverFocusX === "number" && Number.isFinite(edit.listCoverFocusX)
+        ? edit.listCoverFocusX
+        : LIST_FOCAL_X;
+    const y =
+      typeof edit?.listCoverFocusY === "number" && Number.isFinite(edit.listCoverFocusY)
+        ? edit.listCoverFocusY
+        : LIST_FOCAL_Y;
+    return { x, y };
+  }
+  
+  function getListCoverCacheKey(book) {
+    const { x, y } = resolveListCoverFocus(book);
+    return `${x.toFixed(4)}-${y.toFixed(4)}`;
+  }
+  
+  function getListCoverImagePresentation(book) {
+    if (book?.coverImageListFile) {
+      return {
+        className: "cover-list-strip",
+        style: "",
+      };
+    }
+    return {
+      className: "cover-list-focal",
+      style: "",
+    };
+  }
+  
+  function computeListCoverPreviewLayout(
+    sourceWidth,
+    sourceHeight,
+    focalX,
+    focalY,
+    containerWidth,
+    containerHeight,
+    listWidth = LIST_WIDTH,
+    listHeight = LIST_HEIGHT,
+  ) {
+    if (
+      !sourceWidth ||
+      !sourceHeight ||
+      !containerWidth ||
+      !containerHeight
+    ) {
+      return null;
+    }
+  
+    const crop = computeListCoverCrop(
+      sourceWidth,
+      sourceHeight,
+      listWidth,
+      listHeight,
+      focalX,
+      focalY,
+    );
+    const scale = containerWidth / crop.width;
+    const cropDisplayHeight = crop.height * scale;
+  
+    return {
+      width: sourceWidth * scale,
+      height: sourceHeight * scale,
+      left: -crop.left * scale,
+      top: -crop.top * scale + (containerHeight - cropDisplayHeight) / 2,
+    };
+  }
+  
+  function computeListCoverCrop(
+    sourceWidth,
+    sourceHeight,
+    listWidth = LIST_WIDTH,
+    listHeight = LIST_HEIGHT,
+    focalX = LIST_FOCAL_X,
+    focalY = LIST_FOCAL_Y,
+  ) {
+    const targetAspect = listWidth / listHeight;
+    let cropWidth = sourceWidth;
+    let cropHeight = Math.round(cropWidth / targetAspect);
+    if (cropHeight > sourceHeight) {
+      cropHeight = sourceHeight;
+      cropWidth = Math.round(cropHeight * targetAspect);
+    }
+    const focalPxX = focalX * sourceWidth;
+    const focalPxY = focalY * sourceHeight;
+    let left = Math.round(focalPxX - cropWidth / 2);
+    let top = Math.round(focalPxY - cropHeight / 2);
+    left = Math.max(0, Math.min(sourceWidth - cropWidth, left));
+    top = Math.max(0, Math.min(sourceHeight - cropHeight, top));
+    return { left, top, width: cropWidth, height: cropHeight };
+  }
+  
+  function applyListCoverFocusPatch(edit, field, value) {
+    if (field !== "listCoverFocusX" && field !== "listCoverFocusY") {
+      return false;
+    }
+    if (value === null || value === undefined) {
+      delete edit[field];
+    } else {
+      edit[field] = value;
+    }
+    const { x, y } = resolveListCoverFocus(edit);
+    if (isDefaultListCoverFocus(x, y)) {
+      delete edit.listCoverFocusX;
+      delete edit.listCoverFocusY;
+    }
+    return true;
+  }
+  return {
+    LIST_WIDTH,
+    LIST_HEIGHT,
+    LIST_FOCAL_X,
+    LIST_FOCAL_Y,
+    isDefaultListCoverFocus,
+    resolveListCoverFocus,
+    getListCoverImagePresentation,
+    getListCoverCacheKey,
+    computeListCoverCrop,
+    computeListCoverPreviewLayout,
   };
 })();
 
@@ -2225,10 +2370,21 @@ function renderCover(book, cacheKey, variant = "card") {
     return `<div class="placeholder">No cover image</div>`;
   }
 
-  const src = viewerCovers.appendCoverCacheKey(coverPath, cacheKey);
+  const resolvedCacheKey =
+    variant === "list" ? viewerListCrop.getListCoverCacheKey(book) : cacheKey;
+  const src = viewerCovers.appendCoverCacheKey(coverPath, resolvedCacheKey);
   const title = escapeHtml(book.title || "this book");
-  const listClass = variant === "list" ? ' class="cover-list-strip"' : "";
-  const imgHtml = `<img${listClass} src="${src}" alt="Cover of ${title}" loading="lazy" onerror="onCoverImageError(this)">`;
+  let imgAttrs = "";
+  if (variant === "list") {
+    const presentation = viewerListCrop.getListCoverImagePresentation(book);
+    const styleAttr = presentation.style ? ` style="${presentation.style}"` : "";
+    const bookIdAttr =
+      presentation.className === "cover-list-focal"
+        ? ` data-book-id="${book.id}"`
+        : "";
+    imgAttrs = ` class="${presentation.className}"${bookIdAttr}${styleAttr}`;
+  }
+  const imgHtml = `<img${imgAttrs} src="${src}" alt="Cover of ${title}" loading="lazy" onerror="onCoverImageError(this)">`;
 
   if (variant !== "detail") {
     return imgHtml;
@@ -2618,6 +2774,61 @@ window.onCoverImageError = function (img) {
   );
 };
 
+function layoutListCoverPreviewImage(img) {
+  const bookId = Number(img.dataset.bookId);
+  const book = books.find((entry) => entry.id === bookId);
+  const wrap = img.closest(".cover-wrap");
+  if (!book || !wrap || !img.naturalWidth) {
+    return;
+  }
+
+  const { x, y } = viewerListCrop.resolveListCoverFocus(book);
+  const layout = viewerListCrop.computeListCoverPreviewLayout(
+    img.naturalWidth,
+    img.naturalHeight,
+    x,
+    y,
+    wrap.clientWidth,
+    wrap.clientHeight,
+  );
+  if (!layout) {
+    return;
+  }
+
+  img.style.width = `${layout.width}px`;
+  img.style.height = `${layout.height}px`;
+  img.style.left = `${layout.left}px`;
+  img.style.top = `${layout.top}px`;
+}
+
+function layoutListCoverPreviews() {
+  if (gridViewMode !== "list") {
+    return;
+  }
+
+  grid.querySelectorAll("img.cover-list-focal[data-book-id]").forEach((img) => {
+    if (img.complete && img.naturalWidth) {
+      layoutListCoverPreviewImage(img);
+      return;
+    }
+    img.addEventListener("load", () => layoutListCoverPreviewImage(img), {
+      once: true,
+    });
+  });
+}
+
+let listCoverPreviewObserver = null;
+
+function ensureListCoverPreviewObserver() {
+  if (listCoverPreviewObserver) {
+    return;
+  }
+  listCoverPreviewObserver = new ResizeObserver(() => {
+    layoutListCoverPreviews();
+  });
+  listCoverPreviewObserver.observe(grid);
+}
+
 function renderCard(book) {
   let collectionClass = "";
   if (shouldHighlightCollectionOnCards()) {
@@ -2783,6 +2994,7 @@ function render() {
   }
 
   grid.innerHTML = visible.map(renderCard).join("");
+  layoutListCoverPreviews();
 
   if (!bookDetailDialog.hidden && detailBookId) {
     const detailBook = books.find((entry) => entry.id === detailBookId);
@@ -3132,14 +3344,37 @@ function openEditDialog(bookId) {
   editGoodreadsUrlInput.value = resolveGoodreadsUrl(book) || "";
   editDescriptionInput.value = getBookDescription(book) || "";
   editCoverFileInput.value = "";
+  selectEditDialogTab("details");
+  openListCoverPicker(book);
   editDialog.hidden = false;
   editTitleInput.focus();
 }
 
 function closeEditDialog() {
   editingBookId = null;
+  closeListCoverPicker();
+  selectEditDialogTab("details");
   editDialog.hidden = true;
   editBookForm.reset();
+}
+
+function selectEditDialogTab(tab) {
+  const detailsActive = tab === "details";
+  editTabDetails.setAttribute(
+    "aria-selected",
+    detailsActive ? "true" : "false",
+  );
+  editTabListCrop.setAttribute(
+    "aria-selected",
+    detailsActive ? "false" : "true",
+  );
+  editTabDetails.tabIndex = detailsActive ? 0 : -1;
+  editTabListCrop.tabIndex = detailsActive ? -1 : 0;
+  editPanelDetails.hidden = !detailsActive;
+  editPanelListCrop.hidden = detailsActive;
+  if (!detailsActive) {
+    updateListCoverOverlay();
+  }
 }
 
 function selectSettingsTab(tab) {
@@ -3307,6 +3542,182 @@ function closeAttributionDialog() {
 }
 
 
+/* List cover crop picker in the edit dialog (serve only) */
+
+let editListCoverFocusX = viewerListCrop.LIST_FOCAL_X;
+let editListCoverFocusY = viewerListCrop.LIST_FOCAL_Y;
+let listCoverFocusSaveTimer = null;
+
+function isCoverDerivativePath(relativePath) {
+  return (
+    typeof relativePath === "string" &&
+    (relativePath.endsWith(".card.webp") ||
+      relativePath.endsWith(".detail.webp") ||
+      relativePath.endsWith(".list.webp"))
+  );
+}
+
+function resolveMasterCoverPath(book) {
+  const coverPath = viewerCovers.getCoverPath(book, "card");
+  if (!coverPath || isCoverDerivativePath(coverPath)) {
+    return null;
+  }
+  return coverPath;
+}
+
+function applyListCoverFocusToEditingBook() {
+  const book = books.find((entry) => entry.id === editingBookId);
+  if (!book) {
+    return;
+  }
+  book.listCoverFocusX = editListCoverFocusX;
+  book.listCoverFocusY = editListCoverFocusY;
+}
+
+function updateListCoverOverlay() {
+  const img = editListCoverImage;
+  if (!img?.naturalWidth || editPanelListCrop.hidden) {
+    return;
+  }
+  const crop = viewerListCrop.computeListCoverCrop(
+    img.naturalWidth,
+    img.naturalHeight,
+    viewerListCrop.LIST_WIDTH,
+    viewerListCrop.LIST_HEIGHT,
+    editListCoverFocusX,
+    editListCoverFocusY,
+  );
+  const w = img.naturalWidth;
+  const h = img.naturalHeight;
+  editListCoverOverlay.style.left = `${(crop.left / w) * 100}%`;
+  editListCoverOverlay.style.top = `${(crop.top / h) * 100}%`;
+  editListCoverOverlay.style.width = `${(crop.width / w) * 100}%`;
+  editListCoverOverlay.style.height = `${(crop.height / h) * 100}%`;
+  editListCoverFocalMarker.style.left = `${editListCoverFocusX * 100}%`;
+  editListCoverFocalMarker.style.top = `${editListCoverFocusY * 100}%`;
+}
+
+async function persistListCoverFocus() {
+  if (!editingBookId || !serveEnabled) {
+    return;
+  }
+  const book = books.find((entry) => entry.id === editingBookId);
+  if (!book || !resolveMasterCoverPath(book)) {
+    return;
+  }
+
+  const title =
+    sanitizeSingleLineText(editTitleInput.value) || book.title || "";
+  if (!title) {
+    return;
+  }
+
+  try {
+    const formData = new FormData();
+    formData.append("title", title);
+    formData.append("listCoverFocusX", String(editListCoverFocusX));
+    formData.append("listCoverFocusY", String(editListCoverFocusY));
+    const response = await fetch(`/api/books/${editingBookId}`, {
+      method: "PATCH",
+      body: formData,
+    });
+    const payload = await response.json();
+    if (!response.ok) {
+      throw new Error(payload.error || "Could not save list crop");
+    }
+    applyEditResponseToBook(editingBookId, payload);
+    render();
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+function scheduleListCoverFocusSave() {
+  if (listCoverFocusSaveTimer) {
+    clearTimeout(listCoverFocusSaveTimer);
+  }
+  listCoverFocusSaveTimer = setTimeout(() => {
+    listCoverFocusSaveTimer = null;
+    persistListCoverFocus();
+  }, 400);
+}
+
+function onListCoverImageClick(event) {
+  const img = editListCoverImage;
+  const rect = img.getBoundingClientRect();
+  if (!rect.width || !rect.height) {
+    return;
+  }
+  editListCoverFocusX = Math.max(
+    0,
+    Math.min(1, (event.clientX - rect.left) / rect.width),
+  );
+  editListCoverFocusY = Math.max(
+    0,
+    Math.min(1, (event.clientY - rect.top) / rect.height),
+  );
+  applyListCoverFocusToEditingBook();
+  updateListCoverOverlay();
+  render();
+  scheduleListCoverFocusSave();
+}
+
+function resetListCoverFocus() {
+  editListCoverFocusX = viewerListCrop.LIST_FOCAL_X;
+  editListCoverFocusY = viewerListCrop.LIST_FOCAL_Y;
+  applyListCoverFocusToEditingBook();
+  updateListCoverOverlay();
+  render();
+  scheduleListCoverFocusSave();
+}
+
+function openListCoverPicker(book) {
+  const coverPath = resolveMasterCoverPath(book);
+  if (!coverPath) {
+    editTabListCrop.hidden = true;
+    return;
+  }
+
+  const focus = viewerListCrop.resolveListCoverFocus(book);
+  editListCoverFocusX = focus.x;
+  editListCoverFocusY = focus.y;
+  editTabListCrop.hidden = false;
+  editListCoverImage.src = viewerCovers.appendCoverCacheKey(
+    coverPath,
+    book.coverCacheKey,
+  );
+}
+
+function closeListCoverPicker() {
+  if (listCoverFocusSaveTimer) {
+    clearTimeout(listCoverFocusSaveTimer);
+    listCoverFocusSaveTimer = null;
+  }
+  editListCoverFocusX = viewerListCrop.LIST_FOCAL_X;
+  editListCoverFocusY = viewerListCrop.LIST_FOCAL_Y;
+  editTabListCrop.hidden = true;
+  editListCoverImage.removeAttribute("src");
+}
+
+function appendListCoverFocusToFormData(formData) {
+  if (!editingBookId) {
+    return;
+  }
+  const book = books.find((entry) => entry.id === editingBookId);
+  if (!book || !resolveMasterCoverPath(book)) {
+    return;
+  }
+  formData.append("listCoverFocusX", String(editListCoverFocusX));
+  formData.append("listCoverFocusY", String(editListCoverFocusY));
+}
+
+function initListCoverPicker() {
+  editListCoverImage.addEventListener("load", updateListCoverOverlay);
+  editListCoverImage.addEventListener("click", onListCoverImageClick);
+  editListCoverResetBtn.addEventListener("click", resetListCoverFocus);
+}
+
+
 /* Edit dialog and dev-server PATCH / DELETE API */
 
 
@@ -3377,6 +3788,16 @@ function applyEditResponseToBook(bookId, payload) {
     book.coverImageFile = payload.coverImageFile;
     book.coverCacheKey = Date.now();
   }
+  if (Object.prototype.hasOwnProperty.call(payload, "listCoverFocusX")) {
+    book.listCoverFocusX = payload.listCoverFocusX;
+  } else {
+    delete book.listCoverFocusX;
+  }
+  if (Object.prototype.hasOwnProperty.call(payload, "listCoverFocusY")) {
+    book.listCoverFocusY = payload.listCoverFocusY;
+  } else {
+    delete book.listCoverFocusY;
+  }
   const key = String(bookId);
   const storedEdit = payload.edit || {};
   book.hidden = storedEdit.hidden === true;
@@ -3434,6 +3855,7 @@ async function saveBookEdits(event) {
     if (editCoverFileInput.files?.[0]) {
       formData.append("cover", editCoverFileInput.files[0]);
     }
+    appendListCoverFocusToFormData(formData);
 
     const response = await fetch(`/api/books/${editingBookId}`, {
       method: "PATCH",
@@ -3915,6 +4337,8 @@ bookDetailDialog
 
 editBookForm.addEventListener("submit", saveBookEdits);
 bindEditFieldSanitizers(editBookForm);
+initListCoverPicker();
+ensureListCoverPreviewObserver();
 editDeleteBtn.addEventListener("click", deleteBook);
 editCancelBtn.addEventListener("click", closeEditDialog);
 editDialog.querySelectorAll("[data-close-edit]").forEach((element) => {
@@ -3940,6 +4364,14 @@ settingsTabAbout.addEventListener("click", () => {
 
 settingsTabSettings.addEventListener("click", () => {
   selectSettingsTab("settings");
+});
+
+editTabDetails.addEventListener("click", () => {
+  selectEditDialogTab("details");
+});
+
+editTabListCrop.addEventListener("click", () => {
+  selectEditDialogTab("list-crop");
 });
 
 if (coverLightbox) {

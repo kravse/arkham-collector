@@ -85,7 +85,15 @@ function saveBookCoverUpload(bookId, file, options = {}) {
 
   fs.mkdirSync(coversDir, { recursive: true });
   fs.writeFileSync(fullPath, file.buffer);
-  setBookEdit(bookId, { coverImageFile: relativePath }, scraped);
+  setBookEdit(
+    bookId,
+    {
+      coverImageFile: relativePath,
+      listCoverFocusX: null,
+      listCoverFocusY: null,
+    },
+    scraped,
+  );
 
   return {
     bookId,

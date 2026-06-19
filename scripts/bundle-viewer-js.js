@@ -12,6 +12,7 @@ const { syncViewerUserState } = require("./sync-viewer-user-state");
 const { syncViewerGistSync } = require("./sync-viewer-gist-sync");
 const { syncViewerCollectionImport } = require("./sync-viewer-collection-import");
 const { syncViewerCovers } = require("./sync-viewer-covers");
+const { syncViewerListCrop } = require("./sync-viewer-list-crop");
 
 const ROOT = path.join(__dirname, "..");
 const VIEWER_DIR = path.join(ROOT, "js", "viewer");
@@ -43,6 +44,11 @@ const PARTS = [
   {
     file: "00-viewer-covers.js",
     title: "Cover source helpers (generated from scripts/lib/viewer-covers.js)",
+  },
+  {
+    file: "00-viewer-list-crop.js",
+    title:
+      "List cover crop math (generated from scripts/lib/cover-list-crop.js)",
   },
   {
     file: "00-viewer-mode.js",
@@ -85,6 +91,10 @@ const PARTS = [
     title: "Book detail overlay, settings, and attribution dialogs",
     start: 1248,
     end: 1548,
+  },
+  {
+    file: "07-list-cover-picker.js",
+    title: "List cover crop picker in the edit dialog",
   },
   {
     file: "07-edit-api.js",
@@ -141,6 +151,7 @@ function bundleViewerJs() {
   syncViewerGistSync();
   syncViewerCollectionImport();
   syncViewerCovers();
+  syncViewerListCrop();
   if (!fs.existsSync(BODY)) {
     const partials = PARTS.map((p) => path.join(VIEWER_DIR, p.file));
     if (partials.every((file) => fs.existsSync(file))) {

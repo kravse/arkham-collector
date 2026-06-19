@@ -2,6 +2,7 @@ const fs = require("fs");
 const path = require("path");
 
 const { DATA_DIR } = require("../config");
+const { applyListCoverFocusPatch } = require("./cover-list-crop");
 
 const EDITS_JSON = path.join(DATA_DIR, "edits.json");
 const EDITS_JS = path.join(DATA_DIR, "edits.js");
@@ -15,6 +16,8 @@ const EDITABLE_FIELDS = new Set([
   "wikipediaUrl",
   "goodreadsUrl",
   "coverImageFile",
+  "listCoverFocusX",
+  "listCoverFocusY",
   "description",
   "hidden",
   "deleted",
@@ -214,6 +217,10 @@ function compactAllEdits(books) {
 }
 
 function applyPatchField(edit, scraped, field, value) {
+  if (field === "listCoverFocusX" || field === "listCoverFocusY") {
+    applyListCoverFocusPatch(edit, field, value);
+    return;
+  }
   if (field === "hidden") {
     if (value === true) {
       edit.hidden = true;

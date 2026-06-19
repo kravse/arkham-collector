@@ -336,14 +336,37 @@ function openEditDialog(bookId) {
   editGoodreadsUrlInput.value = resolveGoodreadsUrl(book) || "";
   editDescriptionInput.value = getBookDescription(book) || "";
   editCoverFileInput.value = "";
+  selectEditDialogTab("details");
+  openListCoverPicker(book);
   editDialog.hidden = false;
   editTitleInput.focus();
 }
 
 function closeEditDialog() {
   editingBookId = null;
+  closeListCoverPicker();
+  selectEditDialogTab("details");
   editDialog.hidden = true;
   editBookForm.reset();
+}
+
+function selectEditDialogTab(tab) {
+  const detailsActive = tab === "details";
+  editTabDetails.setAttribute(
+    "aria-selected",
+    detailsActive ? "true" : "false",
+  );
+  editTabListCrop.setAttribute(
+    "aria-selected",
+    detailsActive ? "false" : "true",
+  );
+  editTabDetails.tabIndex = detailsActive ? 0 : -1;
+  editTabListCrop.tabIndex = detailsActive ? -1 : 0;
+  editPanelDetails.hidden = !detailsActive;
+  editPanelListCrop.hidden = detailsActive;
+  if (!detailsActive) {
+    updateListCoverOverlay();
+  }
 }
 
 function selectSettingsTab(tab) {

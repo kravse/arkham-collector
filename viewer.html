@@ -721,53 +721,110 @@
         aria-labelledby="edit-dialog-title"
       >
         <h2 id="edit-dialog-title">Edit book</h2>
+        <div class="edit-dialog-tabs" role="tablist">
+          <button
+            type="button"
+            id="edit-tab-details"
+            class="edit-dialog-tab"
+            role="tab"
+            aria-selected="true"
+          >
+            Details
+          </button>
+          <button
+            type="button"
+            id="edit-tab-list-crop"
+            class="edit-dialog-tab"
+            role="tab"
+            aria-selected="false"
+            hidden
+          >
+            List crop
+          </button>
+        </div>
         <form id="edit-book-form">
-          <label class="edit-field">
-            Title
-            <input id="edit-title" name="title" type="text" required />
-          </label>
-          <label class="edit-field">
-            Author
-            <input id="edit-author" name="author" type="text" />
-          </label>
-          <label class="edit-field">
-            Cover artist
-            <input id="edit-cover-artist" name="coverArtist" type="text" />
-          </label>
-          <label class="edit-field">
-            Publication date
-            <input
-              id="edit-publication-date"
-              name="publicationDate"
-              type="text"
-            />
-          </label>
-          <label class="edit-field">
-            Wikipedia URL
-            <input id="edit-wikipedia-url" name="wikipediaUrl" type="url" />
-          </label>
-          <label class="edit-field">
-            Goodreads URL
-            <input id="edit-goodreads-url" name="goodreadsUrl" type="url" />
-          </label>
-          <label class="edit-field">
-            Description
-            <textarea
-              id="edit-description"
-              name="description"
-              rows="6"
-              spellcheck="true"
-            ></textarea>
-          </label>
-          <label class="edit-field">
-            Cover image
-            <input
-              id="edit-cover-file"
-              name="cover"
-              type="file"
-              accept="image/*"
-            />
-          </label>
+          <div
+            id="edit-panel-details"
+            class="edit-dialog-tab-panel"
+            role="tabpanel"
+          >
+            <label class="edit-field">
+              Title
+              <input id="edit-title" name="title" type="text" required />
+            </label>
+            <label class="edit-field">
+              Author
+              <input id="edit-author" name="author" type="text" />
+            </label>
+            <label class="edit-field">
+              Cover artist
+              <input id="edit-cover-artist" name="coverArtist" type="text" />
+            </label>
+            <label class="edit-field">
+              Publication date
+              <input
+                id="edit-publication-date"
+                name="publicationDate"
+                type="text"
+              />
+            </label>
+            <label class="edit-field">
+              Wikipedia URL
+              <input id="edit-wikipedia-url" name="wikipediaUrl" type="url" />
+            </label>
+            <label class="edit-field">
+              Goodreads URL
+              <input id="edit-goodreads-url" name="goodreadsUrl" type="url" />
+            </label>
+            <label class="edit-field">
+              Description
+              <textarea
+                id="edit-description"
+                name="description"
+                rows="6"
+                spellcheck="true"
+              ></textarea>
+            </label>
+            <label class="edit-field">
+              Cover image
+              <input
+                id="edit-cover-file"
+                name="cover"
+                type="file"
+                accept="image/*"
+              />
+            </label>
+          </div>
+          <div
+            id="edit-panel-list-crop"
+            class="edit-dialog-tab-panel"
+            role="tabpanel"
+            hidden
+          >
+            <div id="edit-list-cover-picker" class="edit-list-cover-picker">
+              <p class="edit-list-cover-hint">
+                Click the cover to set the list row background strip.
+              </p>
+              <div class="edit-list-cover-stage">
+                <img id="edit-list-cover-image" alt="" />
+                <div
+                  id="edit-list-cover-overlay"
+                  class="edit-list-cover-overlay"
+                ></div>
+                <div
+                  id="edit-list-cover-focal"
+                  class="edit-list-cover-focal"
+                ></div>
+              </div>
+              <button
+                type="button"
+                id="edit-list-cover-reset"
+                class="edit-list-cover-reset"
+              >
+                Reset to default
+              </button>
+            </div>
+          </div>
           <div class="edit-dialog-actions">
             <button type="button" id="edit-delete" class="edit-delete-btn">
               Delete book

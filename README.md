@@ -60,11 +60,11 @@ npm run serve    # http://localhost:8742 — full UI + edit/hide/upload API
 npm run build && open build/index.html   # read-only static site (matches deploy)
 ```
 
-**`npm run serve`** — edit metadata, upload covers, hide or soft-delete titles; changes go to `data/edits.json` only.
+**`npm run serve`** — edit metadata, upload covers, hide or soft-delete titles, and pick list-view cover crops; changes go to `data/edits.json` only.
 
-**`npm run build`** — writes `build/` for static hosting (`READ_ONLY`, bundled CSS/JS, `noindex`). Cover images in `covers/` are resized to WebP at build time (480px card thumbnails, 960px detail images, and 1200×80 list strips); masters stay in the repo but only optimized files ship in `build/`.
+**`npm run build`** — writes `build/` for static hosting (`READ_ONLY`, bundled CSS/JS, `noindex`). Cover images in `covers/` are resized to WebP at build time (480px card thumbnails, 960px detail images, and 1200×80 list strips); masters stay in the repo but only optimized files ship in `build/`. List strip crops use per-book focal points from edits when set (default center / 70% down).
 
-**Cover images:** Drop high-resolution scans into `covers/` using the existing `{slug}-{id}.{ext}` naming (or set `coverImageFile` via edits). `npm run serve` uses the originals for local dev. `npm run build` generates `*.card.webp`, `*.detail.webp`, and `*.list.webp` derivatives for the deploy site (list strips power list-view row backgrounds). After uploading large covers, run `npm run shrink-cover-masters` to resize masters in place before committing (default max edge 1600px; use `shrink-cover-masters:dry-run` to preview).
+**Cover images:** Drop high-resolution scans into `covers/` using the existing `{slug}-{id}.{ext}` naming (or set `coverImageFile` via edits). `npm run serve` uses the originals for local dev; list view approximates the saved list strip crop via CSS (`listCoverFocusX` / `listCoverFocusY`). In the edit dialog, open the **List crop** tab and click the cover to set the list strip focal point (saved automatically to `edits.json`); `npm run build` generates `*.card.webp`, `*.detail.webp`, and `*.list.webp` derivatives for the deploy site. Uploading a new cover resets the list crop to default. After uploading large covers, run `npm run shrink-cover-masters` to resize masters in place before committing (default max edge 1600px; use `shrink-cover-masters:dry-run` to preview).
 
 ## Customize the catalog (maintainers)
 

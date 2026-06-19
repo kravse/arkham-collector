@@ -1,12 +1,16 @@
 const fs = require("fs");
 const path = require("path");
 const { findCoverMasterPath } = require("./covers-files");
+const {
+  LIST_WIDTH,
+  LIST_HEIGHT,
+  LIST_FOCAL_X,
+  LIST_FOCAL_Y,
+  computeListCoverCrop,
+} = require("./cover-list-crop");
 
 const CARD_MAX_WIDTH = 480;
 const DETAIL_MAX_WIDTH = 960;
-const LIST_WIDTH = 1200;
-const LIST_HEIGHT = 80;
-const LIST_FOCAL_Y = 0.7;
 const WEBP_QUALITY = 80;
 
 function coverDerivativePaths(relativePath) {
@@ -22,27 +26,6 @@ function coverDerivativePaths(relativePath) {
 
 function coverSourceKey(relativePath) {
   return String(relativePath || "").replace(/\\/g, "/");
-}
-
-function computeListCoverCrop(
-  sourceWidth,
-  sourceHeight,
-  listWidth = LIST_WIDTH,
-  listHeight = LIST_HEIGHT,
-  focalY = LIST_FOCAL_Y,
-) {
-  const targetAspect = listWidth / listHeight;
-  let cropWidth = sourceWidth;
-  let cropHeight = Math.round(cropWidth / targetAspect);
-  if (cropHeight > sourceHeight) {
-    cropHeight = sourceHeight;
-    cropWidth = Math.round(cropHeight * targetAspect);
-  }
-  const left = Math.round((sourceWidth - cropWidth) / 2);
-  const focalPx = focalY * sourceHeight;
-  let top = Math.round(focalPx - cropHeight / 2);
-  top = Math.max(0, Math.min(sourceHeight - cropHeight, top));
-  return { left, top, width: cropWidth, height: cropHeight };
 }
 
 function applyOptimizedCoverPaths(books, optimizedBySource) {
@@ -80,6 +63,7 @@ async function writeOptimizedCoverVariants(
   const detailWidth = options.detailWidth ?? DETAIL_MAX_WIDTH;
   const listWidth = options.listWidth ?? LIST_WIDTH;
   const listHeight = options.listHeight ?? LIST_HEIGHT;
+  const listFocalX = options.listFocalX ?? LIST_FOCAL_X;
   const listFocalY = options.listFocalY ?? LIST_FOCAL_Y;
   const quality = options.quality ?? WEBP_QUALITY;
   const derivatives = coverDerivativePaths(relativeSource);
@@ -98,6 +82,7 @@ async function writeOptimizedCoverVariants(
     metadata.height,
     listWidth,
     listHeight,
+    listFocalX,
     listFocalY,
   );
 
@@ -140,6 +125,9 @@ async function optimizeCoverPaths(coverPaths, options = {}) {
     sharp = require("sharp");
   }
 
+  const focalBySource =
+    options.focalBySource instanceof Map ? options.focalBySource : new Map();
+
   const optimizedBySource = new Map();
   const stats = {
     processed: 0,
@@ -157,12 +145,20 @@ async function optimizeCoverPaths(coverPaths, options = {}) {
       continue;
     }
 
+    const focal = focalBySource.get(normalized) || {
+      x: LIST_FOCAL_X,
+      y: LIST_FOCAL_Y,
+    };
     const result = await writeOptimizedCoverVariants(
       sourcePath,
       normalized,
       destRoot,
       sharp,
-      options,
+      {
+        ...options,
+        listFocalX: focal.x,
+        listFocalY: focal.y,
+      },
     );
     optimizedBySource.set(normalized, result);
     stats.processed += 1;
@@ -179,6 +175,7 @@ module.exports = {
   DETAIL_MAX_WIDTH,
   LIST_WIDTH,
   LIST_HEIGHT,
+  LIST_FOCAL_X,
   LIST_FOCAL_Y,
   WEBP_QUALITY,
   coverDerivativePaths,

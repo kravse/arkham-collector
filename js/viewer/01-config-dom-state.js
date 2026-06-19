@@ -34,6 +34,15 @@ const editGoodreadsUrlInput =
   document.getElementById("edit-goodreads-url");
 const editDescriptionInput = document.getElementById("edit-description");
 const editCoverFileInput = document.getElementById("edit-cover-file");
+const editTabDetails = document.getElementById("edit-tab-details");
+const editTabListCrop = document.getElementById("edit-tab-list-crop");
+const editPanelDetails = document.getElementById("edit-panel-details");
+const editPanelListCrop = document.getElementById("edit-panel-list-crop");
+const editListCoverPicker = document.getElementById("edit-list-cover-picker");
+const editListCoverImage = document.getElementById("edit-list-cover-image");
+const editListCoverOverlay = document.getElementById("edit-list-cover-overlay");
+const editListCoverFocalMarker = document.getElementById("edit-list-cover-focal");
+const editListCoverResetBtn = document.getElementById("edit-list-cover-reset");
 const bookDetailDialog = document.getElementById("book-detail-dialog");
 const bookDetailCloseBtn = document.getElementById("book-detail-close");
 const bookDetailPrevBtn = document.getElementById("book-detail-prev");

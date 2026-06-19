@@ -29,6 +29,7 @@ const {
   extensionFromMime,
   removeLocalCovers,
 } = require("./scripts/lib/cover-upload");
+const { parseListCoverFocusPatch } = require("./scripts/lib/cover-list-crop");
 
 const ROOT = __dirname;
 const DATA_DIR = path.join(ROOT, "data");
@@ -243,6 +244,15 @@ app.patch("/api/books/:id", upload.single("cover"), (req, res) => {
       patch.description = optionalText(req.body.description, htmlToPlainText);
     }
 
+    const focusPatch = parseListCoverFocusPatch(req.body);
+    if (focusPatch?.error) {
+      res.status(400).json({ error: focusPatch.error });
+      return;
+    }
+    if (focusPatch) {
+      Object.assign(patch, focusPatch);
+    }
+
     if (req.file) {
       removeLocalCoversForBook(book);
 
@@ -258,6 +268,8 @@ app.patch("/api/books/:id", upload.single("cover"), (req, res) => {
       fs.mkdirSync(COVERS_DIR, { recursive: true });
       fs.writeFileSync(fullPath, req.file.buffer);
       patch.coverImageFile = relativePath;
+      patch.listCoverFocusX = null;
+      patch.listCoverFocusY = null;
     }
 
     setBookEdit(bookId, patch, scraped);

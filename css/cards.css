@@ -544,6 +544,17 @@ body.view-mode-list .cover-wrap img.cover-list-strip {
   transform: none;
 }
 
+body.view-mode-list .cover-wrap img.cover-list-focal {
+  inset: auto;
+  width: auto;
+  height: auto;
+  max-width: none;
+  max-height: none;
+  object-fit: fill;
+  object-position: center center;
+  transform: none;
+}
+
 body.view-mode-list .cover-wrap .placeholder {
   position: absolute;
   inset: 0;

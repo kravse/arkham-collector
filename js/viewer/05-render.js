@@ -12,10 +12,21 @@ function renderCover(book, cacheKey, variant = "card") {
     return `<div class="placeholder">No cover image</div>`;
   }
 
-  const src = viewerCovers.appendCoverCacheKey(coverPath, cacheKey);
+  const resolvedCacheKey =
+    variant === "list" ? viewerListCrop.getListCoverCacheKey(book) : cacheKey;
+  const src = viewerCovers.appendCoverCacheKey(coverPath, resolvedCacheKey);
   const title = escapeHtml(book.title || "this book");
-  const listClass = variant === "list" ? ' class="cover-list-strip"' : "";
-  const imgHtml = `<img${listClass} src="${src}" alt="Cover of ${title}" loading="lazy" onerror="onCoverImageError(this)">`;
+  let imgAttrs = "";
+  if (variant === "list") {
+    const presentation = viewerListCrop.getListCoverImagePresentation(book);
+    const styleAttr = presentation.style ? ` style="${presentation.style}"` : "";
+    const bookIdAttr =
+      presentation.className === "cover-list-focal"
+        ? ` data-book-id="${book.id}"`
+        : "";
+    imgAttrs = ` class="${presentation.className}"${bookIdAttr}${styleAttr}`;
+  }
+  const imgHtml = `<img${imgAttrs} src="${src}" alt="Cover of ${title}" loading="lazy" onerror="onCoverImageError(this)">`;
 
   if (variant !== "detail") {
     return imgHtml;
@@ -405,6 +416,61 @@ window.onCoverImageError = function (img) {
   );
 };
 
+function layoutListCoverPreviewImage(img) {
+  const bookId = Number(img.dataset.bookId);
+  const book = books.find((entry) => entry.id === bookId);
+  const wrap = img.closest(".cover-wrap");
+  if (!book || !wrap || !img.naturalWidth) {
+    return;
+  }
+
+  const { x, y } = viewerListCrop.resolveListCoverFocus(book);
+  const layout = viewerListCrop.computeListCoverPreviewLayout(
+    img.naturalWidth,
+    img.naturalHeight,
+    x,
+    y,
+    wrap.clientWidth,
+    wrap.clientHeight,
+  );
+  if (!layout) {
+    return;
+  }
+
+  img.style.width = `${layout.width}px`;
+  img.style.height = `${layout.height}px`;
+  img.style.left = `${layout.left}px`;
+  img.style.top = `${layout.top}px`;
+}
+
+function layoutListCoverPreviews() {
+  if (gridViewMode !== "list") {
+    return;
+  }
+
+  grid.querySelectorAll("img.cover-list-focal[data-book-id]").forEach((img) => {
+    if (img.complete && img.naturalWidth) {
+      layoutListCoverPreviewImage(img);
+      return;
+    }
+    img.addEventListener("load", () => layoutListCoverPreviewImage(img), {
+      once: true,
+    });
+  });
+}
+
+let listCoverPreviewObserver = null;
+
+function ensureListCoverPreviewObserver() {
+  if (listCoverPreviewObserver) {
+    return;
+  }
+  listCoverPreviewObserver = new ResizeObserver(() => {
+    layoutListCoverPreviews();
+  });
+  listCoverPreviewObserver.observe(grid);
+}
+
 function renderCard(book) {
   let collectionClass = "";
   if (shouldHighlightCollectionOnCards()) {
@@ -570,6 +636,7 @@ function render() {
   }
 
   grid.innerHTML = visible.map(renderCard).join("");
+  layoutListCoverPreviews();
 
   if (!bookDetailDialog.hidden && detailBookId) {
     const detailBook = books.find((entry) => entry.id === detailBookId);

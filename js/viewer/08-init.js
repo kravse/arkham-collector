@@ -77,6 +77,8 @@ bookDetailDialog
 
 editBookForm.addEventListener("submit", saveBookEdits);
 bindEditFieldSanitizers(editBookForm);
+initListCoverPicker();
+ensureListCoverPreviewObserver();
 editDeleteBtn.addEventListener("click", deleteBook);
 editCancelBtn.addEventListener("click", closeEditDialog);
 editDialog.querySelectorAll("[data-close-edit]").forEach((element) => {
@@ -102,6 +104,14 @@ settingsTabAbout.addEventListener("click", () => {
 
 settingsTabSettings.addEventListener("click", () => {
   selectSettingsTab("settings");
+});
+
+editTabDetails.addEventListener("click", () => {
+  selectEditDialogTab("details");
+});
+
+editTabListCrop.addEventListener("click", () => {
+  selectEditDialogTab("list-crop");
 });
 
 if (coverLightbox) {
