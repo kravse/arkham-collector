@@ -539,6 +539,11 @@ body.view-mode-list .cover-wrap img {
   opacity: var(--list-cover-bg-opacity);
 }
 
+body.view-mode-list .cover-wrap img.cover-list-strip {
+  object-position: center center;
+  transform: none;
+}
+
 body.view-mode-list .cover-wrap .placeholder {
   position: absolute;
   inset: 0;

@@ -4,6 +4,9 @@ const { findCoverMasterPath } = require("./covers-files");
 
 const CARD_MAX_WIDTH = 480;
 const DETAIL_MAX_WIDTH = 960;
+const LIST_WIDTH = 1200;
+const LIST_HEIGHT = 80;
+const LIST_FOCAL_Y = 0.7;
 const WEBP_QUALITY = 80;
 
 function coverDerivativePaths(relativePath) {
@@ -13,6 +16,7 @@ function coverDerivativePaths(relativePath) {
   return {
     card: `${base}.card.webp`,
     detail: `${base}.detail.webp`,
+    list: `${base}.list.webp`,
   };
 }
 
@@ -20,11 +24,25 @@ function coverSourceKey(relativePath) {
   return String(relativePath || "").replace(/\\/g, "/");
 }
 
-function isCoverDerivativePath(relativePath) {
-  return (
-    typeof relativePath === "string" &&
-    (relativePath.endsWith(".card.webp") || relativePath.endsWith(".detail.webp"))
-  );
+function computeListCoverCrop(
+  sourceWidth,
+  sourceHeight,
+  listWidth = LIST_WIDTH,
+  listHeight = LIST_HEIGHT,
+  focalY = LIST_FOCAL_Y,
+) {
+  const targetAspect = listWidth / listHeight;
+  let cropWidth = sourceWidth;
+  let cropHeight = Math.round(cropWidth / targetAspect);
+  if (cropHeight > sourceHeight) {
+    cropHeight = sourceHeight;
+    cropWidth = Math.round(cropHeight * targetAspect);
+  }
+  const left = Math.round((sourceWidth - cropWidth) / 2);
+  const focalPx = focalY * sourceHeight;
+  let top = Math.round(focalPx - cropHeight / 2);
+  top = Math.max(0, Math.min(sourceHeight - cropHeight, top));
+  return { left, top, width: cropWidth, height: cropHeight };
 }
 
 function applyOptimizedCoverPaths(books, optimizedBySource) {
@@ -46,6 +64,7 @@ function applyOptimizedCoverPaths(books, optimizedBySource) {
       ...book,
       coverImageFile: optimized.card,
       coverImageDetailFile: optimized.detail,
+      coverImageListFile: optimized.list,
     };
   });
 }
@@ -59,15 +78,29 @@ async function writeOptimizedCoverVariants(
 ) {
   const cardWidth = options.cardWidth ?? CARD_MAX_WIDTH;
   const detailWidth = options.detailWidth ?? DETAIL_MAX_WIDTH;
+  const listWidth = options.listWidth ?? LIST_WIDTH;
+  const listHeight = options.listHeight ?? LIST_HEIGHT;
+  const listFocalY = options.listFocalY ?? LIST_FOCAL_Y;
   const quality = options.quality ?? WEBP_QUALITY;
   const derivatives = coverDerivativePaths(relativeSource);
   const cardAbs = path.join(destRoot, derivatives.card);
   const detailAbs = path.join(destRoot, derivatives.detail);
+  const listAbs = path.join(destRoot, derivatives.list);
 
   fs.mkdirSync(path.dirname(cardAbs), { recursive: true });
   fs.mkdirSync(path.dirname(detailAbs), { recursive: true });
+  fs.mkdirSync(path.dirname(listAbs), { recursive: true });
 
   const image = sharp(sourcePath).rotate();
+  const metadata = await image.metadata();
+  const crop = computeListCoverCrop(
+    metadata.width,
+    metadata.height,
+    listWidth,
+    listHeight,
+    listFocalY,
+  );
+
   await image
     .clone()
     .resize({ width: cardWidth, withoutEnlargement: true })
@@ -78,12 +111,20 @@ async function writeOptimizedCoverVariants(
     .resize({ width: detailWidth, withoutEnlargement: true })
     .webp({ quality })
     .toFile(detailAbs);
+  await image
+    .clone()
+    .extract(crop)
+    .resize(listWidth, listHeight)
+    .webp({ quality })
+    .toFile(listAbs);
 
   return {
     card: derivatives.card.replace(/\\/g, "/"),
     detail: derivatives.detail.replace(/\\/g, "/"),
+    list: derivatives.list.replace(/\\/g, "/"),
     cardBytes: fs.statSync(cardAbs).size,
     detailBytes: fs.statSync(detailAbs).size,
+    listBytes: fs.statSync(listAbs).size,
   };
 }
 
@@ -105,6 +146,7 @@ async function optimizeCoverPaths(coverPaths, options = {}) {
     missing: 0,
     cardBytes: 0,
     detailBytes: 0,
+    listBytes: 0,
   };
 
   for (const relativePath of coverPaths) {
@@ -126,6 +168,7 @@ async function optimizeCoverPaths(coverPaths, options = {}) {
     stats.processed += 1;
     stats.cardBytes += result.cardBytes;
     stats.detailBytes += result.detailBytes;
+    stats.listBytes += result.listBytes;
   }
 
   return { optimizedBySource, stats };
@@ -134,9 +177,13 @@ async function optimizeCoverPaths(coverPaths, options = {}) {
 module.exports = {
   CARD_MAX_WIDTH,
   DETAIL_MAX_WIDTH,
+  LIST_WIDTH,
+  LIST_HEIGHT,
+  LIST_FOCAL_Y,
   WEBP_QUALITY,
   coverDerivativePaths,
   coverSourceKey,
+  computeListCoverCrop,
   applyOptimizedCoverPaths,
   writeOptimizedCoverVariants,
   optimizeCoverPaths,

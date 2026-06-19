@@ -10,6 +10,7 @@ const book = {
   id: 42,
   coverImageFile: "covers/the-dunwich-horror-42.card.webp",
   coverImageDetailFile: "covers/the-dunwich-horror-42.detail.webp",
+  coverImageListFile: "covers/the-dunwich-horror-42.list.webp",
 };
 
 test("getCoverPath returns coverImageFile for card and detail", () => {
@@ -21,6 +22,37 @@ test("getCoverPath returns detail derivative for lightbox", () => {
   assert.equal(
     getCoverPath(book, "lightbox"),
     "covers/the-dunwich-horror-42.detail.webp",
+  );
+});
+
+test("getCoverPath returns list derivative for list mode", () => {
+  assert.equal(
+    getCoverPath(book, "list"),
+    "covers/the-dunwich-horror-42.list.webp",
+  );
+});
+
+test("getCoverPath list falls back to detail then card", () => {
+  assert.equal(
+    getCoverPath(
+      {
+        id: 419,
+        coverImageFile: "covers/the-outsider-and-others-419.card.webp",
+        coverImageDetailFile: "covers/the-outsider-and-others-419.detail.webp",
+      },
+      "list",
+    ),
+    "covers/the-outsider-and-others-419.detail.webp",
+  );
+  assert.equal(
+    getCoverPath(
+      {
+        id: 419,
+        coverImageFile: "covers/the-outsider-and-others-419.webp",
+      },
+      "list",
+    ),
+    "covers/the-outsider-and-others-419.webp",
   );
 });
 

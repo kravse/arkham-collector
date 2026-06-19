@@ -62,9 +62,9 @@ npm run build && open build/index.html   # read-only static site (matches deploy
 
 **`npm run serve`** — edit metadata, upload covers, hide or soft-delete titles; changes go to `data/edits.json` only.
 
-**`npm run build`** — writes `build/` for static hosting (`READ_ONLY`, bundled CSS/JS, `noindex`). Cover images in `covers/` are resized to WebP at build time (480px card thumbnails + 960px detail images); masters stay in the repo but only optimized files ship in `build/`.
+**`npm run build`** — writes `build/` for static hosting (`READ_ONLY`, bundled CSS/JS, `noindex`). Cover images in `covers/` are resized to WebP at build time (480px card thumbnails, 960px detail images, and 1200×80 list strips); masters stay in the repo but only optimized files ship in `build/`.
 
-**Cover images:** Drop high-resolution scans into `covers/` using the existing `{slug}-{id}.{ext}` naming (or set `coverImageFile` via edits). `npm run serve` uses the originals for local dev. `npm run build` generates `*.card.webp` and `*.detail.webp` derivatives for the deploy site. After uploading large covers, run `npm run shrink-cover-masters` to resize masters in place before committing (default max edge 1600px; use `shrink-cover-masters:dry-run` to preview).
+**Cover images:** Drop high-resolution scans into `covers/` using the existing `{slug}-{id}.{ext}` naming (or set `coverImageFile` via edits). `npm run serve` uses the originals for local dev. `npm run build` generates `*.card.webp`, `*.detail.webp`, and `*.list.webp` derivatives for the deploy site (list strips power list-view row backgrounds). After uploading large covers, run `npm run shrink-cover-masters` to resize masters in place before committing (default max edge 1600px; use `shrink-cover-masters:dry-run` to preview).
 
 ## Customize the catalog (maintainers)
 
@@ -136,7 +136,7 @@ Entry point: `node scripts/index.js`. Common flags: `--yes`, `--local`, `--limit
 |--------|---------|
 | `sync-collection` | CSV → `collection.js` (also runs on `build` / `serve`) |
 | `compact-edits` | Drop edit fields that match scraped data |
-| `shrink-cover-masters` | Resize large cover masters in `covers/` in place (skips `*.card.webp` / `*.detail.webp`) |
+| `shrink-cover-masters` | Resize large cover masters in `covers/` in place (skips `*.card.webp`, `*.detail.webp`, and `*.list.webp`) |
 | `shrink-cover-masters:dry-run` | Preview master cover shrink without writing |
 | `report-small-covers` | Flag cover masters under 700px longest edge; write `cover-review/index.html`, serve on port 28471, upload covers into edits, Google Image Search + eBay search links |
 | `fix-arkham-magazines` | Move issue/season data out of `listAuthor` into `title` and `publicationDate` for Arkham Sampler and Collector magazine issues |

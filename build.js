@@ -210,6 +210,7 @@ async function buildStaticSiteAsync() {
   let missingCovers = 0;
   let coverCardBytes = 0;
   let coverDetailBytes = 0;
+  let coverListBytes = 0;
   let booksForDeploy = mergedBooks;
 
   if (coverPaths.size) {
@@ -225,6 +226,7 @@ async function buildStaticSiteAsync() {
     missingCovers = stats.missing;
     coverCardBytes = stats.cardBytes;
     coverDetailBytes = stats.detailBytes;
+    coverListBytes = stats.listBytes;
   }
 
   writeViewerBookScripts(booksForDeploy, buildDataDir);
@@ -293,7 +295,7 @@ async function buildStaticSiteAsync() {
   );
   console.log(`Static assets copied: ${copiedAssets}`);
   console.log(
-    `Covers optimized: ${optimizedCovers} (${(coverCardBytes / 1024).toFixed(1)} KB card + ${(coverDetailBytes / 1024).toFixed(1)} KB detail WebP)`,
+    `Covers optimized: ${optimizedCovers} (${(coverCardBytes / 1024).toFixed(1)} KB card + ${(coverDetailBytes / 1024).toFixed(1)} KB detail + ${(coverListBytes / 1024).toFixed(1)} KB list WebP)`,
   );
   if (missingCovers) {
     console.log(`Covers missing on disk: ${missingCovers}`);
