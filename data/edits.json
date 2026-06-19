@@ -139,18 +139,23 @@
       "coverImageFile": "covers/the-cleansing-novel-243.jpg"
     },
     "245": {
-      "goodreadsUrl": "https://www.goodreads.com/book/show/370614.Book_of_the_Dead",
-      "coverImageFile": "covers/book-of-the-dead-memoir-245.jpg"
+      "coverImageFile": "covers/book-of-the-dead-memoir-245.jpg",
+      "listCoverFocusX": 0.6659663865546218,
+      "listCoverFocusY": 0.4360933324905125,
+      "goodreadsUrl": "https://www.goodreads.com/book/show/370614.Book_of_the_Dead"
     },
     "246": {
       "description": "Arkham's Masters of Horror is an anthology of fantasy and horror stories edited by Peter Ruber. It was released by Arkham House in an edition of approximately 4,000 copies in 2000. The book includes an introductory essay by Ruber before each story and about its author.\n\nRuber drew criticism from the horror/fantasy community for the hostility with which he introduced some authors within the volume - for instance, his accusation that H.P. Lovecraft \"had a schizoid personality\" and could be labelled \"a genuine crackpot.\"",
-      "coverImageFile": "covers/arkhams-masters-of-horror-246.jpg"
+      "coverImageFile": "covers/arkhams-masters-of-horror-246.jpg",
+      "listCoverFocusX": 0.4369747899159664,
+      "listCoverFocusY": 0.7528329155961413
     },
     "247": {
       "coverImageFile": "covers/in-the-stone-house-247.jpg"
     },
     "248": {
-      "coverImageFile": "covers/sixty-years-of-arkham-house-248.jpg"
+      "listCoverFocusX": 0.27941176470588236,
+      "listCoverFocusY": 0.08713518634633105
     },
     "249": {
       "coverImageFile": "covers/dragonfly-durbin-novel-249.jpg"
@@ -165,11 +170,18 @@
       "coverImageFile": "covers/voyages-by-starlight-253.jpg"
     },
     "254": {
-      "coverImageFile": "covers/synthesis-other-virtual-realities-254.jpg"
+      "coverImageFile": "covers/synthesis-other-virtual-realities-254.jpg",
+      "listCoverFocusX": 0.6218487394957983,
+      "listCoverFocusY": 0.5741648590513125
+    },
+    "255": {
+      "listCoverFocusX": 0.37815126050420167,
+      "listCoverFocusY": 0.38558352822959757
     },
     "256": {
-      "publicationDate": "1995",
-      "coverImageFile": "covers/miscellaneous-writings-256.jpg"
+      "listCoverFocusX": 0.5861344537815126,
+      "listCoverFocusY": 0.7993622826273099,
+      "publicationDate": "1995"
     },
     "257": {
       "coverImageFile": "covers/the-breath-of-suspension-257.jpg"
@@ -178,7 +190,9 @@
       "coverImageFile": "covers/the-aliens-of-earth-258.jpg"
     },
     "259": {
-      "coverImageFile": "covers/alone-with-the-horrors-the-great-short-fiction-of-ramsey-campbell-1961-1991-259.jpg"
+      "coverImageFile": "covers/alone-with-the-horrors-the-great-short-fiction-of-ramsey-campbell-1961-1991-259.jpg",
+      "listCoverFocusX": 0.5147058823529411,
+      "listCoverFocusY": 0.22736756673254094
     },
     "260": {
       "coverImageFile": "covers/meeting-in-infinity-260.jpg"
@@ -194,11 +208,13 @@
       "coverImageFile": "covers/the-ends-of-the-earth-science-fiction-stories-263.png"
     },
     "265": {
+      "coverImageFile": "covers/cthulhu-mythos-anthology-265.jpg",
+      "description": "Arkham House released a revised edition of Tales of the Cthulhu Mythos in November 1990, edited by Jim Turner with a substantially different selection of stories, reflecting the editor's disdain for \"Mythos pastiches in which eccentric New England recluses utter the right incantations in the wrong books and are promptly eaten by a giant frog named Cthulhu.\" It was released in an edition of 7,015 copies.\n\nTurner eliminates some authors from the earlier edition (totalling four stories, those by Wade, Shea and two by Lumley) --while still suggesting that \"a few of the earliest pieces in this volume.now seem like pop-cultural kitsch.\"\n\nThe added seven stories, he writes, are from \"the relative handful of successful works that have been influenced by the Cthulhu Mythos.exemplifying the darkly enduring power of H. P. Lovecraft over a disparate group of writers who have made their own inimitable contributions to the Mythos.\"",
+      "listCoverFocusX": 0.5777310924369747,
+      "listCoverFocusY": 0.14194194495365525,
       "publicationDate": "1990",
       "decade": "1990s",
-      "wikipediaUrl": "https://en.wikipedia.org/wiki/Cthulhu_Mythos_anthology#Tales_of_the_Cthulhu_Mythos:_Golden_Anniversary_Anthology",
-      "coverImageFile": "covers/cthulhu-mythos-anthology-265.jpg",
-      "description": "Arkham House released a revised edition of Tales of the Cthulhu Mythos in November 1990, edited by Jim Turner with a substantially different selection of stories, reflecting the editor's disdain for \"Mythos pastiches in which eccentric New England recluses utter the right incantations in the wrong books and are promptly eaten by a giant frog named Cthulhu.\" It was released in an edition of 7,015 copies.\n\nTurner eliminates some authors from the earlier edition (totalling four stories, those by Wade, Shea and two by Lumley) --while still suggesting that \"a few of the earliest pieces in this volume.now seem like pop-cultural kitsch.\"\n\nThe added seven stories, he writes, are from \"the relative handful of successful works that have been influenced by the Cthulhu Mythos.exemplifying the darkly enduring power of H. P. Lovecraft over a disparate group of writers who have made their own inimitable contributions to the Mythos.\""
+      "wikipediaUrl": "https://en.wikipedia.org/wiki/Cthulhu_Mythos_anthology#Tales_of_the_Cthulhu_Mythos:_Golden_Anniversary_Anthology"
     },
     "266": {
       "coverImageFile": "covers/crystal-express-266.jpg"
@@ -214,10 +230,14 @@
       "listCoverFocusY": 0.2624382583048793
     },
     "270": {
-      "coverImageFile": "covers/polyphemus-book-270.jpg"
+      "coverImageFile": "covers/polyphemus-book-270.jpg",
+      "listCoverFocusX": 0.5042016806722689,
+      "listCoverFocusY": 0.1399285888671875
     },
     "271": {
-      "coverImageFile": "covers/the-jaguar-hunter-271.jpg"
+      "coverImageFile": "covers/the-jaguar-hunter-271.jpg",
+      "listCoverFocusX": 0.47478991596638653,
+      "listCoverFocusY": 0.4955386655661908
     },
     "272": {
       "coverImageFile": "covers/tales-of-the-quintana-roo-272.jpg",
@@ -878,6 +898,10 @@
     "428": {
       "hidden": true,
       "deleted": true
+    },
+    "430": {
+      "listCoverFocusX": 0.4852941176470588,
+      "listCoverFocusY": 0.7732387874218338
     },
     "432": {
       "coverImageFile": "covers/the-dunwich-horror-and-others-432.webp"
