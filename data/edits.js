@@ -163,6 +163,9 @@ window.BOOK_EDITS = {
   "285": {
     "coverImageFile": "covers/blooded-on-arachne-285.jpg"
   },
+  "288": {
+    "coverImageFile": "covers/the-third-grave-288.jpg"
+  },
   "289": {
     "title": "New Tales of the Cthulhu Mythos",
     "author": "Ramsey Campbell (Ed.)",
@@ -170,11 +173,20 @@ window.BOOK_EDITS = {
     "description": "New Tales of the Cthulhu Mythos was edited by Ramsey Campbell and published by Arkham House in 1980 in an edition of 3,647 copies. In his introduction, Campbell noted that \"in recent years the Mythos at times has seemed in danger of becoming conventionalized,\" despite the fact that \"Lovecraft's intention and achievement was precisely to avoid the predictability and resultant lack of terror which beset the conventional macabre fiction of his day.\" Therefore, Campbell wrote, \"in this anthology I have tended to favor less familiar treatments or uses of the Mythos. They contain few erudite occultists, decaying towns, or stylistic pastiches. Indeed, one of our tales hints at the ultimate event of the Mythos without ever referring to the traditional names.\"\n\nOne story in the book is an expansion, by Martin S. Warnes, of Lovecraft's fragment \"The Book\".",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Cthulhu_Mythos_anthology#New_Tales_of_the_Cthulhu_Mythos"
   },
+  "295": {
+    "coverImageFile": "covers/born-to-exile-295.jpg"
+  },
   "296": {
     "coverImageFile": "covers/in-mayan-splendor-296.jpg"
   },
   "297": {
     "coverImageFile": "covers/the-horror-at-oakdeene-and-others-297.jpg"
+  },
+  "298": {
+    "coverImageFile": "covers/and-afterward-the-dark-298.jpg"
+  },
+  "299": {
+    "coverImageFile": "covers/kecksies-and-other-twilight-tales-299.jpg"
   },
   "303": {
     "coverImageFile": "covers/selected-letters-of-h-p-lovecraft-v-1934-1937-303.jpg"
@@ -297,6 +309,9 @@ window.BOOK_EDITS = {
   "370": {
     "coverImageFile": "covers/pleasant-dreams-nightmares-370.jpg"
   },
+  "371": {
+    "coverImageFile": "covers/the-abominations-of-yondo-371.jpg"
+  },
   "372": {
     "goodreadsUrl": "https://www.goodreads.com/book/show/10049265-the-shuttered-room-and-other-pieces",
     "coverImageFile": "covers/the-shuttered-room-and-other-pieces-372.webp"
@@ -313,6 +328,9 @@ window.BOOK_EDITS = {
   },
   "376": {
     "coverImageFile": "covers/the-mask-of-cthulhu-376.jpg"
+  },
+  "377": {
+    "coverImageFile": "covers/spells-and-philtres-377.png"
   },
   "378": {
     "goodreadsUrl": "https://www.goodreads.com/book/show/1512252.Always_Comes_Evening",
