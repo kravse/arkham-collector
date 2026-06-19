@@ -2,6 +2,9 @@ window.BOOK_EDITS = {
   "181": {
     "hidden": true
   },
+  "212": {
+    "hidden": true
+  },
   "214": {
     "goodreadsUrl": "https://www.goodreads.com/book/show/879503.The_Final_Adventures_of_Solar_Pons"
   },
@@ -30,7 +33,8 @@ window.BOOK_EDITS = {
     "goodreadsUrl": "https://www.goodreads.com/book/show/10041771-three-problems-for-solar-pons"
   },
   "229": {
-    "goodreadsUrl": "https://www.goodreads.com/book/show/1831257.The_Memoirs_of_Solar_Pons"
+    "goodreadsUrl": "https://www.goodreads.com/book/show/1831257.The_Memoirs_of_Solar_Pons",
+    "coverImageFile": "covers/the-memoirs-of-solar-pons-229.png"
   },
   "230": {
     "goodreadsUrl": "https://www.goodreads.com/book/show/345563.Carnacki_the_Ghost_Finder"
@@ -65,7 +69,6 @@ window.BOOK_EDITS = {
   },
   "237": {
     "hidden": true,
-    "coverImageFile": "covers/august-derleths-eerie-creatures-237.jpg",
     "description": "Part of the The Macabre Quarto. \n\nIntroduction by Brian Lumley\n\n--Vampire\nBat's Belfry (1926)\nNellie Foster (1933)\nThe Satin Mask (1936)\nThe Drifting Snow (1939)\nThe Occupant of the Crypt (1947)\nReanimated Dead\nThey Shall Rise (1936)\nThe Return of Sarah Purcell (1936)\nDeath Holds the Post (1936)\nA Gentleman from Prague (1944)\nParrington's Pool (1947)\n--Shapeshifters\nThe Owl on the Moor (1928)\nThe Woman at Loon Point (1936)\nElemental/Mythological\nThe Deserted Garden (1929)\nOld Mark (1929)\nThe Place in the Woods (1954)\n--Imps and Demons\nScarlatti's Bottle (1929)\nThe Captain is Afraid (1931)\nLesandro's Familiar (1936)\nBramwell's Guardian (1940)\nMr. Ames' Devil (1943)\nBaynter's Imp (1943)\nBlessed are the Meek (1948)\nBalu (1949)\nSaunder's Little Friend (1948)\n--Miscellaneous\nThe Marmoset (1926)\nThe Tenant (1928)\nRiders in the Sky (1928)\nThe Pacer (1930)\nRed Hands (1932)\nThe Carven Image (1932)"
   },
   "238": {
@@ -73,37 +76,65 @@ window.BOOK_EDITS = {
     "goodreadsUrl": "https://www.goodreads.com/book/show/8507286-the-shunned-house",
     "description": "A total of 100 copies were bound under the Arkham House imprint in 1961. Despite bearing that imprint, this volume is not a genuine Arkham House production in the traditional sense — the actual printing was carried out by W. Paul Cook back in 1928. The printed sheets sat unbound and largely undistributed for years, with R. H. Barlow circulating a small number of copies in 1935, before Arkham House finally bound the remaining 100 sets. The book includes an introduction by Frank Belknap Long. [The spine notation and dust jacket details appear corrupted in the source text and cannot be accurately reproduced.]\n\nSometime around 1965, a forgery surfaced, believed to have originated in England. It was produced via offset printing of the original text, bound in red half leather with gold spine stamping. The forged print run is estimated at several hundred copies."
   },
+  "239": {
+    "coverImageFile": "covers/evermore-anthology-239.jpg"
+  },
   "240": {
     "coverImageFile": "covers/other-worlds-than-ours-240.jpg"
+  },
+  "241": {
+    "coverImageFile": "covers/cave-of-a-thousand-tales-241.jpg"
+  },
+  "242": {
+    "coverImageFile": "covers/selected-letters-of-clark-ashton-smith-242.jpg"
   },
   "243": {
     "coverImageFile": "covers/the-cleansing-novel-243.jpg"
   },
   "245": {
-    "goodreadsUrl": "https://www.goodreads.com/book/show/370614.Book_of_the_Dead"
+    "goodreadsUrl": "https://www.goodreads.com/book/show/370614.Book_of_the_Dead",
+    "coverImageFile": "covers/book-of-the-dead-memoir-245.jpg"
   },
   "246": {
     "description": "Arkham's Masters of Horror is an anthology of fantasy and horror stories edited by Peter Ruber. It was released by Arkham House in an edition of approximately 4,000 copies in 2000. The book includes an introductory essay by Ruber before each story and about its author.\n\nRuber drew criticism from the horror/fantasy community for the hostility with which he introduced some authors within the volume - for instance, his accusation that H.P. Lovecraft \"had a schizoid personality\" and could be labelled \"a genuine crackpot.\"",
     "coverImageFile": "covers/arkhams-masters-of-horror-246.jpg"
   },
+  "247": {
+    "coverImageFile": "covers/in-the-stone-house-247.jpg"
+  },
   "248": {
     "coverImageFile": "covers/sixty-years-of-arkham-house-248.jpg"
+  },
+  "249": {
+    "coverImageFile": "covers/dragonfly-durbin-novel-249.jpg"
+  },
+  "250": {
+    "coverImageFile": "covers/new-horizons-book-250.jpg"
   },
   "251": {
     "coverImageFile": "covers/lovecraft-remembered-251.jpg"
   },
-  "255": {
-    "coverImageFile": "covers/cthulhu-2000-255.jpg"
+  "253": {
+    "coverImageFile": "covers/voyages-by-starlight-253.jpg"
+  },
+  "254": {
+    "coverImageFile": "covers/synthesis-other-virtual-realities-254.jpg"
   },
   "256": {
     "publicationDate": "1995",
     "coverImageFile": "covers/miscellaneous-writings-256.jpg"
+  },
+  "257": {
+    "coverImageFile": "covers/the-breath-of-suspension-257.jpg"
   },
   "258": {
     "coverImageFile": "covers/the-aliens-of-earth-258.jpg"
   },
   "259": {
     "coverImageFile": "covers/alone-with-the-horrors-the-great-short-fiction-of-ramsey-campbell-1961-1991-259.jpg"
+  },
+  "260": {
+    "coverImageFile": "covers/meeting-in-infinity-260.jpg"
   },
   "261": {
     "coverImageFile": "covers/lord-kelvins-machine-261.jpg"
@@ -115,15 +146,15 @@ window.BOOK_EDITS = {
     "publicationDate": "1991",
     "coverImageFile": "covers/the-ends-of-the-earth-science-fiction-stories-263.png"
   },
-  "264": {
-    "coverImageFile": "covers/her-smoke-rose-up-forever-264.jpg"
-  },
   "265": {
     "publicationDate": "1990",
     "decade": "1990s",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Cthulhu_Mythos_anthology#Tales_of_the_Cthulhu_Mythos:_Golden_Anniversary_Anthology",
-    "coverImageFile": "covers/tales-of-the-cthulhu-mythos-golden-anniversary-anthology-265.jpg",
+    "coverImageFile": "covers/cthulhu-mythos-anthology-265.jpg",
     "description": "Arkham House released a revised edition of Tales of the Cthulhu Mythos in November 1990, edited by Jim Turner with a substantially different selection of stories, reflecting the editor's disdain for \"Mythos pastiches in which eccentric New England recluses utter the right incantations in the wrong books and are promptly eaten by a giant frog named Cthulhu.\" It was released in an edition of 7,015 copies.\n\nTurner eliminates some authors from the earlier edition (totalling four stories, those by Wade, Shea and two by Lumley) --while still suggesting that \"a few of the earliest pieces in this volume.now seem like pop-cultural kitsch.\"\n\nThe added seven stories, he writes, are from \"the relative handful of successful works that have been influenced by the Cthulhu Mythos.exemplifying the darkly enduring power of H. P. Lovecraft over a disparate group of writers who have made their own inimitable contributions to the Mythos.\""
+  },
+  "266": {
+    "coverImageFile": "covers/crystal-express-266.jpg"
   },
   "267": {
     "coverImageFile": "covers/the-horror-in-the-museum-and-other-revisions-267.jpg"
@@ -139,6 +170,9 @@ window.BOOK_EDITS = {
   },
   "272": {
     "coverImageFile": "covers/tales-of-the-quintana-roo-272.jpg"
+  },
+  "273": {
+    "coverImageFile": "covers/dreams-of-dark-and-light-the-great-short-fiction-of-tanith-lee-273.jpg"
   },
   "274": {
     "coverImageFile": "covers/dagon-and-other-macabre-tales-274.png"
@@ -158,6 +192,9 @@ window.BOOK_EDITS = {
   "279": {
     "coverImageFile": "covers/watchers-at-the-strait-gate-279.webp"
   },
+  "280": {
+    "coverImageFile": "covers/one-winter-in-eden-280.jpg"
+  },
   "281": {
     "coverImageFile": "covers/the-zanzibar-cat-281.jpg"
   },
@@ -173,6 +210,12 @@ window.BOOK_EDITS = {
   "285": {
     "coverImageFile": "covers/blooded-on-arachne-285.jpg"
   },
+  "286": {
+    "coverImageFile": "covers/tales-from-the-nightside-286.png"
+  },
+  "287": {
+    "coverImageFile": "covers/collected-poems-richard-l-tierney-287.jpg"
+  },
   "288": {
     "coverImageFile": "covers/the-third-grave-288.jpg"
   },
@@ -182,6 +225,15 @@ window.BOOK_EDITS = {
     "coverImageFile": "covers/new-tales-of-the-cthulhu-mythos-289.jpg",
     "description": "New Tales of the Cthulhu Mythos was edited by Ramsey Campbell and published by Arkham House in 1980 in an edition of 3,647 copies. In his introduction, Campbell noted that \"in recent years the Mythos at times has seemed in danger of becoming conventionalized,\" despite the fact that \"Lovecraft's intention and achievement was precisely to avoid the predictability and resultant lack of terror which beset the conventional macabre fiction of his day.\" Therefore, Campbell wrote, \"in this anthology I have tended to favor less familiar treatments or uses of the Mythos. They contain few erudite occultists, decaying towns, or stylistic pastiches. Indeed, one of our tales hints at the ultimate event of the Mythos without ever referring to the traditional names.\"\n\nOne story in the book is an expansion, by Martin S. Warnes, of Lovecraft's fragment \"The Book\".",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Cthulhu_Mythos_anthology#New_Tales_of_the_Cthulhu_Mythos"
+  },
+  "290": {
+    "coverImageFile": "covers/necropolis-copper-novel-290.jpg"
+  },
+  "291": {
+    "coverImageFile": "covers/the-black-book-of-clark-ashton-smith-291.jpg"
+  },
+  "292": {
+    "coverImageFile": "covers/the-princess-of-all-lands-292.jpg"
   },
   "293": {
     "coverImageFile": "covers/in-the-mist-and-other-uncanny-encounters-293.png"
@@ -207,6 +259,12 @@ window.BOOK_EDITS = {
   "300": {
     "coverImageFile": "covers/the-height-of-the-scream-300.jpg"
   },
+  "301": {
+    "coverImageFile": "covers/literary-swordsmen-and-sorcerers-301.jpg"
+  },
+  "302": {
+    "coverImageFile": "covers/dwellers-in-darkness-302.jpg"
+  },
   "303": {
     "coverImageFile": "covers/selected-letters-of-h-p-lovecraft-v-1934-1937-303.jpg"
   },
@@ -224,8 +282,17 @@ window.BOOK_EDITS = {
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Purcell_Papers",
     "description": "This collection includes only a selection of the stories from the original 1880 edition of The Purcell Papers, along with several stories not found in that edition. The individual tales originally appeared in print between 1838 and 1871. Derleth's attribution of \"A Night in the Bell Inn\" — published in Dublin University Magazine in June 1850 — to LeFanu was based on internal textual evidence, however later scholarship has since identified the actual author as a little-known Irish writer, Henry Ferris, who lived approximately from 1801 to 1853."
   },
+  "307": {
+    "coverImageFile": "covers/nameless-places-307.jpg"
+  },
   "308": {
     "coverImageFile": "covers/the-house-of-the-worm-308.jpg"
+  },
+  "309": {
+    "coverImageFile": "covers/harrigans-file-309.jpg"
+  },
+  "310": {
+    "coverImageFile": "covers/x-lucha-and-others-310.png"
   },
   "311": {
     "coverArtist": "Frank Utpatel",
@@ -243,11 +310,17 @@ window.BOOK_EDITS = {
   "315": {
     "coverImageFile": "covers/stories-of-darkness-and-dread-315.jpg"
   },
+  "316": {
+    "coverImageFile": "covers/from-evils-pillow-316.jpg"
+  },
   "317": {
     "coverImageFile": "covers/demons-by-daylight-317.png"
   },
   "318": {
     "coverImageFile": "covers/the-rim-of-the-unknown-318.jpg"
+  },
+  "319": {
+    "coverImageFile": "covers/disclosures-in-scarlet-319.jpg"
   },
   "320": {
     "coverImageFile": "covers/the-arkham-collector-volume-i-320.jpg"
@@ -270,6 +343,9 @@ window.BOOK_EDITS = {
   "326": {
     "coverImageFile": "covers/eight-tales-326.jpg"
   },
+  "327": {
+    "coverImageFile": "covers/the-face-in-the-mirror-327.png"
+  },
   "328": {
     "coverImageFile": "covers/selected-poems-c-a-smith-328.jpg"
   },
@@ -279,6 +355,9 @@ window.BOOK_EDITS = {
   "330": {
     "coverImageFile": "covers/demons-and-dinosaurs-330.jpg"
   },
+  "331": {
+    "coverImageFile": "covers/thirty-years-of-arkham-house-1939-69-a-history-and-bibliography-331.jpg"
+  },
   "332": {
     "coverImageFile": "covers/the-folsom-flint-and-other-curious-tales-332.jpg"
   },
@@ -287,8 +366,14 @@ window.BOOK_EDITS = {
     "description": "Tales of the Cthulhu Mythos, edited by writer August Derleth and published by Arkham House in 1969, is considered the first Cthulhu Mythos anthology. It contained two stories by Lovecraft, a number of reprints of pieces written by members of Lovecraft's circle of correspondents, and several new tales written for the collection by a new generation of Cthulhu Mythos writers. It was published in an edition of 4,024 copies.\n\nDerleth prefaced the collection with \"The Cthulhu Mythos\", an outline of his (sometimes controversial) views on the development and content of the Mythos. In this introduction, Derleth prematurely declared the genre to be dead--\"for certainly the Mythos as an inspiration for new fiction is hardly likely to afford readers with enough that is new and sufficiently different in execution to create a continuing and growing demand\".\n\nLin Carter later wrote that Tales of the Cthulhu Mythos \"marked the beginning of a new era in the history of the Mythos for many reasons, and one of the most important was that it introduced a number of new writers in the Mythos.\"",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Cthulhu_Mythos_anthology#Tales_of_the_Cthulhu_Mythos"
   },
+  "334": {
+    "coverImageFile": "covers/nightmares-and-daydreams-334.jpg"
+  },
   "335": {
     "coverImageFile": "covers/selected-letters-of-h-p-lovecraft-ii-1925-1929-335.jpg"
+  },
+  "336": {
+    "coverImageFile": "covers/the-green-round-336.jpg"
   },
   "337": {
     "coverImageFile": "covers/strange-gateways-337.jpg"
@@ -301,11 +386,26 @@ window.BOOK_EDITS = {
     "coverImageFile": "covers/travellers-by-night-340.jpg"
   },
   "341": {
-    "goodreadsUrl": "https://www.goodreads.com/book/show/20705405-deep-waters",
-    "coverImageFile": "covers/deep-waters-book-341.jpg"
+    "goodreadsUrl": "https://www.goodreads.com/book/show/20705405-deep-waters"
+  },
+  "342": {
+    "coverImageFile": "covers/black-medicine-342.jpg"
+  },
+  "343": {
+    "coverImageFile": "covers/colonel-markesan-and-less-pleasant-people-343.jpg"
+  },
+  "345": {
+    "coverImageFile": "covers/strange-harvest-book-345.jpg"
   },
   "346": {
-    "goodreadsUrl": "https://www.goodreads.com/book/show/3602733-something-breathing"
+    "goodreadsUrl": "https://www.goodreads.com/book/show/3602733-something-breathing",
+    "coverImageFile": "covers/something-breathing-346.jpg"
+  },
+  "347": {
+    "coverImageFile": "covers/the-quick-and-the-dead-collection-347.jpg"
+  },
+  "348": {
+    "coverImageFile": "covers/poems-in-prose-smith-348.jpg"
   },
   "349": {
     "coverImageFile": "covers/selected-letters-of-h-p-lovecraft-i-1911-1924-349.jpg"
@@ -325,8 +425,14 @@ window.BOOK_EDITS = {
   "354": {
     "coverImageFile": "covers/poems-for-midnight-354.jpg"
   },
+  "355": {
+    "coverImageFile": "covers/the-inhabitant-of-the-lake-and-less-welcome-tenants-355.jpg"
+  },
   "356": {
     "coverImageFile": "covers/the-dark-man-and-others-356.jpg"
+  },
+  "357": {
+    "coverImageFile": "covers/mr-george-and-other-odd-persons-357.jpg"
   },
   "358": {
     "coverImageFile": "covers/who-fears-the-devil-358.jpg"
@@ -335,11 +441,20 @@ window.BOOK_EDITS = {
     "coverImageFile": "covers/autobiography-some-notes-on-a-nonentity-359.png",
     "goodreadsUrl": "https://www.goodreads.com/book/show/29865383-autobiography-some-notes-on-a-nonentity"
   },
+  "360": {
+    "coverImageFile": "covers/collected-poems-h-p-lovecraft-360.jpg"
+  },
   "361": {
     "coverImageFile": "covers/the-horror-from-the-hills-361.jpg"
   },
+  "362": {
+    "coverImageFile": "covers/100-books-by-august-derleth-362.jpg"
+  },
   "364": {
     "coverImageFile": "covers/dark-mind-dark-heart-364.png"
+  },
+  "365": {
+    "coverImageFile": "covers/lonesome-places-365.jpg"
   },
   "366": {
     "coverImageFile": "covers/dreams-and-fancies-366.jpg"
@@ -361,7 +476,8 @@ window.BOOK_EDITS = {
     "coverImageFile": "covers/the-shuttered-room-and-other-pieces-372.webp"
   },
   "373": {
-    "goodreadsUrl": "https://www.goodreads.com/book/show/5743580-some-notes-on-h-p-lovecraft"
+    "goodreadsUrl": "https://www.goodreads.com/book/show/5743580-some-notes-on-h-p-lovecraft",
+    "coverImageFile": "covers/some-notes-on-h-p-lovecraft-373.png"
   },
   "374": {
     "title": "Arkham House: The First 20 Years",
@@ -369,6 +485,9 @@ window.BOOK_EDITS = {
     "goodreadsUrl": "https://www.goodreads.com/book/show/133432742-arkham-house",
     "coverArtist": "Frank Utpatel",
     "description": "Jacket artwork by Frank Utpatel. A total of 815 copies were produced, including 80 copies issued in library bindings. This anniversary publication was subsequently revised and expanded as Thirty Years of Arkham House (1970; no. 105)."
+  },
+  "375": {
+    "coverImageFile": "covers/nine-horrors-and-a-dream-375.jpg"
   },
   "376": {
     "coverImageFile": "covers/the-mask-of-cthulhu-376.jpg"
@@ -383,8 +502,8 @@ window.BOOK_EDITS = {
   "379": {
     "coverImageFile": "covers/the-survivor-and-others-379.jpg"
   },
-  "382": {
-    "coverImageFile": "covers/nights-yawning-peal-a-ghostly-company-382.jpg"
+  "380": {
+    "coverImageFile": "covers/the-feasting-dead-380.jpg"
   },
   "383": {
     "coverImageFile": "covers/tales-from-underwood-383.png"
@@ -394,6 +513,9 @@ window.BOOK_EDITS = {
   },
   "385": {
     "coverImageFile": "covers/a-hornbook-for-witches-385.png"
+  },
+  "386": {
+    "coverImageFile": "covers/the-throne-of-saturn-short-story-collection-386.jpg"
   },
   "387": {
     "coverImageFile": "covers/something-about-cats-and-other-pieces-387.jpg"
@@ -407,12 +529,6 @@ window.BOOK_EDITS = {
   "390": {
     "coverImageFile": "covers/roads-novel-390.jpg"
   },
-  "392": {
-    "coverImageFile": "covers/the-web-of-easter-island-392.jpg"
-  },
-  "393": {
-    "coverImageFile": "covers/the-travelling-grave-and-other-stories-393.jpg"
-  },
   "394": {
     "coverImageFile": "covers/nights-black-agents-394.jpg"
   },
@@ -424,7 +540,7 @@ window.BOOK_EDITS = {
     "coverImageFile": "covers/dark-carnival-short-story-collection-396.jpg"
   },
   "397": {
-    "coverImageFile": "covers/dark-of-the-moon-poems-of-fantasy-and-the-macabre-397.jpg"
+    "coverImageFile": "covers/dark-of-the-moon-poems-of-fantasy-and-the-macabre-397.webp"
   },
   "398": {
     "coverImageFile": "covers/this-mortal-coil-book-398.jpg"
@@ -442,10 +558,7 @@ window.BOOK_EDITS = {
     "coverImageFile": "covers/west-india-lights-402.jpg"
   },
   "403": {
-    "coverImageFile": "covers/skull-face-and-others-403.jpg"
-  },
-  "404": {
-    "coverImageFile": "covers/the-house-on-the-borderland-and-other-novels-404.jpg"
+    "coverImageFile": "covers/skull-face-and-others-403.png"
   },
   "405": {
     "coverImageFile": "covers/the-doll-and-one-other-405.jpg"
@@ -521,15 +634,6 @@ window.BOOK_EDITS = {
   "428": {
     "hidden": true,
     "deleted": true
-  },
-  "429": {
-    "coverImageFile": "covers/the-horror-in-the-museum-and-other-revisions-429.jpg"
-  },
-  "430": {
-    "coverImageFile": "covers/dagon-and-other-macabre-tales-430.jpg"
-  },
-  "431": {
-    "coverImageFile": "covers/at-the-mountains-of-madness-and-other-novels-431.jpg"
   },
   "432": {
     "coverImageFile": "covers/the-dunwich-horror-and-others-432.webp"
