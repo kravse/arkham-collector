@@ -138,7 +138,7 @@ Entry point: `node scripts/index.js`. Common flags: `--yes`, `--local`, `--limit
 | `compact-edits` | Drop edit fields that match scraped data |
 | `shrink-cover-masters` | Resize large cover masters in `covers/` in place (skips `*.card.webp` / `*.detail.webp`) |
 | `shrink-cover-masters:dry-run` | Preview master cover shrink without writing |
-| `report-small-covers` | Write `cover-review/index.html`, serve on port 28471, upload covers into edits, Google Image Search + eBay search links |
+| `report-small-covers` | Flag cover masters under 700px longest edge; write `cover-review/index.html`, serve on port 28471, upload covers into edits, Google Image Search + eBay search links |
 | `fix-arkham-magazines` | Move issue/season data out of `listAuthor` into `title` and `publicationDate` for Arkham Sampler and Collector magazine issues |
 | `fix-arkham-magazines:dry-run` | Preview magazine fixes without writing |
 | `dedupe-book-ids` | Split duplicate stable ids |

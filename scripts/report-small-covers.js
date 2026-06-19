@@ -47,7 +47,7 @@ are obviously too small (longest edge below the threshold).
 Output: ${REPORT_DIR_NAME}/index.html (gitignored)
 
 Usage:
-  npm run report-small-covers [-- --min-edge 480] [-- --port 28471] [-- --no-serve]
+  npm run report-small-covers [-- --min-edge 700] [-- --port 28471] [-- --no-serve]
 
 Options:
   --min-edge N   Flag masters whose longest edge is below N pixels (default ${MIN_MASTER_EDGE})

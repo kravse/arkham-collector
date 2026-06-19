@@ -1,9 +1,8 @@
 const fs = require("fs");
 const path = require("path");
-const { CARD_MAX_WIDTH } = require("./cover-optimize");
 const { listCoverMasterFiles } = require("./cover-shrink");
 
-const MIN_MASTER_EDGE = CARD_MAX_WIDTH;
+const MIN_MASTER_EDGE = 700;
 const REPORT_DIR_NAME = "cover-review";
 
 function parseCoverBookId(filename) {
@@ -249,6 +248,16 @@ function renderSmallCoverReportHtml(entries, options = {}) {
           --accent: #d7a06a;
           --border: #3a322a;
         }
+
+        .report-ebay {
+          background: color-mix(in srgb, #0064d2 28%, var(--panel));
+          color: #8ec5ff;
+          border-color: color-mix(in srgb, #0064d2 65%, var(--border));
+        }
+
+        .report-ebay:hover {
+          background: color-mix(in srgb, #0064d2 38%, var(--panel));
+        }
       }
       * {
         box-sizing: border-box;
@@ -341,7 +350,6 @@ function renderSmallCoverReportHtml(entries, options = {}) {
         align-items: center;
       }
       .report-search,
-      .report-ebay,
       .report-upload {
         display: inline-block;
         padding: 0.45rem 0.85rem;
@@ -349,6 +357,21 @@ function renderSmallCoverReportHtml(entries, options = {}) {
         border: 1px solid var(--accent);
         font-size: 0.95rem;
         transition: background 0.15s ease;
+      }
+      .report-ebay {
+        display: inline-block;
+        padding: 0.45rem 0.85rem;
+        border-radius: 999px;
+        border: 1px solid color-mix(in srgb, #0064d2 55%, var(--border));
+        font-size: 0.95rem;
+        transition: background 0.15s ease;
+        background: color-mix(in srgb, #0064d2 14%, var(--panel));
+        color: #0054b6;
+        text-decoration: none;
+        font-weight: 600;
+      }
+      .report-ebay:hover {
+        background: color-mix(in srgb, #0064d2 24%, var(--panel));
       }
       .report-upload {
         cursor: pointer;
@@ -359,14 +382,12 @@ function renderSmallCoverReportHtml(entries, options = {}) {
       .report-upload:hover {
         background: color-mix(in srgb, var(--accent) 82%, var(--text));
       }
-      .report-search,
-      .report-ebay {
+      .report-search {
         background: color-mix(in srgb, var(--text) 7%, var(--panel));
         color: var(--accent);
         text-decoration: none;
       }
-      .report-search:hover,
-      .report-ebay:hover {
+      .report-search:hover {
         background: color-mix(in srgb, var(--accent) 14%, var(--panel));
       }
       .report-upload.is-uploading {
@@ -442,7 +463,7 @@ function renderSmallCoverReportHtml(entries, options = {}) {
           }
           const total = Number(summary.dataset.total || "0");
           const filteredTotal = Number(summary.dataset.filtered || "0");
-          const minEdge = summary.dataset.minEdge || "480";
+          const minEdge = summary.dataset.minEdge || "${minEdge}";
           const generated = summary.dataset.generated || "";
           const filtering = hideHiddenCheckbox?.checked === true;
           const visible = filtering ? total - filteredTotal : total;

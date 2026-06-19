@@ -19,8 +19,9 @@ test("parseCoverBookId reads trailing book id from cover filename", () => {
 });
 
 test("isObviouslyTooSmall compares longest edge to minimum", () => {
-  assert.equal(isObviouslyTooSmall({ width: 300, height: 450 }, 480), true);
-  assert.equal(isObviouslyTooSmall({ width: 480, height: 720 }, 480), false);
+  assert.equal(MIN_MASTER_EDGE, 700);
+  assert.equal(isObviouslyTooSmall({ width: 300, height: 450 }, 700), true);
+  assert.equal(isObviouslyTooSmall({ width: 700, height: 720 }, 700), false);
   assert.equal(isObviouslyTooSmall({ width: 300, height: 300 }, MIN_MASTER_EDGE), true);
 });
 
