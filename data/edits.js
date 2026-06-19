@@ -101,8 +101,18 @@ window.BOOK_EDITS = {
     "publicationDate": "1995",
     "coverImageFile": "covers/miscellaneous-writings-256.jpg"
   },
+  "258": {
+    "coverImageFile": "covers/the-aliens-of-earth-258.jpg"
+  },
+  "259": {
+    "coverImageFile": "covers/alone-with-the-horrors-the-great-short-fiction-of-ramsey-campbell-1961-1991-259.jpg"
+  },
+  "262": {
+    "coverImageFile": "covers/gravitys-angels-262.jpg"
+  },
   "263": {
-    "publicationDate": "1991"
+    "publicationDate": "1991",
+    "coverImageFile": "covers/the-ends-of-the-earth-science-fiction-stories-263.jpg"
   },
   "264": {
     "coverImageFile": "covers/her-smoke-rose-up-forever-264.jpg"
@@ -117,8 +127,17 @@ window.BOOK_EDITS = {
   "267": {
     "coverImageFile": "covers/the-horror-in-the-museum-and-other-revisions-267.jpg"
   },
+  "268": {
+    "coverImageFile": "covers/memories-of-the-space-age-268.jpg"
+  },
   "269": {
     "coverImageFile": "covers/a-rendezvous-in-averoigne-269.jpg"
+  },
+  "270": {
+    "coverImageFile": "covers/polyphemus-book-270.jpg"
+  },
+  "271": {
+    "coverImageFile": "covers/the-jaguar-hunter-271.jpg"
   },
   "274": {
     "coverImageFile": "covers/dagon-and-other-macabre-tales-274.png"
@@ -132,8 +151,17 @@ window.BOOK_EDITS = {
   "279": {
     "coverImageFile": "covers/watchers-at-the-strait-gate-279.webp"
   },
+  "281": {
+    "coverImageFile": "covers/the-zanzibar-cat-281.jpg"
+  },
+  "282": {
+    "coverImageFile": "covers/the-wind-from-a-burning-woman-282.jpg"
+  },
   "284": {
     "coverImageFile": "covers/the-darkling-284.jpg"
+  },
+  "285": {
+    "coverImageFile": "covers/blooded-on-arachne-285.jpg"
   },
   "289": {
     "title": "New Tales of the Cthulhu Mythos",
@@ -148,6 +176,12 @@ window.BOOK_EDITS = {
   "297": {
     "coverImageFile": "covers/the-horror-at-oakdeene-and-others-297.jpg"
   },
+  "303": {
+    "coverImageFile": "covers/selected-letters-of-h-p-lovecraft-v-1934-1937-303.jpg"
+  },
+  "304": {
+    "coverImageFile": "covers/selected-letters-of-h-p-lovecraft-iv-1932-1934-304.jpg"
+  },
   "305": {
     "coverImageFile": "covers/dreams-from-rlyeh-305.jpg"
   },
@@ -159,12 +193,21 @@ window.BOOK_EDITS = {
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Purcell_Papers",
     "description": "This collection includes only a selection of the stories from the original 1880 edition of The Purcell Papers, along with several stories not found in that edition. The individual tales originally appeared in print between 1838 and 1871. Derleth's attribution of \"A Night in the Bell Inn\" — published in Dublin University Magazine in June 1850 — to LeFanu was based on internal textual evidence, however later scholarship has since identified the actual author as a little-known Irish writer, Henry Ferris, who lived approximately from 1801 to 1853."
   },
+  "308": {
+    "coverImageFile": "covers/the-house-of-the-worm-308.jpg"
+  },
   "311": {
     "coverArtist": "Frank Utpatel",
     "description": "Howard Phillips Lovecraft: Dreamer on the Nightside is a\nbiography of author H. P. Lovecraft."
   },
+  "312": {
+    "coverImageFile": "covers/the-watchers-out-of-time-and-others-312.jpg"
+  },
   "314": {
     "coverImageFile": "covers/beneath-the-moors-314.jpg"
+  },
+  "315": {
+    "coverImageFile": "covers/stories-of-darkness-and-dread-315.jpg"
   },
   "320": {
     "coverImageFile": "covers/the-arkham-collector-volume-i-320.jpg"
@@ -172,8 +215,14 @@ window.BOOK_EDITS = {
   "321": {
     "coverImageFile": "covers/the-caller-of-the-black-321.jpg"
   },
+  "322": {
+    "coverImageFile": "covers/selected-letters-of-h-p-lovecraft-iii-1929-1931-322.jpg"
+  },
   "324": {
     "coverImageFile": "covers/the-arkham-collector-324.jpg"
+  },
+  "325": {
+    "coverImageFile": "covers/dark-things-325.jpg"
   },
   "326": {
     "coverImageFile": "covers/eight-tales-326.jpg"
@@ -186,8 +235,14 @@ window.BOOK_EDITS = {
     "description": "Tales of the Cthulhu Mythos, edited by writer August Derleth and published by Arkham House in 1969, is considered the first Cthulhu Mythos anthology. It contained two stories by Lovecraft, a number of reprints of pieces written by members of Lovecraft's circle of correspondents, and several new tales written for the collection by a new generation of Cthulhu Mythos writers. It was published in an edition of 4,024 copies.\n\nDerleth prefaced the collection with \"The Cthulhu Mythos\", an outline of his (sometimes controversial) views on the development and content of the Mythos. In this introduction, Derleth prematurely declared the genre to be dead--\"for certainly the Mythos as an inspiration for new fiction is hardly likely to afford readers with enough that is new and sufficiently different in execution to create a continuing and growing demand\".\n\nLin Carter later wrote that Tales of the Cthulhu Mythos \"marked the beginning of a new era in the history of the Mythos for many reasons, and one of the most important was that it introduced a number of new writers in the Mythos.\"",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Cthulhu_Mythos_anthology#Tales_of_the_Cthulhu_Mythos"
   },
+  "335": {
+    "coverImageFile": "covers/selected-letters-of-h-p-lovecraft-ii-1925-1929-335.jpg"
+  },
   "338": {
     "goodreadsUrl": "https://www.goodreads.com/book/show/5743125-three-tales-of-horror"
+  },
+  "340": {
+    "coverImageFile": "covers/travellers-by-night-340.jpg"
   },
   "341": {
     "goodreadsUrl": "https://www.goodreads.com/book/show/20705405-deep-waters",
@@ -196,11 +251,29 @@ window.BOOK_EDITS = {
   "346": {
     "goodreadsUrl": "https://www.goodreads.com/book/show/3602733-something-breathing"
   },
+  "349": {
+    "coverImageFile": "covers/selected-letters-of-h-p-lovecraft-i-1911-1924-349.jpg"
+  },
   "350": {
     "coverImageFile": "covers/tales-of-science-and-sorcery-350.jpg"
   },
+  "351": {
+    "coverImageFile": "covers/nightmare-need-351.jpg"
+  },
+  "352": {
+    "coverImageFile": "covers/portraits-in-moonlight-352.jpg"
+  },
+  "353": {
+    "coverImageFile": "covers/over-the-edge-anthology-353.webp"
+  },
   "354": {
     "coverImageFile": "covers/poems-for-midnight-354.jpg"
+  },
+  "356": {
+    "coverImageFile": "covers/the-dark-man-and-others-356.jpg"
+  },
+  "358": {
+    "coverImageFile": "covers/who-fears-the-devil-358.jpg"
   },
   "359": {
     "coverImageFile": "covers/autobiography-some-notes-on-a-nonentity-359.png",
@@ -214,6 +287,9 @@ window.BOOK_EDITS = {
   },
   "367": {
     "coverImageFile": "covers/fire-and-sleet-and-candlelight-367.jpg"
+  },
+  "368": {
+    "coverImageFile": "covers/strayers-from-sheol-368.jpg"
   },
   "369": {
     "coverImageFile": "covers/invaders-from-the-dark-369.jpg"
@@ -245,9 +321,6 @@ window.BOOK_EDITS = {
   "379": {
     "coverImageFile": "covers/the-survivor-and-others-379.jpg"
   },
-  "381": {
-    "coverImageFile": "covers/the-curse-of-yig-book-381.jpg"
-  },
   "382": {
     "coverImageFile": "covers/nights-yawning-peal-a-ghostly-company-382.jpg"
   },
@@ -265,6 +338,9 @@ window.BOOK_EDITS = {
   },
   "389": {
     "coverImageFile": "covers/genius-loci-and-other-tales-389.jpg"
+  },
+  "390": {
+    "coverImageFile": "covers/roads-novel-390.jpg"
   },
   "392": {
     "coverImageFile": "covers/the-web-of-easter-island-392.jpg"
@@ -288,8 +364,14 @@ window.BOOK_EDITS = {
   "399": {
     "coverImageFile": "covers/slan-399.webp"
   },
+  "400": {
+    "coverImageFile": "covers/the-clock-strikes-twelve-400.jpg"
+  },
   "401": {
     "coverImageFile": "covers/fearful-pleasures-401.jpg"
+  },
+  "403": {
+    "coverImageFile": "covers/skull-face-and-others-403.jpg"
   },
   "404": {
     "coverImageFile": "covers/the-house-on-the-borderland-and-other-novels-404.jpg"

@@ -195,7 +195,7 @@ window.BOOKS = [
     "publicationDate": "2002",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Cleansing_(novel)",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/f/f6/Cleansing_harvey.jpg",
-    "coverImageFile": "covers/the-cleansing-novel-13.jpg",
+    "coverImageFile": "covers/the-cleansing-novel-243.jpg",
     "error": null,
     "goodreadsUrl": "https://www.goodreads.com/book/show/2717148-the-cleansing"
   },
@@ -211,7 +211,7 @@ window.BOOKS = [
     "publicationDate": "2002",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Far_Side_of_Nowhere",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/0/06/Far_side_of_nowhere.jpg",
-    "coverImageFile": "covers/the-far-side-of-nowhere-14.jpg",
+    "coverImageFile": "covers/the-far-side-of-nowhere-244.jpg",
     "error": null,
     "goodreadsUrl": "https://www.goodreads.com/book/show/994129.The_Far_Side_of_Nowhere"
   },
@@ -274,7 +274,7 @@ window.BOOKS = [
     "publicationDate": "1999",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Sixty_Years_of_Arkham_House",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/0/05/Sixty_years_of_arkham_house.jpg",
-    "coverImageFile": "covers/sixty-years-of-arkham-house-18.jpg",
+    "coverImageFile": "covers/sixty-years-of-arkham-house-248.jpg",
     "error": null,
     "goodreadsUrl": "https://www.goodreads.com/book/show/1172349.Sixty_Years_of_Arkham_House"
   },
@@ -322,7 +322,7 @@ window.BOOKS = [
     "publicationDate": "1998",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Lovecraft_Remembered",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/7/7f/Lovecraft_remembered.jpg",
-    "coverImageFile": "covers/lovecraft-remembered-21.jpg",
+    "coverImageFile": "covers/lovecraft-remembered-251.jpg",
     "error": null,
     "goodreadsUrl": "https://www.goodreads.com/book/show/100091.Lovecraft_Remembered"
   },
@@ -338,7 +338,7 @@ window.BOOKS = [
     "publicationDate": "1998",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Flowers_from_the_Moon_and_Other_Lunacies",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/2/2c/Flowers_from_the_moon.jpg",
-    "coverImageFile": "covers/flowers-from-the-moon-and-other-lunacies-22.jpg",
+    "coverImageFile": "covers/flowers-from-the-moon-and-other-lunacies-252.jpg",
     "error": null,
     "goodreadsUrl": "https://www.goodreads.com/book/show/730584.Flowers_from_the_Moon_and_Other_Lunacies"
   },
@@ -386,7 +386,7 @@ window.BOOKS = [
     "publicationDate": "1995",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Cthulhu_2000",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/f/fc/Cthulhu_2000.jpg",
-    "coverImageFile": "covers/cthulhu-2000-25.jpg",
+    "coverImageFile": "covers/cthulhu-2000-255.jpg",
     "error": null,
     "goodreadsUrl": "https://www.goodreads.com/book/show/620486.Cthulhu_2000"
   },
@@ -402,7 +402,7 @@ window.BOOKS = [
     "publicationDate": "1994",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Miscellaneous_Writings",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/f/fe/Miscellaneous_writings.jpg",
-    "coverImageFile": "covers/miscellaneous-writings-26.jpg",
+    "coverImageFile": "covers/miscellaneous-writings-256.jpg",
     "error": null,
     "goodreadsUrl": "https://www.goodreads.com/book/show/102590.Miscellaneous_Writings"
   },
@@ -530,7 +530,7 @@ window.BOOKS = [
     "publicationDate": "1990",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Her_Smoke_Rose_Up_Forever",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/6/62/Her_smoke_rose_up_forever.jpg",
-    "coverImageFile": "covers/her-smoke-rose-up-forever-34.jpg",
+    "coverImageFile": "covers/her-smoke-rose-up-forever-264.jpg",
     "error": null,
     "goodreadsUrl": "https://www.goodreads.com/book/show/27059.Her_Smoke_Rose_Up_Forever"
   },
@@ -610,7 +610,7 @@ window.BOOKS = [
     "publicationDate": "1988",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/A_Rendezvous_in_Averoigne",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/c/c7/Rendezvous_in_averoigne.jpg",
-    "coverImageFile": "covers/a-rendezvous-in-averoigne-39.jpg",
+    "coverImageFile": "covers/a-rendezvous-in-averoigne-269.jpg",
     "error": null,
     "goodreadsUrl": "https://www.goodreads.com/book/show/102095.A_Rendezvous_in_Averoigne"
   },
@@ -770,7 +770,7 @@ window.BOOKS = [
     "publicationDate": "1984",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Watchers_at_the_Strait_Gate",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/f/fe/Watchers_at_the_strait_gate.jpg",
-    "coverImageFile": "covers/watchers-at-the-strait-gate-49.jpg",
+    "coverImageFile": "covers/watchers-at-the-strait-gate-279.webp",
     "error": null,
     "goodreadsUrl": "https://www.goodreads.com/book/show/211910.Watchers_at_the_Strait_Gate"
   },
@@ -850,7 +850,7 @@ window.BOOKS = [
     "publicationDate": "1982",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Darkling",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/6/60/Darkling.jpg",
-    "coverImageFile": "covers/the-darkling-54.jpg",
+    "coverImageFile": "covers/the-darkling-284.jpg",
     "error": null,
     "goodreadsUrl": "https://www.goodreads.com/book/show/50254516-the-darkling"
   },
@@ -1042,7 +1042,7 @@ window.BOOKS = [
     "publicationDate": "1977",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/In_Mayan_Splendor",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/b/b9/In_mayan_spledor.jpg",
-    "coverImageFile": "covers/in-mayan-splendor-66.jpg",
+    "coverImageFile": "covers/in-mayan-splendor-296.jpg",
     "error": null,
     "goodreadsUrl": "https://www.goodreads.com/book/show/2570748-in-mayan-splendor"
   },
@@ -1058,7 +1058,7 @@ window.BOOKS = [
     "publicationDate": "1977",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Horror_at_Oakdeene_and_Others",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/9/92/Horror_at_oakdeene.jpg",
-    "coverImageFile": "covers/the-horror-at-oakdeene-and-others-67.jpg",
+    "coverImageFile": "covers/the-horror-at-oakdeene-and-others-297.jpg",
     "error": null,
     "goodreadsUrl": "https://www.goodreads.com/book/show/1771090.The_Horror_at_Oakdeene_and_Others"
   },
@@ -1186,7 +1186,7 @@ window.BOOKS = [
     "publicationDate": "1975",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Dreams_from_R'lyeh",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/d/d6/Dreams_from_rlyeh.jpg",
-    "coverImageFile": "covers/dreams-from-rlyeh-75.jpg",
+    "coverImageFile": "covers/dreams-from-rlyeh-305.jpg",
     "error": null,
     "goodreadsUrl": "https://www.goodreads.com/book/show/806935.Dreams_from_R_lyeh"
   },
@@ -1330,7 +1330,7 @@ window.BOOKS = [
     "publicationDate": "1974",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Beneath_the_Moors",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/b/b7/Beneath_the_moors.jpg",
-    "coverImageFile": "covers/beneath-the-moors-84.jpg",
+    "coverImageFile": "covers/beneath-the-moors-314.jpg",
     "error": null,
     "goodreadsUrl": "https://www.goodreads.com/book/show/1862250.Beneath_the_Moors"
   },
@@ -1441,7 +1441,7 @@ window.BOOKS = [
     "publicationDate": "1971",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Caller_of_the_Black",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/7/77/Caller_of_the_black.jpg",
-    "coverImageFile": "covers/the-caller-of-the-black-91.jpg",
+    "coverImageFile": "covers/the-caller-of-the-black-321.jpg",
     "error": null,
     "goodreadsUrl": "https://www.goodreads.com/book/show/5158721-the-caller-of-the-black"
   },
@@ -1521,7 +1521,7 @@ window.BOOKS = [
     "publicationDate": "1971",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Eight_Tales",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/4/4f/Eight_tales.jpg",
-    "coverImageFile": "covers/eight-tales-96.jpg",
+    "coverImageFile": "covers/eight-tales-326.jpg",
     "error": null,
     "goodreadsUrl": "https://www.goodreads.com/book/show/971259.Eight_Tales"
   },
@@ -1601,7 +1601,7 @@ window.BOOKS = [
     "publicationDate": "1970",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Horror_in_the_Museum_and_Other_Revisions",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/8/82/Horror_in_the_museum.jpg",
-    "coverImageFile": null,
+    "coverImageFile": "covers/the-horror-in-the-museum-and-other-revisions-267.jpg",
     "error": null,
     "goodreadsUrl": "https://www.goodreads.com/book/show/1157900.The_Horror_in_the_Museum"
   },
@@ -1697,7 +1697,7 @@ window.BOOKS = [
     "publicationDate": "1969",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Folsom_Flint_and_Other_Curious_Tales",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/e/e5/Folsom_flint.jpg",
-    "coverImageFile": "covers/the-folsom-flint-and-other-curious-tales-107.jpg",
+    "coverImageFile": "covers/the-folsom-flint-and-other-curious-tales-332.jpg",
     "error": null,
     "goodreadsUrl": "https://www.goodreads.com/book/show/336819.The_Folsom_Flint_and_Other_Curious_Tales"
   },
@@ -1920,7 +1920,7 @@ window.BOOKS = [
     "publicationDate": "1967",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Deep_Waters_(book)",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/8/8a/Deep_waters.jpg",
-    "coverImageFile": "covers/deep-waters-book-121.jpg",
+    "coverImageFile": "covers/deep-waters-book-341.jpg",
     "error": null
   },
   {
@@ -2030,7 +2030,7 @@ window.BOOKS = [
     "publicationDate": "1965",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Dagon_and_Other_Macabre_Tales",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/8/8f/Dagon_first.jpg",
-    "coverImageFile": null,
+    "coverImageFile": "covers/dagon-and-other-macabre-tales-274.png",
     "error": null,
     "goodreadsUrl": "https://www.goodreads.com/book/show/102575.Dagon_and_Other_Macabre_Tales"
   },
@@ -2078,7 +2078,7 @@ window.BOOKS = [
     "publicationDate": "1964",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Tales_of_Science_and_Sorcery",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/0/07/Tales_of_science_and_sorcery.jpg",
-    "coverImageFile": "covers/tales-of-science-and-sorcery-131.jpg",
+    "coverImageFile": "covers/tales-of-science-and-sorcery-350.jpg",
     "error": null,
     "goodreadsUrl": "https://www.goodreads.com/book/show/287433.Tales_of_Science_and_Sorcery"
   },
@@ -2126,7 +2126,7 @@ window.BOOKS = [
     "publicationDate": "1964",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/At_the_Mountains_of_Madness_and_Other_Novels",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/a/a0/At_the_mountains_of_madness.jpg",
-    "coverImageFile": null,
+    "coverImageFile": "covers/at-the-mountains-of-madness-and-other-novels-275.jpg",
     "error": null,
     "goodreadsUrl": "https://www.goodreads.com/book/show/32768.At_the_Mountains_of_Madness_and_Other_Novels"
   },
@@ -2158,7 +2158,7 @@ window.BOOKS = [
     "publicationDate": "1964",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Poems_for_Midnight",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/a/a3/Poems_for_midnight.jpg",
-    "coverImageFile": "covers/poems-for-midnight-136.jpg",
+    "coverImageFile": "covers/poems-for-midnight-354.jpg",
     "error": null,
     "goodreadsUrl": "https://www.goodreads.com/book/show/35392569-poems-for-midnight"
   },
@@ -2253,7 +2253,7 @@ window.BOOKS = [
     "publicationDate": "1963",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Dunwich_Horror_and_Others",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/commons/6/63/Dunwich_Horror_and_Others_dust_jacket.jpg",
-    "coverImageFile": null,
+    "coverImageFile": "covers/the-dunwich-horror-and-others-276.jpg",
     "error": null,
     "goodreadsUrl": "https://www.goodreads.com/book/show/63213.The_Dunwich_Horror_and_Others"
   },
@@ -2285,7 +2285,7 @@ window.BOOKS = [
     "publicationDate": "1963",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Horror_from_the_Hills",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/5/57/Horror_from_the_hills.jpg",
-    "coverImageFile": "covers/the-horror-from-the-hills-144.jpg",
+    "coverImageFile": "covers/the-horror-from-the-hills-361.jpg",
     "error": null,
     "goodreadsUrl": "https://www.goodreads.com/book/show/3904596-the-horror-from-the-hills"
   },
@@ -2365,7 +2365,7 @@ window.BOOKS = [
     "publicationDate": "1962",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Dreams_and_Fancies",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/3/38/Dreams_and_fancies.jpg",
-    "coverImageFile": "covers/dreams-and-fancies-149.jpg",
+    "coverImageFile": "covers/dreams-and-fancies-366.jpg",
     "error": null,
     "goodreadsUrl": "https://www.goodreads.com/book/show/5347916-dreams-and-fancies"
   },
@@ -2396,7 +2396,7 @@ window.BOOKS = [
     "publicationDate": "1961",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Fire_and_Sleet_and_Candlelight",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/4/4c/Fire_and_sleet_and_candlelight.jpg",
-    "coverImageFile": "covers/fire-and-sleet-and-candlelight-151.jpg",
+    "coverImageFile": "covers/fire-and-sleet-and-candlelight-367.jpg",
     "error": null,
     "goodreadsUrl": "https://www.goodreads.com/book/show/2543653.Fire_and_Sleet_and_Candlelight"
   },
@@ -2428,7 +2428,7 @@ window.BOOKS = [
     "publicationDate": "1960",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Invaders_from_the_Dark",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/6/69/Invaders_from_the_dark.jpg",
-    "coverImageFile": "covers/invaders-from-the-dark-153.jpg",
+    "coverImageFile": "covers/invaders-from-the-dark-369.jpg",
     "error": null,
     "goodreadsUrl": "https://www.goodreads.com/book/show/6408740-invaders-from-the-dark"
   },
@@ -2444,7 +2444,7 @@ window.BOOKS = [
     "publicationDate": "1960",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Pleasant_Dreams%3A_Nightmares",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/9/93/Pleasant_dreams_nightmares.jpg",
-    "coverImageFile": "covers/pleasant-dreams-nightmares-154.jpg",
+    "coverImageFile": "covers/pleasant-dreams-nightmares-370.jpg",
     "error": null,
     "goodreadsUrl": "https://www.goodreads.com/book/show/1490134.Pleasant_Dreams"
   },
@@ -2476,7 +2476,7 @@ window.BOOKS = [
     "publicationDate": "1959",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Shuttered_Room_and_Other_Pieces",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/f/ff/Shuttered_room.jpg",
-    "coverImageFile": "covers/the-shuttered-room-and-other-pieces-156.jpg",
+    "coverImageFile": "covers/the-shuttered-room-and-other-pieces-372.webp",
     "error": null
   },
   {
@@ -2506,7 +2506,7 @@ window.BOOKS = [
     "publicationDate": "1959",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Arkham_House%3A_The_First_20_Years",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/4/4f/Arkham_House_%28logo%29.png",
-    "coverImageFile": "covers/arkham-house-the-first-20-years-158.png",
+    "coverImageFile": "covers/arkham-house-the-first-20-years-374.jpg",
     "error": null,
     "goodreadsUrl": "https://www.goodreads.com/book/show/22734482-thirty-years-of-arkham-house-1939-1969"
   },
@@ -2538,7 +2538,7 @@ window.BOOKS = [
     "publicationDate": "1958",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Mask_of_Cthulhu",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/4/4f/Mask_of_cthulhu.jpg",
-    "coverImageFile": "covers/the-mask-of-cthulhu-160.jpg",
+    "coverImageFile": "covers/the-mask-of-cthulhu-376.jpg",
     "error": null,
     "goodreadsUrl": "https://www.goodreads.com/book/show/1886928.The_Mask_of_Cthulhu"
   },
@@ -2570,7 +2570,7 @@ window.BOOKS = [
     "publicationDate": "1957",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Always_Comes_Evening",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/b/ba/Always_comes_evening.jpg",
-    "coverImageFile": "covers/always-comes-evening-162.jpg",
+    "coverImageFile": "covers/always-comes-evening-378.jpg",
     "error": null
   },
   {
@@ -2585,7 +2585,7 @@ window.BOOKS = [
     "publicationDate": "1957",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Survivor_and_Others",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/a/a1/Survivor_and_others.jpg",
-    "coverImageFile": "covers/the-survivor-and-others-163.jpg",
+    "coverImageFile": "covers/the-survivor-and-others-379.jpg",
     "error": null,
     "goodreadsUrl": "https://www.goodreads.com/book/show/872968.The_Survivor_and_Others"
   },
@@ -2617,7 +2617,7 @@ window.BOOKS = [
     "publicationDate": "1953",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Curse_of_Yig_(book)",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/8/82/Curse_of_yig.jpg",
-    "coverImageFile": "covers/the-curse-of-yig-book-165.jpg",
+    "coverImageFile": "covers/the-curse-of-yig-book-381.jpg",
     "error": null,
     "goodreadsUrl": "https://www.goodreads.com/book/show/11904105-the-curse-of-yig"
   },
@@ -2633,7 +2633,7 @@ window.BOOKS = [
     "publicationDate": "1952",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Night's_Yawning_Peal%3A_A_Ghostly_Company",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/5/5f/Night%27s_yawning_peal.jpg",
-    "coverImageFile": "covers/nights-yawning-peal-a-ghostly-company-166.jpg",
+    "coverImageFile": "covers/nights-yawning-peal-a-ghostly-company-382.jpg",
     "error": null,
     "goodreadsUrl": "https://www.goodreads.com/book/show/82070.Night_s_Yawning_Peal"
   },
@@ -2777,7 +2777,7 @@ window.BOOKS = [
     "publicationDate": "1949",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Something_About_Cats_and_Other_Pieces",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/3/32/Something_about_cats.jpg",
-    "coverImageFile": "covers/something-about-cats-and-other-pieces-175.jpg",
+    "coverImageFile": "covers/something-about-cats-and-other-pieces-387.jpg",
     "error": null,
     "goodreadsUrl": "https://www.goodreads.com/book/show/1104566.Something_About_Cats_and_Other_Pieces"
   },
@@ -2793,7 +2793,7 @@ window.BOOKS = [
     "publicationDate": "1948",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Not_Long_for_this_World",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/8/86/Not_long_for_this_world.jpg",
-    "coverImageFile": "covers/not-long-for-this-world-176.jpg",
+    "coverImageFile": "covers/not-long-for-this-world-388.webp",
     "error": null,
     "goodreadsUrl": "https://www.goodreads.com/book/show/2436635.Not_Long_for_This_World"
   },
@@ -2809,7 +2809,7 @@ window.BOOKS = [
     "publicationDate": "1948",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Genius_Loci_and_Other_Tales",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/9/99/Genius_loci.jpg",
-    "coverImageFile": "covers/genius-loci-and-other-tales-177.jpg",
+    "coverImageFile": "covers/genius-loci-and-other-tales-389.jpg",
     "error": null,
     "goodreadsUrl": "https://www.goodreads.com/book/show/1950319.Genius_Loci_and_Other_Tales"
   },
@@ -2921,7 +2921,7 @@ window.BOOKS = [
     "publicationDate": "1948",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Web_of_Easter_Island",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/f/fe/Web_of_easter_island.jpg",
-    "coverImageFile": "covers/the-web-of-easter-island-184.jpg",
+    "coverImageFile": "covers/the-web-of-easter-island-392.jpg",
     "error": null,
     "goodreadsUrl": "https://www.goodreads.com/book/show/2307034.The_Web_of_Easter_Island"
   },
@@ -2937,7 +2937,7 @@ window.BOOKS = [
     "publicationDate": "1948",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Travelling_Grave_and_Other_Stories",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/e/e2/Travelling_grave.jpg",
-    "coverImageFile": "covers/the-travelling-grave-and-other-stories-185.jpg",
+    "coverImageFile": "covers/the-travelling-grave-and-other-stories-393.jpg",
     "error": null,
     "goodreadsUrl": "https://www.goodreads.com/book/show/2155960.The_Travelling_Grave_and_Other_Stories"
   },
@@ -2969,7 +2969,7 @@ window.BOOKS = [
     "publicationDate": "1947",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Revelations_in_Black",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/f/fb/Revelations_in_black.jpg",
-    "coverImageFile": "covers/revelations-in-black-187.jpg",
+    "coverImageFile": "covers/revelations-in-black-395.jpg",
     "error": null,
     "goodreadsUrl": "https://www.goodreads.com/book/show/324673.Revelations_in_Black"
   },
@@ -2985,7 +2985,7 @@ window.BOOKS = [
     "publicationDate": "1947",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Dark_Carnival_(short_story_collection)",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/d/d5/Dark_carnival_originall.jpg",
-    "coverImageFile": "covers/dark-carnival-short-story-collection-188.jpg",
+    "coverImageFile": "covers/dark-carnival-short-story-collection-396.jpg",
     "error": null
   },
   {
@@ -3000,7 +3000,7 @@ window.BOOKS = [
     "publicationDate": "1947",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Dark_of_the_Moon%3A_Poems_of_Fantasy_and_the_Macabre",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/5/5e/Dark_of_the_moon.jpg",
-    "coverImageFile": "covers/dark-of-the-moon-poems-of-fantasy-and-the-macabre-189.jpg",
+    "coverImageFile": "covers/dark-of-the-moon-poems-of-fantasy-and-the-macabre-397.jpg",
     "error": null,
     "goodreadsUrl": "https://www.goodreads.com/book/show/781239.Dark_of_the_Moon"
   },
@@ -3016,7 +3016,7 @@ window.BOOKS = [
     "publicationDate": "1947",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/This_Mortal_Coil_(book)",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/a/a9/This_mortal_coil.jpg",
-    "coverImageFile": "covers/this-mortal-coil-book-190.jpg",
+    "coverImageFile": "covers/this-mortal-coil-book-398.jpg",
     "error": null,
     "goodreadsUrl": "https://www.goodreads.com/book/show/2845541-this-mortal-coil"
   },
@@ -3032,7 +3032,7 @@ window.BOOKS = [
     "publicationDate": "1946",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Slan",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/c/ca/Slan.jpg",
-    "coverImageFile": "covers/slan-191.jpg",
+    "coverImageFile": "covers/slan-399.webp",
     "error": null,
     "goodreadsUrl": "https://www.goodreads.com/book/show/643792.Slan"
   },
@@ -3064,7 +3064,7 @@ window.BOOKS = [
     "publicationDate": "1946",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Fearful_Pleasures",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/4/45/Fearful_pleasures.jpg",
-    "coverImageFile": "covers/fearful-pleasures-193.jpg",
+    "coverImageFile": "covers/fearful-pleasures-401.jpg",
     "error": null,
     "goodreadsUrl": "https://www.goodreads.com/book/show/5248022-fearful-pleasures"
   },
@@ -3112,7 +3112,7 @@ window.BOOKS = [
     "publicationDate": "1946",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_House_on_the_Borderland_and_Other_Novels",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/5/57/House_on_the_borderland.jpg",
-    "coverImageFile": "covers/the-house-on-the-borderland-and-other-novels-196.jpg",
+    "coverImageFile": "covers/the-house-on-the-borderland-and-other-novels-404.jpg",
     "error": null,
     "goodreadsUrl": "https://www.goodreads.com/book/show/220937.The_House_on_the_Borderland"
   },
@@ -3128,7 +3128,7 @@ window.BOOKS = [
     "publicationDate": "1946",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Doll_and_One_Other",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/3/39/Doll_and_one_other.jpg",
-    "coverImageFile": "covers/the-doll-and-one-other-197.jpg",
+    "coverImageFile": "covers/the-doll-and-one-other-405.jpg",
     "error": null,
     "goodreadsUrl": "https://www.goodreads.com/book/show/61300920-the-doll-and-one-other"
   },
@@ -3144,7 +3144,7 @@ window.BOOKS = [
     "publicationDate": "1946",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Hounds_of_Tindalos_(book)",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/9/9a/Hounds_of_tindalos.jpg",
-    "coverImageFile": "covers/the-hounds-of-tindalos-book-198.jpg",
+    "coverImageFile": "covers/the-hounds-of-tindalos-book-406.webp",
     "error": null,
     "goodreadsUrl": "https://www.goodreads.com/book/show/1831275.The_Hounds_of_Tindalos"
   },
@@ -3160,7 +3160,7 @@ window.BOOKS = [
     "publicationDate": "1945",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Lurker_at_the_Threshold",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/0/06/Lurker_at_the_threshold.jpg",
-    "coverImageFile": "covers/the-lurker-at-the-threshold-199.jpg",
+    "coverImageFile": "covers/the-lurker-at-the-threshold-407.webp",
     "error": null,
     "goodreadsUrl": "https://www.goodreads.com/book/show/164312.The_Lurker_at_the_Threshold"
   },
@@ -3176,7 +3176,7 @@ window.BOOKS = [
     "publicationDate": "1945",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Green_Tea_and_Other_Ghost_Stories",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/e/e1/Green_Tea_and_Other_Ghost_Stories.jpg",
-    "coverImageFile": "covers/green-tea-and-other-ghost-stories-200.jpg",
+    "coverImageFile": "covers/green-tea-and-other-ghost-stories-408.jpg",
     "error": null,
     "goodreadsUrl": "https://www.goodreads.com/book/show/752869.Green_Tea_and_Other_Ghost_Stories"
   },
@@ -3192,7 +3192,7 @@ window.BOOKS = [
     "publicationDate": "1945",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Witch_House",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/3/31/Witch_house.jpg",
-    "coverImageFile": "covers/witch-house-201.jpg",
+    "coverImageFile": "covers/witch-house-409.jpg",
     "error": null,
     "goodreadsUrl": "https://www.goodreads.com/book/show/2378596.Witch_House"
   },
@@ -3208,7 +3208,7 @@ window.BOOKS = [
     "publicationDate": "1945",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Opener_of_the_Way",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/0/07/Opener_of_the_way.jpg",
-    "coverImageFile": "covers/the-opener-of-the-way-202.jpg",
+    "coverImageFile": "covers/the-opener-of-the-way-410.jpg",
     "error": null,
     "goodreadsUrl": "https://www.goodreads.com/book/show/3051048-the-opener-of-the-way"
   },
@@ -3240,7 +3240,7 @@ window.BOOKS = [
     "publicationDate": "1944",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Marginalia_(collection)",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/commons/e/e8/Marginalia_lovecraft.jpg",
-    "coverImageFile": "covers/marginalia-collection-204.jpg",
+    "coverImageFile": "covers/marginalia-collection-412.jpg",
     "error": null
   },
   {
@@ -3255,7 +3255,7 @@ window.BOOKS = [
     "publicationDate": "1944",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Lost_Worlds_(Smith_collection)",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/3/3e/Lost_Worlds_Smith.jpg",
-    "coverImageFile": "covers/lost-worlds-smith-collection-205.jpg",
+    "coverImageFile": "covers/lost-worlds-smith-collection-413.jpg",
     "error": null,
     "goodreadsUrl": "https://www.goodreads.com/book/show/102092.Lost_Worlds"
   },
@@ -3271,7 +3271,7 @@ window.BOOKS = [
     "publicationDate": "1944",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Jumbee_and_Other_Uncanny_Tales",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/4/4e/Jumbee.JPG",
-    "coverImageFile": "covers/jumbee-and-other-uncanny-tales-206.jpg",
+    "coverImageFile": "covers/jumbee-and-other-uncanny-tales-414.jpg",
     "error": null,
     "goodreadsUrl": "https://www.goodreads.com/book/show/4744376-jumbee-and-other-uncanny-tales"
   },
@@ -3303,7 +3303,7 @@ window.BOOKS = [
     "publicationDate": "1943",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Beyond_the_Wall_of_Sleep_(collection)",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/4/40/Beyond_the_wall_of_sleep.jpg",
-    "coverImageFile": "covers/beyond-the-wall-of-sleep-collection-208.jpg",
+    "coverImageFile": "covers/beyond-the-wall-of-sleep-collection-416.jpg",
     "error": null,
     "goodreadsUrl": "https://www.goodreads.com/book/show/13596226-beyond-the-wall-of-sleep"
   },
@@ -3335,7 +3335,7 @@ window.BOOKS = [
     "publicationDate": "1941",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Someone_in_the_Dark",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/f/f0/Someone_in_the_dark.jpg",
-    "coverImageFile": "covers/someone-in-the-dark-210.jpg",
+    "coverImageFile": "covers/someone-in-the-dark-418.jpg",
     "error": null,
     "goodreadsUrl": "https://www.goodreads.com/book/show/3280403-someone-in-the-dark"
   },
@@ -3351,7 +3351,7 @@ window.BOOKS = [
     "publicationDate": "1939",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_Outsider_and_Others",
     "coverImageUrl": "https://upload.wikimedia.org/wikipedia/en/2/27/The_Outsider_and_Others_book_cover.jpg",
-    "coverImageFile": "covers/the-outsider-and-others-419.png",
+    "coverImageFile": "covers/the-outsider-and-others-419.webp",
     "error": null,
     "goodreadsUrl": "https://www.goodreads.com/book/show/176155"
   },
