@@ -4203,6 +4203,7 @@ if (viewModeToggle) {
     gridViewMode = gridViewMode === "list" ? "cards" : "list";
     saveUserState();
     updateViewModeState();
+    render();
   });
 }
 

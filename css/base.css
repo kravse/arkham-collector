@@ -87,3 +87,19 @@ body.viewing-want main {
   );
 }
 
+@media (min-width: 1001px) {
+  body {
+    --layout-wide-inline: max(1.5rem, calc((100% - var(--layout-wide-max)) / 2));
+  }
+
+  header {
+    padding-left: var(--layout-wide-inline);
+    padding-right: var(--layout-wide-inline);
+  }
+
+  header > * {
+    width: 100%;
+    max-width: var(--layout-wide-max);
+  }
+}
+
