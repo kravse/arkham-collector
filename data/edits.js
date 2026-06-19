@@ -105,12 +105,15 @@ window.BOOK_EDITS = {
   "259": {
     "coverImageFile": "covers/alone-with-the-horrors-the-great-short-fiction-of-ramsey-campbell-1961-1991-259.jpg"
   },
+  "261": {
+    "coverImageFile": "covers/lord-kelvins-machine-261.jpg"
+  },
   "262": {
     "coverImageFile": "covers/gravitys-angels-262.jpg"
   },
   "263": {
     "publicationDate": "1991",
-    "coverImageFile": "covers/the-ends-of-the-earth-science-fiction-stories-263.jpg"
+    "coverImageFile": "covers/the-ends-of-the-earth-science-fiction-stories-263.png"
   },
   "264": {
     "coverImageFile": "covers/her-smoke-rose-up-forever-264.jpg"
@@ -133,6 +136,9 @@ window.BOOK_EDITS = {
   },
   "271": {
     "coverImageFile": "covers/the-jaguar-hunter-271.jpg"
+  },
+  "272": {
+    "coverImageFile": "covers/tales-of-the-quintana-roo-272.jpg"
   },
   "274": {
     "coverImageFile": "covers/dagon-and-other-macabre-tales-274.png"
@@ -264,6 +270,15 @@ window.BOOK_EDITS = {
   "326": {
     "coverImageFile": "covers/eight-tales-326.jpg"
   },
+  "328": {
+    "coverImageFile": "covers/selected-poems-c-a-smith-328.jpg"
+  },
+  "329": {
+    "coverImageFile": "covers/other-dimensions-329.jpg"
+  },
+  "330": {
+    "coverImageFile": "covers/demons-and-dinosaurs-330.jpg"
+  },
   "332": {
     "coverImageFile": "covers/the-folsom-flint-and-other-curious-tales-332.jpg"
   },
@@ -371,6 +386,9 @@ window.BOOK_EDITS = {
   "382": {
     "coverImageFile": "covers/nights-yawning-peal-a-ghostly-company-382.jpg"
   },
+  "383": {
+    "coverImageFile": "covers/tales-from-underwood-383.png"
+  },
   "384": {
     "coverImageFile": "covers/the-dark-chateau-384.png"
   },
@@ -447,6 +465,9 @@ window.BOOK_EDITS = {
   "410": {
     "coverImageFile": "covers/the-opener-of-the-way-410.jpg"
   },
+  "411": {
+    "coverImageFile": "covers/something-near-411.jpg"
+  },
   "412": {
     "goodreadsUrl": "https://www.goodreads.com/book/show/5743058-marginalia",
     "coverImageFile": "covers/marginalia-collection-412.jpg"
@@ -456,6 +477,9 @@ window.BOOK_EDITS = {
   },
   "414": {
     "coverImageFile": "covers/jumbee-and-other-uncanny-tales-414.jpg"
+  },
+  "415": {
+    "coverImageFile": "covers/the-eye-and-the-finger-415.jpg"
   },
   "416": {
     "coverImageFile": "covers/beyond-the-wall-of-sleep-collection-416.jpg"
