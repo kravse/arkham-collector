@@ -24,9 +24,16 @@ function isObviouslyTooSmall(metadata, minEdge = MIN_MASTER_EDGE) {
   return Math.max(width, height) < minEdge;
 }
 
+function buildCoverSearchQuery(title) {
+  return `${String(title || "").trim()} arkham`.trim();
+}
+
 function buildGoogleCoverSearchUrl(title) {
-  const query = `${String(title || "").trim()} arkham`.trim();
-  return `https://www.google.com/search?tbm=isch&q=${encodeURIComponent(query)}`;
+  return `https://www.google.com/search?tbm=isch&q=${encodeURIComponent(buildCoverSearchQuery(title))}`;
+}
+
+function buildEbayCoverSearchUrl(title) {
+  return `https://www.ebay.com/sch/i.html?_nkw=${encodeURIComponent(buildCoverSearchQuery(title))}`;
 }
 
 function escapeHtml(value) {
@@ -143,6 +150,7 @@ async function collectSmallCoverMasters(options = {}) {
       hidden: book.hidden === true,
       deleted: book.deleted === true,
       searchUrl: buildGoogleCoverSearchUrl(book.title),
+      ebayUrl: buildEbayCoverSearchUrl(book.title),
     });
   }
 
@@ -203,7 +211,13 @@ function renderSmallCoverReportHtml(entries, options = {}) {
           href="${escapeHtml(entry.searchUrl)}"
           target="_blank"
           rel="noopener noreferrer"
-        >Search cover</a>
+        >Search images</a>
+        <a
+          class="report-search report-ebay"
+          href="${escapeHtml(entry.ebayUrl)}"
+          target="_blank"
+          rel="noopener noreferrer"
+        >Search eBay</a>
         </div>
       </div>
     </li>`,
@@ -327,6 +341,7 @@ function renderSmallCoverReportHtml(entries, options = {}) {
         align-items: center;
       }
       .report-search,
+      .report-ebay,
       .report-upload {
         display: inline-block;
         padding: 0.45rem 0.85rem;
@@ -344,12 +359,14 @@ function renderSmallCoverReportHtml(entries, options = {}) {
       .report-upload:hover {
         background: color-mix(in srgb, var(--accent) 82%, var(--text));
       }
-      .report-search {
+      .report-search,
+      .report-ebay {
         background: color-mix(in srgb, var(--text) 7%, var(--panel));
         color: var(--accent);
         text-decoration: none;
       }
-      .report-search:hover {
+      .report-search:hover,
+      .report-ebay:hover {
         background: color-mix(in srgb, var(--accent) 14%, var(--panel));
       }
       .report-upload.is-uploading {
@@ -557,6 +574,7 @@ module.exports = {
   parseCoverBookId,
   isObviouslyTooSmall,
   buildGoogleCoverSearchUrl,
+  buildEbayCoverSearchUrl,
   titleFromCoverSlug,
   findBookByCoverPath,
   resolveBookForCoverFile,

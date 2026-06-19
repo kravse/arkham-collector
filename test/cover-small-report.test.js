@@ -6,6 +6,7 @@ const {
   parseCoverBookId,
   isObviouslyTooSmall,
   buildGoogleCoverSearchUrl,
+  buildEbayCoverSearchUrl,
   titleFromCoverSlug,
   findBookByCoverPath,
   resolveBookForCoverFile,
@@ -26,6 +27,12 @@ test("isObviouslyTooSmall compares longest edge to minimum", () => {
 test("buildGoogleCoverSearchUrl opens Google Image Search with title and arkham", () => {
   const url = buildGoogleCoverSearchUrl("The Shunned House");
   assert.match(url, /^https:\/\/www\.google\.com\/search\?tbm=isch&q=/);
+  assert.match(decodeURIComponent(url), /The Shunned House arkham/);
+});
+
+test("buildEbayCoverSearchUrl opens eBay search with title and arkham", () => {
+  const url = buildEbayCoverSearchUrl("The Shunned House");
+  assert.match(url, /^https:\/\/www\.ebay\.com\/sch\/i\.html\?_nkw=/);
   assert.match(decodeURIComponent(url), /The Shunned House arkham/);
 });
 
@@ -102,16 +109,19 @@ test("renderSmallCoverReportHtml includes image, details, and search link", () =
       hidden: false,
       deleted: false,
       searchUrl: buildGoogleCoverSearchUrl("The Shunned House"),
+      ebayUrl: buildEbayCoverSearchUrl("The Shunned House"),
     },
   ]);
 
   assert.match(html, /src="\.\.\/covers\/the-shunned-house-238\.jpg"/);
   assert.match(html, /The Shunned House/);
-  assert.match(html, /Search cover/);
+  assert.match(html, /Search images/);
+  assert.match(html, /Search eBay/);
   assert.match(html, /Upload cover/);
   assert.match(html, /id="report-refresh"/);
   assert.match(html, /id="hide-hidden-books"/);
   assert.match(html, /Hide hidden and deleted books/);
   assert.match(html, /data-deleted="false"/);
   assert.match(html, /tbm=isch/);
+  assert.match(html, /ebay\.com\/sch\/i\.html/);
 });
