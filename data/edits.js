@@ -73,11 +73,26 @@ window.BOOK_EDITS = {
     "goodreadsUrl": "https://www.goodreads.com/book/show/8507286-the-shunned-house",
     "description": "A total of 100 copies were bound under the Arkham House imprint in 1961. Despite bearing that imprint, this volume is not a genuine Arkham House production in the traditional sense — the actual printing was carried out by W. Paul Cook back in 1928. The printed sheets sat unbound and largely undistributed for years, with R. H. Barlow circulating a small number of copies in 1935, before Arkham House finally bound the remaining 100 sets. The book includes an introduction by Frank Belknap Long. [The spine notation and dust jacket details appear corrupted in the source text and cannot be accurately reproduced.]\n\nSometime around 1965, a forgery surfaced, believed to have originated in England. It was produced via offset printing of the original text, bound in red half leather with gold spine stamping. The forged print run is estimated at several hundred copies."
   },
+  "243": {
+    "coverImageFile": "covers/the-cleansing-novel-243.jpg"
+  },
+  "244": {
+    "coverImageFile": "covers/the-far-side-of-nowhere-244.jpg"
+  },
   "245": {
     "goodreadsUrl": "https://www.goodreads.com/book/show/370614.Book_of_the_Dead"
   },
   "246": {
     "description": "Arkham's Masters of Horror is an anthology of fantasy and horror stories edited by Peter Ruber. It was released by Arkham House in an edition of approximately 4,000 copies in 2000. The book includes an introductory essay by Ruber before each story and about its author.\n\nRuber drew criticism from the horror/fantasy community for the hostility with which he introduced some authors within the volume - for instance, his accusation that H.P. Lovecraft \"had a schizoid personality\" and could be labelled \"a genuine crackpot.\""
+  },
+  "248": {
+    "coverImageFile": "covers/sixty-years-of-arkham-house-248.jpg"
+  },
+  "251": {
+    "coverImageFile": "covers/lovecraft-remembered-251.jpg"
+  },
+  "252": {
+    "coverImageFile": "covers/flowers-from-the-moon-and-other-lunacies-252.jpg"
   },
   "255": {
     "coverImageFile": "covers/cthulhu-2000-255.jpg"
@@ -89,6 +104,9 @@ window.BOOK_EDITS = {
   "263": {
     "publicationDate": "1991"
   },
+  "264": {
+    "coverImageFile": "covers/her-smoke-rose-up-forever-264.jpg"
+  },
   "265": {
     "publicationDate": "1990",
     "decade": "1990s",
@@ -99,6 +117,9 @@ window.BOOK_EDITS = {
   "267": {
     "coverImageFile": "covers/the-horror-in-the-museum-and-other-revisions-267.jpg"
   },
+  "269": {
+    "coverImageFile": "covers/a-rendezvous-in-averoigne-269.jpg"
+  },
   "274": {
     "coverImageFile": "covers/dagon-and-other-macabre-tales-274.png"
   },
@@ -107,6 +128,12 @@ window.BOOK_EDITS = {
   },
   "276": {
     "coverImageFile": "covers/the-dunwich-horror-and-others-276.jpg"
+  },
+  "279": {
+    "coverImageFile": "covers/watchers-at-the-strait-gate-279.webp"
+  },
+  "284": {
+    "coverImageFile": "covers/the-darkling-284.jpg"
   },
   "289": {
     "title": "New Tales of the Cthulhu Mythos",
@@ -117,6 +144,9 @@ window.BOOK_EDITS = {
   },
   "296": {
     "coverImageFile": "covers/in-mayan-splendor-296.jpg"
+  },
+  "297": {
+    "coverImageFile": "covers/the-horror-at-oakdeene-and-others-297.jpg"
   },
   "305": {
     "coverImageFile": "covers/dreams-from-rlyeh-305.jpg"
@@ -133,11 +163,23 @@ window.BOOK_EDITS = {
     "coverArtist": "Frank Utpatel",
     "description": "Howard Phillips Lovecraft: Dreamer on the Nightside is a\nbiography of author H. P. Lovecraft."
   },
+  "314": {
+    "coverImageFile": "covers/beneath-the-moors-314.jpg"
+  },
   "320": {
     "coverImageFile": "covers/the-arkham-collector-volume-i-320.jpg"
   },
+  "321": {
+    "coverImageFile": "covers/the-caller-of-the-black-321.jpg"
+  },
   "324": {
     "coverImageFile": "covers/the-arkham-collector-324.jpg"
+  },
+  "326": {
+    "coverImageFile": "covers/eight-tales-326.jpg"
+  },
+  "332": {
+    "coverImageFile": "covers/the-folsom-flint-and-other-curious-tales-332.jpg"
   },
   "333": {
     "coverImageFile": "covers/tales-of-the-cthulhu-mythos-333.jpg",
@@ -148,14 +190,24 @@ window.BOOK_EDITS = {
     "goodreadsUrl": "https://www.goodreads.com/book/show/5743125-three-tales-of-horror"
   },
   "341": {
-    "goodreadsUrl": "https://www.goodreads.com/book/show/20705405-deep-waters"
+    "goodreadsUrl": "https://www.goodreads.com/book/show/20705405-deep-waters",
+    "coverImageFile": "covers/deep-waters-book-341.jpg"
   },
   "346": {
     "goodreadsUrl": "https://www.goodreads.com/book/show/3602733-something-breathing"
   },
+  "350": {
+    "coverImageFile": "covers/tales-of-science-and-sorcery-350.jpg"
+  },
+  "354": {
+    "coverImageFile": "covers/poems-for-midnight-354.jpg"
+  },
   "359": {
     "coverImageFile": "covers/autobiography-some-notes-on-a-nonentity-359.png",
     "goodreadsUrl": "https://www.goodreads.com/book/show/29865383-autobiography-some-notes-on-a-nonentity"
+  },
+  "361": {
+    "coverImageFile": "covers/the-horror-from-the-hills-361.jpg"
   },
   "366": {
     "coverImageFile": "covers/dreams-and-fancies-366.jpg"
@@ -165,6 +217,9 @@ window.BOOK_EDITS = {
   },
   "369": {
     "coverImageFile": "covers/invaders-from-the-dark-369.jpg"
+  },
+  "370": {
+    "coverImageFile": "covers/pleasant-dreams-nightmares-370.jpg"
   },
   "372": {
     "goodreadsUrl": "https://www.goodreads.com/book/show/10049265-the-shuttered-room-and-other-pieces",
@@ -180,9 +235,21 @@ window.BOOK_EDITS = {
     "coverArtist": "Frank Utpatel",
     "description": "Jacket artwork by Frank Utpatel. A total of 815 copies were produced, including 80 copies issued in library bindings. This anniversary publication was subsequently revised and expanded as Thirty Years of Arkham House (1970; no. 105)."
   },
+  "376": {
+    "coverImageFile": "covers/the-mask-of-cthulhu-376.jpg"
+  },
   "378": {
     "goodreadsUrl": "https://www.goodreads.com/book/show/1512252.Always_Comes_Evening",
     "coverImageFile": "covers/always-comes-evening-378.jpg"
+  },
+  "379": {
+    "coverImageFile": "covers/the-survivor-and-others-379.jpg"
+  },
+  "381": {
+    "coverImageFile": "covers/the-curse-of-yig-book-381.jpg"
+  },
+  "382": {
+    "coverImageFile": "covers/nights-yawning-peal-a-ghostly-company-382.jpg"
   },
   "384": {
     "coverImageFile": "covers/the-dark-chateau-384.png"
@@ -190,14 +257,51 @@ window.BOOK_EDITS = {
   "385": {
     "coverImageFile": "covers/a-hornbook-for-witches-385.png"
   },
+  "387": {
+    "coverImageFile": "covers/something-about-cats-and-other-pieces-387.jpg"
+  },
+  "388": {
+    "coverImageFile": "covers/not-long-for-this-world-388.webp"
+  },
+  "389": {
+    "coverImageFile": "covers/genius-loci-and-other-tales-389.jpg"
+  },
+  "392": {
+    "coverImageFile": "covers/the-web-of-easter-island-392.jpg"
+  },
   "393": {
     "coverImageFile": "covers/the-travelling-grave-and-other-stories-393.jpg"
   },
+  "395": {
+    "coverImageFile": "covers/revelations-in-black-395.jpg"
+  },
   "396": {
-    "goodreadsUrl": "https://www.goodreads.com/book/show/1794059.Dark_Carnival"
+    "goodreadsUrl": "https://www.goodreads.com/book/show/1794059.Dark_Carnival",
+    "coverImageFile": "covers/dark-carnival-short-story-collection-396.jpg"
+  },
+  "397": {
+    "coverImageFile": "covers/dark-of-the-moon-poems-of-fantasy-and-the-macabre-397.jpg"
+  },
+  "398": {
+    "coverImageFile": "covers/this-mortal-coil-book-398.jpg"
+  },
+  "399": {
+    "coverImageFile": "covers/slan-399.webp"
+  },
+  "401": {
+    "coverImageFile": "covers/fearful-pleasures-401.jpg"
+  },
+  "404": {
+    "coverImageFile": "covers/the-house-on-the-borderland-and-other-novels-404.jpg"
   },
   "405": {
     "coverImageFile": "covers/the-doll-and-one-other-405.jpg"
+  },
+  "406": {
+    "coverImageFile": "covers/the-hounds-of-tindalos-book-406.webp"
+  },
+  "407": {
+    "coverImageFile": "covers/the-lurker-at-the-threshold-407.webp"
   },
   "408": {
     "coverImageFile": "covers/green-tea-and-other-ghost-stories-408.jpg"
