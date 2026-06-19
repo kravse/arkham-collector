@@ -73,26 +73,24 @@ window.BOOK_EDITS = {
     "goodreadsUrl": "https://www.goodreads.com/book/show/8507286-the-shunned-house",
     "description": "A total of 100 copies were bound under the Arkham House imprint in 1961. Despite bearing that imprint, this volume is not a genuine Arkham House production in the traditional sense — the actual printing was carried out by W. Paul Cook back in 1928. The printed sheets sat unbound and largely undistributed for years, with R. H. Barlow circulating a small number of copies in 1935, before Arkham House finally bound the remaining 100 sets. The book includes an introduction by Frank Belknap Long. [The spine notation and dust jacket details appear corrupted in the source text and cannot be accurately reproduced.]\n\nSometime around 1965, a forgery surfaced, believed to have originated in England. It was produced via offset printing of the original text, bound in red half leather with gold spine stamping. The forged print run is estimated at several hundred copies."
   },
+  "240": {
+    "coverImageFile": "covers/other-worlds-than-ours-240.jpg"
+  },
   "243": {
     "coverImageFile": "covers/the-cleansing-novel-243.jpg"
-  },
-  "244": {
-    "coverImageFile": "covers/the-far-side-of-nowhere-244.jpg"
   },
   "245": {
     "goodreadsUrl": "https://www.goodreads.com/book/show/370614.Book_of_the_Dead"
   },
   "246": {
-    "description": "Arkham's Masters of Horror is an anthology of fantasy and horror stories edited by Peter Ruber. It was released by Arkham House in an edition of approximately 4,000 copies in 2000. The book includes an introductory essay by Ruber before each story and about its author.\n\nRuber drew criticism from the horror/fantasy community for the hostility with which he introduced some authors within the volume - for instance, his accusation that H.P. Lovecraft \"had a schizoid personality\" and could be labelled \"a genuine crackpot.\""
+    "description": "Arkham's Masters of Horror is an anthology of fantasy and horror stories edited by Peter Ruber. It was released by Arkham House in an edition of approximately 4,000 copies in 2000. The book includes an introductory essay by Ruber before each story and about its author.\n\nRuber drew criticism from the horror/fantasy community for the hostility with which he introduced some authors within the volume - for instance, his accusation that H.P. Lovecraft \"had a schizoid personality\" and could be labelled \"a genuine crackpot.\"",
+    "coverImageFile": "covers/arkhams-masters-of-horror-246.jpg"
   },
   "248": {
     "coverImageFile": "covers/sixty-years-of-arkham-house-248.jpg"
   },
   "251": {
     "coverImageFile": "covers/lovecraft-remembered-251.jpg"
-  },
-  "252": {
-    "coverImageFile": "covers/flowers-from-the-moon-and-other-lunacies-252.jpg"
   },
   "255": {
     "coverImageFile": "covers/cthulhu-2000-255.jpg"
@@ -130,9 +128,6 @@ window.BOOK_EDITS = {
   "268": {
     "coverImageFile": "covers/memories-of-the-space-age-268.jpg"
   },
-  "269": {
-    "coverImageFile": "covers/a-rendezvous-in-averoigne-269.jpg"
-  },
   "270": {
     "coverImageFile": "covers/polyphemus-book-270.jpg"
   },
@@ -148,6 +143,12 @@ window.BOOK_EDITS = {
   "276": {
     "coverImageFile": "covers/the-dunwich-horror-and-others-276.jpg"
   },
+  "277": {
+    "coverImageFile": "covers/lovecrafts-book-277.jpg"
+  },
+  "278": {
+    "coverImageFile": "covers/who-made-stevie-crye-278.jpg"
+  },
   "279": {
     "coverImageFile": "covers/watchers-at-the-strait-gate-279.webp"
   },
@@ -156,6 +157,9 @@ window.BOOK_EDITS = {
   },
   "282": {
     "coverImageFile": "covers/the-wind-from-a-burning-woman-282.jpg"
+  },
+  "283": {
+    "coverImageFile": "covers/the-house-of-the-wolf-283.jpg"
   },
   "284": {
     "coverImageFile": "covers/the-darkling-284.jpg"
@@ -173,6 +177,12 @@ window.BOOK_EDITS = {
     "description": "New Tales of the Cthulhu Mythos was edited by Ramsey Campbell and published by Arkham House in 1980 in an edition of 3,647 copies. In his introduction, Campbell noted that \"in recent years the Mythos at times has seemed in danger of becoming conventionalized,\" despite the fact that \"Lovecraft's intention and achievement was precisely to avoid the predictability and resultant lack of terror which beset the conventional macabre fiction of his day.\" Therefore, Campbell wrote, \"in this anthology I have tended to favor less familiar treatments or uses of the Mythos. They contain few erudite occultists, decaying towns, or stylistic pastiches. Indeed, one of our tales hints at the ultimate event of the Mythos without ever referring to the traditional names.\"\n\nOne story in the book is an expansion, by Martin S. Warnes, of Lovecraft's fragment \"The Book\".",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Cthulhu_Mythos_anthology#New_Tales_of_the_Cthulhu_Mythos"
   },
+  "293": {
+    "coverImageFile": "covers/in-the-mist-and-other-uncanny-encounters-293.png"
+  },
+  "294": {
+    "coverImageFile": "covers/half-in-shadow-294.jpg"
+  },
   "295": {
     "coverImageFile": "covers/born-to-exile-295.jpg"
   },
@@ -187,6 +197,9 @@ window.BOOK_EDITS = {
   },
   "299": {
     "coverImageFile": "covers/kecksies-and-other-twilight-tales-299.jpg"
+  },
+  "300": {
+    "coverImageFile": "covers/the-height-of-the-scream-300.jpg"
   },
   "303": {
     "coverImageFile": "covers/selected-letters-of-h-p-lovecraft-v-1934-1937-303.jpg"
@@ -215,11 +228,20 @@ window.BOOK_EDITS = {
   "312": {
     "coverImageFile": "covers/the-watchers-out-of-time-and-others-312.jpg"
   },
+  "313": {
+    "coverImageFile": "covers/collected-ghost-stories-313.jpg"
+  },
   "314": {
     "coverImageFile": "covers/beneath-the-moors-314.jpg"
   },
   "315": {
     "coverImageFile": "covers/stories-of-darkness-and-dread-315.jpg"
+  },
+  "317": {
+    "coverImageFile": "covers/demons-by-daylight-317.png"
+  },
+  "318": {
+    "coverImageFile": "covers/the-rim-of-the-unknown-318.jpg"
   },
   "320": {
     "coverImageFile": "covers/the-arkham-collector-volume-i-320.jpg"
@@ -229,6 +251,9 @@ window.BOOK_EDITS = {
   },
   "322": {
     "coverImageFile": "covers/selected-letters-of-h-p-lovecraft-iii-1929-1931-322.jpg"
+  },
+  "323": {
+    "coverImageFile": "covers/songs-and-sonnets-atlantean-323.jpg"
   },
   "324": {
     "coverImageFile": "covers/the-arkham-collector-324.jpg"
@@ -243,15 +268,19 @@ window.BOOK_EDITS = {
     "coverImageFile": "covers/the-folsom-flint-and-other-curious-tales-332.jpg"
   },
   "333": {
-    "coverImageFile": "covers/tales-of-the-cthulhu-mythos-333.jpg",
+    "coverImageFile": "covers/cthulhu-mythos-anthology-333.jpg",
     "description": "Tales of the Cthulhu Mythos, edited by writer August Derleth and published by Arkham House in 1969, is considered the first Cthulhu Mythos anthology. It contained two stories by Lovecraft, a number of reprints of pieces written by members of Lovecraft's circle of correspondents, and several new tales written for the collection by a new generation of Cthulhu Mythos writers. It was published in an edition of 4,024 copies.\n\nDerleth prefaced the collection with \"The Cthulhu Mythos\", an outline of his (sometimes controversial) views on the development and content of the Mythos. In this introduction, Derleth prematurely declared the genre to be dead--\"for certainly the Mythos as an inspiration for new fiction is hardly likely to afford readers with enough that is new and sufficiently different in execution to create a continuing and growing demand\".\n\nLin Carter later wrote that Tales of the Cthulhu Mythos \"marked the beginning of a new era in the history of the Mythos for many reasons, and one of the most important was that it introduced a number of new writers in the Mythos.\"",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Cthulhu_Mythos_anthology#Tales_of_the_Cthulhu_Mythos"
   },
   "335": {
     "coverImageFile": "covers/selected-letters-of-h-p-lovecraft-ii-1925-1929-335.jpg"
   },
+  "337": {
+    "coverImageFile": "covers/strange-gateways-337.jpg"
+  },
   "338": {
-    "goodreadsUrl": "https://www.goodreads.com/book/show/5743125-three-tales-of-horror"
+    "goodreadsUrl": "https://www.goodreads.com/book/show/5743125-three-tales-of-horror",
+    "coverImageFile": "covers/three-tales-of-horror-338.jpg"
   },
   "340": {
     "coverImageFile": "covers/travellers-by-night-340.jpg"
@@ -294,11 +323,11 @@ window.BOOK_EDITS = {
   "361": {
     "coverImageFile": "covers/the-horror-from-the-hills-361.jpg"
   },
+  "364": {
+    "coverImageFile": "covers/dark-mind-dark-heart-364.png"
+  },
   "366": {
     "coverImageFile": "covers/dreams-and-fancies-366.jpg"
-  },
-  "367": {
-    "coverImageFile": "covers/fire-and-sleet-and-candlelight-367.jpg"
   },
   "368": {
     "coverImageFile": "covers/strayers-from-sheol-368.jpg"
@@ -366,6 +395,9 @@ window.BOOK_EDITS = {
   "393": {
     "coverImageFile": "covers/the-travelling-grave-and-other-stories-393.jpg"
   },
+  "394": {
+    "coverImageFile": "covers/nights-black-agents-394.jpg"
+  },
   "395": {
     "coverImageFile": "covers/revelations-in-black-395.jpg"
   },
@@ -387,6 +419,9 @@ window.BOOK_EDITS = {
   },
   "401": {
     "coverImageFile": "covers/fearful-pleasures-401.jpg"
+  },
+  "402": {
+    "coverImageFile": "covers/west-india-lights-402.jpg"
   },
   "403": {
     "coverImageFile": "covers/skull-face-and-others-403.jpg"
