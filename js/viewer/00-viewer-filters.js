@@ -152,6 +152,13 @@ const viewerFilters = (function () {
         isOrdered(book, collectedIds, orderedIds),
     );
   }
+  
+  function pickRandomBook(books) {
+    if (!Array.isArray(books) || books.length === 0) {
+      return null;
+    }
+    return books[Math.floor(Math.random() * books.length)];
+  }
   return {
     prepareBookSearchIndex,
     matchesSearch,
@@ -168,5 +175,6 @@ const viewerFilters = (function () {
     cycleMycroftFilter,
     cycleCollectionFilter,
     hasAnyOrderedBooks,
+    pickRandomBook,
   };
 })();

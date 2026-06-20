@@ -150,6 +150,13 @@ function hasAnyOrderedBooks(books, collectedIds, orderedIds, visibilityOptions) 
   );
 }
 
+function pickRandomBook(books) {
+  if (!Array.isArray(books) || books.length === 0) {
+    return null;
+  }
+  return books[Math.floor(Math.random() * books.length)];
+}
+
 module.exports = {
   prepareBookSearchIndex,
   matchesSearch,
@@ -166,4 +173,5 @@ module.exports = {
   cycleMycroftFilter,
   cycleCollectionFilter,
   hasAnyOrderedBooks,
+  pickRandomBook,
 };

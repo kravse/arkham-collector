@@ -15,6 +15,7 @@ const {
   cycleCollectionFilter,
   hasAnyOrderedBooks,
   isOrdered,
+  pickRandomBook,
 } = require("../scripts/lib/viewer-filters");
 
 function book(id, overrides = {}) {
@@ -262,4 +263,15 @@ test("hasAnyOrderedBooks ignores hidden books unless show-hidden is on", () => {
     ),
     false,
   );
+});
+
+test("pickRandomBook returns null for empty input", () => {
+  assert.equal(pickRandomBook([]), null);
+  assert.equal(pickRandomBook(null), null);
+});
+
+test("pickRandomBook returns one of the provided books", () => {
+  const pool = [book(1), book(2), book(3)];
+  const picked = pickRandomBook(pool);
+  assert.ok(pool.some((entry) => entry.id === picked.id));
 });

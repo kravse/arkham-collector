@@ -37,6 +37,7 @@ ${body
     cycleMycroftFilter,
     cycleCollectionFilter,
     hasAnyOrderedBooks,
+    pickRandomBook,
   };
 })();
 `;

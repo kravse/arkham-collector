@@ -118,6 +118,13 @@ async function checkServeSupport() {
   refreshDetailToolbarIfOpen();
 }
 
+function openRandomVisibleBook() {
+  const book = viewerFilters.pickRandomBook(getVisibleBooks());
+  if (book) {
+    openBookDetail(book.id);
+  }
+}
+
 function openBookDetail(bookId, options = {}) {
   let { historyMode = "push" } = options;
   const book = books.find((entry) => entry.id === bookId);

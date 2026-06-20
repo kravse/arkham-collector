@@ -1,5 +1,9 @@
 /* Event listeners and application startup */
 
+const RANDOM_CARD_LOGO_TAP_MS = 1200;
+const RANDOM_CARD_LOGO_TAP_COUNT = 3;
+let randomCardLogoTapTimes = [];
+
 window.addEventListener("popstate", handleDetailPopState);
 
 grid.addEventListener("click", (event) => {
@@ -416,6 +420,20 @@ stats.addEventListener("click", (event) => {
     return;
   }
 });
+
+if (headerLogo) {
+  headerLogo.addEventListener("click", () => {
+    const now = Date.now();
+    randomCardLogoTapTimes = randomCardLogoTapTimes.filter(
+      (time) => now - time < RANDOM_CARD_LOGO_TAP_MS,
+    );
+    randomCardLogoTapTimes.push(now);
+    if (randomCardLogoTapTimes.length >= RANDOM_CARD_LOGO_TAP_COUNT) {
+      randomCardLogoTapTimes = [];
+      openRandomVisibleBook();
+    }
+  });
+}
 
 function startViewer() {
   loadUserStateAsync().then(() => {
