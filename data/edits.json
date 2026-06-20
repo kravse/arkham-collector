@@ -6,6 +6,10 @@
     "212": {
       "hidden": true
     },
+    "213": {
+      "listCoverFocusX": 0.49369747899159666,
+      "listCoverFocusY": 0.32579868211017693
+    },
     "214": {
       "goodreadsUrl": "https://www.goodreads.com/book/show/879503.The_Final_Adventures_of_Solar_Pons"
     },
@@ -133,7 +137,9 @@
       "coverImageFile": "covers/cave-of-a-thousand-tales-241.jpg"
     },
     "242": {
-      "coverImageFile": "covers/selected-letters-of-clark-ashton-smith-242.jpg"
+      "coverImageFile": "covers/selected-letters-of-clark-ashton-smith-242.jpg",
+      "listCoverFocusX": 0.4831932773109244,
+      "listCoverFocusY": 0.7836506813069656
     },
     "243": {
       "coverImageFile": "covers/the-cleansing-novel-243.jpg"
@@ -151,7 +157,9 @@
       "listCoverFocusY": 0.7528329155961413
     },
     "247": {
-      "coverImageFile": "covers/in-the-stone-house-247.jpg"
+      "coverImageFile": "covers/in-the-stone-house-247.jpg",
+      "listCoverFocusX": 0.4579831932773109,
+      "listCoverFocusY": 0.6675874083588657
     },
     "248": {
       "listCoverFocusX": 0.27941176470588236,
@@ -161,13 +169,22 @@
       "coverImageFile": "covers/dragonfly-durbin-novel-249.jpg"
     },
     "250": {
-      "coverImageFile": "covers/new-horizons-book-250.jpg"
+      "coverImageFile": "covers/new-horizons-book-250.jpg",
+      "listCoverFocusX": 0.6722689075630253,
+      "listCoverFocusY": 0.33412707212161813
     },
     "251": {
-      "coverImageFile": "covers/lovecraft-remembered-251.jpg"
+      "listCoverFocusX": 0.4894957983193277,
+      "listCoverFocusY": 0.26571293486716996
+    },
+    "252": {
+      "listCoverFocusX": 0.6218487394957983,
+      "listCoverFocusY": 0.3093449308260041
     },
     "253": {
-      "coverImageFile": "covers/voyages-by-starlight-253.jpg"
+      "coverImageFile": "covers/voyages-by-starlight-253.jpg",
+      "listCoverFocusX": 0.5546218487394958,
+      "listCoverFocusY": 0.4711356195876492
     },
     "254": {
       "coverImageFile": "covers/synthesis-other-virtual-realities-254.jpg",
@@ -184,7 +201,9 @@
       "publicationDate": "1995"
     },
     "257": {
-      "coverImageFile": "covers/the-breath-of-suspension-257.jpg"
+      "coverImageFile": "covers/the-breath-of-suspension-257.jpg",
+      "listCoverFocusX": 0.31092436974789917,
+      "listCoverFocusY": 0.4475701122144761
     },
     "258": {
       "coverImageFile": "covers/the-aliens-of-earth-258.jpg"
@@ -210,11 +229,8 @@
     "265": {
       "coverImageFile": "covers/cthulhu-mythos-anthology-265.jpg",
       "description": "Arkham House released a revised edition of Tales of the Cthulhu Mythos in November 1990, edited by Jim Turner with a substantially different selection of stories, reflecting the editor's disdain for \"Mythos pastiches in which eccentric New England recluses utter the right incantations in the wrong books and are promptly eaten by a giant frog named Cthulhu.\" It was released in an edition of 7,015 copies.\n\nTurner eliminates some authors from the earlier edition (totalling four stories, those by Wade, Shea and two by Lumley) --while still suggesting that \"a few of the earliest pieces in this volume.now seem like pop-cultural kitsch.\"\n\nThe added seven stories, he writes, are from \"the relative handful of successful works that have been influenced by the Cthulhu Mythos.exemplifying the darkly enduring power of H. P. Lovecraft over a disparate group of writers who have made their own inimitable contributions to the Mythos.\"",
-      "listCoverFocusX": 0.5777310924369747,
-      "listCoverFocusY": 0.14194194495365525,
-      "publicationDate": "1990",
-      "decade": "1990s",
-      "wikipediaUrl": "https://en.wikipedia.org/wiki/Cthulhu_Mythos_anthology#Tales_of_the_Cthulhu_Mythos:_Golden_Anniversary_Anthology"
+      "listCoverFocusX": 0.47058823529411764,
+      "listCoverFocusY": 0.8174437847388626
     },
     "266": {
       "coverImageFile": "covers/crystal-express-266.jpg"
@@ -351,10 +367,14 @@
       "coverImageFile": "covers/dwellers-in-darkness-302.jpg"
     },
     "303": {
-      "coverImageFile": "covers/selected-letters-of-h-p-lovecraft-v-1934-1937-303.jpg"
+      "coverImageFile": "covers/selected-letters-of-h-p-lovecraft-v-1934-1937-303.jpg",
+      "listCoverFocusX": 0.25,
+      "listCoverFocusY": 0.7845312822865412
     },
     "304": {
-      "coverImageFile": "covers/selected-letters-of-h-p-lovecraft-iv-1932-1934-304.jpg"
+      "coverImageFile": "covers/selected-letters-of-h-p-lovecraft-iv-1932-1934-304.jpg",
+      "listCoverFocusX": 0.27521008403361347,
+      "listCoverFocusY": 0.7516904776436942
     },
     "305": {
       "listCoverFocusX": 0.4789915966386555,
@@ -362,8 +382,8 @@
     },
     "306": {
       "description": "This collection includes only a selection of the stories from the original 1880 edition of The Purcell Papers, along with several stories not found in that edition. The individual tales originally appeared in print between 1838 and 1871. Derleth's attribution of \"A Night in the Bell Inn\" — published in Dublin University Magazine in June 1850 — to LeFanu was based on internal textual evidence, however later scholarship has since identified the actual author as a little-known Irish writer, Henry Ferris, who lived approximately from 1801 to 1853.",
-      "listCoverFocusX": 0.773109243697479,
-      "listCoverFocusY": 0.33770457521305786,
+      "listCoverFocusX": 0.453781512605042,
+      "listCoverFocusY": 0.2923935096093971,
       "author": "Frank Belknap Long",
       "coverArtist": "Frank Utpatel",
       "publicationDate": "1975",
@@ -380,7 +400,9 @@
       "listCoverFocusY": 0.4889252694130743
     },
     "309": {
-      "coverImageFile": "covers/harrigans-file-309.jpg"
+      "coverImageFile": "covers/harrigans-file-309.jpg",
+      "listCoverFocusX": 0.4432773109243697,
+      "listCoverFocusY": 0.4226207033367648
     },
     "310": {
       "coverImageFile": "covers/x-lucha-and-others-310.png",
@@ -433,13 +455,16 @@
       "listCoverFocusY": 0.47530992194812643
     },
     "320": {
-      "coverImageFile": "covers/the-arkham-collector-volume-i-320.jpg"
+      "listCoverFocusX": 0.2920168067226891,
+      "listCoverFocusY": 0.5589144119996509
     },
     "321": {
       "coverImageFile": "covers/the-caller-of-the-black-321.jpg"
     },
     "322": {
-      "coverImageFile": "covers/selected-letters-of-h-p-lovecraft-iii-1929-1931-322.jpg"
+      "coverImageFile": "covers/selected-letters-of-h-p-lovecraft-iii-1929-1931-322.jpg",
+      "listCoverFocusX": 0.31512605042016806,
+      "listCoverFocusY": 0.7638895611151355
     },
     "323": {
       "coverImageFile": "covers/songs-and-sonnets-atlantean-323.jpg"
@@ -642,12 +667,16 @@
     },
     "365": {
       "coverImageFile": "covers/lonesome-places-365.jpg",
-      "listCoverFocusX": 0.6512605042016807,
-      "listCoverFocusY": 0.5168061241922561
+      "listCoverFocusX": 0.5777310924369747,
+      "listCoverFocusY": 0.2659376744413554
     },
     "366": {
       "listCoverFocusX": 0.6512605042016807,
       "listCoverFocusY": 0.7715428149882673
+    },
+    "367": {
+      "listCoverFocusX": 0.4327731092436975,
+      "listCoverFocusY": 0.27282273713199584
     },
     "368": {
       "coverImageFile": "covers/strayers-from-sheol-368.jpg"
@@ -898,6 +927,10 @@
     "428": {
       "hidden": true,
       "deleted": true
+    },
+    "429": {
+      "listCoverFocusX": 0.5588235294117647,
+      "listCoverFocusY": 0.5107500975986967
     },
     "430": {
       "listCoverFocusX": 0.4852941176470588,
