@@ -173,8 +173,8 @@ window.BOOK_EDITS = {
     "listCoverFocusY": 0.33412707212161813
   },
   "251": {
-    "listCoverFocusX": 0.4894957983193277,
-    "listCoverFocusY": 0.26571293486716996
+    "listCoverFocusX": 0.5010504201680672,
+    "listCoverFocusY": 0.32549171542462724
   },
   "252": {
     "listCoverFocusX": 0.6218487394957983,
