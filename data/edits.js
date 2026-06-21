@@ -232,7 +232,9 @@ window.BOOK_EDITS = {
     "listCoverFocusY": 0.8174437847388626
   },
   "266": {
-    "coverImageFile": "covers/crystal-express-266.jpg"
+    "coverImageFile": "covers/crystal-express-266.webp",
+    "listCoverFocusX": 0.7993697478991597,
+    "listCoverFocusY": 0.8490352161368827
   },
   "267": {
     "coverImageFile": "covers/the-horror-in-the-museum-and-other-revisions-267.jpg"
