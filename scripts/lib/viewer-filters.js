@@ -9,6 +9,7 @@ function prepareBookSearchIndex(book) {
     book.publicationDate,
     book.decade,
     book.listAuthor,
+    ...(Array.isArray(book.tags) ? book.tags : []),
   ]
     .filter(Boolean)
     .join(" ")

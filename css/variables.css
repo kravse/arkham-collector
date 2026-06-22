@@ -24,6 +24,9 @@
   --want-border: rgba(120, 200, 150, 0.55);
   --want-glow: rgba(72, 168, 118, 0.2);
   --want-body: rgba(72, 168, 118, 0.1);
+  --tag-bg: rgba(72, 128, 210, 0.18);
+  --tag-border: rgba(130, 180, 245, 0.42);
+  --tag-text: #b8d8f5;
   --layout-wide-max: 1000px;
 }
 

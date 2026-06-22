@@ -19,6 +19,8 @@ function parseArgs(argv) {
     dedupeBookIds: false,
     compactEdits: false,
     fixArkhamMagazines: false,
+    exportArkhamCatalog: false,
+    output: null,
     yes: false,
   };
 
@@ -51,6 +53,10 @@ function parseArgs(argv) {
       options.compactEdits = true;
     } else if (arg === "--fix-arkham-magazines") {
       options.fixArkhamMagazines = true;
+    } else if (arg === "--export-arkham-catalog") {
+      options.exportArkhamCatalog = true;
+    } else if (arg === "--output") {
+      options.output = argv[++i];
     } else if (arg === "--skip-download") {
       options.skipDownload = true;
     } else if (arg === "--sync-collection") {
@@ -115,6 +121,9 @@ function getScriptMode(args) {
   }
   if (args.fixArkhamMagazines) {
     return "fixArkhamMagazines";
+  }
+  if (args.exportArkhamCatalog) {
+    return "exportArkhamCatalog";
   }
   return "crawl";
 }

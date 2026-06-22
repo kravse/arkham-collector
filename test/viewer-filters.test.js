@@ -47,6 +47,13 @@ test("matchesSearch finds haystack matches case-insensitively", () => {
   assert.equal(matchesSearch(entry, "derleth"), false);
 });
 
+test("matchesSearch includes book tags", () => {
+  const entry = book(2, { title: "At the Mountains of Madness", tags: ["Signed"] });
+
+  assert.equal(matchesSearch(entry, "signed"), true);
+  assert.equal(matchesSearch(entry, "first"), false);
+});
+
 test("passesHiddenVisibility respects hidden-only and show-hidden modes", () => {
   const visible = book(1);
   const hidden = book(2, { hidden: true });

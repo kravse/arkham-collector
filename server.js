@@ -30,6 +30,12 @@ const {
   removeLocalCovers,
 } = require("./scripts/lib/cover-upload");
 const { parseListCoverFocusPatch } = require("./scripts/lib/cover-list-crop");
+const {
+  loadTags,
+  setBookTags,
+  getAllTags,
+  normalizeTags,
+} = require("./scripts/lib/tags");
 
 const ROOT = __dirname;
 const DATA_DIR = path.join(ROOT, "data");
@@ -123,6 +129,42 @@ app.post("/api/books/:id/cover", upload.single("cover"), (req, res) => {
           ? 400
           : 500;
     res.status(status).json({ error: error.message });
+  }
+});
+
+app.get("/api/tags", (_req, res) => {
+  try {
+    const { byBookId } = loadTags();
+    res.json({ tags: getAllTags(byBookId) });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.patch("/api/books/:id/tags", (req, res) => {
+  try {
+    const bookId = Number(req.params.id);
+    if (!Number.isInteger(bookId) || bookId < 1) {
+      res.status(400).json({ error: "Invalid book id" });
+      return;
+    }
+
+    if (!Array.isArray(req.body.tags)) {
+      res.status(400).json({ error: "Expected tags array" });
+      return;
+    }
+
+    const payload = readPayload();
+    if (!getScrapedBook(payload, bookId)) {
+      res.status(404).json({ error: "Book not found" });
+      return;
+    }
+
+    const tags = normalizeTags(req.body.tags);
+    setBookTags(bookId, tags);
+    res.json({ id: bookId, tags });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 });
 
@@ -349,6 +391,9 @@ app.use(
       if (filePath.includes(`${path.sep}data${path.sep}edits.js`)) {
         res.setHeader("Cache-Control", "no-store");
       }
+      if (filePath.includes(`${path.sep}data${path.sep}tags.js`)) {
+        res.setHeader("Cache-Control", "no-store");
+      }
       if (filePath.includes(`${path.sep}data${path.sep}book-order.js`)) {
         res.setHeader("Cache-Control", "no-store");
       }
@@ -374,6 +419,6 @@ if (fs.existsSync(COLLECTION_CSV)) {
 
 app.listen(PORT, () => {
   console.log(`Arkham viewer running at http://localhost:${PORT}`);
-  console.log("Book editing, cover uploads, and hide/unhide are enabled.");
+  console.log("Book editing, cover uploads, tags, and hide/unhide are enabled.");
   console.log("Edits persist only fields that differ from data/books.json.");
 });

@@ -24,6 +24,7 @@ const BOOKS_JS = path.join(ROOT, "data", "books.js");
 const DESCRIPTIONS_JS = path.join(ROOT, "data", "descriptions.js");
 const EDITS_JSON = path.join(ROOT, "data", "edits.json");
 const EDITS_JS = path.join(ROOT, "data", "edits.js");
+const TAGS_JS = path.join(ROOT, "data", "tags.js");
 const VIEWER_HTML = path.join(ROOT, "viewer.html");
 const COLLECTION_JS = path.join(ROOT, "my_collection", "collection.js");
 const COLLECTION_CSV = path.join(ROOT, "my_collection", "my_collection.csv");
@@ -240,6 +241,15 @@ async function buildStaticSiteAsync() {
     fs.writeFileSync(
       path.join(BUILD_DIR, "data", "edits.js"),
       "window.BOOK_EDITS = {};\n",
+    );
+  }
+
+  if (fs.existsSync(TAGS_JS)) {
+    copyFile(TAGS_JS, path.join(BUILD_DIR, "data", "tags.js"));
+  } else {
+    fs.writeFileSync(
+      path.join(BUILD_DIR, "data", "tags.js"),
+      "window.BOOK_TAGS = {};\n",
     );
   }
 

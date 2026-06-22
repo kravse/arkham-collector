@@ -229,3 +229,120 @@
   cursor: wait;
 }
 
+.edit-tags-label {
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+.edit-tags-current {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  min-height: 1.5rem;
+}
+
+.edit-tags-empty {
+  margin: 0;
+  font-size: 0.74rem;
+  color: rgba(232, 234, 237, 0.45);
+}
+
+.edit-tag-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.18rem 0.35rem 0.18rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid var(--tag-border);
+  background: var(--tag-bg);
+  color: var(--tag-text);
+  font-size: 0.74rem;
+  line-height: 1.2;
+}
+
+.edit-tag-remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.1rem;
+  height: 1.1rem;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: rgba(232, 234, 237, 0.65);
+  font: inherit;
+  font-size: 0.95rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.edit-tag-remove:hover {
+  color: #ffd6d6;
+  background: rgba(120, 40, 40, 0.22);
+}
+
+.edit-tags-add-row {
+  display: flex;
+  gap: 0.4rem;
+  margin-top: 0.45rem;
+}
+
+.edit-tags-add-row input[type="text"] {
+  flex: 1;
+  min-width: 0;
+  font: inherit;
+  font-size: 0.82rem;
+  color: var(--text);
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.55rem 0.7rem;
+}
+
+.edit-tags-add-row button {
+  flex-shrink: 0;
+  font: inherit;
+  font-size: 0.78rem;
+  border-radius: 8px;
+  padding: 0.45rem 0.75rem;
+  cursor: pointer;
+  border: 1px solid var(--tag-border);
+  background: var(--tag-bg);
+  color: var(--tag-text);
+}
+
+.edit-tags-pool {
+  margin-top: 0.55rem;
+}
+
+.edit-tags-pool-label {
+  margin: 0 0 0.35rem;
+  font-size: 0.72rem;
+  color: var(--muted);
+}
+
+.edit-tags-pool-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.edit-tag-pool-btn {
+  font: inherit;
+  font-size: 0.72rem;
+  border-radius: 999px;
+  padding: 0.22rem 0.55rem;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--muted);
+}
+
+.edit-tag-pool-btn:hover {
+  color: var(--tag-text);
+  border-color: var(--tag-border);
+  background: rgba(72, 128, 210, 0.12);
+}
+

@@ -3,7 +3,10 @@
 
 /* Configuration, DOM references, and mutable state */
 
-const books = applyBookEdits(window.BOOKS || [], window.BOOK_EDITS || {});
+const books = applyBookTags(
+  applyBookEdits(window.BOOKS || [], window.BOOK_EDITS || {}),
+  window.BOOK_TAGS || {},
+);
 const grid = document.getElementById("grid");
 const stats = document.getElementById("stats");
 const searchInput = document.getElementById("search");
@@ -33,6 +36,12 @@ const editWikipediaUrlInput =
 const editGoodreadsUrlInput =
   document.getElementById("edit-goodreads-url");
 const editDescriptionInput = document.getElementById("edit-description");
+const editTagsField = document.getElementById("edit-tags-field");
+const editTagsCurrent = document.getElementById("edit-tags-current");
+const editTagInput = document.getElementById("edit-tag-input");
+const editTagAddBtn = document.getElementById("edit-tag-add");
+const editTagsPool = document.getElementById("edit-tags-pool");
+const editTagsPoolList = document.getElementById("edit-tags-pool-list");
 const editCoverFileInput = document.getElementById("edit-cover-file");
 const editTabDetails = document.getElementById("edit-tab-details");
 const editTabListCrop = document.getElementById("edit-tab-list-crop");

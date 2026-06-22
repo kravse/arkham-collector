@@ -118,6 +118,48 @@ editTabListCrop.addEventListener("click", () => {
   selectEditDialogTab("list-crop");
 });
 
+if (editTagAddBtn) {
+  editTagAddBtn.addEventListener("click", () => {
+    addEditingBookTag(editTagInput?.value || "");
+  });
+}
+
+if (editTagInput) {
+  editTagInput.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      addEditingBookTag(editTagInput.value);
+    }
+  });
+}
+
+if (editTagsCurrent) {
+  editTagsCurrent.addEventListener("click", (event) => {
+    const removeBtn = event.target.closest(".edit-tag-remove");
+    if (!removeBtn) {
+      return;
+    }
+    event.preventDefault();
+    const tag = removeBtn
+      .closest(".edit-tag-chip")
+      ?.querySelector(".edit-tag-chip-label")?.textContent;
+    if (tag) {
+      removeEditingBookTag(tag);
+    }
+  });
+}
+
+if (editTagsPoolList) {
+  editTagsPoolList.addEventListener("click", (event) => {
+    const button = event.target.closest(".edit-tag-pool-btn");
+    if (!button) {
+      return;
+    }
+    event.preventDefault();
+    addEditingBookTag(button.textContent);
+  });
+}
+
 if (coverLightbox) {
   coverLightbox.addEventListener("click", (event) => {
     if (event.target.closest(".cover-lightbox-img")) {

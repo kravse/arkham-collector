@@ -114,6 +114,7 @@ async function checkServeSupport() {
   }
 
   showHiddenWrap.hidden = !viewerMode.shouldShowShowHiddenToggle(serveEnabled);
+  syncEditTagsVisibility();
   updateSortControlVisibility();
   refreshDetailToolbarIfOpen();
 }
@@ -159,6 +160,7 @@ function openBookDetail(bookId, options = {}) {
   );
 
   const metaHtml = renderBookMetaHtml(book);
+  const tagsHtml = renderBookTagsHtml(book);
   const description = getBookDescription(book);
   const descriptionHtml = description?.trim()
     ? `<div class="book-detail-description">${escapeHtml(description)}</div>`
@@ -172,6 +174,7 @@ function openBookDetail(bookId, options = {}) {
   <h2 class="title" id="book-detail-title">${escapeHtml(book.title || "Untitled")}${detailDateHtml}</h2>
   <div class="book-detail-scroll-block">
     <div class="book-detail-meta">${metaHtml}</div>
+    ${tagsHtml}
     ${descriptionHtml}
   </div>
 `;
@@ -343,6 +346,11 @@ function openEditDialog(bookId) {
   editGoodreadsUrlInput.value = resolveGoodreadsUrl(book) || "";
   editDescriptionInput.value = getBookDescription(book) || "";
   editCoverFileInput.value = "";
+  syncEditTagsVisibility();
+  renderEditTagsUi();
+  if (editTagInput) {
+    editTagInput.value = "";
+  }
   selectEditDialogTab("details");
   openListCoverPicker(book);
   editDialog.hidden = false;

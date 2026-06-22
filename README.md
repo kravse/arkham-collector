@@ -10,9 +10,9 @@ A visual catalog for collectors and readers of [Arkham House](https://en.wikiped
 
 | | |
 |---|---|
-| **Search & sort** | Search the grid; **list/grid toggle** beside search (saved in browser); **Sort** (oldest/newest/title) everywhere. Same-year tiebreaks from `book-order.js`; maintainers set those with **Reorder** on `npm run serve` only |
+| **Search & sort** | Search the grid (title, author, cover artist, date, and tags); **list/grid toggle** beside search (saved in browser); **Sort** (oldest/newest/title) everywhere. Same-year tiebreaks from `book-order.js`; maintainers set those with **Reorder** on `npm run serve` only |
 | **Filters** | Collection, want list, Mycroft & Moran imprint, decade |
-| **Book detail** | Cover, description, cover artist, **W** / **G** links, **Collect** (Ordered → Collection), and want toggles. In the detail overlay, tap the cover (mobile) or hover and click the magnifier (desktop) for a full-screen view |
+| **Book detail** | Cover, description, cover artist, tags, **W** / **G** links, **Collect** (Ordered → Collection), and want toggles. In the detail overlay, tap the cover (mobile) or hover and click the magnifier (desktop) for a full-screen view |
 | **Your data** | Stored in the browser (`arkham-user-state` v2; older keys migrate automatically). Default is **This device only**; optional **Sync with GitHub Gist** saves full state to a private GitHub Gist using a throwaway bot account PAT (`arkham-gist-sync`) |
 | **Export** | Download your collection as CSV (ordered and collected titles; same rows, no order status column). **Import collection CSV** replaces collected titles for the active storage mode only and clears on-order titles for that mode; your want list is unchanged |
 
@@ -60,7 +60,7 @@ npm run serve    # http://localhost:8742 — full UI + edit/hide/upload API
 npm run build && open build/index.html   # read-only static site (matches deploy)
 ```
 
-**`npm run serve`** — edit metadata, upload covers, hide or soft-delete titles, and pick list-view cover crops; changes go to `data/edits.json` only.
+**`npm run serve`** — edit metadata, upload covers, add or remove tags, hide or soft-delete titles, and pick list-view cover crops; metadata changes go to `data/edits.json`; tags go to `data/tags.json`.
 
 **`npm run build`** — writes `build/` for static hosting (`READ_ONLY`, bundled CSS/JS, `noindex`). Cover images in `covers/` are resized to WebP at build time (480px card thumbnails, 960px detail images, and 1200×80 list strips); masters stay in the repo but only optimized files ship in `build/`. List strip crops use per-book focal points from edits when set (default center / 70% down).
 
@@ -72,13 +72,16 @@ npm run build && open build/index.html   # read-only static site (matches deploy
 |-------|--------|----------------|
 | Scraped | `data/books.json`, `books.js`, `descriptions.js` | Crawler & sync scripts |
 | Overrides | `data/edits.json` | Dev server (`npm run serve`) only |
+| Tags | `data/tags.json`, `tags.js` | Dev server edit dialog (`npm run serve`) only |
 | Display order | `data/book-order.json`, `book-order.js` | Dev server **Reorder** dialog (`npm run serve`) only |
 
-At load time, [`js/book-edits.js`](js/book-edits.js) merges scraped rows with edits; only differing fields are stored in `edits.json` so re-crawls can refresh untouched fields. The grid is sorted by publication year; [`data/book-order.js`](data/book-order.js) breaks ties within each year. Magazine seasons (e.g. “Summer, 1967”) sort as that year—use **Reorder** to set issue order. Visitors on the built site cannot change order.
+At load time, [`js/book-edits.js`](js/book-edits.js) merges scraped rows with edits; only differing fields are stored in `edits.json` so re-crawls can refresh untouched fields. [`js/book-tags.js`](js/book-tags.js) attaches tags from [`data/tags.js`](data/tags.js) (static in production; editable only on localhost). The grid is sorted by publication year; [`data/book-order.js`](data/book-order.js) breaks ties within each year. Magazine seasons (e.g. “Summer, 1967”) sort as that year—use **Reorder** to set issue order. Visitors on the built site cannot change order or tags.
+
+**Tags (maintainers):** With `npm run serve`, open a book’s edit dialog. Add a custom tag or pick from existing tags in the pool; remove tags with × on each chip. Tags save immediately to `data/tags.json` and regenerate `tags.js`. Run `npm run build` to ship tags to the live site. Tags appear in book detail and in the main search bar.
 
 **Reorder books (maintainers):** With `npm run serve`, use **Reorder** in the header. The list shows all non-deleted titles (respecting **Show hidden**). Move titles within the same calendar year only. Save writes `data/book-order.json` and regenerates `book-order.js`; run `npm run build` to ship the order to the live site.
 
-**Dev API:** `GET /api/book-order` returns the normalized id list; `PUT /api/book-order` with `{ "order": [ … ] }` saves it (400 if order breaks year sequence or omits books).
+**Dev API:** `GET /api/tags` returns all known tags; `PATCH /api/books/:id/tags` with `{ "tags": [ … ] }` saves a book’s tag list (400 on invalid input). `GET /api/book-order` returns the normalized id list; `PUT /api/book-order` with `{ "order": [ … ] }` saves it (400 if order breaks year sequence or omits books).
 
 **Maintainer sample CSV:** [`my_collection/my_collection.csv`](my_collection/my_collection.csv) is synced by `npm run sync-collection` for script/testing use; it is not loaded in the visitor viewer.
 
@@ -142,6 +145,8 @@ Entry point: `node scripts/index.js`. Common flags: `--yes`, `--local`, `--limit
 | `fix-arkham-magazines` | Move issue/season data out of `listAuthor` into `title` and `publicationDate` for Arkham Sampler and Collector magazine issues |
 | `fix-arkham-magazines:dry-run` | Preview magazine fixes without writing |
 | `dedupe-book-ids` | Split duplicate stable ids |
+| `export-arkham-catalog` | Write `arkham_catalog.csv` (Arkham House only; title, author, year — same shape as collection export) |
+| `export-arkham-catalog:stdout` | Same export to stdout (`--output -`) |
 
 **Curation tips:** Prefer `serve` for one-off fixes. Use targeted syncs instead of full `crawl` when possible. **Hide** (`hidden` in edits) shows on localhost with “Show hidden”; **delete** removes from the UI but keeps the scraped row.
 
@@ -152,12 +157,12 @@ Entry point: `node scripts/index.js`. Common flags: `--yes`, `--local`, `--limit
 | `viewer.html` | UI shell (loads `js/viewer-bundle.js`) |
 | `js/viewer/` | Viewer source; `npm run bundle-viewer` |
 | `css/` | Styles (bundled to `css/viewer.css` in `build/`) |
-| `data/` | Catalog + edits + descriptions |
+| `data/` | Catalog + edits + tags + descriptions |
 | `covers/` | Cover images |
 | `my_collection/` | Maintainer sample CSV + `collection.js` |
 | `scripts/` | Crawler CLI (`index.js`, `lib/`, `tasks/`) |
 | `build/` | Generated deploy output |
-| `server.js` | Dev API for edits, uploads, and book order |
+| `server.js` | Dev API for edits, tags, uploads, and book order |
 
 Vanilla HTML/CSS/JS—no TypeScript or app framework. Dependencies: **cheerio**, **express**, **multer**.
 

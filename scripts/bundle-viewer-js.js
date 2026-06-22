@@ -103,6 +103,10 @@ const PARTS = [
     end: 1726,
   },
   {
+    file: "07-edit-tags.js",
+    title: "Tag editing in the dev-server edit dialog",
+  },
+  {
     file: "09-order.js",
     title: "Admin book order dialog",
   },
