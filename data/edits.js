@@ -173,8 +173,8 @@ window.BOOK_EDITS = {
     "listCoverFocusY": 0.33412707212161813
   },
   "251": {
-    "listCoverFocusX": 0.4894957983193277,
-    "listCoverFocusY": 0.26571293486716996
+    "listCoverFocusX": 0.5010504201680672,
+    "listCoverFocusY": 0.32549171542462724
   },
   "252": {
     "listCoverFocusX": 0.6218487394957983,
@@ -232,7 +232,9 @@ window.BOOK_EDITS = {
     "listCoverFocusY": 0.8174437847388626
   },
   "266": {
-    "coverImageFile": "covers/crystal-express-266.jpg"
+    "coverImageFile": "covers/crystal-express-266.webp",
+    "listCoverFocusX": 0.7993697478991597,
+    "listCoverFocusY": 0.8490352161368827
   },
   "267": {
     "coverImageFile": "covers/the-horror-in-the-museum-and-other-revisions-267.jpg"
@@ -304,7 +306,9 @@ window.BOOK_EDITS = {
     "coverImageFile": "covers/blooded-on-arachne-285.jpg"
   },
   "286": {
-    "coverImageFile": "covers/tales-from-the-nightside-286.png"
+    "coverImageFile": "covers/tales-from-the-nightside-286.jpg",
+    "listCoverFocusX": 0.5913865546218487,
+    "listCoverFocusY": 0.758395624921068
   },
   "287": {
     "coverImageFile": "covers/collected-poems-richard-l-tierney-287.jpg",
@@ -323,7 +327,9 @@ window.BOOK_EDITS = {
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Cthulhu_Mythos_anthology#New_Tales_of_the_Cthulhu_Mythos"
   },
   "290": {
-    "coverImageFile": "covers/necropolis-copper-novel-290.jpg"
+    "coverImageFile": "covers/necropolis-copper-novel-290.jpg",
+    "listCoverFocusX": 0.46113445378151263,
+    "listCoverFocusY": 0.6700352913190722
   },
   "291": {
     "coverImageFile": "covers/the-black-book-of-clark-ashton-smith-291.jpg"
@@ -786,8 +792,8 @@ window.BOOK_EDITS = {
     "listCoverFocusY": 0.7406389272860934
   },
   "393": {
-    "listCoverFocusX": 0.6785714285714286,
-    "listCoverFocusY": 0.8512778349202658
+    "listCoverFocusX": 0.6502100840336135,
+    "listCoverFocusY": 0.5228178938990615
   },
   "394": {
     "coverImageFile": "covers/nights-black-agents-394.jpg",
