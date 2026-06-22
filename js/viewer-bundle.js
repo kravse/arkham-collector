@@ -1541,15 +1541,15 @@ const viewerTags = (function () {
   }
   
   function colorsForHue(hue, band) {
-    const saturation = [52, 78, 56, 82][band % 4];
-    const textLightness = [84, 74, 80, 72][band % 4];
-    const bgLightness = [32, 42, 36, 44][band % 4];
-    const bgAlpha = [0.26, 0.34, 0.28, 0.36][band % 4];
+    const saturation = [34, 44, 36, 46][band % 4];
+    const textLightness = [72, 68, 74, 66][band % 4];
+    const bgLightness = [28, 32, 30, 34][band % 4];
+    const bgAlpha = [0.18, 0.22, 0.2, 0.24][band % 4];
   
     return {
       bg: `hsla(${hue}, ${saturation}%, ${bgLightness}%, ${bgAlpha})`,
-      border: `hsla(${hue}, ${Math.min(saturation + 10, 90)}%, 58%, 0.58)`,
-      text: `hsla(${hue}, ${Math.min(saturation + 14, 92)}%, ${textLightness}%, 0.96)`,
+      border: `hsla(${hue}, ${Math.min(saturation + 6, 55)}%, 48%, 0.38)`,
+      text: `hsla(${hue}, ${Math.min(saturation + 8, 58)}%, ${textLightness}%, 0.82)`,
     };
   }
   

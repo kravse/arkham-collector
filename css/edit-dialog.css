@@ -253,9 +253,9 @@
   gap: 0.2rem;
   padding: 0.18rem 0.35rem 0.18rem 0.55rem;
   border-radius: 999px;
-  border: 1px solid var(--tag-border, rgba(130, 180, 245, 0.42));
-  background: var(--tag-bg, rgba(72, 128, 210, 0.18));
-  color: var(--tag-text, #b8d8f5);
+  border: 1px solid var(--tag-border, rgba(130, 180, 245, 0.28));
+  background: var(--tag-bg, rgba(72, 128, 210, 0.12));
+  color: var(--tag-text, rgba(184, 200, 220, 0.82));
   font-family: var(--tag-font);
   font-size: 0.72rem;
   font-weight: 600;
