@@ -88,7 +88,7 @@ function renderBookOrderList() {
       const canMoveUp = canMoveBookInOrder(workingBookOrder, index, -1);
       const canMoveDown = canMoveBookInOrder(workingBookOrder, index, 1);
       const dateLabel = book.publicationDate || "—";
-      const title = escapeHtml(book.title || book.listTitle || "Untitled");
+      const title = viewerCardHtml.escapeHtml(book.title || book.listTitle || "Untitled");
 
       return `
         <div class="order-dialog-row" data-book-id="${id}">
@@ -101,7 +101,7 @@ function renderBookOrderList() {
           >⠿</span>
           <div class="order-dialog-row-text">
             <span class="order-dialog-row-title">${title}</span>
-            <span class="order-dialog-row-date">${escapeHtml(dateLabel)}</span>
+            <span class="order-dialog-row-date">${viewerCardHtml.escapeHtml(dateLabel)}</span>
           </div>
           <div class="order-dialog-row-actions">
             <button

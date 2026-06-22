@@ -8,25 +8,11 @@ const {
   LIST_FOCAL_Y,
   computeListCoverCrop,
 } = require("./cover-list-crop");
+const { coverSourceKey, coverDerivativePaths } = require("./covers-shared");
 
 const CARD_MAX_WIDTH = 480;
 const DETAIL_MAX_WIDTH = 960;
 const WEBP_QUALITY = 80;
-
-function coverDerivativePaths(relativePath) {
-  const normalized = String(relativePath || "").replace(/\\/g, "/");
-  const parsed = path.posix.parse(normalized);
-  const base = parsed.dir ? `${parsed.dir}/${parsed.name}` : parsed.name;
-  return {
-    card: `${base}.card.webp`,
-    detail: `${base}.detail.webp`,
-    list: `${base}.list.webp`,
-  };
-}
-
-function coverSourceKey(relativePath) {
-  return String(relativePath || "").replace(/\\/g, "/");
-}
 
 function applyOptimizedCoverPaths(books, optimizedBySource) {
   const lookup =

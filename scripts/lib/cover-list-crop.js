@@ -1,13 +1,10 @@
 const { findCoverMasterPath } = require("./covers-files");
+const { coverSourceKey } = require("./covers-shared");
 
 const LIST_WIDTH = 1200;
 const LIST_HEIGHT = 80;
 const LIST_FOCAL_X = 0.5;
 const LIST_FOCAL_Y = 0.7;
-
-function coverSourceKey(relativePath) {
-  return String(relativePath || "").replace(/\\/g, "/");
-}
 
 function isDefaultListCoverFocus(x, y) {
   return x === LIST_FOCAL_X && y === LIST_FOCAL_Y;

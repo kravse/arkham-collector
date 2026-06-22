@@ -2,6 +2,7 @@ const fs = require("fs");
 const path = require("path");
 const { COLLECTION_CSV, COLLECTION_JS } = require("../config");
 const { parseCsvLine, parseYear } = require("./text");
+const { writeJsGlobal } = require("./static-data");
 
 function parseCollectionCsv(csvText) {
   return csvText
@@ -35,11 +36,7 @@ function syncCollectionFromCsv() {
   }
 
   const items = parseCollectionCsv(fs.readFileSync(COLLECTION_CSV, "utf8"));
-  fs.mkdirSync(path.dirname(COLLECTION_JS), { recursive: true });
-  fs.writeFileSync(
-    COLLECTION_JS,
-    `window.MY_COLLECTION = ${JSON.stringify(items, null, 2)};\n`,
-  );
+  writeJsGlobal(COLLECTION_JS, "MY_COLLECTION", items);
   console.log(`Synced ${items.length} collection items to ${COLLECTION_JS}`);
 }
 

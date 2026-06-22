@@ -1,31 +1,23 @@
 #!/usr/bin/env node
 /**
- * Splits js/viewer/_body.js into ordered partials (shared IIFE scope) or
- * concatenates partials into js/viewer-bundle.js for a single script tag.
+ * Concatenates js/viewer/ partials into js/viewer-bundle.js for a single script tag.
  */
 const fs = require("fs");
 const path = require("path");
-const { syncViewerSort } = require("./sync-viewer-sort");
-const { syncViewerFilters } = require("./sync-viewer-filters");
-const { syncViewerMode } = require("./sync-viewer-mode");
-const { syncViewerUserState } = require("./sync-viewer-user-state");
-const { syncViewerGistSync } = require("./sync-viewer-gist-sync");
-const { syncViewerCollectionImport } = require("./sync-viewer-collection-import");
-const { syncViewerCovers } = require("./sync-viewer-covers");
-const { syncViewerListCrop } = require("./sync-viewer-list-crop");
-const { syncViewerTags } = require("./sync-viewer-tags");
+const { syncAllViewerModules } = require("./sync-viewer-module");
 
 const ROOT = path.join(__dirname, "..");
 const VIEWER_DIR = path.join(ROOT, "js", "viewer");
-const BODY = path.join(VIEWER_DIR, "_body.js");
 
 const PARTS = [
   {
     file: "01-config-dom-state.js",
     title: "Configuration, DOM references, and mutable state",
-    start: 1,
-    end: 162,
-    prefix: '(function () {\n  "use strict";\n\n',
+  },
+  {
+    file: "00-viewer-card-html.js",
+    title:
+      "Card HTML helpers (generated from scripts/lib/viewer-card-html.js)",
   },
   {
     file: "00-viewer-user-state.js",
@@ -53,7 +45,8 @@ const PARTS = [
   },
   {
     file: "00-viewer-mode.js",
-    title: "Shared read-only vs serve visibility (generated from scripts/lib/viewer-mode.js)",
+    title:
+      "Shared read-only vs serve visibility (generated from scripts/lib/viewer-mode.js)",
   },
   {
     file: "00-viewer-filters.js",
@@ -61,19 +54,16 @@ const PARTS = [
   },
   {
     file: "00-viewer-tags.js",
-    title: "Tag color helpers (generated from scripts/lib/viewer-tags.js)",
+    title:
+      "Tag helpers (generated from scripts/lib/tag-normalize.js)",
   },
   {
     file: "02-books-parse.js",
     title: "Book list helpers and CSV / title parsing",
-    start: 163,
-    end: 325,
   },
   {
     file: "03-collection.js",
     title: "Collection, want list, storage, and user state",
-    start: 326,
-    end: 586,
   },
   {
     file: "00-viewer-sort.js",
@@ -82,20 +72,14 @@ const PARTS = [
   {
     file: "04-catalog.js",
     title: "Sort, search, filters, and visible book list",
-    start: 587,
-    end: 702,
   },
   {
     file: "05-render.js",
     title: "Covers, cards, stats, and main grid render",
-    start: 703,
-    end: 1247,
   },
   {
     file: "06-detail-dialogs.js",
     title: "Book detail overlay, settings, and attribution dialogs",
-    start: 1248,
-    end: 1548,
   },
   {
     file: "07-list-cover-picker.js",
@@ -104,8 +88,6 @@ const PARTS = [
   {
     file: "07-edit-api.js",
     title: "Edit dialog and dev-server PATCH / DELETE API",
-    start: 1549,
-    end: 1726,
   },
   {
     file: "07-edit-tags.js",
@@ -116,36 +98,27 @@ const PARTS = [
     title: "Admin book order dialog",
   },
   {
-    file: "08-init.js",
-    title: "Event listeners and application startup",
-    start: 1727,
-    end: null,
-    suffix: "\n})();\n",
+    file: "08-init-grid.js",
+    title: "Grid and header filter event listeners",
+  },
+  {
+    file: "08-init-detail.js",
+    title: "Detail overlay and cover lightbox event listeners",
+  },
+  {
+    file: "08-init-edit.js",
+    title: "Edit dialog, settings, search, and startup",
   },
 ];
 
-function readBodyLines() {
-  return fs.readFileSync(BODY, "utf8").split("\n");
-}
-
-function sliceLines(lines, start, end) {
-  const slice = lines.slice(start - 1, end == null ? lines.length : end);
-  return slice.join("\n");
-}
-
-function writePartials() {
-  const lines = readBodyLines();
-  for (const part of PARTS) {
-    let content = sliceLines(lines, part.start, part.end);
-    const header = `/* ${part.title} */\n\n`;
-    content = (part.prefix || "") + header + content + (part.suffix || "");
-    const outPath = path.join(VIEWER_DIR, part.file);
-    fs.writeFileSync(outPath, `${content.trimEnd()}\n`);
-  }
-}
-
 function writeBundle() {
   const ordered = PARTS.map((p) => path.join(VIEWER_DIR, p.file));
+  const missing = ordered.filter((file) => !fs.existsSync(file));
+  if (missing.length) {
+    throw new Error(
+      `Missing viewer partials: ${missing.map((f) => path.basename(f)).join(", ")}`,
+    );
+  }
   const bundle = ordered
     .map((file) => fs.readFileSync(file, "utf8"))
     .join("\n\n");
@@ -153,26 +126,7 @@ function writeBundle() {
 }
 
 function bundleViewerJs() {
-  syncViewerSort();
-  syncViewerFilters();
-  syncViewerMode();
-  syncViewerUserState();
-  syncViewerGistSync();
-  syncViewerCollectionImport();
-  syncViewerCovers();
-  syncViewerListCrop();
-  syncViewerTags();
-  if (!fs.existsSync(BODY)) {
-    const partials = PARTS.map((p) => path.join(VIEWER_DIR, p.file));
-    if (partials.every((file) => fs.existsSync(file))) {
-      writeBundle();
-      return;
-    }
-    throw new Error(
-      `Missing ${BODY} and incomplete js/viewer/ partials — cannot bundle viewer JS.`,
-    );
-  }
-  writePartials();
+  syncAllViewerModules();
   writeBundle();
 }
 
@@ -183,4 +137,4 @@ if (require.main === module) {
   );
 }
 
-module.exports = { bundleViewerJs };
+module.exports = { bundleViewerJs, PARTS, writeBundle };

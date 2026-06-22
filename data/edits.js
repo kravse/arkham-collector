@@ -62,8 +62,8 @@ window.BOOK_EDITS = {
     "goodreadsUrl": "https://www.goodreads.com/book/show/6052605-the-reminiscences-of-solar-pons"
   },
   "227": {
-    "listCoverFocusX": 0.6334033613445378,
-    "listCoverFocusY": 0.3526596218509491
+    "listCoverFocusX": 0.4652777777777778,
+    "listCoverFocusY": 0.12935605370029654
   },
   "228": {
     "listCoverFocusX": 0.38760504201680673,

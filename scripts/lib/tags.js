@@ -2,26 +2,16 @@ const fs = require("fs");
 const path = require("path");
 
 const { DATA_DIR } = require("../config");
+const {
+  MAX_TAG_LENGTH,
+  tagKey,
+  normalizeTag,
+  collectAllKnownTags,
+} = require("./tag-normalize");
+const { writeJsonAndJs } = require("./static-data");
 
 const TAGS_JSON = path.join(DATA_DIR, "tags.json");
 const TAGS_JS = path.join(DATA_DIR, "tags.js");
-const MAX_TAG_LENGTH = 48;
-
-function tagKey(tag) {
-  return String(tag || "")
-    .trim()
-    .toLowerCase();
-}
-
-function normalizeTag(value) {
-  const text = String(value || "")
-    .trim()
-    .replace(/\s+/g, " ");
-  if (!text || text.length > MAX_TAG_LENGTH) {
-    return null;
-  }
-  return text.toUpperCase();
-}
 
 function normalizeTags(tags) {
   const seen = new Set();
@@ -62,12 +52,13 @@ function saveTags(payload, paths = {}) {
   const output = { byBookId };
   const tagsJson = paths.tagsJson || TAGS_JSON;
   const tagsJs = paths.tagsJs || TAGS_JS;
-  fs.mkdirSync(path.dirname(tagsJson), { recursive: true });
-  fs.writeFileSync(tagsJson, `${JSON.stringify(output, null, 2)}\n`);
-  fs.writeFileSync(
-    tagsJs,
-    `window.BOOK_TAGS = ${JSON.stringify(byBookId, null, 2)};\n`,
-  );
+  writeJsonAndJs({
+    jsonPath: tagsJson,
+    jsPath: tagsJs,
+    jsonValue: output,
+    jsGlobal: "BOOK_TAGS",
+    jsValue: byBookId,
+  });
   return output;
 }
 
@@ -92,19 +83,7 @@ function setBookTags(bookId, tags) {
 }
 
 function getAllTags(tagsByBookId) {
-  const seen = new Set();
-  const tags = [];
-  for (const bookTags of Object.values(tagsByBookId || {})) {
-    for (const tag of normalizeTags(Array.isArray(bookTags) ? bookTags : [])) {
-      const key = tagKey(tag);
-      if (seen.has(key)) {
-        continue;
-      }
-      seen.add(key);
-      tags.push(tag);
-    }
-  }
-  return tags.sort((a, b) => tagKey(a).localeCompare(tagKey(b)));
+  return collectAllKnownTags(tagsByBookId);
 }
 
 function compactAllTags() {

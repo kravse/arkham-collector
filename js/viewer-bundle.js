@@ -258,6 +258,150 @@ function updateImportCollectionStatus(message, isError) {
 }
 
 
+/* Generated from scripts/lib/viewer-card-html.js — run npm run bundle-viewer */
+
+const viewerCardHtml = (function () {
+  function escapeHtml(value) {
+    return String(value || "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+  
+  function getDisplayAuthor(book) {
+    if (book.author) {
+      return book.author;
+    }
+  
+    const line = (book.listAuthor || "").trim();
+    if (!line) {
+      return null;
+    }
+  
+    const withoutYear = line.replace(/\s*\(\d{4}\)\s*$/, "").trim();
+    const editedMatch = withoutYear.match(/edited by\s+(.+)$/i);
+    if (editedMatch) {
+      return editedMatch[1].trim();
+    }
+  
+    const byMatch = withoutYear.match(/(?:^|,\s*)by\s+(.+)$/i);
+    if (byMatch) {
+      return byMatch[1].split(/\s+vol\.\s+/i)[0].trim() || null;
+    }
+  
+    return null;
+  }
+  
+  function getAuthorLastName(book) {
+    const author = getDisplayAuthor(book);
+    if (!author) {
+      return null;
+    }
+    const suffixes = new Set(["jr", "jr.", "sr", "sr.", "ii", "iii", "iv"]);
+    const parts = author.trim().split(/\s+/);
+    while (parts.length > 1 && suffixes.has(parts[parts.length - 1].toLowerCase())) {
+      parts.pop();
+    }
+    return parts.length
+      ? parts[parts.length - 1].replace(/[,.]+$/, "")
+      : null;
+  }
+  
+  function getGoodreadsSearchUrl(book) {
+    const query = [(book.title || book.listTitle || "").trim(), getAuthorLastName(book)]
+      .filter(Boolean)
+      .join(" ")
+      .trim();
+    if (!query) {
+      return null;
+    }
+    const params = new URLSearchParams({
+      utf8: "✓",
+      q: query,
+      search_type: "books",
+    });
+    return `https://www.goodreads.com/search?${params}`;
+  }
+  
+  function renderWikiButton(url, className = "card-wiki-btn") {
+    if (!url) {
+      return "";
+    }
+  
+    return `
+    <a
+      class="${className}"
+      href="${url}"
+      target="_blank"
+      rel="noopener"
+      aria-label="Open on Wikipedia"
+      title="Wikipedia"
+    >W</a>
+  `;
+  }
+  
+  function renderGoodreadsButton(link, className = "card-goodreads-btn") {
+    if (!link?.url) {
+      return "";
+    }
+  
+    const searchClass = link.search ? ` ${className}--search` : "";
+    const label = link.search ? "Search on Goodreads" : "Open on Goodreads";
+    const title = link.search ? "Search Goodreads" : "Goodreads";
+  
+    return `
+    <a
+      class="${className}${searchClass}"
+      href="${link.url}"
+      target="_blank"
+      rel="noopener"
+      aria-label="${label}"
+      title="${title}"
+    >G</a>
+  `;
+  }
+  
+  function renderBookMetaHtml(book) {
+    const author = getDisplayAuthor(book);
+    const lines = [];
+  
+    if (author) {
+      lines.push(`<p class="meta"><strong>Author:</strong> ${author}</p>`);
+    }
+  
+    if (book.coverArtist) {
+      lines.push(`<p class="meta"><strong>Cover:</strong> ${book.coverArtist}</p>`);
+    }
+  
+    if (book.imprint === "mycroft_moran") {
+      lines.push(`<p class="meta"><strong>Imprint:</strong> Mycroft &amp; Moran</p>`);
+    }
+  
+    return lines.join("");
+  }
+  
+  function renderImprintBadge(book, placement = "cover") {
+    const isMycroft = book.imprint === "mycroft_moran";
+    const label = isMycroft ? "MM" : "AH";
+    const title = isMycroft ? "Mycroft & Moran" : "Arkham House";
+    const imprintClass = isMycroft ? "imprint-badge--mm" : "imprint-badge--ah";
+  
+    return `<span class="imprint-badge imprint-badge--${placement} ${imprintClass}" title="${title}" aria-label="${title}">${label}</span>`;
+  }
+  return {
+    escapeHtml,
+    getDisplayAuthor,
+    getAuthorLastName,
+    getGoodreadsSearchUrl,
+    renderWikiButton,
+    renderGoodreadsButton,
+    renderBookMetaHtml,
+    renderImprintBadge,
+  };
+})();
+
+
 /* Generated from scripts/lib/viewer-user-state.js — run npm run bundle-viewer */
 
 const viewerUserState = (function () {
@@ -1492,10 +1636,10 @@ const viewerFilters = (function () {
 })();
 
 
-/* Generated from scripts/lib/viewer-tags.js — run npm run bundle-viewer */
+/* Generated from scripts/lib/tag-normalize.js — run npm run bundle-viewer */
 
 const viewerTags = (function () {
-  const MAX_DISTINCT_HUES = 18;
+  const MAX_TAG_LENGTH = 48;
   
   function tagKey(tag) {
     return String(tag || "")
@@ -1503,132 +1647,47 @@ const viewerTags = (function () {
       .toLowerCase();
   }
   
-  function hashTagKey(key) {
-    let hash = 2166136261;
-    for (let i = 0; i < key.length; i += 1) {
-      hash ^= key.charCodeAt(i);
-      hash = Math.imul(hash, 16777619);
+  function normalizeTag(value) {
+    const text = String(value || "")
+      .trim()
+      .replace(/\s+/g, " ");
+    if (!text || text.length > MAX_TAG_LENGTH) {
+      return null;
     }
-    return hash >>> 0;
+    return text.toUpperCase();
   }
   
-  function hueDistance(a, b) {
-    const diff = Math.abs(a - b) % 360;
-    return Math.min(diff, 360 - diff);
+  function formatTagLabel(tag) {
+    return normalizeTag(tag) || String(tag || "").trim().toUpperCase();
   }
   
-  function uniqueSortedTags(tagLabels) {
+  function collectAllKnownTags(tagsByBookId) {
     const seen = new Set();
     const tags = [];
-    for (const raw of tagLabels || []) {
-      const label = String(raw || "").trim();
-      if (!label) {
+    for (const bookTags of Object.values(tagsByBookId || {})) {
+      if (!Array.isArray(bookTags)) {
         continue;
       }
-      const key = tagKey(label);
-      if (seen.has(key)) {
-        continue;
+      for (const tag of bookTags) {
+        const label = formatTagLabel(tag);
+        if (!label) {
+          continue;
+        }
+        const key = tagKey(label);
+        if (seen.has(key)) {
+          continue;
+        }
+        seen.add(key);
+        tags.push(label);
       }
-      seen.add(key);
-      tags.push(label);
     }
     return tags.sort((a, b) => tagKey(a).localeCompare(tagKey(b)));
   }
-  
-  function evenlySpacedHues(count) {
-    const slots = Math.max(count, 1);
-    return Array.from({ length: slots }, (_, index) => (index * 360) / slots);
-  }
-  
-  function colorsForHue(hue, band) {
-    const saturation = [34, 44, 36, 46][band % 4];
-    const textLightness = [72, 68, 74, 66][band % 4];
-    const bgLightness = [28, 32, 30, 34][band % 4];
-    const bgAlpha = [0.18, 0.22, 0.2, 0.24][band % 4];
-  
-    return {
-      bg: `hsla(${hue}, ${saturation}%, ${bgLightness}%, ${bgAlpha})`,
-      border: `hsla(${hue}, ${Math.min(saturation + 6, 55)}%, 48%, 0.38)`,
-      text: `hsla(${hue}, ${Math.min(saturation + 8, 58)}%, ${textLightness}%, 0.82)`,
-    };
-  }
-  
-  function buildTagColorMap(tagLabels) {
-    const tags = uniqueSortedTags(tagLabels);
-    const map = new Map();
-    if (!tags.length) {
-      return map;
-    }
-  
-    const hueCount = Math.min(tags.length, MAX_DISTINCT_HUES);
-    const hueSlots = evenlySpacedHues(hueCount);
-  
-    tags.forEach((tag, index) => {
-      const hueIndex = index % hueCount;
-      const band = Math.floor(index / hueCount) % 4;
-      map.set(tagKey(tag), colorsForHue(hueSlots[hueIndex], band));
-    });
-  
-    return map;
-  }
-  
-  function fallbackTagColors(tag) {
-    const key = tagKey(tag);
-    const hue = (hashTagKey(key) * 137.508) % 360;
-    return colorsForHue(hue, hashTagKey(key) % 4);
-  }
-  
-  function createTagColorRegistry(tagLabels) {
-    let colorMap = buildTagColorMap(tagLabels);
-  
-    function rebuild(nextTagLabels) {
-      colorMap = buildTagColorMap(nextTagLabels);
-    }
-  
-    function getTagColors(tag) {
-      return colorMap.get(tagKey(tag)) || fallbackTagColors(tag);
-    }
-  
-    function tagChipStyleAttr(tag) {
-      const colors = getTagColors(tag);
-      return `style="--tag-bg: ${colors.bg}; --tag-border: ${colors.border}; --tag-text: ${colors.text};"`;
-    }
-  
-    function minHueSeparation() {
-      const hues = [...colorMap.values()]
-        .map((colors) => {
-          const match = colors.bg.match(/hsla\(([\d.]+),/);
-          return match ? Number(match[1]) : null;
-        })
-        .filter((hue) => hue != null);
-  
-      if (hues.length < 2) {
-        return 360;
-      }
-  
-      let minSeparation = 360;
-      for (let i = 0; i < hues.length; i += 1) {
-        for (let j = i + 1; j < hues.length; j += 1) {
-          minSeparation = Math.min(minSeparation, hueDistance(hues[i], hues[j]));
-        }
-      }
-      return minSeparation;
-    }
-  
-    return {
-      rebuild,
-      getTagColors,
-      tagChipStyleAttr,
-      minHueSeparation,
-    };
-  }
   return {
     tagKey,
-    hashTagKey,
-    hueDistance,
-    uniqueSortedTags,
-    buildTagColorMap,
-    createTagColorRegistry,
+    normalizeTag,
+    formatTagLabel,
+    collectAllKnownTags,
   };
 })();
 
@@ -2577,7 +2636,7 @@ function renderCover(book, cacheKey, variant = "card") {
   const resolvedCacheKey =
     variant === "list" ? viewerListCrop.getListCoverCacheKey(book) : cacheKey;
   const src = viewerCovers.appendCoverCacheKey(coverPath, resolvedCacheKey);
-  const title = escapeHtml(book.title || "this book");
+  const title = viewerCardHtml.escapeHtml(book.title || "this book");
   let imgAttrs = "";
   if (variant === "list") {
     const presentation = viewerListCrop.getListCoverImagePresentation(book);
@@ -2663,7 +2722,7 @@ function refreshDetailToolbar(book) {
   }
 
   if (bookDetailImprint) {
-    bookDetailImprint.innerHTML = renderImprintBadge(book, "detail");
+    bookDetailImprint.innerHTML = viewerCardHtml.renderImprintBadge(book, "detail");
   }
 
   if (bookDetailToolbarStart) {
@@ -2694,136 +2753,16 @@ const hideIcon = `
 </svg>
     `;
 
-function renderWikiButton(url, className = "card-wiki-btn") {
-  if (!url) {
-    return "";
-  }
-
-  return `
-  <a
-    class="${className}"
-    href="${url}"
-    target="_blank"
-    rel="noopener"
-    aria-label="Open on Wikipedia"
-    title="Wikipedia"
-  >W</a>
-`;
-}
-
-function getAuthorLastName(book) {
-  const author = getDisplayAuthor(book);
-  if (!author) {
-    return null;
-  }
-  const suffixes = new Set(["jr", "jr.", "sr", "sr.", "ii", "iii", "iv"]);
-  const parts = author.trim().split(/\s+/);
-  while (parts.length > 1 && suffixes.has(parts[parts.length - 1].toLowerCase())) {
-    parts.pop();
-  }
-  return parts.length
-    ? parts[parts.length - 1].replace(/[,.]+$/, "")
-    : null;
-}
-
-function getGoodreadsSearchUrl(book) {
-  const query = [(book.title || book.listTitle || "").trim(), getAuthorLastName(book)]
-    .filter(Boolean)
-    .join(" ")
-    .trim();
-  if (!query) {
-    return null;
-  }
-  const params = new URLSearchParams({
-    utf8: "✓",
-    q: query,
-    search_type: "books",
-  });
-  return `https://www.goodreads.com/search?${params}`;
-}
-
 function getGoodreadsLinkForBook(book) {
   const savedUrl = resolveGoodreadsUrl(book);
   if (savedUrl) {
     return { url: savedUrl, search: false };
   }
-  const searchUrl = getGoodreadsSearchUrl(book);
+  const searchUrl = viewerCardHtml.getGoodreadsSearchUrl(book);
   if (!searchUrl) {
     return null;
   }
   return { url: searchUrl, search: true };
-}
-
-function renderGoodreadsButton(link, className = "card-goodreads-btn") {
-  if (!link?.url) {
-    return "";
-  }
-
-  const searchClass = link.search ? ` ${className}--search` : "";
-  const label = link.search ? "Search on Goodreads" : "Open on Goodreads";
-  const title = link.search ? "Search Goodreads" : "Goodreads";
-
-  return `
-  <a
-    class="${className}${searchClass}"
-    href="${link.url}"
-    target="_blank"
-    rel="noopener"
-    aria-label="${label}"
-    title="${title}"
-  >G</a>
-`;
-}
-
-function getDisplayAuthor(book) {
-  if (book.author) {
-    return book.author;
-  }
-
-  const line = (book.listAuthor || "").trim();
-  if (!line) {
-    return null;
-  }
-
-  const withoutYear = line.replace(/\s*\(\d{4}\)\s*$/, "").trim();
-  const editedMatch = withoutYear.match(/edited by\s+(.+)$/i);
-  if (editedMatch) {
-    return editedMatch[1].trim();
-  }
-
-  const byMatch = withoutYear.match(/(?:^|,\s*)by\s+(.+)$/i);
-  if (byMatch) {
-    return byMatch[1].split(/\s+vol\.\s+/i)[0].trim() || null;
-  }
-
-  return null;
-}
-
-function renderBookMetaHtml(book) {
-  const author = getDisplayAuthor(book);
-  const lines = [];
-
-  if (author) {
-    lines.push(`<p class="meta"><strong>Author:</strong> ${author}</p>`);
-  }
-
-  if (book.coverArtist) {
-    lines.push(`<p class="meta"><strong>Cover:</strong> ${book.coverArtist}</p>`);
-  }
-
-  if (book.imprint === "mycroft_moran") {
-    lines.push(`<p class="meta"><strong>Imprint:</strong> Mycroft &amp; Moran</p>`);
-  }
-
-  return lines.join("");
-}
-
-function escapeHtml(value) {
-  return String(value || "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
 }
 
 function renderBookDescriptionHtml(book) {
@@ -2831,7 +2770,7 @@ function renderBookDescriptionHtml(book) {
   if (!description?.trim()) {
     return "";
   }
-  return `<div class="book-detail-description">${escapeHtml(description)}</div>`;
+  return `<div class="book-detail-description">${viewerCardHtml.escapeHtml(description)}</div>`;
 }
 
 const unhideIcon = `
@@ -2857,15 +2796,6 @@ function renderHideButton(book) {
     title="${isHidden ? "Unhide book" : "Hide book"}"
   >${isHidden ? unhideIcon : hideIcon}</button>
 `;
-}
-
-function renderImprintBadge(book, placement = "cover") {
-  const isMycroft = book.imprint === "mycroft_moran";
-  const label = isMycroft ? "MM" : "AH";
-  const title = isMycroft ? "Mycroft & Moran" : "Arkham House";
-  const imprintClass = isMycroft ? "imprint-badge--mm" : "imprint-badge--ah";
-
-  return `<span class="imprint-badge imprint-badge--${placement} ${imprintClass}" title="${title}" aria-label="${title}">${label}</span>`;
 }
 
 function renderCardWantBadge(book) {
@@ -3047,7 +2977,7 @@ function renderCard(book) {
   const imageHtml = renderCover(book, book.coverCacheKey, coverVariant);
   const coverActions = renderCoverActions(book);
 
-  const imprintBadge = renderImprintBadge(book, "card");
+  const imprintBadge = viewerCardHtml.renderImprintBadge(book, "card");
   const wantBadge = renderCardWantBadge(book);
   const ownedBadge = renderOwnedBadge(book);
   const bottomRow = renderCardBottomRow(
@@ -3088,7 +3018,7 @@ function renderCard(book) {
       <div class="card-list-head">
         ${listPrimaryHtml}
       </div>
-      ${renderBookMetaHtml(book)}
+      ${viewerCardHtml.renderBookMetaHtml(book)}
       ${bottomRow}
     </div>
   </article>
@@ -3357,8 +3287,8 @@ function openBookDetail(bookId, options = {}) {
     ? `<span class="hidden-badge">Hidden</span>`
     : "";
   const linkButtons = [
-    renderWikiButton(book.wikipediaUrl, "book-detail-wiki-btn"),
-    renderGoodreadsButton(
+    viewerCardHtml.renderWikiButton(book.wikipediaUrl, "book-detail-wiki-btn"),
+    viewerCardHtml.renderGoodreadsButton(
       getGoodreadsLinkForBook(book),
       "book-detail-goodreads-btn",
     ),
@@ -3374,19 +3304,19 @@ function openBookDetail(bookId, options = {}) {
     collectionControl,
   );
 
-  const metaHtml = renderBookMetaHtml(book);
+  const metaHtml = viewerCardHtml.renderBookMetaHtml(book);
   const tagsHtml = renderBookTagsHtml(book);
   const description = getBookDescription(book);
   const descriptionHtml = description?.trim()
-    ? `<div class="book-detail-description">${escapeHtml(description)}</div>`
+    ? `<div class="book-detail-description">${viewerCardHtml.escapeHtml(description)}</div>`
     : `<div class="book-detail-description book-detail-description--empty" aria-hidden="true"></div>`;
 
   const detailDateHtml = book.publicationDate
-    ? `<span class="date"> (${escapeHtml(book.publicationDate)})</span>`
+    ? `<span class="date"> (${viewerCardHtml.escapeHtml(book.publicationDate)})</span>`
     : "";
   bookDetailBody.innerHTML = `
   ${hiddenBadge}
-  <h2 class="title" id="book-detail-title">${escapeHtml(book.title || "Untitled")}${detailDateHtml}</h2>
+  <h2 class="title" id="book-detail-title">${viewerCardHtml.escapeHtml(book.title || "Untitled")}${detailDateHtml}</h2>
   <div class="book-detail-scroll-block">
     <div class="book-detail-meta">${metaHtml}</div>
     ${tagsHtml}
@@ -4139,41 +4069,11 @@ async function setBookHidden(bookId, hidden) {
 /* Tag editing in the dev-server edit dialog */
 
 function normalizeTagInput(rawTag) {
-  const text = String(rawTag || "")
-    .trim()
-    .replace(/\s+/g, " ");
-  if (!text || text.length > 48) {
-    return "";
-  }
-  return text.toUpperCase();
-}
-
-function formatTagLabel(tag) {
-  return normalizeTagInput(tag) || String(tag || "").trim().toUpperCase();
+  return viewerTags.normalizeTag(rawTag) || "";
 }
 
 function getAllKnownTags() {
-  const byId = window.BOOK_TAGS || {};
-  const seen = new Set();
-  const tags = [];
-  for (const bookTags of Object.values(byId)) {
-    if (!Array.isArray(bookTags)) {
-      continue;
-    }
-    for (const tag of bookTags) {
-      const label = formatTagLabel(tag);
-      if (!label) {
-        continue;
-      }
-      const key = tagKey(label);
-      if (seen.has(key)) {
-        continue;
-      }
-      seen.add(key);
-      tags.push(label);
-    }
-  }
-  return tags.sort((a, b) => tagKey(a).localeCompare(tagKey(b)));
+  return viewerTags.collectAllKnownTags(window.BOOK_TAGS || {});
 }
 
 function getEditingBookTags() {
@@ -4182,22 +4082,6 @@ function getEditingBookTags() {
   }
   const book = books.find((entry) => entry.id === editingBookId);
   return Array.isArray(book?.tags) ? book.tags.slice() : [];
-}
-
-function tagKey(tag) {
-  return String(tag || "")
-    .trim()
-    .toLowerCase();
-}
-
-let tagColorRegistry = viewerTags.createTagColorRegistry([]);
-
-function rebuildTagColorRegistry() {
-  tagColorRegistry = viewerTags.createTagColorRegistry(getAllKnownTags());
-}
-
-function tagChipStyleAttr(tag) {
-  return tagColorRegistry.tagChipStyleAttr(formatTagLabel(tag));
 }
 
 function syncEditTagsVisibility() {
@@ -4212,7 +4096,7 @@ function renderEditTagsUi() {
   }
 
   const currentTags = getEditingBookTags();
-  const currentKeys = new Set(currentTags.map(tagKey));
+  const currentKeys = new Set(currentTags.map(viewerTags.tagKey));
 
   if (!currentTags.length) {
     editTagsCurrent.innerHTML =
@@ -4220,13 +4104,15 @@ function renderEditTagsUi() {
   } else {
     editTagsCurrent.innerHTML = currentTags
       .map((tag) => {
-        const label = formatTagLabel(tag);
-        return `<span class="edit-tag-chip" ${tagChipStyleAttr(label)}><span class="edit-tag-chip-label">${escapeHtml(label)}</span><button type="button" class="edit-tag-remove" aria-label="Remove tag ${escapeHtml(label)}">×</button></span>`;
+        const label = viewerTags.formatTagLabel(tag);
+        return `<span class="edit-tag-chip"><span class="edit-tag-chip-label">${viewerCardHtml.escapeHtml(label)}</span><button type="button" class="edit-tag-remove" aria-label="Remove tag ${viewerCardHtml.escapeHtml(label)}">×</button></span>`;
       })
       .join("");
   }
 
-  const poolTags = getAllKnownTags().filter((tag) => !currentKeys.has(tagKey(tag)));
+  const poolTags = getAllKnownTags().filter(
+    (tag) => !currentKeys.has(viewerTags.tagKey(tag)),
+  );
   if (!poolTags.length) {
     editTagsPool.hidden = true;
     editTagsPoolList.innerHTML = "";
@@ -4236,8 +4122,8 @@ function renderEditTagsUi() {
   editTagsPool.hidden = false;
   editTagsPoolList.innerHTML = poolTags
     .map((tag) => {
-      const label = formatTagLabel(tag);
-      return `<button type="button" class="edit-tag-pool-btn" ${tagChipStyleAttr(label)}>${escapeHtml(label)}</button>`;
+      const label = viewerTags.formatTagLabel(tag);
+      return `<button type="button" class="edit-tag-pool-btn">${viewerCardHtml.escapeHtml(label)}</button>`;
     })
     .join("");
 }
@@ -4255,8 +4141,6 @@ function applyTagResponseToBook(bookId, tags) {
   } else {
     delete window.BOOK_TAGS[key];
   }
-  prepareBookSearchIndex(book);
-  rebuildTagColorRegistry();
 }
 
 async function persistBookTags(bookId, nextTags) {
@@ -4298,7 +4182,11 @@ async function addEditingBookTag(rawTag) {
   }
 
   const currentTags = getEditingBookTags();
-  if (currentTags.some((entry) => tagKey(entry) === tagKey(tag))) {
+  if (
+    currentTags.some(
+      (entry) => viewerTags.tagKey(entry) === viewerTags.tagKey(tag),
+    )
+  ) {
     if (editTagInput) {
       editTagInput.value = "";
     }
@@ -4325,9 +4213,9 @@ async function addEditingBookTag(rawTag) {
 }
 
 async function removeEditingBookTag(rawTag) {
-  const removeKey = tagKey(rawTag);
+  const removeKey = viewerTags.tagKey(rawTag);
   const nextTags = getEditingBookTags().filter(
-    (tag) => tagKey(tag) !== removeKey,
+    (tag) => viewerTags.tagKey(tag) !== removeKey,
   );
 
   if (editTagAddBtn) {
@@ -4352,8 +4240,10 @@ async function removeDetailBookTag(rawTag) {
 
   const book = books.find((entry) => entry.id === detailBookId);
   const currentTags = Array.isArray(book?.tags) ? book.tags : [];
-  const removeKey = tagKey(rawTag);
-  const nextTags = currentTags.filter((tag) => tagKey(tag) !== removeKey);
+  const removeKey = viewerTags.tagKey(rawTag);
+  const nextTags = currentTags.filter(
+    (tag) => viewerTags.tagKey(tag) !== removeKey,
+  );
 
   try {
     await persistBookTags(detailBookId, nextTags);
@@ -4372,13 +4262,12 @@ function renderBookTagsHtml(book) {
   const editable = serveEnabled;
   const chips = tags
     .map((tag) => {
-      const label = formatTagLabel(tag);
-      const styleAttr = tagChipStyleAttr(label);
-      const searchButton = `<button type="button" class="book-detail-tag" ${styleAttr} aria-label="Search for tag ${escapeHtml(label)}">${escapeHtml(label)}</button>`;
+      const label = viewerTags.formatTagLabel(tag);
+      const searchButton = `<button type="button" class="book-detail-tag" aria-label="Search for tag ${viewerCardHtml.escapeHtml(label)}">${viewerCardHtml.escapeHtml(label)}</button>`;
       if (!editable) {
         return searchButton;
       }
-      return `<span class="book-detail-tag-chip" ${styleAttr}>${searchButton}<button type="button" class="book-detail-tag-remove" aria-label="Remove tag ${escapeHtml(label)}">×</button></span>`;
+      return `<span class="book-detail-tag-chip">${searchButton}<button type="button" class="book-detail-tag-remove" aria-label="Remove tag ${viewerCardHtml.escapeHtml(label)}">×</button></span>`;
     })
     .join("");
   const editableClass = editable ? " book-detail-tags--editable" : "";
@@ -4386,7 +4275,7 @@ function renderBookTagsHtml(book) {
 }
 
 function applyTagSearch(rawTag) {
-  const tag = formatTagLabel(rawTag);
+  const tag = viewerTags.formatTagLabel(rawTag);
   if (!tag || !searchInput) {
     return;
   }
@@ -4398,8 +4287,6 @@ function applyTagSearch(rawTag) {
   searchInput.focus();
   grid.scrollIntoView({ behavior: "smooth", block: "start" });
 }
-
-rebuildTagColorRegistry();
 
 
 /* Admin book order dialog */
@@ -4492,7 +4379,7 @@ function renderBookOrderList() {
       const canMoveUp = canMoveBookInOrder(workingBookOrder, index, -1);
       const canMoveDown = canMoveBookInOrder(workingBookOrder, index, 1);
       const dateLabel = book.publicationDate || "—";
-      const title = escapeHtml(book.title || book.listTitle || "Untitled");
+      const title = viewerCardHtml.escapeHtml(book.title || book.listTitle || "Untitled");
 
       return `
         <div class="order-dialog-row" data-book-id="${id}">
@@ -4505,7 +4392,7 @@ function renderBookOrderList() {
           >⠿</span>
           <div class="order-dialog-row-text">
             <span class="order-dialog-row-title">${title}</span>
-            <span class="order-dialog-row-date">${escapeHtml(dateLabel)}</span>
+            <span class="order-dialog-row-date">${viewerCardHtml.escapeHtml(dateLabel)}</span>
           </div>
           <div class="order-dialog-row-actions">
             <button
@@ -4746,13 +4633,11 @@ function refreshBookOrderDialogIfOpen() {
 }
 
 
-/* Event listeners and application startup */
+/* Grid and header filter event listeners */
 
 const RANDOM_CARD_LOGO_TAP_MS = 1200;
 const RANDOM_CARD_LOGO_TAP_COUNT = 3;
 let randomCardLogoTapTimes = [];
-
-window.addEventListener("popstate", handleDetailPopState);
 
 grid.addEventListener("click", (event) => {
   const editButton = event.target.closest(".edit-book-btn");
@@ -4785,6 +4670,53 @@ grid.addEventListener("click", (event) => {
     openBookDetail(Number(card.dataset.bookId));
   }
 });
+
+stats.addEventListener("click", (event) => {
+  if (event.target.closest("#collection-filter-toggle")) {
+    cycleCollectionFilter();
+    wantOnly = false;
+    render();
+    return;
+  }
+  if (event.target.closest("#hidden-filter-toggle")) {
+    hiddenOnly = !hiddenOnly;
+    render();
+    return;
+  }
+  if (event.target.closest("#mycroft-filter-toggle")) {
+    cycleMycroftFilter();
+    render();
+    return;
+  }
+  if (event.target.closest("#want-filter-toggle")) {
+    const next = !wantOnly;
+    wantOnly = next;
+    if (next) {
+      collectionFilterMode = null;
+    }
+    render();
+    return;
+  }
+});
+
+if (headerLogo) {
+  headerLogo.addEventListener("click", () => {
+    const now = Date.now();
+    randomCardLogoTapTimes = randomCardLogoTapTimes.filter(
+      (time) => now - time < RANDOM_CARD_LOGO_TAP_MS,
+    );
+    randomCardLogoTapTimes.push(now);
+    if (randomCardLogoTapTimes.length >= RANDOM_CARD_LOGO_TAP_COUNT) {
+      randomCardLogoTapTimes = [];
+      openRandomVisibleBook();
+    }
+  });
+}
+
+
+/* Detail overlay and cover lightbox event listeners */
+
+window.addEventListener("popstate", handleDetailPopState);
 
 bookDetailCloseBtn.addEventListener("click", closeBookDetail);
 bookDetailCover.addEventListener("click", handleCoverZoomTrigger);
@@ -4848,6 +4780,68 @@ bookDetailDialog
   .forEach((element) => {
     element.addEventListener("click", closeBookDetail);
   });
+
+if (coverLightbox) {
+  coverLightbox.addEventListener("click", (event) => {
+    if (event.target.closest(".cover-lightbox-img")) {
+      if (isMobileCoverLightboxViewport()) {
+        closeCoverLightbox();
+      }
+      return;
+    }
+    closeCoverLightbox();
+  });
+}
+
+document.addEventListener("keydown", (event) => {
+  if (event.key !== "Escape") {
+    return;
+  }
+  if (coverLightbox && !coverLightbox.hidden) {
+    event.preventDefault();
+    closeCoverLightbox();
+  }
+});
+
+document.addEventListener("keydown", (event) => {
+  if (coverLightbox && !coverLightbox.hidden) {
+    if (event.key === "ArrowLeft") {
+      event.preventDefault();
+      navigateCoverLightbox(-1);
+      return;
+    }
+    if (event.key === "ArrowRight") {
+      event.preventDefault();
+      navigateCoverLightbox(1);
+      return;
+    }
+  }
+});
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && !bookDetailDialog.hidden) {
+    closeBookDetail();
+    return;
+  }
+  if (
+    !bookDetailDialog.hidden &&
+    editDialog.hidden &&
+    (!coverLightbox || coverLightbox.hidden)
+  ) {
+    if (event.key === "ArrowLeft") {
+      event.preventDefault();
+      navigateDetail(-1);
+      return;
+    }
+    if (event.key === "ArrowRight") {
+      event.preventDefault();
+      navigateDetail(1);
+    }
+  }
+});
+
+
+/* Edit dialog, settings, search, and startup */
 
 editBookForm.addEventListener("submit", saveBookEdits);
 bindEditFieldSanitizers(editBookForm);
@@ -4929,43 +4923,6 @@ if (editTagsPoolList) {
     addEditingBookTag(button.textContent);
   });
 }
-
-if (coverLightbox) {
-  coverLightbox.addEventListener("click", (event) => {
-    if (event.target.closest(".cover-lightbox-img")) {
-      if (isMobileCoverLightboxViewport()) {
-        closeCoverLightbox();
-      }
-      return;
-    }
-    closeCoverLightbox();
-  });
-}
-
-document.addEventListener("keydown", (event) => {
-  if (event.key !== "Escape") {
-    return;
-  }
-  if (coverLightbox && !coverLightbox.hidden) {
-    event.preventDefault();
-    closeCoverLightbox();
-  }
-});
-
-document.addEventListener("keydown", (event) => {
-  if (coverLightbox && !coverLightbox.hidden) {
-    if (event.key === "ArrowLeft") {
-      event.preventDefault();
-      navigateCoverLightbox(-1);
-      return;
-    }
-    if (event.key === "ArrowRight") {
-      event.preventDefault();
-      navigateCoverLightbox(1);
-      return;
-    }
-  }
-});
 
 if (storageModeLocalInput) {
   storageModeLocalInput.addEventListener("change", () => {
@@ -5091,26 +5048,6 @@ document.addEventListener("keydown", (event) => {
     closeEditDialog();
     return;
   }
-  if (event.key === "Escape" && !bookDetailDialog.hidden) {
-    closeBookDetail();
-    return;
-  }
-  if (
-    !bookDetailDialog.hidden &&
-    editDialog.hidden &&
-    (!coverLightbox || coverLightbox.hidden)
-  ) {
-    if (event.key === "ArrowLeft") {
-      event.preventDefault();
-      navigateDetail(-1);
-      return;
-    }
-    if (event.key === "ArrowRight") {
-      event.preventDefault();
-      navigateDetail(1);
-      return;
-    }
-  }
   if (event.key === "Escape" && !settingsDialog.hidden) {
     closeSettingsDialog();
     return;
@@ -5202,48 +5139,6 @@ if (viewModeToggle) {
     saveUserState();
     updateViewModeState();
     render();
-  });
-}
-
-stats.addEventListener("click", (event) => {
-  if (event.target.closest("#collection-filter-toggle")) {
-    cycleCollectionFilter();
-    wantOnly = false;
-    render();
-    return;
-  }
-  if (event.target.closest("#hidden-filter-toggle")) {
-    hiddenOnly = !hiddenOnly;
-    render();
-    return;
-  }
-  if (event.target.closest("#mycroft-filter-toggle")) {
-    cycleMycroftFilter();
-    render();
-    return;
-  }
-  if (event.target.closest("#want-filter-toggle")) {
-    const next = !wantOnly;
-    wantOnly = next;
-    if (next) {
-      collectionFilterMode = null;
-    }
-    render();
-    return;
-  }
-});
-
-if (headerLogo) {
-  headerLogo.addEventListener("click", () => {
-    const now = Date.now();
-    randomCardLogoTapTimes = randomCardLogoTapTimes.filter(
-      (time) => now - time < RANDOM_CARD_LOGO_TAP_MS,
-    );
-    randomCardLogoTapTimes.push(now);
-    if (randomCardLogoTapTimes.length >= RANDOM_CARD_LOGO_TAP_COUNT) {
-      randomCardLogoTapTimes = [];
-      openRandomVisibleBook();
-    }
   });
 }
 

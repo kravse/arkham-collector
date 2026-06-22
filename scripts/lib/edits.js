@@ -3,6 +3,7 @@ const path = require("path");
 
 const { DATA_DIR } = require("../config");
 const { applyListCoverFocusPatch } = require("./cover-list-crop");
+const { writeJsonAndJs } = require("./static-data");
 
 const EDITS_JSON = path.join(DATA_DIR, "edits.json");
 const EDITS_JS = path.join(DATA_DIR, "edits.js");
@@ -33,16 +34,19 @@ function loadEdits() {
   };
 }
 
-function saveEdits(payload) {
+function saveEdits(payload, paths = {}) {
   const output = {
     edits: payload.edits || {},
   };
-  fs.mkdirSync(DATA_DIR, { recursive: true });
-  fs.writeFileSync(EDITS_JSON, `${JSON.stringify(output, null, 2)}\n`);
-  fs.writeFileSync(
-    EDITS_JS,
-    `window.BOOK_EDITS = ${JSON.stringify(output.edits, null, 2)};\n`,
-  );
+  const editsJson = paths.editsJson || EDITS_JSON;
+  const editsJs = paths.editsJs || EDITS_JS;
+  writeJsonAndJs({
+    jsonPath: editsJson,
+    jsPath: editsJs,
+    jsonValue: output,
+    jsGlobal: "BOOK_EDITS",
+    jsValue: output.edits,
+  });
   return output;
 }
 

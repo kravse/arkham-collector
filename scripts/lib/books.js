@@ -32,6 +32,28 @@ const {
 const {
   deduplicateBookIds,
 } = require("./book-ids");
+const { writeJsonFile, writeJsGlobal } = require("./static-data");
+
+const BOOKS_JSON = path.join(DATA_DIR, "books.json");
+const BOOKS_JS = path.join(DATA_DIR, "books.js");
+
+function readBooksPayload(booksJsonPath = BOOKS_JSON) {
+  if (!fs.existsSync(booksJsonPath)) {
+    throw new Error("Missing data/books.json. Run the crawler first.");
+  }
+  return JSON.parse(fs.readFileSync(booksJsonPath, "utf8"));
+}
+
+function writeDevBooksPayload(payload, paths = {}) {
+  const booksJson = paths.booksJson || BOOKS_JSON;
+  const booksJs = paths.booksJs || BOOKS_JS;
+  writeJsonFile(booksJson, payload);
+  writeJsGlobal(booksJs, "BOOKS", payload.books || []);
+}
+
+function getScrapedBookFromPayload(payload, bookId) {
+  return (payload.books || []).find((entry) => entry.id === bookId) || null;
+}
 
 function migrateLegacyImprints(books) {
   return books.map((book) => ({
@@ -231,11 +253,8 @@ function writeViewerBookScripts(books, dataDir) {
   const { slim, descriptions } = splitBooksAndDescriptions(books);
   const booksPath = path.join(dataDir, "books.js");
   const descriptionsPath = path.join(dataDir, "descriptions.js");
-  fs.writeFileSync(booksPath, `window.BOOKS = ${JSON.stringify(slim, null, 2)};\n`);
-  fs.writeFileSync(
-    descriptionsPath,
-    `window.BOOK_DESCRIPTIONS = ${JSON.stringify(descriptions, null, 2)};\n`,
-  );
+  writeJsGlobal(booksPath, "BOOKS", slim);
+  writeJsGlobal(descriptionsPath, "BOOK_DESCRIPTIONS", descriptions);
   return { booksPath, descriptionsPath };
 }
 
@@ -279,6 +298,9 @@ function writeOutput(payload) {
 }
 
 module.exports = {
+  readBooksPayload,
+  writeDevBooksPayload,
+  getScrapedBookFromPayload,
   migrateLegacyImprints,
   replaceScrapedBooks,
   loadExistingPayload,

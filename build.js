@@ -16,6 +16,7 @@ const {
 const { buildListFocalByMaster } = require("./scripts/lib/cover-list-crop");
 const { bundleViewerJs } = require("./scripts/bundle-viewer-js");
 const { syncCollectionFromCsv } = require("./scripts/lib/collection");
+const { VIEWER_CSS_FILES } = require("./scripts/css-manifest");
 
 const ROOT = __dirname;
 const BUILD_DIR = path.join(ROOT, "build");
@@ -36,20 +37,6 @@ const FAVICON_FILES = [
   "apple-touch-icon.png",
   "android-chrome-192x192.png",
   "android-chrome-512x512.png",
-];
-
-const VIEWER_CSS_FILES = [
-  "variables.css",
-  "base.css",
-  "header.css",
-  "attribution.css",
-  "settings.css",
-  "order-dialog.css",
-  "cards.css",
-  "edit-dialog.css",
-  "book-detail.css",
-  "cover-lightbox.css",
-  "mobile.css",
 ];
 
 function copyFile(src, dest) {

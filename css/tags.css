@@ -1,0 +1,57 @@
+.book-detail-tag,
+.book-detail-tag-chip,
+.edit-tag-chip,
+.edit-tag-pool-btn {
+  border: 1px solid var(--tag-border);
+  background: var(--tag-bg);
+  color: var(--tag-text);
+  font-family: var(--tag-font);
+  font-size: 0.7rem;
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  -webkit-font-smoothing: antialiased;
+}
+
+.book-detail-tag,
+.edit-tag-pool-btn {
+  cursor: pointer;
+  transition: filter 0.15s ease;
+}
+
+.book-detail-tag:hover,
+.edit-tag-pool-btn:hover,
+.book-detail-tag-chip:hover {
+  filter: brightness(1.12);
+}
+
+.book-detail-tag:focus-visible {
+  outline: 2px solid var(--tag-border);
+  outline-offset: 2px;
+}
+
+.book-detail-tag-remove,
+.edit-tag-remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.1rem;
+  height: 1.1rem;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: rgba(232, 234, 237, 0.65);
+  font-family: var(--tag-font);
+  font-size: 0.95rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.book-detail-tag-remove:hover,
+.edit-tag-remove:hover {
+  color: #ffd6d6;
+  background: rgba(120, 40, 40, 0.22);
+}

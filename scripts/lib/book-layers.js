@@ -16,3 +16,7 @@ function applyBookTags(books, tagsByBookId) {
     return { ...book, tags };
   });
 }
+
+module.exports = {
+  applyBookTags,
+};

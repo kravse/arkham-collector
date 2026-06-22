@@ -37,7 +37,6 @@ Do not edit the plan files in `.cursor/plans/` for this — only `README.md`. Ke
 | `examples/` | Saved Wikipedia HTML for `--local` crawls |
 | `build.js` → `build/` | Static site (`npm run build`): read-only viewer, `css/viewer.css`, slim books + descriptions JS, no `books.json` in deploy |
 | `server.js` | Dev server with PATCH/upload (`npm run serve`, port 8742) |
-| `my_script.js` | Thin wrapper → `scripts/index.js` (backward compat only) |
 | `test/` | Node tests (`npm test`); `test/fixtures/` for small JSON fixtures |
 | `scripts/lib/viewer-*.js` | Testable viewer domain logic; synced into `js/viewer/00-viewer-*.js` on bundle |
 
@@ -48,12 +47,17 @@ Styles live in `css/`, linked from `viewer.html` in this order (load order matte
 1. `variables.css` — `:root` custom properties
 2. `base.css` — reset, body, filter-mode themes
 3. `header.css` — header, search, sort, stats
-4. `cards.css` — grid, cards, badges, card content
-5. `edit-dialog.css` — edit modal
-6. `book-detail.css` — detail overlay + desktop `@media (min-width: 641px)`
-7. `mobile.css` — `@media (max-width: 640px)` overrides
+4. `attribution.css`, `settings.css`, `order-dialog.css` — footer, gear, reorder dialog
+5. `cards.css` — grid, cards, badges, card content
+6. `tags.css` — shared tag chip styles (detail + edit dialog)
+7. `edit-dialog.css` — edit modal
+8. `book-detail.css` — detail overlay + desktop `@media (min-width: 641px)`
+9. `cover-lightbox.css` — full-screen cover view
+10. `mobile.css` — `@media (max-width: 640px)` overrides
 
-When adding styles: put them in the most specific file above; add a new file only for a distinct UI surface. After CSS changes, ensure `build.js` still copies `css/` (via `copyDirectory("css")`).
+Canonical load order: [`scripts/css-manifest.js`](../../scripts/css-manifest.js) (`VIEWER_CSS_FILES`). Keep [`viewer.html`](../../viewer.html) link tags in sync.
+
+When adding styles: put them in the most specific file above; add a new file only for a distinct UI surface. After CSS changes, update the manifest and `viewer.html` links.
 
 ## Crawler / scripts JavaScript
 
@@ -77,7 +81,7 @@ Guidelines:
 - Scrapes use `replaceScrapedBooks`: stable `id` per bibliography line (`wikipediaUrl + listYear`); scripts never write `edits.json`
 - `npm run dedupe-book-ids` splits duplicate ids; shared `hidden` edits move to reprint ids only
 - Scripts may read `edits.json` read-only to skip cover download/reconcile when `coverImageFile` is set in edits, or skip description sync when `description` is set in edits
-- Viewer/build merge scraped books with edits at read time (`js/book-edits.js`)
+- Viewer/build merge scraped books with edits at read time (`js/book-edits.js`, `js/book-layers.js`)
 - Scrape modes that overwrite data show a warning unless `--yes`
 
 Entry point for all npm crawl/sync scripts: `node scripts/index.js`
@@ -86,9 +90,9 @@ Entry point for all npm crawl/sync scripts: `node scripts/index.js`
 
 App logic lives in `js/viewer/` (eight topic files, one shared IIFE) and ships as `js/viewer-bundle.js`. Edit the partials, then `npm run bundle-viewer` (also runs at the start of `npm run build`). Follow existing patterns: vanilla JS, `localStorage` for want-list (`arkham-want-list`), sample collection (`arkham-sample-collection`, seeded from CSV), own collection (`arkham-collection`), and active mode (`arkham-collection-source`); gear settings can reset sample to CSV defaults; `getVisibleBooks()` for filtered order; descriptions editable via the edit dialog (stored in `edits.json`).
 
-`js/book-edits.js` merges `window.BOOKS` with `window.BOOK_EDITS` at startup. Linked from `viewer.html`, copied in `build.js` via `copyDirectory("js")`.
+`js/book-edits.js` merges `window.BOOKS` with `window.BOOK_EDITS` at startup; `js/book-layers.js` attaches `window.BOOK_TAGS`. Linked from `viewer.html`, copied in `build.js` via `copyDirectory("js")`.
 
-Viewer domain logic that affects behavior (sort, filters, collection state, parsing helpers, etc.) belongs in `scripts/lib/` as pure CommonJS, tested under `test/`, then wired into the viewer via generated `js/viewer/00-*.js` partials (`scripts/sync-viewer-*.js`, run by `npm run bundle-viewer`). Do not leave behavior-only logic untested in `js/viewer/` alone.
+Viewer domain logic that affects behavior (sort, filters, collection state, parsing helpers, etc.) belongs in `scripts/lib/` as pure CommonJS, tested under `test/`, then wired into the viewer via generated `js/viewer/00-*.js` partials (`scripts/sync-viewer-module.js` + `scripts/viewer-sync-config.js`, run by `npm run bundle-viewer`). Do not leave behavior-only logic untested in `js/viewer/` alone.
 
 ## Tests (required for relevant features)
 
@@ -107,7 +111,7 @@ Skip tests only for purely visual/CSS tweaks, copy/markup-only edits, or one-lin
 - Command: `npm test` (runs `test/**/*.test.js`)
 - Location: `test/<topic>.test.js`; shared fixtures in `test/fixtures/`
 - Scripts: put testable logic in `scripts/lib/<name>.js`, export pure functions, `require()` from tests
-- Viewer: shared module in `scripts/lib/viewer-*.js` → `scripts/sync-viewer-*.js` → `js/viewer/00-viewer-*.js`; viewer partials call `viewerSort` / `viewerFilters` / etc.; run `npm run bundle-viewer` after changes
+- Viewer: shared module in `scripts/lib/viewer-*.js` → `scripts/sync-viewer-module.js` → `js/viewer/00-viewer-*.js`; viewer partials call `viewerSort` / `viewerFilters` / etc.; run `npm run bundle-viewer` after changes
 - After adding tests or scripts: update `README.md` `npm test` row if workflow changed
 
 **Test quality**

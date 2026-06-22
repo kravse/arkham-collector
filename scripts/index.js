@@ -2,6 +2,7 @@
 
 const { state, initState } = require("./state");
 const { SCRAPE_MODES, getScriptMode, printCustomDataWarning } = require("./cli");
+const { resolveTaskId } = require("./lib/cli-dispatch");
 const { syncCollectionFromCsv } = require("./lib/collection");
 const { reconcileCoversFromDisk } = require("./tasks/reconcile-covers");
 const { fillMissingCovers } = require("./tasks/fill-covers");
@@ -30,73 +31,46 @@ function fail(error) {
   process.exit(1);
 }
 
-if (state.args.syncCollection) {
-  try {
-    syncCollectionFromCsv();
-  } catch (error) {
-    fail(error);
-  }
-} else if (state.args.reconcileCovers) {
-  try {
-    reconcileCoversFromDisk();
-  } catch (error) {
-    fail(error);
-  }
-} else if (state.args.fillCovers) {
-  fillMissingCovers().catch(fail);
-} else if (state.args.mycroftOnly) {
-  crawlMycroftOnly().catch(fail);
-} else if (state.args.syncPublicationDates) {
-  syncPublicationDates().catch(fail);
-} else if (state.args.syncAuthors) {
-  try {
-    syncAuthors();
-  } catch (error) {
-    fail(error);
-  }
-} else if (state.args.syncDescriptions) {
-  syncDescriptions().catch(fail);
-} else if (state.args.syncGoodreads) {
-  syncGoodreads().catch(fail);
-} else if (state.args.importGoodreadsShelf) {
-  try {
-    importGoodreadsShelf();
-  } catch (error) {
-    fail(error);
-  }
-} else if (state.args.dedupeBookIds) {
-  try {
-    dedupeBookIds();
-  } catch (error) {
-    fail(error);
-  }
-} else if (state.args.compactEdits) {
-  try {
-    compactEdits();
-  } catch (error) {
-    fail(error);
-  }
-} else if (state.args.fixArkhamMagazines) {
-  try {
-    fixArkhamMagazines();
-  } catch (error) {
-    fail(error);
-  }
-} else if (state.args.exportArkhamCatalog) {
-  try {
-    exportArkhamCatalog({ output: state.args.output });
-  } catch (error) {
-    fail(error);
-  }
-} else if (state.args.importTagsFromCsv) {
-  try {
+const TASKS = {
+  syncCollection: () => syncCollectionFromCsv(),
+  reconcileCovers: () => reconcileCoversFromDisk(),
+  fillCovers: () => fillMissingCovers(),
+  mycroftOnly: () => crawlMycroftOnly(),
+  syncPublicationDates: () => syncPublicationDates(),
+  syncAuthors: () => syncAuthors(),
+  syncDescriptions: () => syncDescriptions(),
+  syncGoodreads: () => syncGoodreads(),
+  importGoodreadsShelf: () => importGoodreadsShelf(),
+  dedupeBookIds: () => dedupeBookIds(),
+  compactEdits: () => compactEdits(),
+  fixArkhamMagazines: () => fixArkhamMagazines(),
+  exportArkhamCatalog: () => exportArkhamCatalog({ output: state.args.output }),
+  importTagsFromCsv: () => {
     if (!state.args.csvPath) {
       throw new Error("Pass --csv <path> with --import-tags-from-csv");
     }
     importTagsFromCsvTask(state.args.csvPath);
-  } catch (error) {
-    fail(error);
+  },
+  crawl: () => main(),
+};
+
+const ASYNC_TASKS = new Set([
+  "fillCovers",
+  "mycroftOnly",
+  "syncPublicationDates",
+  "syncDescriptions",
+  "syncGoodreads",
+  "crawl",
+]);
+
+const taskId = resolveTaskId(state.args);
+const runTask = TASKS[taskId];
+
+try {
+  const result = runTask();
+  if (ASYNC_TASKS.has(taskId)) {
+    result.catch(fail);
   }
-} else {
-  main().catch(fail);
+} catch (error) {
+  fail(error);
 }

@@ -145,8 +145,8 @@ function openBookDetail(bookId, options = {}) {
     ? `<span class="hidden-badge">Hidden</span>`
     : "";
   const linkButtons = [
-    renderWikiButton(book.wikipediaUrl, "book-detail-wiki-btn"),
-    renderGoodreadsButton(
+    viewerCardHtml.renderWikiButton(book.wikipediaUrl, "book-detail-wiki-btn"),
+    viewerCardHtml.renderGoodreadsButton(
       getGoodreadsLinkForBook(book),
       "book-detail-goodreads-btn",
     ),
@@ -162,19 +162,19 @@ function openBookDetail(bookId, options = {}) {
     collectionControl,
   );
 
-  const metaHtml = renderBookMetaHtml(book);
+  const metaHtml = viewerCardHtml.renderBookMetaHtml(book);
   const tagsHtml = renderBookTagsHtml(book);
   const description = getBookDescription(book);
   const descriptionHtml = description?.trim()
-    ? `<div class="book-detail-description">${escapeHtml(description)}</div>`
+    ? `<div class="book-detail-description">${viewerCardHtml.escapeHtml(description)}</div>`
     : `<div class="book-detail-description book-detail-description--empty" aria-hidden="true"></div>`;
 
   const detailDateHtml = book.publicationDate
-    ? `<span class="date"> (${escapeHtml(book.publicationDate)})</span>`
+    ? `<span class="date"> (${viewerCardHtml.escapeHtml(book.publicationDate)})</span>`
     : "";
   bookDetailBody.innerHTML = `
   ${hiddenBadge}
-  <h2 class="title" id="book-detail-title">${escapeHtml(book.title || "Untitled")}${detailDateHtml}</h2>
+  <h2 class="title" id="book-detail-title">${viewerCardHtml.escapeHtml(book.title || "Untitled")}${detailDateHtml}</h2>
   <div class="book-detail-scroll-block">
     <div class="book-detail-meta">${metaHtml}</div>
     ${tagsHtml}

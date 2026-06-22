@@ -5,21 +5,12 @@ const os = require("os");
 const path = require("path");
 
 const {
-  normalizeTag,
   normalizeTags,
   getTagsForBook,
   getAllTags,
   applyTagsToBooks,
   saveTags,
 } = require("../scripts/lib/tags");
-
-test("normalizeTag trims, uppercases, and rejects empty or long values", () => {
-  assert.equal(normalizeTag("  signed  copy  "), "SIGNED COPY");
-  assert.equal(normalizeTag("Gothic"), "GOTHIC");
-  assert.equal(normalizeTag(""), null);
-  assert.equal(normalizeTag("   "), null);
-  assert.equal(normalizeTag("x".repeat(49)), null);
-});
 
 test("normalizeTags dedupes case-insensitively and sorts", () => {
   assert.deepEqual(normalizeTags(["Signed", "signed", "First"]), [

@@ -3,6 +3,7 @@ const path = require("path");
 
 const { DATA_DIR } = require("../config");
 const { parseYear } = require("./text");
+const { writeJsonAndJs } = require("./static-data");
 
 const BOOK_ORDER_JSON = path.join(DATA_DIR, "book-order.json");
 const BOOK_ORDER_JS = path.join(DATA_DIR, "book-order.js");
@@ -147,14 +148,17 @@ function loadBookOrder() {
   };
 }
 
-function saveBookOrder(order) {
+function saveBookOrder(order, paths = {}) {
   const output = { order };
-  fs.mkdirSync(DATA_DIR, { recursive: true });
-  fs.writeFileSync(BOOK_ORDER_JSON, `${JSON.stringify(output, null, 2)}\n`);
-  fs.writeFileSync(
-    BOOK_ORDER_JS,
-    `window.BOOK_ORDER = ${JSON.stringify(order, null, 2)};\n`,
-  );
+  const bookOrderJson = paths.bookOrderJson || BOOK_ORDER_JSON;
+  const bookOrderJs = paths.bookOrderJs || BOOK_ORDER_JS;
+  writeJsonAndJs({
+    jsonPath: bookOrderJson,
+    jsPath: bookOrderJs,
+    jsonValue: output,
+    jsGlobal: "BOOK_ORDER",
+    jsValue: order,
+  });
   return output;
 }
 

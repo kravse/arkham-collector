@@ -1,105 +1,4 @@
-/* Event listeners and application startup */
-
-const RANDOM_CARD_LOGO_TAP_MS = 1200;
-const RANDOM_CARD_LOGO_TAP_COUNT = 3;
-let randomCardLogoTapTimes = [];
-
-window.addEventListener("popstate", handleDetailPopState);
-
-grid.addEventListener("click", (event) => {
-  const editButton = event.target.closest(".edit-book-btn");
-  if (editButton) {
-    event.preventDefault();
-    event.stopPropagation();
-    openEditDialog(Number(editButton.dataset.bookId));
-    return;
-  }
-
-  const hideButton = event.target.closest(".hide-book-btn");
-  if (hideButton) {
-    event.preventDefault();
-    event.stopPropagation();
-    const bookId = Number(hideButton.dataset.bookId);
-    const isHidden = hideButton.dataset.hidden === "true";
-    setBookHidden(bookId, !isHidden);
-    return;
-  }
-
-  if (
-    event.target.closest(".book-detail-wiki-btn") ||
-    event.target.closest(".book-detail-goodreads-btn")
-  ) {
-    return;
-  }
-
-  const card = event.target.closest(".card");
-  if (card) {
-    openBookDetail(Number(card.dataset.bookId));
-  }
-});
-
-bookDetailCloseBtn.addEventListener("click", closeBookDetail);
-bookDetailCover.addEventListener("click", handleCoverZoomTrigger);
-bookDetailPrevBtn.addEventListener("click", (event) => {
-  event.stopPropagation();
-  navigateDetail(-1);
-});
-bookDetailNextBtn.addEventListener("click", (event) => {
-  event.stopPropagation();
-  navigateDetail(1);
-});
-bookDetailDialog.addEventListener("click", (event) => {
-  const tagRemove = event.target.closest(".book-detail-tag-remove");
-  if (tagRemove) {
-    event.preventDefault();
-    event.stopPropagation();
-    const label = tagRemove
-      .closest(".book-detail-tag-chip")
-      ?.querySelector(".book-detail-tag")
-      ?.textContent;
-    if (label) {
-      removeDetailBookTag(label);
-    }
-    return;
-  }
-
-  const tagButton = event.target.closest(".book-detail-tag");
-  if (tagButton) {
-    event.preventDefault();
-    event.stopPropagation();
-    applyTagSearch(tagButton.textContent);
-    return;
-  }
-
-  const editButton = event.target.closest(".book-detail-edit-btn");
-  if (editButton) {
-    event.preventDefault();
-    event.stopPropagation();
-    openEditDialog(Number(editButton.dataset.bookId));
-    return;
-  }
-
-  const collectionButton = event.target.closest(".collection-btn");
-  if (collectionButton) {
-    event.preventDefault();
-    event.stopPropagation();
-    toggleCollection(Number(collectionButton.dataset.bookId));
-    return;
-  }
-
-  const wantButton = event.target.closest(".want-btn");
-  if (!wantButton || wantButton.classList.contains("want-badge")) {
-    return;
-  }
-  event.preventDefault();
-  event.stopPropagation();
-  toggleWant(Number(wantButton.dataset.bookId));
-});
-bookDetailDialog
-  .querySelectorAll("[data-close-detail]")
-  .forEach((element) => {
-    element.addEventListener("click", closeBookDetail);
-  });
+/* Edit dialog, settings, search, and startup */
 
 editBookForm.addEventListener("submit", saveBookEdits);
 bindEditFieldSanitizers(editBookForm);
@@ -181,43 +80,6 @@ if (editTagsPoolList) {
     addEditingBookTag(button.textContent);
   });
 }
-
-if (coverLightbox) {
-  coverLightbox.addEventListener("click", (event) => {
-    if (event.target.closest(".cover-lightbox-img")) {
-      if (isMobileCoverLightboxViewport()) {
-        closeCoverLightbox();
-      }
-      return;
-    }
-    closeCoverLightbox();
-  });
-}
-
-document.addEventListener("keydown", (event) => {
-  if (event.key !== "Escape") {
-    return;
-  }
-  if (coverLightbox && !coverLightbox.hidden) {
-    event.preventDefault();
-    closeCoverLightbox();
-  }
-});
-
-document.addEventListener("keydown", (event) => {
-  if (coverLightbox && !coverLightbox.hidden) {
-    if (event.key === "ArrowLeft") {
-      event.preventDefault();
-      navigateCoverLightbox(-1);
-      return;
-    }
-    if (event.key === "ArrowRight") {
-      event.preventDefault();
-      navigateCoverLightbox(1);
-      return;
-    }
-  }
-});
 
 if (storageModeLocalInput) {
   storageModeLocalInput.addEventListener("change", () => {
@@ -343,26 +205,6 @@ document.addEventListener("keydown", (event) => {
     closeEditDialog();
     return;
   }
-  if (event.key === "Escape" && !bookDetailDialog.hidden) {
-    closeBookDetail();
-    return;
-  }
-  if (
-    !bookDetailDialog.hidden &&
-    editDialog.hidden &&
-    (!coverLightbox || coverLightbox.hidden)
-  ) {
-    if (event.key === "ArrowLeft") {
-      event.preventDefault();
-      navigateDetail(-1);
-      return;
-    }
-    if (event.key === "ArrowRight") {
-      event.preventDefault();
-      navigateDetail(1);
-      return;
-    }
-  }
   if (event.key === "Escape" && !settingsDialog.hidden) {
     closeSettingsDialog();
     return;
@@ -454,48 +296,6 @@ if (viewModeToggle) {
     saveUserState();
     updateViewModeState();
     render();
-  });
-}
-
-stats.addEventListener("click", (event) => {
-  if (event.target.closest("#collection-filter-toggle")) {
-    cycleCollectionFilter();
-    wantOnly = false;
-    render();
-    return;
-  }
-  if (event.target.closest("#hidden-filter-toggle")) {
-    hiddenOnly = !hiddenOnly;
-    render();
-    return;
-  }
-  if (event.target.closest("#mycroft-filter-toggle")) {
-    cycleMycroftFilter();
-    render();
-    return;
-  }
-  if (event.target.closest("#want-filter-toggle")) {
-    const next = !wantOnly;
-    wantOnly = next;
-    if (next) {
-      collectionFilterMode = null;
-    }
-    render();
-    return;
-  }
-});
-
-if (headerLogo) {
-  headerLogo.addEventListener("click", () => {
-    const now = Date.now();
-    randomCardLogoTapTimes = randomCardLogoTapTimes.filter(
-      (time) => now - time < RANDOM_CARD_LOGO_TAP_MS,
-    );
-    randomCardLogoTapTimes.push(now);
-    if (randomCardLogoTapTimes.length >= RANDOM_CARD_LOGO_TAP_COUNT) {
-      randomCardLogoTapTimes = [];
-      openRandomVisibleBook();
-    }
   });
 }
 

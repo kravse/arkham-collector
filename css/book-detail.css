@@ -315,10 +315,6 @@
   gap: 0.15rem;
   padding: 0.18rem 0.3rem 0.18rem 0.5rem;
   border-radius: 999px;
-  border: 1px solid var(--tag-border, rgba(130, 180, 245, 0.28));
-  background: var(--tag-bg, rgba(72, 128, 210, 0.12));
-  color: var(--tag-text, rgba(184, 200, 220, 0.82));
-  transition: filter 0.15s ease;
 }
 
 .book-detail-tag-chip .book-detail-tag {
@@ -326,41 +322,15 @@
   border: 0;
   background: transparent;
   border-radius: 0;
-  color: var(--tag-text);
-}
-
-.book-detail-tag-chip:hover {
-  filter: brightness(1.12);
-}
-
-.book-detail-tag-chip .book-detail-tag:hover {
-  background: transparent;
-  border-color: transparent;
   color: inherit;
-  filter: none;
-}
-
-.book-detail-tag-remove {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 1.1rem;
-  height: 1.1rem;
-  margin: 0;
-  padding: 0;
-  border: 0;
-  border-radius: 999px;
-  background: transparent;
-  color: rgba(232, 234, 237, 0.65);
-  font-family: var(--tag-font);
-  font-size: 0.95rem;
-  line-height: 1;
   cursor: pointer;
+  appearance: none;
 }
 
-.book-detail-tag-remove:hover {
-  color: #ffd6d6;
-  background: rgba(120, 40, 40, 0.22);
+.book-detail-tag-chip .book-detail-tag:hover,
+.book-detail-tag-chip .book-detail-tag:focus-visible {
+  filter: none;
+  outline: none;
 }
 
 .book-detail-tag {
@@ -368,28 +338,7 @@
   margin: 0;
   padding: 0.18rem 0.55rem;
   border-radius: 999px;
-  border: 1px solid var(--tag-border, rgba(130, 180, 245, 0.28));
-  background: var(--tag-bg, rgba(72, 128, 210, 0.12));
-  color: var(--tag-text, rgba(184, 200, 220, 0.82));
-  font-family: var(--tag-font);
-  font-size: 0.7rem;
-  font-weight: 600;
-  line-height: 1.25;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  -webkit-font-smoothing: antialiased;
-  cursor: pointer;
   appearance: none;
-  transition: filter 0.15s ease;
-}
-
-.book-detail-tag:hover {
-  filter: brightness(1.12);
-}
-
-.book-detail-tag:focus-visible {
-  outline: 2px solid var(--tag-border, rgba(160, 200, 255, 0.75));
-  outline-offset: 2px;
 }
 
 .book-detail-scroll-block .book-detail-description {

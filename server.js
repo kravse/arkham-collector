@@ -20,6 +20,7 @@ const {
   htmlToPlainText,
   sanitizeSingleLineText,
   sanitizeUrlInput,
+  slugify,
 } = require("./scripts/lib/text");
 const { syncCollectionFromCsv } = require("./scripts/lib/collection");
 const { COLLECTION_CSV } = require("./scripts/config");
@@ -40,18 +41,12 @@ const {
 const ROOT = __dirname;
 const DATA_DIR = path.join(ROOT, "data");
 const COVERS_DIR = path.join(ROOT, "covers");
-const BOOKS_JSON = path.join(DATA_DIR, "books.json");
-const BOOKS_JS = path.join(DATA_DIR, "books.js");
+const {
+  readBooksPayload,
+  writeDevBooksPayload,
+  getScrapedBookFromPayload,
+} = require("./scripts/lib/books");
 const PORT = Number(process.env.PORT) || 8742;
-
-function slugify(value) {
-  return String(value || "")
-    .toLowerCase()
-    .replace(/['']/g, "")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .slice(0, 120);
-}
 
 function wikiTitleFromHref(href) {
   if (!href) {
@@ -65,20 +60,16 @@ function wikiTitleFromHref(href) {
 }
 
 function readPayload() {
-  if (!fs.existsSync(BOOKS_JSON)) {
-    throw new Error("Missing data/books.json. Run the crawler first.");
-  }
-  return JSON.parse(fs.readFileSync(BOOKS_JSON, "utf8"));
+  return readBooksPayload();
 }
 
 function writePayload(payload) {
   fs.mkdirSync(DATA_DIR, { recursive: true });
-  fs.writeFileSync(BOOKS_JSON, `${JSON.stringify(payload, null, 2)}\n`);
-  fs.writeFileSync(BOOKS_JS, `window.BOOKS = ${JSON.stringify(payload.books, null, 2)};\n`);
+  writeDevBooksPayload(payload);
 }
 
 function getScrapedBook(payload, bookId) {
-  return payload.books.find((entry) => entry.id === bookId) || null;
+  return getScrapedBookFromPayload(payload, bookId);
 }
 
 function getMergedBook(payload, bookId) {

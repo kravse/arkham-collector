@@ -75,7 +75,7 @@ npm run build && open build/index.html   # read-only static site (matches deploy
 | Tags | `data/tags.json`, `tags.js` | Dev server edit dialog (`npm run serve`) only |
 | Display order | `data/book-order.json`, `book-order.js` | Dev server **Reorder** dialog (`npm run serve`) only |
 
-At load time, [`js/book-edits.js`](js/book-edits.js) merges scraped rows with edits; only differing fields are stored in `edits.json` so re-crawls can refresh untouched fields. [`js/book-tags.js`](js/book-tags.js) attaches tags from [`data/tags.js`](data/tags.js) (static in production; editable only on localhost). The grid is sorted by publication year; [`data/book-order.js`](data/book-order.js) breaks ties within each year. Magazine seasons (e.g. “Summer, 1967”) sort as that year—use **Reorder** to set issue order. Visitors on the built site cannot change order or tags.
+At load time, [`js/book-edits.js`](js/book-edits.js) merges scraped rows with edits; only differing fields are stored in `edits.json` so re-crawls can refresh untouched fields. [`js/book-layers.js`](js/book-layers.js) attaches tags from [`data/tags.js`](data/tags.js) (static in production; editable only on localhost). The grid is sorted by publication year; [`data/book-order.js`](data/book-order.js) breaks ties within each year. Magazine seasons (e.g. “Summer, 1967”) sort as that year—use **Reorder** to set issue order. Visitors on the built site cannot change order or tags.
 
 **Tags (maintainers):** With `npm run serve`, open a book’s edit dialog. Add a custom tag or pick from existing tags in the pool; remove tags with × on each chip. Tags save immediately to `data/tags.json` and regenerate `tags.js`. Run `npm run build` to ship tags to the live site. Tags appear in book detail; click a tag to search with `tag:…`, or type `tag:horror` / `tag:"cthulhu mythos"` in the search bar (plain search does not match tags).
 
@@ -111,7 +111,7 @@ Entry point: `node scripts/index.js`. Common flags: `--yes`, `--local`, `--limit
 |--------|---------|
 | `serve` | Dev server on port 8742 (`PORT` to override) |
 | `build` | Static site in `build/` (optimizes cover images to WebP) |
-| `bundle-viewer` | Rebuild `js/viewer-bundle.js` from `js/viewer/` |
+| `bundle-viewer` | Rebuild `js/viewer-bundle.js` from `js/viewer/` (syncs `scripts/lib/viewer-*.js` → `00-*.js` partials first) |
 | `test` | Run Node tests (`test/`; sort and filter logic under `scripts/lib/`) |
 
 ### Crawl & sync
@@ -157,11 +157,12 @@ Entry point: `node scripts/index.js`. Common flags: `--yes`, `--local`, `--limit
 |------|------|
 | `viewer.html` | UI shell (loads `js/viewer-bundle.js`) |
 | `js/viewer/` | Viewer source; `npm run bundle-viewer` |
-| `css/` | Styles (bundled to `css/viewer.css` in `build/`) |
+| `js/book-edits.js`, `js/book-layers.js` | Browser merge of edits and tags at load time |
+| `css/` | Styles; load order in [`scripts/css-manifest.js`](scripts/css-manifest.js) (bundled to `css/viewer.css` in `build/`) |
 | `data/` | Catalog + edits + tags + descriptions |
 | `covers/` | Cover images |
 | `my_collection/` | Maintainer sample CSV + `collection.js` |
-| `scripts/` | Crawler CLI (`index.js`, `lib/`, `tasks/`) |
+| `scripts/` | Crawler CLI (`index.js`, task registry, `lib/`, `tasks/`) |
 | `build/` | Generated deploy output |
 | `server.js` | Dev API for edits, tags, uploads, and book order |
 
