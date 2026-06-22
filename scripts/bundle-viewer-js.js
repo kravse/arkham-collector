@@ -13,6 +13,7 @@ const { syncViewerGistSync } = require("./sync-viewer-gist-sync");
 const { syncViewerCollectionImport } = require("./sync-viewer-collection-import");
 const { syncViewerCovers } = require("./sync-viewer-covers");
 const { syncViewerListCrop } = require("./sync-viewer-list-crop");
+const { syncViewerTags } = require("./sync-viewer-tags");
 
 const ROOT = path.join(__dirname, "..");
 const VIEWER_DIR = path.join(ROOT, "js", "viewer");
@@ -57,6 +58,10 @@ const PARTS = [
   {
     file: "00-viewer-filters.js",
     title: "Shared filter helpers (generated from scripts/lib/viewer-filters.js)",
+  },
+  {
+    file: "00-viewer-tags.js",
+    title: "Tag color helpers (generated from scripts/lib/viewer-tags.js)",
   },
   {
     file: "02-books-parse.js",
@@ -156,6 +161,7 @@ function bundleViewerJs() {
   syncViewerCollectionImport();
   syncViewerCovers();
   syncViewerListCrop();
+  syncViewerTags();
   if (!fs.existsSync(BODY)) {
     const partials = PARTS.map((p) => path.join(VIEWER_DIR, p.file));
     if (partials.every((file) => fs.existsSync(file))) {

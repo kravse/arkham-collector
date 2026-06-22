@@ -253,9 +253,9 @@
   gap: 0.2rem;
   padding: 0.18rem 0.35rem 0.18rem 0.55rem;
   border-radius: 999px;
-  border: 1px solid var(--tag-border);
-  background: var(--tag-bg);
-  color: var(--tag-text);
+  border: 1px solid var(--tag-border, rgba(130, 180, 245, 0.42));
+  background: var(--tag-bg, rgba(72, 128, 210, 0.18));
+  color: var(--tag-text, #b8d8f5);
   font-family: var(--tag-font);
   font-size: 0.72rem;
   font-weight: 600;
@@ -343,16 +343,16 @@
   border-radius: 999px;
   padding: 0.22rem 0.55rem;
   cursor: pointer;
-  border: 1px solid var(--border);
-  background: var(--panel);
-  color: var(--muted);
+  border: 1px solid var(--tag-border, var(--border));
+  background: var(--tag-bg, var(--panel));
+  color: var(--tag-text, var(--muted));
   text-transform: uppercase;
   -webkit-font-smoothing: antialiased;
+  transition: filter 0.15s ease;
 }
 
 .edit-tag-pool-btn:hover {
-  color: var(--tag-text);
-  border-color: var(--tag-border);
-  background: rgba(72, 128, 210, 0.12);
+  color: var(--tag-text, var(--text));
+  filter: brightness(1.12);
 }
 

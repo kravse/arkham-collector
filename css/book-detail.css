@@ -315,8 +315,10 @@
   gap: 0.15rem;
   padding: 0.18rem 0.3rem 0.18rem 0.5rem;
   border-radius: 999px;
-  border: 1px solid var(--tag-border);
-  background: var(--tag-bg);
+  border: 1px solid var(--tag-border, rgba(130, 180, 245, 0.42));
+  background: var(--tag-bg, rgba(72, 128, 210, 0.18));
+  color: var(--tag-text, #b8d8f5);
+  transition: filter 0.15s ease;
 }
 
 .book-detail-tag-chip .book-detail-tag {
@@ -324,12 +326,18 @@
   border: 0;
   background: transparent;
   border-radius: 0;
+  color: var(--tag-text);
+}
+
+.book-detail-tag-chip:hover {
+  filter: brightness(1.12);
 }
 
 .book-detail-tag-chip .book-detail-tag:hover {
   background: transparent;
   border-color: transparent;
-  color: #d4e8ff;
+  color: inherit;
+  filter: none;
 }
 
 .book-detail-tag-remove {
@@ -360,9 +368,9 @@
   margin: 0;
   padding: 0.18rem 0.55rem;
   border-radius: 999px;
-  border: 1px solid var(--tag-border);
-  background: var(--tag-bg);
-  color: var(--tag-text);
+  border: 1px solid var(--tag-border, rgba(130, 180, 245, 0.42));
+  background: var(--tag-bg, rgba(72, 128, 210, 0.18));
+  color: var(--tag-text, #b8d8f5);
   font-family: var(--tag-font);
   font-size: 0.7rem;
   font-weight: 600;
@@ -372,20 +380,15 @@
   -webkit-font-smoothing: antialiased;
   cursor: pointer;
   appearance: none;
-  transition:
-    background 0.15s ease,
-    border-color 0.15s ease,
-    color 0.15s ease;
+  transition: filter 0.15s ease;
 }
 
 .book-detail-tag:hover {
-  background: rgba(72, 128, 210, 0.28);
-  border-color: rgba(160, 200, 255, 0.62);
-  color: #d4e8ff;
+  filter: brightness(1.12);
 }
 
 .book-detail-tag:focus-visible {
-  outline: 2px solid rgba(160, 200, 255, 0.75);
+  outline: 2px solid var(--tag-border, rgba(160, 200, 255, 0.75));
   outline-offset: 2px;
 }
 

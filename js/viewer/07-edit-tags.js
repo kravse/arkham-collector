@@ -52,6 +52,16 @@ function tagKey(tag) {
     .toLowerCase();
 }
 
+let tagColorRegistry = viewerTags.createTagColorRegistry([]);
+
+function rebuildTagColorRegistry() {
+  tagColorRegistry = viewerTags.createTagColorRegistry(getAllKnownTags());
+}
+
+function tagChipStyleAttr(tag) {
+  return tagColorRegistry.tagChipStyleAttr(formatTagLabel(tag));
+}
+
 function syncEditTagsVisibility() {
   if (editTagsField) {
     editTagsField.hidden = !serveEnabled;
@@ -73,7 +83,7 @@ function renderEditTagsUi() {
     editTagsCurrent.innerHTML = currentTags
       .map((tag) => {
         const label = formatTagLabel(tag);
-        return `<span class="edit-tag-chip"><span class="edit-tag-chip-label">${escapeHtml(label)}</span><button type="button" class="edit-tag-remove" aria-label="Remove tag ${escapeHtml(label)}">×</button></span>`;
+        return `<span class="edit-tag-chip" ${tagChipStyleAttr(label)}><span class="edit-tag-chip-label">${escapeHtml(label)}</span><button type="button" class="edit-tag-remove" aria-label="Remove tag ${escapeHtml(label)}">×</button></span>`;
       })
       .join("");
   }
@@ -87,10 +97,10 @@ function renderEditTagsUi() {
 
   editTagsPool.hidden = false;
   editTagsPoolList.innerHTML = poolTags
-    .map(
-      (tag) =>
-        `<button type="button" class="edit-tag-pool-btn">${escapeHtml(formatTagLabel(tag))}</button>`,
-    )
+    .map((tag) => {
+      const label = formatTagLabel(tag);
+      return `<button type="button" class="edit-tag-pool-btn" ${tagChipStyleAttr(label)}>${escapeHtml(label)}</button>`;
+    })
     .join("");
 }
 
@@ -108,6 +118,7 @@ function applyTagResponseToBook(bookId, tags) {
     delete window.BOOK_TAGS[key];
   }
   prepareBookSearchIndex(book);
+  rebuildTagColorRegistry();
 }
 
 async function persistBookTags(bookId, nextTags) {
@@ -224,11 +235,12 @@ function renderBookTagsHtml(book) {
   const chips = tags
     .map((tag) => {
       const label = formatTagLabel(tag);
-      const searchButton = `<button type="button" class="book-detail-tag" aria-label="Search for tag ${escapeHtml(label)}">${escapeHtml(label)}</button>`;
+      const styleAttr = tagChipStyleAttr(label);
+      const searchButton = `<button type="button" class="book-detail-tag" ${styleAttr} aria-label="Search for tag ${escapeHtml(label)}">${escapeHtml(label)}</button>`;
       if (!editable) {
         return searchButton;
       }
-      return `<span class="book-detail-tag-chip">${searchButton}<button type="button" class="book-detail-tag-remove" aria-label="Remove tag ${escapeHtml(label)}">×</button></span>`;
+      return `<span class="book-detail-tag-chip" ${styleAttr}>${searchButton}<button type="button" class="book-detail-tag-remove" aria-label="Remove tag ${escapeHtml(label)}">×</button></span>`;
     })
     .join("");
   const editableClass = editable ? " book-detail-tags--editable" : "";
@@ -248,3 +260,5 @@ function applyTagSearch(rawTag) {
   searchInput.focus();
   grid.scrollIntoView({ behavior: "smooth", block: "start" });
 }
+
+rebuildTagColorRegistry();
