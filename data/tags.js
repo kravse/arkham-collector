@@ -210,7 +210,8 @@ window.BOOK_TAGS = {
   "249": [
     "FANTASY",
     "HORROR",
-    "NOVEL"
+    "NOVEL",
+    "YOUNG ADULT"
   ],
   "250": [
     "COLLECTION",
@@ -250,6 +251,7 @@ window.BOOK_TAGS = {
     "CTHULHU MYTHOS",
     "ESSAYS",
     "LETTERS",
+    "MISCELLANY",
     "NONFICTION",
     "WEIRD FICTION"
   ],
@@ -963,6 +965,7 @@ window.BOOK_TAGS = {
     "COLLECTION",
     "CTHULHU MYTHOS",
     "HORROR",
+    "MISCELLANY",
     "SHORT STORIES",
     "WEIRD FICTION"
   ],
@@ -1008,7 +1011,7 @@ window.BOOK_TAGS = {
   ],
   "380": [
     "HORROR",
-    "NOVEL",
+    "NOVELLA",
     "SUPERNATURAL FICTION"
   ],
   "381": [
@@ -1093,6 +1096,7 @@ window.BOOK_TAGS = {
   ],
   "394": [
     "COLLECTION",
+    "DARK FANTASY",
     "FANTASY",
     "HORROR",
     "SHORT STORIES",
@@ -1241,6 +1245,7 @@ window.BOOK_TAGS = {
     "COLLECTION",
     "CTHULHU MYTHOS",
     "HORROR",
+    "MISCELLANY",
     "SHORT STORIES",
     "WEIRD FICTION"
   ],

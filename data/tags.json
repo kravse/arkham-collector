@@ -211,7 +211,8 @@
     "249": [
       "FANTASY",
       "HORROR",
-      "NOVEL"
+      "NOVEL",
+      "YOUNG ADULT"
     ],
     "250": [
       "COLLECTION",
@@ -251,6 +252,7 @@
       "CTHULHU MYTHOS",
       "ESSAYS",
       "LETTERS",
+      "MISCELLANY",
       "NONFICTION",
       "WEIRD FICTION"
     ],
@@ -964,6 +966,7 @@
       "COLLECTION",
       "CTHULHU MYTHOS",
       "HORROR",
+      "MISCELLANY",
       "SHORT STORIES",
       "WEIRD FICTION"
     ],
@@ -1009,7 +1012,7 @@
     ],
     "380": [
       "HORROR",
-      "NOVEL",
+      "NOVELLA",
       "SUPERNATURAL FICTION"
     ],
     "381": [
@@ -1094,6 +1097,7 @@
     ],
     "394": [
       "COLLECTION",
+      "DARK FANTASY",
       "FANTASY",
       "HORROR",
       "SHORT STORIES",
@@ -1242,6 +1246,7 @@
       "COLLECTION",
       "CTHULHU MYTHOS",
       "HORROR",
+      "MISCELLANY",
       "SHORT STORIES",
       "WEIRD FICTION"
     ],
