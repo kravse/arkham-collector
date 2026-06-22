@@ -256,6 +256,7 @@
       "LETTERS",
       "MISCELLANY",
       "NONFICTION",
+      "SHORT STORIES",
       "WEIRD FICTION"
     ],
     "257": [
@@ -802,6 +803,7 @@
       "HORROR",
       "MISCELLANY",
       "NONFICTION",
+      "POETRY",
       "WEIRD FICTION"
     ],
     "345": [
@@ -967,7 +969,9 @@
     "372": [
       "COLLECTION",
       "CTHULHU MYTHOS",
+      "ESSAYS",
       "HORROR",
+      "MEMOIR",
       "MISCELLANY",
       "SHORT STORIES",
       "WEIRD FICTION"
@@ -1058,6 +1062,7 @@
       "ESSAYS",
       "MISCELLANY",
       "NONFICTION",
+      "POETRY",
       "WEIRD FICTION"
     ],
     "388": [
@@ -1221,6 +1226,7 @@
       "ESSAYS",
       "MISCELLANY",
       "NONFICTION",
+      "POETRY",
       "WEIRD FICTION"
     ],
     "413": [
@@ -1249,6 +1255,7 @@
       "CTHULHU MYTHOS",
       "HORROR",
       "MISCELLANY",
+      "POETRY",
       "SHORT STORIES",
       "WEIRD FICTION"
     ],

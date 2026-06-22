@@ -255,6 +255,7 @@ window.BOOK_TAGS = {
     "LETTERS",
     "MISCELLANY",
     "NONFICTION",
+    "SHORT STORIES",
     "WEIRD FICTION"
   ],
   "257": [
@@ -801,6 +802,7 @@ window.BOOK_TAGS = {
     "HORROR",
     "MISCELLANY",
     "NONFICTION",
+    "POETRY",
     "WEIRD FICTION"
   ],
   "345": [
@@ -966,7 +968,9 @@ window.BOOK_TAGS = {
   "372": [
     "COLLECTION",
     "CTHULHU MYTHOS",
+    "ESSAYS",
     "HORROR",
+    "MEMOIR",
     "MISCELLANY",
     "SHORT STORIES",
     "WEIRD FICTION"
@@ -1057,6 +1061,7 @@ window.BOOK_TAGS = {
     "ESSAYS",
     "MISCELLANY",
     "NONFICTION",
+    "POETRY",
     "WEIRD FICTION"
   ],
   "388": [
@@ -1220,6 +1225,7 @@ window.BOOK_TAGS = {
     "ESSAYS",
     "MISCELLANY",
     "NONFICTION",
+    "POETRY",
     "WEIRD FICTION"
   ],
   "413": [
@@ -1248,6 +1254,7 @@ window.BOOK_TAGS = {
     "CTHULHU MYTHOS",
     "HORROR",
     "MISCELLANY",
+    "POETRY",
     "SHORT STORIES",
     "WEIRD FICTION"
   ],
