@@ -118,6 +118,7 @@ window.BOOK_TAGS = {
   ],
   "231": [
     "MYCROFT & MORAN",
+    "MYSTERY",
     "SHERLOCK HOLMES",
     "SHORT STORIES"
   ],
