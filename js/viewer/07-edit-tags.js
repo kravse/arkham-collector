@@ -1,5 +1,19 @@
 /* Tag editing in the dev-server edit dialog */
 
+function normalizeTagInput(rawTag) {
+  const text = String(rawTag || "")
+    .trim()
+    .replace(/\s+/g, " ");
+  if (!text || text.length > 48) {
+    return "";
+  }
+  return text.toUpperCase();
+}
+
+function formatTagLabel(tag) {
+  return normalizeTagInput(tag) || String(tag || "").trim().toUpperCase();
+}
+
 function getAllKnownTags() {
   const byId = window.BOOK_TAGS || {};
   const seen = new Set();
@@ -9,21 +23,19 @@ function getAllKnownTags() {
       continue;
     }
     for (const tag of bookTags) {
-      const text = String(tag || "").trim();
-      if (!text) {
+      const label = formatTagLabel(tag);
+      if (!label) {
         continue;
       }
-      const key = text.toLowerCase();
+      const key = tagKey(label);
       if (seen.has(key)) {
         continue;
       }
       seen.add(key);
-      tags.push(text);
+      tags.push(label);
     }
   }
-  return tags.sort((a, b) =>
-    a.localeCompare(b, undefined, { sensitivity: "base" }),
-  );
+  return tags.sort((a, b) => tagKey(a).localeCompare(tagKey(b)));
 }
 
 function getEditingBookTags() {
@@ -59,10 +71,10 @@ function renderEditTagsUi() {
       '<p class="edit-tags-empty">No tags yet.</p>';
   } else {
     editTagsCurrent.innerHTML = currentTags
-      .map(
-        (tag) =>
-          `<span class="edit-tag-chip"><span class="edit-tag-chip-label">${escapeHtml(tag)}</span><button type="button" class="edit-tag-remove" aria-label="Remove tag ${escapeHtml(tag)}">×</button></span>`,
-      )
+      .map((tag) => {
+        const label = formatTagLabel(tag);
+        return `<span class="edit-tag-chip"><span class="edit-tag-chip-label">${escapeHtml(label)}</span><button type="button" class="edit-tag-remove" aria-label="Remove tag ${escapeHtml(label)}">×</button></span>`;
+      })
       .join("");
   }
 
@@ -77,7 +89,7 @@ function renderEditTagsUi() {
   editTagsPoolList.innerHTML = poolTags
     .map(
       (tag) =>
-        `<button type="button" class="edit-tag-pool-btn">${escapeHtml(tag)}</button>`,
+        `<button type="button" class="edit-tag-pool-btn">${escapeHtml(formatTagLabel(tag))}</button>`,
     )
     .join("");
 }
@@ -98,12 +110,12 @@ function applyTagResponseToBook(bookId, tags) {
   prepareBookSearchIndex(book);
 }
 
-async function persistEditingBookTags(nextTags) {
-  if (!editingBookId || !serveEnabled) {
+async function persistBookTags(bookId, nextTags) {
+  if (!bookId || !serveEnabled) {
     return;
   }
 
-  const response = await fetch(`/api/books/${editingBookId}/tags`, {
+  const response = await fetch(`/api/books/${bookId}/tags`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ tags: nextTags }),
@@ -113,16 +125,25 @@ async function persistEditingBookTags(nextTags) {
     throw new Error(payload.error || "Could not save tags");
   }
 
-  applyTagResponseToBook(editingBookId, payload.tags);
-  renderEditTagsUi();
+  applyTagResponseToBook(bookId, payload.tags);
+  if (editingBookId === bookId) {
+    renderEditTagsUi();
+  }
   render();
-  if (detailBookId === editingBookId) {
-    openBookDetail(editingBookId, { historyMode: "none" });
+  if (detailBookId === bookId) {
+    openBookDetail(bookId, { historyMode: "none" });
   }
 }
 
+async function persistEditingBookTags(nextTags) {
+  if (!editingBookId) {
+    return;
+  }
+  await persistBookTags(editingBookId, nextTags);
+}
+
 async function addEditingBookTag(rawTag) {
-  const tag = String(rawTag || "").trim().replace(/\s+/g, " ");
+  const tag = normalizeTagInput(rawTag);
   if (!tag) {
     return;
   }
@@ -175,14 +196,55 @@ async function removeEditingBookTag(rawTag) {
   }
 }
 
+async function removeDetailBookTag(rawTag) {
+  if (!detailBookId || !serveEnabled) {
+    return;
+  }
+
+  const book = books.find((entry) => entry.id === detailBookId);
+  const currentTags = Array.isArray(book?.tags) ? book.tags : [];
+  const removeKey = tagKey(rawTag);
+  const nextTags = currentTags.filter((tag) => tagKey(tag) !== removeKey);
+
+  try {
+    await persistBookTags(detailBookId, nextTags);
+  } catch (error) {
+    console.error(error);
+    window.alert(`Could not remove tag: ${error.message}`);
+  }
+}
+
 function renderBookTagsHtml(book) {
   const tags = Array.isArray(book.tags) ? book.tags : [];
   if (!tags.length) {
     return "";
   }
 
+  const editable = serveEnabled;
   const chips = tags
-    .map((tag) => `<span class="book-detail-tag">${escapeHtml(tag)}</span>`)
+    .map((tag) => {
+      const label = formatTagLabel(tag);
+      const searchButton = `<button type="button" class="book-detail-tag" aria-label="Search for tag ${escapeHtml(label)}">${escapeHtml(label)}</button>`;
+      if (!editable) {
+        return searchButton;
+      }
+      return `<span class="book-detail-tag-chip">${searchButton}<button type="button" class="book-detail-tag-remove" aria-label="Remove tag ${escapeHtml(label)}">×</button></span>`;
+    })
     .join("");
-  return `<div class="book-detail-tags" aria-label="Tags">${chips}</div>`;
+  const editableClass = editable ? " book-detail-tags--editable" : "";
+  return `<div class="book-detail-tags${editableClass}" aria-label="Tags">${chips}</div>`;
+}
+
+function applyTagSearch(rawTag) {
+  const tag = formatTagLabel(rawTag);
+  if (!tag || !searchInput) {
+    return;
+  }
+
+  searchInput.value = viewerFilters.formatTagSearchQuery(tag);
+  updateSearchClearVisibility();
+  closeBookDetail({ programmatic: true });
+  renderNow();
+  searchInput.focus();
+  grid.scrollIntoView({ behavior: "smooth", block: "start" });
 }

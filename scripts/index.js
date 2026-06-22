@@ -15,6 +15,7 @@ const { dedupeBookIds } = require("./tasks/dedupe-book-ids");
 const { compactEdits } = require("./tasks/compact-edits");
 const { fixArkhamMagazines } = require("./tasks/fix-arkham-magazines");
 const { exportArkhamCatalog } = require("./tasks/export-arkham-catalog");
+const { importTagsFromCsvTask } = require("./tasks/import-tags-from-csv");
 const { main } = require("./tasks/crawl");
 
 initState(process.argv.slice(2));
@@ -84,6 +85,15 @@ if (state.args.syncCollection) {
 } else if (state.args.exportArkhamCatalog) {
   try {
     exportArkhamCatalog({ output: state.args.output });
+  } catch (error) {
+    fail(error);
+  }
+} else if (state.args.importTagsFromCsv) {
+  try {
+    if (!state.args.csvPath) {
+      throw new Error("Pass --csv <path> with --import-tags-from-csv");
+    }
+    importTagsFromCsvTask(state.args.csvPath);
   } catch (error) {
     fail(error);
   }

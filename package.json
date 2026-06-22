@@ -29,6 +29,7 @@
     "fix-arkham-magazines:dry-run": "node scripts/index.js --fix-arkham-magazines --dry-run",
     "export-arkham-catalog": "node scripts/index.js --export-arkham-catalog",
     "export-arkham-catalog:stdout": "node scripts/index.js --export-arkham-catalog --output -",
+    "import-tags-from-csv": "node scripts/index.js --import-tags-from-csv --csv",
     "fill-covers": "node scripts/index.js --fill-covers",
     "fill-covers:dry-run": "node scripts/index.js --fill-covers --dry-run",
     "bundle-viewer": "node scripts/bundle-viewer-js.js",

@@ -13,8 +13,9 @@ const {
   saveTags,
 } = require("../scripts/lib/tags");
 
-test("normalizeTag trims, collapses spaces, and rejects empty or long values", () => {
-  assert.equal(normalizeTag("  signed  copy  "), "signed copy");
+test("normalizeTag trims, uppercases, and rejects empty or long values", () => {
+  assert.equal(normalizeTag("  signed  copy  "), "SIGNED COPY");
+  assert.equal(normalizeTag("Gothic"), "GOTHIC");
   assert.equal(normalizeTag(""), null);
   assert.equal(normalizeTag("   "), null);
   assert.equal(normalizeTag("x".repeat(49)), null);
@@ -22,14 +23,14 @@ test("normalizeTag trims, collapses spaces, and rejects empty or long values", (
 
 test("normalizeTags dedupes case-insensitively and sorts", () => {
   assert.deepEqual(normalizeTags(["Signed", "signed", "First"]), [
-    "First",
-    "Signed",
+    "FIRST",
+    "SIGNED",
   ]);
 });
 
 test("getTagsForBook normalizes stored tags", () => {
   const byBookId = { 42: [" Signed ", "signed"] };
-  assert.deepEqual(getTagsForBook(byBookId, 42), ["Signed"]);
+  assert.deepEqual(getTagsForBook(byBookId, 42), ["SIGNED"]);
   assert.deepEqual(getTagsForBook(byBookId, 99), []);
 });
 
@@ -38,14 +39,14 @@ test("getAllTags returns unique sorted tags across books", () => {
     1: ["Signed", "Arkham"],
     2: ["signed", "Reprint"],
   };
-  assert.deepEqual(getAllTags(byBookId), ["Arkham", "Reprint", "Signed"]);
+  assert.deepEqual(getAllTags(byBookId), ["ARKHAM", "REPRINT", "SIGNED"]);
 });
 
 test("applyTagsToBooks attaches tags arrays to books", () => {
   const books = [{ id: 1, title: "A" }, { id: 2, title: "B" }];
   const byBookId = { 1: ["Signed"] };
   const merged = applyTagsToBooks(books, byBookId);
-  assert.deepEqual(merged[0].tags, ["Signed"]);
+  assert.deepEqual(merged[0].tags, ["SIGNED"]);
   assert.deepEqual(merged[1].tags, []);
 });
 
@@ -56,8 +57,8 @@ test("saveTags writes json and js payloads", () => {
 
   saveTags({ byBookId: { 7: ["Rare"] } }, { tagsJson, tagsJs });
   assert.deepEqual(JSON.parse(fs.readFileSync(tagsJson, "utf8")), {
-    byBookId: { 7: ["Rare"] },
+    byBookId: { 7: ["RARE"] },
   });
-  assert.match(fs.readFileSync(tagsJs, "utf8"), /"7": \[\s*"Rare"/);
+  assert.match(fs.readFileSync(tagsJs, "utf8"), /"7": \[\s*"RARE"/);
   fs.rmSync(tmpDir, { recursive: true, force: true });
 });

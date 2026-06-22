@@ -23,6 +23,9 @@ ${body
   .join("\n")}
   return {
     prepareBookSearchIndex,
+    parseSearchQuery,
+    formatTagSearchQuery,
+    matchesTagSearch,
     matchesSearch,
     isMagazineIssue,
     passesHiddenVisibility,

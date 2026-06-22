@@ -117,6 +117,9 @@ async function checkServeSupport() {
   syncEditTagsVisibility();
   updateSortControlVisibility();
   refreshDetailToolbarIfOpen();
+  if (!bookDetailDialog.hidden && detailBookId) {
+    openBookDetail(detailBookId, { historyMode: "none" });
+  }
 }
 
 function openRandomVisibleBook() {

@@ -20,6 +20,8 @@ function parseArgs(argv) {
     compactEdits: false,
     fixArkhamMagazines: false,
     exportArkhamCatalog: false,
+    importTagsFromCsv: false,
+    csvPath: null,
     output: null,
     yes: false,
   };
@@ -55,6 +57,10 @@ function parseArgs(argv) {
       options.fixArkhamMagazines = true;
     } else if (arg === "--export-arkham-catalog") {
       options.exportArkhamCatalog = true;
+    } else if (arg === "--import-tags-from-csv") {
+      options.importTagsFromCsv = true;
+    } else if (arg === "--csv") {
+      options.csvPath = argv[++i];
     } else if (arg === "--output") {
       options.output = argv[++i];
     } else if (arg === "--skip-download") {
@@ -124,6 +130,9 @@ function getScriptMode(args) {
   }
   if (args.exportArkhamCatalog) {
     return "exportArkhamCatalog";
+  }
+  if (args.importTagsFromCsv) {
+    return "importTagsFromCsv";
   }
   return "crawl";
 }

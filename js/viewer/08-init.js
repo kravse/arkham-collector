@@ -49,6 +49,28 @@ bookDetailNextBtn.addEventListener("click", (event) => {
   navigateDetail(1);
 });
 bookDetailDialog.addEventListener("click", (event) => {
+  const tagRemove = event.target.closest(".book-detail-tag-remove");
+  if (tagRemove) {
+    event.preventDefault();
+    event.stopPropagation();
+    const label = tagRemove
+      .closest(".book-detail-tag-chip")
+      ?.querySelector(".book-detail-tag")
+      ?.textContent;
+    if (label) {
+      removeDetailBookTag(label);
+    }
+    return;
+  }
+
+  const tagButton = event.target.closest(".book-detail-tag");
+  if (tagButton) {
+    event.preventDefault();
+    event.stopPropagation();
+    applyTagSearch(tagButton.textContent);
+    return;
+  }
+
   const editButton = event.target.closest(".book-detail-edit-btn");
   if (editButton) {
     event.preventDefault();

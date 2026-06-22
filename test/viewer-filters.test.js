@@ -3,7 +3,10 @@ const assert = require("node:assert/strict");
 
 const {
   prepareBookSearchIndex,
+  parseSearchQuery,
+  formatTagSearchQuery,
   matchesSearch,
+  matchesTagSearch,
   isMagazineIssue,
   passesHiddenVisibility,
   passesBookVisibility,
@@ -47,11 +50,45 @@ test("matchesSearch finds haystack matches case-insensitively", () => {
   assert.equal(matchesSearch(entry, "derleth"), false);
 });
 
-test("matchesSearch includes book tags", () => {
-  const entry = book(2, { title: "At the Mountains of Madness", tags: ["Signed"] });
+test("matchesSearch ignores tags unless query uses tag: prefix", () => {
+  const entry = book(2, {
+    title: "At the Mountains of Madness",
+    tags: ["CTHULHU MYTHOS"],
+  });
 
-  assert.equal(matchesSearch(entry, "signed"), true);
-  assert.equal(matchesSearch(entry, "first"), false);
+  assert.equal(matchesSearch(entry, "cthulhu"), false);
+  assert.equal(matchesSearch(entry, "madness"), true);
+  assert.equal(matchesSearch(entry, "tag:cthulhu"), true);
+  assert.equal(matchesSearch(entry, 'tag:"Cthulhu Mythos"'), true);
+  assert.equal(matchesSearch(entry, "tag:signed"), false);
+});
+
+test("parseSearchQuery and formatTagSearchQuery handle tag helper syntax", () => {
+  assert.deepEqual(parseSearchQuery('tag:"Cthulhu Mythos"'), {
+    mode: "tag",
+    term: "cthulhu mythos",
+  });
+  assert.deepEqual(parseSearchQuery("tag:Cthulhu"), {
+    mode: "tag",
+    term: "cthulhu",
+  });
+  assert.deepEqual(parseSearchQuery("lovecraft"), {
+    mode: "text",
+    term: "lovecraft",
+  });
+  assert.equal(formatTagSearchQuery("HORROR"), "tag:HORROR");
+  assert.equal(formatTagSearchQuery("CTHULHU MYTHOS"), 'tag:"CTHULHU MYTHOS"');
+});
+
+test("matchesTagSearch matches tag substrings only", () => {
+  const entry = book(3, {
+    title: "The Call of Cthulhu",
+    tags: ["CTHULHU MYTHOS", "HORROR"],
+  });
+
+  assert.equal(matchesTagSearch(entry, "cthulhu"), true);
+  assert.equal(matchesTagSearch(entry, "mythos"), true);
+  assert.equal(matchesTagSearch(entry, "call"), false);
 });
 
 test("passesHiddenVisibility respects hidden-only and show-hidden modes", () => {

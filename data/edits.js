@@ -415,7 +415,7 @@ window.BOOK_EDITS = {
     "listCoverFocusY": 0.3380748717393544
   },
   "311": {
-    "description": "Howard Phillips Lovecraft: Dreamer on the Nightside is a\nbiography of author H. P. Lovecraft.",
+    "description": "Howard Phillips Lovecraft: Dreamer on the Nightside is a biography of author H. P. Lovecraft.",
     "listCoverFocusX": 0.3634453781512605,
     "listCoverFocusY": 0.40909763696312995,
     "coverArtist": "Frank Utpatel"

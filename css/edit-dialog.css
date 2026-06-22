@@ -256,8 +256,13 @@
   border: 1px solid var(--tag-border);
   background: var(--tag-bg);
   color: var(--tag-text);
-  font-size: 0.74rem;
-  line-height: 1.2;
+  font-family: var(--tag-font);
+  font-size: 0.72rem;
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  -webkit-font-smoothing: antialiased;
 }
 
 .edit-tag-remove {
@@ -330,14 +335,19 @@
 }
 
 .edit-tag-pool-btn {
-  font: inherit;
-  font-size: 0.72rem;
+  font-family: var(--tag-font);
+  font-size: 0.7rem;
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: 0.05em;
   border-radius: 999px;
   padding: 0.22rem 0.55rem;
   cursor: pointer;
   border: 1px solid var(--border);
   background: var(--panel);
   color: var(--muted);
+  text-transform: uppercase;
+  -webkit-font-smoothing: antialiased;
 }
 
 .edit-tag-pool-btn:hover {

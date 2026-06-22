@@ -1,1 +1,1407 @@
-window.BOOK_TAGS = {};
+window.BOOK_TAGS = {
+  "181": [
+    "ANTHOLOGY",
+    "HORROR",
+    "MAGAZINE",
+    "WEIRD FICTION"
+  ],
+  "213": [
+    "COLLECTION",
+    "CTHULHU MYTHOS",
+    "FANTASY",
+    "HORROR",
+    "MYCROFT & MORAN",
+    "WEIRD FICTION"
+  ],
+  "214": [
+    "MYCROFT & MORAN",
+    "MYSTERY",
+    "SHERLOCK HOLMES",
+    "SHORT STORIES"
+  ],
+  "215": [
+    "COLLECTION",
+    "MYCROFT & MORAN",
+    "MYSTERY",
+    "SHERLOCK HOLMES",
+    "SHORT STORIES"
+  ],
+  "216": [
+    "MYCROFT & MORAN",
+    "MYSTERY",
+    "OCCULT DETECTIVE",
+    "SHORT STORIES",
+    "SUPERNATURAL FICTION"
+  ],
+  "217": [
+    "MYCROFT & MORAN",
+    "MYSTERY",
+    "SHERLOCK HOLMES",
+    "SHORT STORIES"
+  ],
+  "218": [
+    "MYCROFT & MORAN",
+    "MYSTERY",
+    "OCCULT DETECTIVE",
+    "SHORT STORIES",
+    "SUPERNATURAL FICTION"
+  ],
+  "219": [
+    "MYCROFT & MORAN",
+    "MYSTERY",
+    "NOVEL",
+    "SHERLOCK HOLMES"
+  ],
+  "220": [
+    "MYCROFT & MORAN",
+    "MYSTERY",
+    "SHERLOCK HOLMES",
+    "SHORT STORIES"
+  ],
+  "221": [
+    "MYCROFT & MORAN",
+    "NONFICTION"
+  ],
+  "222": [
+    "MYCROFT & MORAN",
+    "MYSTERY",
+    "SHORT STORIES"
+  ],
+  "223": [
+    "MYCROFT & MORAN",
+    "MYSTERY",
+    "SHERLOCK HOLMES",
+    "SHORT STORIES"
+  ],
+  "224": [
+    "MYCROFT & MORAN",
+    "MYSTERY",
+    "OCCULT DETECTIVE",
+    "SHORT STORIES",
+    "SUPERNATURAL FICTION"
+  ],
+  "225": [
+    "MYCROFT & MORAN",
+    "MYSTERY",
+    "SHERLOCK HOLMES",
+    "SHORT STORIES"
+  ],
+  "226": [
+    "MYSTERY",
+    "SHERLOCK HOLMES",
+    "SHORT STORIES"
+  ],
+  "227": [
+    "MYCROFT & MORAN",
+    "MYSTERY",
+    "SHERLOCK HOLMES",
+    "SHORT STORIES"
+  ],
+  "228": [
+    "MYCROFT & MORAN",
+    "MYSTERY",
+    "SHERLOCK HOLMES",
+    "SHORT STORIES"
+  ],
+  "229": [
+    "MYCROFT & MORAN",
+    "MYSTERY",
+    "SHERLOCK HOLMES",
+    "SHORT STORIES"
+  ],
+  "230": [
+    "MYCROFT & MORAN",
+    "MYSTERY",
+    "OCCULT DETECTIVE",
+    "SHORT STORIES",
+    "SUPERNATURAL FICTION"
+  ],
+  "231": [
+    "MYCROFT & MORAN",
+    "SHERLOCK HOLMES",
+    "SHORT STORIES"
+  ],
+  "232": [
+    "HISTORY",
+    "MYSTERY",
+    "NONFICTION",
+    "SHERLOCK HOLMES"
+  ],
+  "233": [
+    "ANTHOLOGY",
+    "CTHULHU MYTHOS",
+    "HORROR",
+    "WEIRD FICTION"
+  ],
+  "234": [
+    "ANTHOLOGY",
+    "HORROR"
+  ],
+  "235": [
+    "ANTHOLOGY",
+    "HORROR"
+  ],
+  "236": [
+    "ANTHOLOGY",
+    "CTHULHU MYTHOS",
+    "HORROR"
+  ],
+  "237": [
+    "ANTHOLOGY",
+    "HORROR",
+    "WEIRD FICTION"
+  ],
+  "238": [
+    "CTHULHU MYTHOS",
+    "HORROR",
+    "NOVELETTE",
+    "WEIRD FICTION"
+  ],
+  "239": [
+    "ANTHOLOGY",
+    "HORROR"
+  ],
+  "240": [
+    "COLLECTION",
+    "FANTASY",
+    "SCIENCE FICTION",
+    "SHORT STORIES"
+  ],
+  "241": [
+    "BIOGRAPHY",
+    "HISTORY",
+    "NONFICTION"
+  ],
+  "242": [
+    "LETTERS",
+    "NONFICTION"
+  ],
+  "243": [
+    "HORROR",
+    "NOVEL"
+  ],
+  "244": [
+    "COLLECTION",
+    "FANTASY",
+    "SCIENCE FICTION",
+    "SHORT STORIES"
+  ],
+  "245": [
+    "HISTORY",
+    "MEMOIR",
+    "NONFICTION"
+  ],
+  "246": [
+    "CRITICISM",
+    "HISTORY",
+    "HORROR",
+    "NONFICTION"
+  ],
+  "247": [
+    "COLLECTION",
+    "SCIENCE FICTION",
+    "SHORT STORIES"
+  ],
+  "248": [
+    "BIBLIOGRAPHY",
+    "HISTORY",
+    "NONFICTION"
+  ],
+  "249": [
+    "FANTASY",
+    "HORROR",
+    "NOVEL"
+  ],
+  "250": [
+    "COLLECTION",
+    "SCIENCE FICTION",
+    "SHORT STORIES"
+  ],
+  "251": [
+    "BIOGRAPHY",
+    "ESSAYS",
+    "NONFICTION"
+  ],
+  "252": [
+    "COLLECTION",
+    "HORROR",
+    "SHORT STORIES",
+    "WEIRD FICTION"
+  ],
+  "253": [
+    "COLLECTION",
+    "FANTASY",
+    "SCIENCE FICTION",
+    "SHORT STORIES"
+  ],
+  "254": [
+    "COLLECTION",
+    "FANTASY",
+    "SCIENCE FICTION",
+    "SHORT STORIES"
+  ],
+  "255": [
+    "ANTHOLOGY",
+    "CTHULHU MYTHOS",
+    "HORROR",
+    "WEIRD FICTION"
+  ],
+  "256": [
+    "CTHULHU MYTHOS",
+    "ESSAYS",
+    "LETTERS",
+    "NONFICTION",
+    "WEIRD FICTION"
+  ],
+  "257": [
+    "COLLECTION",
+    "SCIENCE FICTION",
+    "SHORT STORIES"
+  ],
+  "258": [
+    "COLLECTION",
+    "SCIENCE FICTION",
+    "SHORT STORIES"
+  ],
+  "259": [
+    "COLLECTION",
+    "CTHULHU MYTHOS",
+    "HORROR",
+    "SHORT STORIES",
+    "WEIRD FICTION"
+  ],
+  "260": [
+    "COLLECTION",
+    "SCIENCE FICTION",
+    "SHORT STORIES"
+  ],
+  "261": [
+    "FANTASY",
+    "NOVEL",
+    "SCIENCE FICTION",
+    "STEAMPUNK"
+  ],
+  "262": [
+    "COLLECTION",
+    "SCIENCE FICTION",
+    "SHORT STORIES"
+  ],
+  "263": [
+    "COLLECTION",
+    "FANTASY",
+    "HORROR",
+    "SCIENCE FICTION",
+    "SHORT STORIES"
+  ],
+  "264": [
+    "COLLECTION",
+    "FEMINISM",
+    "SCIENCE FICTION",
+    "SHORT STORIES"
+  ],
+  "265": [
+    "ANTHOLOGY",
+    "CTHULHU MYTHOS",
+    "HORROR",
+    "SHORT STORIES",
+    "WEIRD FICTION"
+  ],
+  "266": [
+    "COLLECTION",
+    "CYBERPUNK",
+    "SCIENCE FICTION",
+    "SHORT STORIES"
+  ],
+  "267": [
+    "COLLECTION",
+    "CTHULHU MYTHOS",
+    "HORROR",
+    "SHORT STORIES",
+    "WEIRD FICTION"
+  ],
+  "268": [
+    "COLLECTION",
+    "SCIENCE FICTION",
+    "SHORT STORIES"
+  ],
+  "269": [
+    "COLLECTION",
+    "FANTASY",
+    "HORROR",
+    "SHORT STORIES",
+    "WEIRD FICTION"
+  ],
+  "270": [
+    "COLLECTION",
+    "FANTASY",
+    "HORROR",
+    "SCIENCE FICTION",
+    "SHORT STORIES"
+  ],
+  "271": [
+    "COLLECTION",
+    "FANTASY",
+    "HORROR",
+    "SCIENCE FICTION",
+    "SHORT STORIES"
+  ],
+  "272": [
+    "COLLECTION",
+    "FANTASY",
+    "SCIENCE FICTION",
+    "SHORT STORIES"
+  ],
+  "273": [
+    "COLLECTION",
+    "FANTASY",
+    "HORROR",
+    "SCIENCE FICTION",
+    "SHORT STORIES"
+  ],
+  "274": [
+    "COLLECTION",
+    "CTHULHU MYTHOS",
+    "HORROR",
+    "SHORT STORIES",
+    "WEIRD FICTION"
+  ],
+  "275": [
+    "CTHULHU MYTHOS",
+    "HORROR",
+    "NOVEL",
+    "SCIENCE FICTION",
+    "WEIRD FICTION"
+  ],
+  "276": [
+    "COLLECTION",
+    "CTHULHU MYTHOS",
+    "HORROR",
+    "SHORT STORIES",
+    "WEIRD FICTION"
+  ],
+  "277": [
+    "CTHULHU MYTHOS",
+    "HISTORICAL FICTION",
+    "HORROR",
+    "NOVEL",
+    "SCIENCE FICTION"
+  ],
+  "278": [
+    "HORROR",
+    "NOVEL",
+    "SCIENCE FICTION"
+  ],
+  "279": [
+    "COLLECTION",
+    "HORROR",
+    "SHORT STORIES",
+    "SUPERNATURAL FICTION"
+  ],
+  "280": [
+    "COLLECTION",
+    "FANTASY",
+    "SCIENCE FICTION",
+    "SHORT STORIES"
+  ],
+  "281": [
+    "COLLECTION",
+    "FANTASY",
+    "FEMINISM",
+    "SCIENCE FICTION",
+    "SHORT STORIES"
+  ],
+  "282": [
+    "COLLECTION",
+    "SCIENCE FICTION",
+    "SHORT STORIES"
+  ],
+  "283": [
+    "GOTHIC",
+    "HORROR",
+    "NOVEL",
+    "WEREWOLF"
+  ],
+  "284": [
+    "HORROR",
+    "NOVEL",
+    "SUPERNATURAL FICTION",
+    "VAMPIRE"
+  ],
+  "285": [
+    "COLLECTION",
+    "SCIENCE FICTION",
+    "SHORT STORIES"
+  ],
+  "286": [
+    "COLLECTION",
+    "HORROR",
+    "SHORT STORIES"
+  ],
+  "287": [
+    "CTHULHU MYTHOS",
+    "HORROR",
+    "POETRY",
+    "WEIRD FICTION"
+  ],
+  "288": [
+    "COLLECTION",
+    "HORROR",
+    "SHORT STORIES",
+    "SUPERNATURAL FICTION"
+  ],
+  "289": [
+    "ANTHOLOGY",
+    "CTHULHU MYTHOS",
+    "HORROR",
+    "WEIRD FICTION"
+  ],
+  "290": [
+    "GOTHIC",
+    "HORROR",
+    "NOVEL",
+    "VAMPIRE"
+  ],
+  "291": [
+    "FANTASY",
+    "NONFICTION",
+    "NOTEBOOK",
+    "POETRY",
+    "WEIRD FICTION"
+  ],
+  "292": [
+    "COLLECTION",
+    "FANTASY",
+    "HORROR",
+    "SHORT STORIES",
+    "SUPERNATURAL FICTION"
+  ],
+  "293": [
+    "COLLECTION",
+    "GHOST STORIES",
+    "HORROR",
+    "SHORT STORIES",
+    "SUPERNATURAL FICTION"
+  ],
+  "294": [
+    "COLLECTION",
+    "HORROR",
+    "SHORT STORIES",
+    "SUPERNATURAL FICTION"
+  ],
+  "295": [
+    "FANTASY",
+    "NOVEL"
+  ],
+  "296": [
+    "FANTASY",
+    "HORROR",
+    "POETRY",
+    "WEIRD FICTION"
+  ],
+  "297": [
+    "COLLECTION",
+    "CTHULHU MYTHOS",
+    "HORROR",
+    "SHORT STORIES",
+    "WEIRD FICTION"
+  ],
+  "298": [
+    "COLLECTION",
+    "GOTHIC",
+    "HORROR",
+    "SHORT STORIES"
+  ],
+  "299": [
+    "COLLECTION",
+    "GHOST STORIES",
+    "HORROR",
+    "SHORT STORIES",
+    "SUPERNATURAL FICTION"
+  ],
+  "300": [
+    "COLLECTION",
+    "HORROR",
+    "SHORT STORIES",
+    "WEIRD FICTION"
+  ],
+  "301": [
+    "CRITICISM",
+    "FANTASY",
+    "HEROIC FANTASY",
+    "NONFICTION",
+    "SWORD AND SORCERY"
+  ],
+  "302": [
+    "COLLECTION",
+    "HORROR",
+    "SHORT STORIES",
+    "WEIRD FICTION"
+  ],
+  "303": [
+    "LETTERS",
+    "NONFICTION"
+  ],
+  "304": [
+    "LETTERS",
+    "NONFICTION"
+  ],
+  "305": [
+    "CTHULHU MYTHOS",
+    "HORROR",
+    "POETRY",
+    "WEIRD FICTION"
+  ],
+  "306": [
+    "COLLECTION",
+    "GOTHIC",
+    "HORROR",
+    "SHORT STORIES",
+    "SUPERNATURAL FICTION"
+  ],
+  "307": [
+    "ANTHOLOGY",
+    "CTHULHU MYTHOS",
+    "HORROR",
+    "WEIRD FICTION"
+  ],
+  "308": [
+    "COLLECTION",
+    "CTHULHU MYTHOS",
+    "FANTASY",
+    "HORROR",
+    "SHORT STORIES",
+    "WEIRD FICTION"
+  ],
+  "309": [
+    "COLLECTION",
+    "MYSTERY",
+    "SHORT STORIES"
+  ],
+  "310": [
+    "COLLECTION",
+    "GOTHIC",
+    "HORROR",
+    "SHORT STORIES",
+    "WEIRD FICTION"
+  ],
+  "311": [
+    "BIOGRAPHY",
+    "NONFICTION"
+  ],
+  "312": [
+    "COLLECTION",
+    "CTHULHU MYTHOS",
+    "HORROR",
+    "SHORT STORIES",
+    "WEIRD FICTION"
+  ],
+  "313": [
+    "COLLECTION",
+    "GHOST STORIES",
+    "HORROR",
+    "SHORT STORIES",
+    "SUPERNATURAL FICTION"
+  ],
+  "314": [
+    "CTHULHU MYTHOS",
+    "HORROR",
+    "NOVEL",
+    "WEIRD FICTION"
+  ],
+  "315": [
+    "COLLECTION",
+    "HORROR",
+    "SHORT STORIES",
+    "WEIRD FICTION"
+  ],
+  "316": [
+    "COLLECTION",
+    "GOTHIC",
+    "HORROR",
+    "SHORT STORIES"
+  ],
+  "317": [
+    "COLLECTION",
+    "CTHULHU MYTHOS",
+    "HORROR",
+    "PSYCHOLOGICAL HORROR",
+    "SHORT STORIES",
+    "WEIRD FICTION"
+  ],
+  "318": [
+    "COLLECTION",
+    "HORROR",
+    "SCIENCE FICTION",
+    "SHORT STORIES",
+    "WEIRD FICTION"
+  ],
+  "319": [
+    "COLLECTION",
+    "HORROR",
+    "SHORT STORIES",
+    "WEIRD FICTION"
+  ],
+  "320": [
+    "ANTHOLOGY",
+    "BIBLIOGRAPHY",
+    "HORROR",
+    "MAGAZINE",
+    "WEIRD FICTION"
+  ],
+  "321": [
+    "COLLECTION",
+    "CTHULHU MYTHOS",
+    "HORROR",
+    "SHORT STORIES",
+    "WEIRD FICTION"
+  ],
+  "322": [
+    "LETTERS",
+    "NONFICTION"
+  ],
+  "323": [
+    "FANTASY",
+    "POETRY",
+    "WEIRD FICTION"
+  ],
+  "324": [
+    "ANTHOLOGY",
+    "BIBLIOGRAPHY",
+    "HORROR",
+    "MAGAZINE",
+    "WEIRD FICTION"
+  ],
+  "325": [
+    "ANTHOLOGY",
+    "HORROR",
+    "WEIRD FICTION"
+  ],
+  "326": [
+    "COLLECTION",
+    "GHOST STORIES",
+    "HORROR",
+    "SHORT STORIES",
+    "SUPERNATURAL FICTION"
+  ],
+  "327": [
+    "COLLECTION",
+    "GHOST STORIES",
+    "HORROR",
+    "SHORT STORIES",
+    "SUPERNATURAL FICTION"
+  ],
+  "328": [
+    "FANTASY",
+    "HORROR",
+    "POETRY",
+    "WEIRD FICTION"
+  ],
+  "329": [
+    "COLLECTION",
+    "FANTASY",
+    "SCIENCE FICTION",
+    "SHORT STORIES",
+    "WEIRD FICTION"
+  ],
+  "330": [
+    "FANTASY",
+    "HUMOR",
+    "POETRY",
+    "SCIENCE FICTION"
+  ],
+  "331": [
+    "BIBLIOGRAPHY",
+    "HISTORY",
+    "NONFICTION"
+  ],
+  "332": [
+    "COLLECTION",
+    "HORROR",
+    "SCIENCE FICTION",
+    "SHORT STORIES",
+    "WEIRD FICTION"
+  ],
+  "333": [
+    "ANTHOLOGY",
+    "CTHULHU MYTHOS",
+    "HORROR",
+    "SHORT STORIES",
+    "WEIRD FICTION"
+  ],
+  "334": [
+    "COLLECTION",
+    "FANTASY",
+    "HORROR",
+    "SCIENCE FICTION",
+    "SHORT STORIES"
+  ],
+  "335": [
+    "LETTERS",
+    "NONFICTION"
+  ],
+  "336": [
+    "GOTHIC",
+    "HORROR",
+    "NOVEL",
+    "SUPERNATURAL FICTION"
+  ],
+  "337": [
+    "COLLECTION",
+    "FANTASY",
+    "HORROR",
+    "SHORT STORIES",
+    "WEIRD FICTION"
+  ],
+  "338": [
+    "CTHULHU MYTHOS",
+    "HORROR",
+    "SHORT STORIES",
+    "WEIRD FICTION"
+  ],
+  "339": [
+    "CTHULHU MYTHOS",
+    "HORROR",
+    "NOVEL",
+    "SCIENCE FICTION"
+  ],
+  "340": [
+    "ANTHOLOGY",
+    "HORROR",
+    "WEIRD FICTION"
+  ],
+  "341": [
+    "COLLECTION",
+    "HORROR",
+    "NAUTICAL",
+    "SHORT STORIES",
+    "SUPERNATURAL FICTION",
+    "WEIRD FICTION"
+  ],
+  "342": [
+    "ADVENTURE",
+    "COLLECTION",
+    "HORROR",
+    "SHORT STORIES",
+    "WEIRD FICTION"
+  ],
+  "343": [
+    "COLLECTION",
+    "HORROR",
+    "SHORT STORIES",
+    "SUPERNATURAL FICTION",
+    "WEIRD FICTION"
+  ],
+  "344": [
+    "CTHULHU MYTHOS",
+    "ESSAYS",
+    "HORROR",
+    "MISCELLANY",
+    "NONFICTION",
+    "WEIRD FICTION"
+  ],
+  "345": [
+    "COLLECTION",
+    "HORROR",
+    "SCIENCE FICTION",
+    "SHORT STORIES",
+    "WEIRD FICTION"
+  ],
+  "346": [
+    "HORROR",
+    "POETRY",
+    "SUPERNATURAL FICTION"
+  ],
+  "347": [
+    "COLLECTION",
+    "HORROR",
+    "MYSTERY",
+    "SHORT STORIES"
+  ],
+  "348": [
+    "FANTASY",
+    "POETRY",
+    "WEIRD FICTION"
+  ],
+  "349": [
+    "LETTERS",
+    "NONFICTION"
+  ],
+  "350": [
+    "COLLECTION",
+    "FANTASY",
+    "SCIENCE FICTION",
+    "SHORT STORIES",
+    "WEIRD FICTION"
+  ],
+  "351": [
+    "HORROR",
+    "POETRY"
+  ],
+  "352": [
+    "COLLECTION",
+    "HORROR",
+    "SHORT STORIES",
+    "WEIRD FICTION"
+  ],
+  "353": [
+    "ANTHOLOGY",
+    "HORROR",
+    "WEIRD FICTION"
+  ],
+  "354": [
+    "HORROR",
+    "POETRY",
+    "WEIRD FICTION"
+  ],
+  "355": [
+    "COLLECTION",
+    "CTHULHU MYTHOS",
+    "HORROR",
+    "SHORT STORIES",
+    "WEIRD FICTION"
+  ],
+  "356": [
+    "ADVENTURE",
+    "COLLECTION",
+    "HORROR",
+    "SHORT STORIES",
+    "SWORD AND SORCERY",
+    "WEIRD FICTION"
+  ],
+  "357": [
+    "COLLECTION",
+    "GHOST STORIES",
+    "HORROR",
+    "SHORT STORIES",
+    "SUPERNATURAL FICTION"
+  ],
+  "358": [
+    "APPALACHIAN",
+    "COLLECTION",
+    "DARK FANTASY",
+    "FOLK HORROR",
+    "HORROR",
+    "SHORT STORIES",
+    "SUPERNATURAL FICTION"
+  ],
+  "359": [
+    "AUTOBIOGRAPHY",
+    "NONFICTION"
+  ],
+  "360": [
+    "CTHULHU MYTHOS",
+    "POETRY",
+    "WEIRD FICTION"
+  ],
+  "361": [
+    "CTHULHU MYTHOS",
+    "HORROR",
+    "NOVEL",
+    "WEIRD FICTION"
+  ],
+  "362": [
+    "BIBLIOGRAPHY",
+    "NONFICTION"
+  ],
+  "363": [
+    "COLLECTION",
+    "CTHULHU MYTHOS",
+    "HORROR",
+    "SHORT STORIES",
+    "WEIRD FICTION"
+  ],
+  "364": [
+    "ANTHOLOGY",
+    "HORROR",
+    "SUPERNATURAL FICTION"
+  ],
+  "365": [
+    "COLLECTION",
+    "HORROR",
+    "SHORT STORIES",
+    "WEIRD FICTION"
+  ],
+  "366": [
+    "CTHULHU MYTHOS",
+    "ESSAYS",
+    "MISCELLANY",
+    "NONFICTION",
+    "WEIRD FICTION"
+  ],
+  "367": [
+    "ANTHOLOGY",
+    "FANTASY",
+    "HORROR",
+    "POETRY"
+  ],
+  "368": [
+    "COLLECTION",
+    "GHOST STORIES",
+    "HORROR",
+    "SHORT STORIES",
+    "SUPERNATURAL FICTION"
+  ],
+  "369": [
+    "HORROR",
+    "NOVEL",
+    "SUPERNATURAL FICTION"
+  ],
+  "370": [
+    "COLLECTION",
+    "HORROR",
+    "SHORT STORIES",
+    "WEIRD FICTION"
+  ],
+  "371": [
+    "COLLECTION",
+    "FANTASY",
+    "HORROR",
+    "SHORT STORIES",
+    "WEIRD FICTION"
+  ],
+  "372": [
+    "COLLECTION",
+    "CTHULHU MYTHOS",
+    "HORROR",
+    "SHORT STORIES",
+    "WEIRD FICTION"
+  ],
+  "373": [
+    "BIOGRAPHY",
+    "NONFICTION"
+  ],
+  "374": [
+    "BIBLIOGRAPHY",
+    "HISTORY",
+    "NONFICTION"
+  ],
+  "375": [
+    "COLLECTION",
+    "HORROR",
+    "SHORT STORIES",
+    "WEIRD FICTION"
+  ],
+  "376": [
+    "COLLECTION",
+    "CTHULHU MYTHOS",
+    "HORROR",
+    "SHORT STORIES",
+    "WEIRD FICTION"
+  ],
+  "377": [
+    "FANTASY",
+    "HORROR",
+    "POETRY",
+    "WEIRD FICTION"
+  ],
+  "378": [
+    "FANTASY",
+    "HORROR",
+    "POETRY"
+  ],
+  "379": [
+    "COLLECTION",
+    "CTHULHU MYTHOS",
+    "HORROR",
+    "SHORT STORIES",
+    "WEIRD FICTION"
+  ],
+  "380": [
+    "HORROR",
+    "NOVEL",
+    "SUPERNATURAL FICTION"
+  ],
+  "381": [
+    "COLLECTION",
+    "CTHULHU MYTHOS",
+    "HORROR",
+    "SHORT STORIES",
+    "WEIRD FICTION"
+  ],
+  "382": [
+    "ANTHOLOGY",
+    "GHOST STORIES",
+    "HORROR",
+    "SUPERNATURAL FICTION"
+  ],
+  "383": [
+    "COLLECTION",
+    "HORROR",
+    "SCIENCE FICTION",
+    "SHORT STORIES",
+    "WEIRD FICTION"
+  ],
+  "384": [
+    "FANTASY",
+    "HORROR",
+    "POETRY",
+    "WEIRD FICTION"
+  ],
+  "385": [
+    "FANTASY",
+    "POETRY",
+    "SUPERNATURAL FICTION"
+  ],
+  "386": [
+    "COLLECTION",
+    "SCIENCE FICTION",
+    "SHORT STORIES"
+  ],
+  "387": [
+    "CTHULHU MYTHOS",
+    "ESSAYS",
+    "MISCELLANY",
+    "NONFICTION",
+    "WEIRD FICTION"
+  ],
+  "388": [
+    "COLLECTION",
+    "HORROR",
+    "SHORT STORIES",
+    "WEIRD FICTION"
+  ],
+  "389": [
+    "COLLECTION",
+    "FANTASY",
+    "HORROR",
+    "SHORT STORIES",
+    "WEIRD FICTION"
+  ],
+  "390": [
+    "FANTASY",
+    "NOVELLA",
+    "SUPERNATURAL FICTION"
+  ],
+  "391": [
+    "COLLECTION",
+    "FANTASY",
+    "SHORT STORIES",
+    "WEIRD FICTION"
+  ],
+  "392": [
+    "CTHULHU MYTHOS",
+    "HORROR",
+    "NOVEL",
+    "WEIRD FICTION"
+  ],
+  "393": [
+    "COLLECTION",
+    "GHOST STORIES",
+    "HORROR",
+    "SHORT STORIES",
+    "SUPERNATURAL FICTION"
+  ],
+  "394": [
+    "COLLECTION",
+    "FANTASY",
+    "HORROR",
+    "SHORT STORIES",
+    "WEIRD FICTION"
+  ],
+  "395": [
+    "COLLECTION",
+    "HORROR",
+    "SHORT STORIES",
+    "WEIRD FICTION"
+  ],
+  "396": [
+    "COLLECTION",
+    "FANTASY",
+    "HORROR",
+    "SHORT STORIES",
+    "WEIRD FICTION"
+  ],
+  "397": [
+    "ANTHOLOGY",
+    "FANTASY",
+    "HORROR",
+    "POETRY"
+  ],
+  "398": [
+    "COLLECTION",
+    "GHOST STORIES",
+    "HORROR",
+    "SHORT STORIES",
+    "SUPERNATURAL FICTION"
+  ],
+  "399": [
+    "NOVEL",
+    "SCIENCE FICTION"
+  ],
+  "400": [
+    "COLLECTION",
+    "GHOST STORIES",
+    "HORROR",
+    "SHORT STORIES",
+    "SUPERNATURAL FICTION"
+  ],
+  "401": [
+    "COLLECTION",
+    "HORROR",
+    "SHORT STORIES",
+    "SUPERNATURAL FICTION"
+  ],
+  "402": [
+    "CARIBBEAN",
+    "COLLECTION",
+    "HORROR",
+    "SHORT STORIES",
+    "SUPERNATURAL FICTION"
+  ],
+  "403": [
+    "ADVENTURE",
+    "COLLECTION",
+    "HORROR",
+    "SHORT STORIES",
+    "SWORD AND SORCERY",
+    "WEIRD FICTION"
+  ],
+  "404": [
+    "HORROR",
+    "NOVEL",
+    "SCIENCE FICTION",
+    "SUPERNATURAL FICTION",
+    "WEIRD FICTION"
+  ],
+  "405": [
+    "COLLECTION",
+    "HORROR",
+    "SHORT STORIES",
+    "SUPERNATURAL FICTION"
+  ],
+  "406": [
+    "COLLECTION",
+    "CTHULHU MYTHOS",
+    "HORROR",
+    "SCIENCE FICTION",
+    "SHORT STORIES",
+    "WEIRD FICTION"
+  ],
+  "407": [
+    "CTHULHU MYTHOS",
+    "HORROR",
+    "NOVEL",
+    "WEIRD FICTION"
+  ],
+  "408": [
+    "COLLECTION",
+    "GHOST STORIES",
+    "GOTHIC",
+    "HORROR",
+    "SHORT STORIES",
+    "SUPERNATURAL FICTION"
+  ],
+  "409": [
+    "HORROR",
+    "NOVEL",
+    "SUPERNATURAL FICTION"
+  ],
+  "410": [
+    "COLLECTION",
+    "CTHULHU MYTHOS",
+    "HORROR",
+    "SHORT STORIES",
+    "WEIRD FICTION"
+  ],
+  "411": [
+    "COLLECTION",
+    "HORROR",
+    "SHORT STORIES",
+    "WEIRD FICTION"
+  ],
+  "412": [
+    "CTHULHU MYTHOS",
+    "ESSAYS",
+    "MISCELLANY",
+    "NONFICTION",
+    "WEIRD FICTION"
+  ],
+  "413": [
+    "COLLECTION",
+    "FANTASY",
+    "SCIENCE FICTION",
+    "SHORT STORIES",
+    "WEIRD FICTION"
+  ],
+  "414": [
+    "CARIBBEAN",
+    "COLLECTION",
+    "HORROR",
+    "SHORT STORIES",
+    "SUPERNATURAL FICTION"
+  ],
+  "415": [
+    "COLLECTION",
+    "HORROR",
+    "SCIENCE FICTION",
+    "SHORT STORIES",
+    "WEIRD FICTION"
+  ],
+  "416": [
+    "COLLECTION",
+    "CTHULHU MYTHOS",
+    "HORROR",
+    "SHORT STORIES",
+    "WEIRD FICTION"
+  ],
+  "417": [
+    "COLLECTION",
+    "FANTASY",
+    "HORROR",
+    "SCIENCE FICTION",
+    "SHORT STORIES",
+    "WEIRD FICTION"
+  ],
+  "418": [
+    "COLLECTION",
+    "HORROR",
+    "SHORT STORIES",
+    "WEIRD FICTION"
+  ],
+  "419": [
+    "COLLECTION",
+    "CTHULHU MYTHOS",
+    "HORROR",
+    "SHORT STORIES",
+    "WEIRD FICTION"
+  ],
+  "420": [
+    "ANTHOLOGY",
+    "HORROR",
+    "MAGAZINE",
+    "WEIRD FICTION"
+  ],
+  "421": [
+    "ANTHOLOGY",
+    "HORROR",
+    "MAGAZINE",
+    "WEIRD FICTION"
+  ],
+  "422": [
+    "ANTHOLOGY",
+    "HORROR",
+    "MAGAZINE",
+    "WEIRD FICTION"
+  ],
+  "423": [
+    "ANTHOLOGY",
+    "HORROR",
+    "MAGAZINE",
+    "WEIRD FICTION"
+  ],
+  "424": [
+    "ANTHOLOGY",
+    "HORROR",
+    "MAGAZINE",
+    "WEIRD FICTION"
+  ],
+  "425": [
+    "ANTHOLOGY",
+    "HORROR",
+    "MAGAZINE",
+    "WEIRD FICTION"
+  ],
+  "426": [
+    "ANTHOLOGY",
+    "HORROR",
+    "MAGAZINE",
+    "WEIRD FICTION"
+  ],
+  "427": [
+    "ANTHOLOGY",
+    "HORROR",
+    "MAGAZINE",
+    "WEIRD FICTION"
+  ],
+  "429": [
+    "COLLECTION",
+    "CTHULHU MYTHOS",
+    "HORROR",
+    "SHORT STORIES",
+    "WEIRD FICTION"
+  ],
+  "430": [
+    "COLLECTION",
+    "CTHULHU MYTHOS",
+    "HORROR",
+    "SHORT STORIES",
+    "WEIRD FICTION"
+  ],
+  "431": [
+    "CTHULHU MYTHOS",
+    "HORROR",
+    "NOVEL",
+    "SCIENCE FICTION",
+    "WEIRD FICTION"
+  ],
+  "432": [
+    "COLLECTION",
+    "CTHULHU MYTHOS",
+    "HORROR",
+    "SHORT STORIES",
+    "WEIRD FICTION"
+  ],
+  "433": [
+    "ANTHOLOGY",
+    "BIBLIOGRAPHY",
+    "HORROR",
+    "MAGAZINE",
+    "WEIRD FICTION"
+  ],
+  "434": [
+    "ANTHOLOGY",
+    "BIBLIOGRAPHY",
+    "HORROR",
+    "MAGAZINE",
+    "WEIRD FICTION"
+  ],
+  "435": [
+    "ANTHOLOGY",
+    "BIBLIOGRAPHY",
+    "HORROR",
+    "MAGAZINE",
+    "WEIRD FICTION"
+  ],
+  "436": [
+    "ANTHOLOGY",
+    "BIBLIOGRAPHY",
+    "HORROR",
+    "MAGAZINE",
+    "WEIRD FICTION"
+  ],
+  "437": [
+    "ANTHOLOGY",
+    "BIBLIOGRAPHY",
+    "HORROR",
+    "MAGAZINE",
+    "WEIRD FICTION"
+  ],
+  "438": [
+    "ANTHOLOGY",
+    "BIBLIOGRAPHY",
+    "HORROR",
+    "MAGAZINE",
+    "WEIRD FICTION"
+  ],
+  "439": [
+    "ANTHOLOGY",
+    "BIBLIOGRAPHY",
+    "HORROR",
+    "MAGAZINE",
+    "WEIRD FICTION"
+  ],
+  "440": [
+    "ANTHOLOGY",
+    "BIBLIOGRAPHY",
+    "HORROR",
+    "MAGAZINE",
+    "WEIRD FICTION"
+  ],
+  "441": [
+    "ANTHOLOGY",
+    "BIBLIOGRAPHY",
+    "HORROR",
+    "MAGAZINE",
+    "WEIRD FICTION"
+  ]
+};

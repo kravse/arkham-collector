@@ -10,7 +10,7 @@ A visual catalog for collectors and readers of [Arkham House](https://en.wikiped
 
 | | |
 |---|---|
-| **Search & sort** | Search the grid (title, author, cover artist, date, and tags); **list/grid toggle** beside search (saved in browser); **Sort** (oldest/newest/title) everywhere. Same-year tiebreaks from `book-order.js`; maintainers set those with **Reorder** on `npm run serve` only |
+| **Search & sort** | Search the grid (title, author, cover artist, date); use `tag:horror` or `tag:"cthulhu mythos"` to filter by tags only; **list/grid toggle** beside search (saved in browser); **Sort** (oldest/newest/title) everywhere. Same-year tiebreaks from `book-order.js`; maintainers set those with **Reorder** on `npm run serve` only |
 | **Filters** | Collection, want list, Mycroft & Moran imprint, decade |
 | **Book detail** | Cover, description, cover artist, tags, **W** / **G** links, **Collect** (Ordered → Collection), and want toggles. In the detail overlay, tap the cover (mobile) or hover and click the magnifier (desktop) for a full-screen view |
 | **Your data** | Stored in the browser (`arkham-user-state` v2; older keys migrate automatically). Default is **This device only**; optional **Sync with GitHub Gist** saves full state to a private GitHub Gist using a throwaway bot account PAT (`arkham-gist-sync`) |
@@ -77,7 +77,7 @@ npm run build && open build/index.html   # read-only static site (matches deploy
 
 At load time, [`js/book-edits.js`](js/book-edits.js) merges scraped rows with edits; only differing fields are stored in `edits.json` so re-crawls can refresh untouched fields. [`js/book-tags.js`](js/book-tags.js) attaches tags from [`data/tags.js`](data/tags.js) (static in production; editable only on localhost). The grid is sorted by publication year; [`data/book-order.js`](data/book-order.js) breaks ties within each year. Magazine seasons (e.g. “Summer, 1967”) sort as that year—use **Reorder** to set issue order. Visitors on the built site cannot change order or tags.
 
-**Tags (maintainers):** With `npm run serve`, open a book’s edit dialog. Add a custom tag or pick from existing tags in the pool; remove tags with × on each chip. Tags save immediately to `data/tags.json` and regenerate `tags.js`. Run `npm run build` to ship tags to the live site. Tags appear in book detail and in the main search bar.
+**Tags (maintainers):** With `npm run serve`, open a book’s edit dialog. Add a custom tag or pick from existing tags in the pool; remove tags with × on each chip. Tags save immediately to `data/tags.json` and regenerate `tags.js`. Run `npm run build` to ship tags to the live site. Tags appear in book detail; click a tag to search with `tag:…`, or type `tag:horror` / `tag:"cthulhu mythos"` in the search bar (plain search does not match tags).
 
 **Reorder books (maintainers):** With `npm run serve`, use **Reorder** in the header. The list shows all non-deleted titles (respecting **Show hidden**). Move titles within the same calendar year only. Save writes `data/book-order.json` and regenerates `book-order.js`; run `npm run build` to ship the order to the live site.
 
@@ -147,6 +147,7 @@ Entry point: `node scripts/index.js`. Common flags: `--yes`, `--local`, `--limit
 | `dedupe-book-ids` | Split duplicate stable ids |
 | `export-arkham-catalog` | Write `arkham_catalog.csv` (Arkham House only; title, author, year — same shape as collection export) |
 | `export-arkham-catalog:stdout` | Same export to stdout (`--output -`) |
+| `import-tags-from-csv` | Import tags from a tagged catalog CSV into `data/tags.json` (pass `-- --csv path/to/file.csv`) |
 
 **Curation tips:** Prefer `serve` for one-off fixes. Use targeted syncs instead of full `crawl` when possible. **Hide** (`hidden` in edits) shows on localhost with “Show hidden”; **delete** removes from the UI but keeps the scraped row.
 

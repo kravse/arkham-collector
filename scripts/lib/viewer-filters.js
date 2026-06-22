@@ -1,5 +1,6 @@
 const SAMPLER_ISSUE_TITLE_RE = /^The Arkham Sampler \(Vol\. [IV]+, No\. \d+\)$/;
 const COLLECTOR_ISSUE_TITLE_RE = /^The Arkham Collector \(No\. \d+\)$/;
+const TAG_SEARCH_PREFIX_RE = /^tag:\s*(?:"([^"]*)"|(.+))$/i;
 
 function prepareBookSearchIndex(book) {
   book._searchHaystack = [
@@ -9,18 +10,59 @@ function prepareBookSearchIndex(book) {
     book.publicationDate,
     book.decade,
     book.listAuthor,
-    ...(Array.isArray(book.tags) ? book.tags : []),
   ]
     .filter(Boolean)
     .join(" ")
     .toLowerCase();
 }
 
-function matchesSearch(book, query) {
-  if (!query) {
+function parseSearchQuery(query) {
+  const text = String(query || "").trim();
+  if (!text) {
+    return { mode: "text", term: "" };
+  }
+
+  const tagMatch = text.match(TAG_SEARCH_PREFIX_RE);
+  if (tagMatch) {
+    return {
+      mode: "tag",
+      term: String(tagMatch[1] ?? tagMatch[2] ?? "")
+        .trim()
+        .toLowerCase(),
+    };
+  }
+
+  return { mode: "text", term: text.toLowerCase() };
+}
+
+function formatTagSearchQuery(tag) {
+  const text = String(tag || "").trim();
+  if (!text) {
+    return "";
+  }
+  if (/\s/.test(text)) {
+    return `tag:"${text.replace(/"/g, "")}"`;
+  }
+  return `tag:${text}`;
+}
+
+function matchesTagSearch(book, term) {
+  if (!term) {
     return true;
   }
-  return (book._searchHaystack || "").includes(String(query).toLowerCase());
+  const tags = Array.isArray(book.tags) ? book.tags : [];
+  return tags.some((tag) => String(tag).toLowerCase().includes(term));
+}
+
+function matchesSearch(book, query) {
+  const parsed = parseSearchQuery(query);
+  if (!parsed.term) {
+    return true;
+  }
+  if (parsed.mode === "tag") {
+    return matchesTagSearch(book, parsed.term);
+  }
+  return (book._searchHaystack || "").includes(parsed.term);
 }
 
 function isMagazineIssue(book) {
@@ -160,6 +202,9 @@ function pickRandomBook(books) {
 
 module.exports = {
   prepareBookSearchIndex,
+  parseSearchQuery,
+  formatTagSearchQuery,
+  matchesTagSearch,
   matchesSearch,
   isMagazineIssue,
   passesHiddenVisibility,

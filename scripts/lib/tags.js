@@ -7,6 +7,12 @@ const TAGS_JSON = path.join(DATA_DIR, "tags.json");
 const TAGS_JS = path.join(DATA_DIR, "tags.js");
 const MAX_TAG_LENGTH = 48;
 
+function tagKey(tag) {
+  return String(tag || "")
+    .trim()
+    .toLowerCase();
+}
+
 function normalizeTag(value) {
   const text = String(value || "")
     .trim()
@@ -14,7 +20,7 @@ function normalizeTag(value) {
   if (!text || text.length > MAX_TAG_LENGTH) {
     return null;
   }
-  return text;
+  return text.toUpperCase();
 }
 
 function normalizeTags(tags) {
@@ -25,16 +31,14 @@ function normalizeTags(tags) {
     if (!tag) {
       continue;
     }
-    const key = tag.toLowerCase();
+    const key = tagKey(tag);
     if (seen.has(key)) {
       continue;
     }
     seen.add(key);
     result.push(tag);
   }
-  return result.sort((a, b) =>
-    a.localeCompare(b, undefined, { sensitivity: "base" }),
-  );
+  return result.sort((a, b) => tagKey(a).localeCompare(tagKey(b)));
 }
 
 function loadTags() {
@@ -48,7 +52,13 @@ function loadTags() {
 }
 
 function saveTags(payload, paths = {}) {
-  const byBookId = payload.byBookId || {};
+  const byBookId = {};
+  for (const [key, tags] of Object.entries(payload.byBookId || {})) {
+    const next = normalizeTags(tags);
+    if (next.length) {
+      byBookId[key] = next;
+    }
+  }
   const output = { byBookId };
   const tagsJson = paths.tagsJson || TAGS_JSON;
   const tagsJs = paths.tagsJs || TAGS_JS;
@@ -86,7 +96,7 @@ function getAllTags(tagsByBookId) {
   const tags = [];
   for (const bookTags of Object.values(tagsByBookId || {})) {
     for (const tag of normalizeTags(Array.isArray(bookTags) ? bookTags : [])) {
-      const key = tag.toLowerCase();
+      const key = tagKey(tag);
       if (seen.has(key)) {
         continue;
       }
@@ -94,9 +104,21 @@ function getAllTags(tagsByBookId) {
       tags.push(tag);
     }
   }
-  return tags.sort((a, b) =>
-    a.localeCompare(b, undefined, { sensitivity: "base" }),
-  );
+  return tags.sort((a, b) => tagKey(a).localeCompare(tagKey(b)));
+}
+
+function compactAllTags() {
+  const payload = loadTags();
+  const byBookId = {};
+
+  for (const [key, tags] of Object.entries(payload.byBookId)) {
+    const next = normalizeTags(tags);
+    if (next.length) {
+      byBookId[key] = next;
+    }
+  }
+
+  return saveTags({ byBookId });
 }
 
 function applyTagsToBook(book, tagsByBookId) {
@@ -123,8 +145,10 @@ module.exports = {
   TAGS_JSON,
   TAGS_JS,
   MAX_TAG_LENGTH,
+  tagKey,
   normalizeTag,
   normalizeTags,
+  compactAllTags,
   loadTags,
   saveTags,
   getTagsForBook,
