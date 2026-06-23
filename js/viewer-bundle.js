@@ -2758,11 +2758,16 @@ function renderSearchChips() {
     .join("");
 }
 
+function setTagSuggestScrollLock(locked) {
+  document.body.classList.toggle("search-tag-suggest-open", locked);
+}
+
 function hideTagSuggest() {
   searchSuggestIndex = -1;
   searchTagSuggest.hidden = true;
   searchTagSuggest.innerHTML = "";
   searchInput.setAttribute("aria-expanded", "false");
+  setTagSuggestScrollLock(false);
 }
 
 function getTagSuggestItems() {
@@ -2791,6 +2796,7 @@ function renderTagSuggest() {
     .join("");
   searchTagSuggest.hidden = false;
   searchInput.setAttribute("aria-expanded", "true");
+  setTagSuggestScrollLock(true);
 }
 
 function updateTagSuggest() {

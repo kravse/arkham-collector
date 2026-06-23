@@ -243,6 +243,10 @@ select {
   display: none;
 }
 
+body.search-tag-suggest-open {
+  overflow: hidden;
+}
+
 .search-tag-suggest-item {
   padding: 0.45rem 0.7rem;
   font-family: var(--tag-font);
