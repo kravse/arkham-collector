@@ -42,6 +42,7 @@ const editDescriptionInput = document.getElementById("edit-description");
 const editTagsField = document.getElementById("edit-tags-field");
 const editTagsCurrent = document.getElementById("edit-tags-current");
 const editTagInput = document.getElementById("edit-tag-input");
+const editTagSuggest = document.getElementById("edit-tag-suggest");
 const editTagAddBtn = document.getElementById("edit-tag-add");
 const editTagsPool = document.getElementById("edit-tags-pool");
 const editTagsPoolList = document.getElementById("edit-tags-pool-list");
@@ -4066,6 +4067,7 @@ function openEditDialog(bookId) {
   if (editTagInput) {
     editTagInput.value = "";
   }
+  hideEditTagSuggest();
   selectEditDialogTab("details");
   openListCoverPicker(book);
   editDialog.hidden = false;
@@ -4073,6 +4075,7 @@ function openEditDialog(bookId) {
 }
 
 function closeEditDialog() {
+  hideEditTagSuggest();
   editingBookId = null;
   closeListCoverPicker();
   selectEditDialogTab("details");
@@ -4638,6 +4641,8 @@ async function setBookHidden(bookId, hidden) {
 
 /* Tag editing in the dev-server edit dialog */
 
+let editTagSuggestIndex = -1;
+
 function normalizeTagInput(rawTag) {
   return viewerTags.normalizeTag(rawTag) || "";
 }
@@ -4658,6 +4663,72 @@ function syncEditTagsVisibility() {
   if (editTagsField) {
     editTagsField.hidden = !serveEnabled;
   }
+}
+
+function hideEditTagSuggest() {
+  editTagSuggestIndex = -1;
+  if (!editTagSuggest) {
+    return;
+  }
+  editTagSuggest.hidden = true;
+  editTagSuggest.innerHTML = "";
+  if (editTagInput) {
+    editTagInput.setAttribute("aria-expanded", "false");
+  }
+}
+
+function getEditTagSuggestItems() {
+  const partial = String(editTagInput?.value || "").trim();
+  if (!partial) {
+    return [];
+  }
+  return viewerFilters.filterTagSuggestions(partial, getAllKnownTags(), {
+    exclude: getEditingBookTags(),
+  });
+}
+
+function renderEditTagSuggest() {
+  const items = getEditTagSuggestItems();
+  if (!items.length || !editTagSuggest) {
+    hideEditTagSuggest();
+    return;
+  }
+
+  editTagSuggest.innerHTML = items
+    .map((label, index) => {
+      const safe = viewerCardHtml.escapeHtml(label);
+      const activeClass = index === editTagSuggestIndex ? " active" : "";
+      return `<li class="edit-tag-suggest-item${activeClass}" role="option" data-suggest-index="${index}" aria-selected="${index === editTagSuggestIndex}">${safe}</li>`;
+    })
+    .join("");
+  editTagSuggest.hidden = false;
+  if (editTagInput) {
+    editTagInput.setAttribute("aria-expanded", "true");
+  }
+}
+
+function updateEditTagSuggest() {
+  if (editTagSuggestIndex >= getEditTagSuggestItems().length) {
+    editTagSuggestIndex = -1;
+  }
+  renderEditTagSuggest();
+}
+
+function pickEditTagSuggestion(index) {
+  const items = getEditTagSuggestItems();
+  const label = items[index];
+  if (!label) {
+    return;
+  }
+  hideEditTagSuggest();
+  addEditingBookTag(label);
+}
+
+function commitEditTagInput() {
+  const value = editTagInput?.value || "";
+  hideEditTagSuggest();
+  const resolved = viewerFilters.resolveTagFilterLabel(value, getAllKnownTags());
+  addEditingBookTag(resolved || value);
 }
 
 function renderEditTagsUi() {
@@ -4759,6 +4830,7 @@ async function addEditingBookTag(rawTag) {
   ) {
     if (editTagInput) {
       editTagInput.value = "";
+      hideEditTagSuggest();
     }
     return;
   }
@@ -4770,6 +4842,7 @@ async function addEditingBookTag(rawTag) {
     await persistEditingBookTags([...currentTags, tag]);
     if (editTagInput) {
       editTagInput.value = "";
+      hideEditTagSuggest();
       editTagInput.focus();
     }
   } catch (error) {
@@ -5458,16 +5531,73 @@ editTabListCrop.addEventListener("click", () => {
 
 if (editTagAddBtn) {
   editTagAddBtn.addEventListener("click", () => {
-    addEditingBookTag(editTagInput?.value || "");
+    commitEditTagInput();
+  });
+}
+
+if (editTagSuggest) {
+  editTagSuggest.addEventListener("mousedown", (event) => {
+    const item = event.target.closest("[data-suggest-index]");
+    if (!item) {
+      return;
+    }
+    event.preventDefault();
+    pickEditTagSuggestion(Number(item.dataset.suggestIndex));
   });
 }
 
 if (editTagInput) {
+  editTagInput.addEventListener("input", () => {
+    updateEditTagSuggest();
+  });
+
   editTagInput.addEventListener("keydown", (event) => {
+    const items = getEditTagSuggestItems();
+    const suggestOpen = items.length > 0 && !editTagSuggest.hidden;
+
     if (event.key === "Enter") {
       event.preventDefault();
-      addEditingBookTag(editTagInput.value);
+      if (suggestOpen && editTagSuggestIndex >= 0) {
+        pickEditTagSuggestion(editTagSuggestIndex);
+      } else {
+        commitEditTagInput();
+      }
+      return;
     }
+
+    if (!suggestOpen) {
+      if (event.key === "Escape") {
+        hideEditTagSuggest();
+      }
+      return;
+    }
+
+    if (event.key === "ArrowDown") {
+      event.preventDefault();
+      editTagSuggestIndex = (editTagSuggestIndex + 1) % items.length;
+      renderEditTagSuggest();
+      return;
+    }
+
+    if (event.key === "ArrowUp") {
+      event.preventDefault();
+      editTagSuggestIndex =
+        editTagSuggestIndex <= 0 ? items.length - 1 : editTagSuggestIndex - 1;
+      renderEditTagSuggest();
+      return;
+    }
+
+    if (event.key === "Escape") {
+      event.preventDefault();
+      event.stopPropagation();
+      hideEditTagSuggest();
+    }
+  });
+
+  editTagInput.addEventListener("blur", () => {
+    window.setTimeout(() => {
+      hideEditTagSuggest();
+    }, 120);
   });
 }
 
@@ -5619,6 +5749,10 @@ attributionDialog.querySelectorAll("[data-close-attribution]").forEach((element)
 
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape" && !editDialog.hidden) {
+    if (editTagSuggest && !editTagSuggest.hidden) {
+      hideEditTagSuggest();
+      return;
+    }
     closeEditDialog();
     return;
   }

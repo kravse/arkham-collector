@@ -354,6 +354,7 @@ function openEditDialog(bookId) {
   if (editTagInput) {
     editTagInput.value = "";
   }
+  hideEditTagSuggest();
   selectEditDialogTab("details");
   openListCoverPicker(book);
   editDialog.hidden = false;
@@ -361,6 +362,7 @@ function openEditDialog(bookId) {
 }
 
 function closeEditDialog() {
+  hideEditTagSuggest();
   editingBookId = null;
   closeListCoverPicker();
   selectEditDialogTab("details");

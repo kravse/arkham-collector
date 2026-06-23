@@ -1,5 +1,7 @@
 /* Tag editing in the dev-server edit dialog */
 
+let editTagSuggestIndex = -1;
+
 function normalizeTagInput(rawTag) {
   return viewerTags.normalizeTag(rawTag) || "";
 }
@@ -20,6 +22,72 @@ function syncEditTagsVisibility() {
   if (editTagsField) {
     editTagsField.hidden = !serveEnabled;
   }
+}
+
+function hideEditTagSuggest() {
+  editTagSuggestIndex = -1;
+  if (!editTagSuggest) {
+    return;
+  }
+  editTagSuggest.hidden = true;
+  editTagSuggest.innerHTML = "";
+  if (editTagInput) {
+    editTagInput.setAttribute("aria-expanded", "false");
+  }
+}
+
+function getEditTagSuggestItems() {
+  const partial = String(editTagInput?.value || "").trim();
+  if (!partial) {
+    return [];
+  }
+  return viewerFilters.filterTagSuggestions(partial, getAllKnownTags(), {
+    exclude: getEditingBookTags(),
+  });
+}
+
+function renderEditTagSuggest() {
+  const items = getEditTagSuggestItems();
+  if (!items.length || !editTagSuggest) {
+    hideEditTagSuggest();
+    return;
+  }
+
+  editTagSuggest.innerHTML = items
+    .map((label, index) => {
+      const safe = viewerCardHtml.escapeHtml(label);
+      const activeClass = index === editTagSuggestIndex ? " active" : "";
+      return `<li class="edit-tag-suggest-item${activeClass}" role="option" data-suggest-index="${index}" aria-selected="${index === editTagSuggestIndex}">${safe}</li>`;
+    })
+    .join("");
+  editTagSuggest.hidden = false;
+  if (editTagInput) {
+    editTagInput.setAttribute("aria-expanded", "true");
+  }
+}
+
+function updateEditTagSuggest() {
+  if (editTagSuggestIndex >= getEditTagSuggestItems().length) {
+    editTagSuggestIndex = -1;
+  }
+  renderEditTagSuggest();
+}
+
+function pickEditTagSuggestion(index) {
+  const items = getEditTagSuggestItems();
+  const label = items[index];
+  if (!label) {
+    return;
+  }
+  hideEditTagSuggest();
+  addEditingBookTag(label);
+}
+
+function commitEditTagInput() {
+  const value = editTagInput?.value || "";
+  hideEditTagSuggest();
+  const resolved = viewerFilters.resolveTagFilterLabel(value, getAllKnownTags());
+  addEditingBookTag(resolved || value);
 }
 
 function renderEditTagsUi() {
@@ -121,6 +189,7 @@ async function addEditingBookTag(rawTag) {
   ) {
     if (editTagInput) {
       editTagInput.value = "";
+      hideEditTagSuggest();
     }
     return;
   }
@@ -132,6 +201,7 @@ async function addEditingBookTag(rawTag) {
     await persistEditingBookTags([...currentTags, tag]);
     if (editTagInput) {
       editTagInput.value = "";
+      hideEditTagSuggest();
       editTagInput.focus();
     }
   } catch (error) {

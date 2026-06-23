@@ -784,6 +784,7 @@ window.BOOK_TAGS = {
   ],
   "342": [
     "ADVENTURE",
+    "CARIBBEAN",
     "COLLECTION",
     "HORROR",
     "SHORT STORIES",
@@ -950,7 +951,8 @@ window.BOOK_TAGS = {
   "369": [
     "HORROR",
     "NOVEL",
-    "SUPERNATURAL FICTION"
+    "SUPERNATURAL FICTION",
+    "WEREWOLF"
   ],
   "370": [
     "COLLECTION",

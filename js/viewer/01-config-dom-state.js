@@ -42,6 +42,7 @@ const editDescriptionInput = document.getElementById("edit-description");
 const editTagsField = document.getElementById("edit-tags-field");
 const editTagsCurrent = document.getElementById("edit-tags-current");
 const editTagInput = document.getElementById("edit-tag-input");
+const editTagSuggest = document.getElementById("edit-tag-suggest");
 const editTagAddBtn = document.getElementById("edit-tag-add");
 const editTagsPool = document.getElementById("edit-tags-pool");
 const editTagsPoolList = document.getElementById("edit-tags-pool-list");

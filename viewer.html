@@ -810,13 +810,24 @@
                 aria-live="polite"
               ></div>
               <div class="edit-tags-add-row">
-                <input
-                  id="edit-tag-input"
-                  type="text"
-                  placeholder="New tag…"
-                  autocomplete="off"
-                  maxlength="48"
-                />
+                <div class="edit-tag-input-wrap">
+                  <input
+                    id="edit-tag-input"
+                    type="text"
+                    placeholder="New tag…"
+                    autocomplete="off"
+                    maxlength="48"
+                    aria-autocomplete="list"
+                    aria-controls="edit-tag-suggest"
+                    aria-expanded="false"
+                  />
+                  <ul
+                    id="edit-tag-suggest"
+                    class="edit-tag-suggest"
+                    role="listbox"
+                    hidden
+                  ></ul>
+                </div>
                 <button type="button" id="edit-tag-add">Add</button>
               </div>
               <div id="edit-tags-pool" class="edit-tags-pool">

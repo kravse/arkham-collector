@@ -41,16 +41,73 @@ editTabListCrop.addEventListener("click", () => {
 
 if (editTagAddBtn) {
   editTagAddBtn.addEventListener("click", () => {
-    addEditingBookTag(editTagInput?.value || "");
+    commitEditTagInput();
+  });
+}
+
+if (editTagSuggest) {
+  editTagSuggest.addEventListener("mousedown", (event) => {
+    const item = event.target.closest("[data-suggest-index]");
+    if (!item) {
+      return;
+    }
+    event.preventDefault();
+    pickEditTagSuggestion(Number(item.dataset.suggestIndex));
   });
 }
 
 if (editTagInput) {
+  editTagInput.addEventListener("input", () => {
+    updateEditTagSuggest();
+  });
+
   editTagInput.addEventListener("keydown", (event) => {
+    const items = getEditTagSuggestItems();
+    const suggestOpen = items.length > 0 && !editTagSuggest.hidden;
+
     if (event.key === "Enter") {
       event.preventDefault();
-      addEditingBookTag(editTagInput.value);
+      if (suggestOpen && editTagSuggestIndex >= 0) {
+        pickEditTagSuggestion(editTagSuggestIndex);
+      } else {
+        commitEditTagInput();
+      }
+      return;
     }
+
+    if (!suggestOpen) {
+      if (event.key === "Escape") {
+        hideEditTagSuggest();
+      }
+      return;
+    }
+
+    if (event.key === "ArrowDown") {
+      event.preventDefault();
+      editTagSuggestIndex = (editTagSuggestIndex + 1) % items.length;
+      renderEditTagSuggest();
+      return;
+    }
+
+    if (event.key === "ArrowUp") {
+      event.preventDefault();
+      editTagSuggestIndex =
+        editTagSuggestIndex <= 0 ? items.length - 1 : editTagSuggestIndex - 1;
+      renderEditTagSuggest();
+      return;
+    }
+
+    if (event.key === "Escape") {
+      event.preventDefault();
+      event.stopPropagation();
+      hideEditTagSuggest();
+    }
+  });
+
+  editTagInput.addEventListener("blur", () => {
+    window.setTimeout(() => {
+      hideEditTagSuggest();
+    }, 120);
   });
 }
 
@@ -202,6 +259,10 @@ attributionDialog.querySelectorAll("[data-close-attribution]").forEach((element)
 
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape" && !editDialog.hidden) {
+    if (editTagSuggest && !editTagSuggest.hidden) {
+      hideEditTagSuggest();
+      return;
+    }
     closeEditDialog();
     return;
   }

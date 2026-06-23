@@ -13,8 +13,8 @@ window.BOOK_EDITS = {
     "goodreadsUrl": "https://www.goodreads.com/book/show/879503.The_Final_Adventures_of_Solar_Pons"
   },
   "216": {
-    "listCoverFocusX": 0.3487394957983193,
-    "listCoverFocusY": 0.35648643053685297
+    "listCoverFocusX": 0.5882352941176471,
+    "listCoverFocusY": 0.43366588830784114
   },
   "217": {
     "goodreadsUrl": "https://www.goodreads.com/book/show/879500.The_Chronicles_of_Solar_Pons"
@@ -257,9 +257,7 @@ window.BOOK_EDITS = {
     "listCoverFocusY": 0.4955386655661908
   },
   "272": {
-    "coverImageFile": "covers/tales-of-the-quintana-roo-272.jpg",
-    "listCoverFocusY": 0.4389509413996117,
-    "listCoverFocusX": 0.5
+    "coverImageFile": "covers/tales-of-the-quintana-roo-272.jpg"
   },
   "273": {
     "coverImageFile": "covers/dreams-of-dark-and-light-the-great-short-fiction-of-tanith-lee-273.jpg",
@@ -267,8 +265,7 @@ window.BOOK_EDITS = {
     "listCoverFocusY": 0.45754904476182934
   },
   "274": {
-    "listCoverFocusX": 0.5315126050420168,
-    "listCoverFocusY": 0.08184482760456994
+    "coverImageFile": "covers/dagon-and-other-macabre-tales-274.jpg"
   },
   "275": {
     "listCoverFocusX": 0.6071428571428571,
@@ -463,9 +460,6 @@ window.BOOK_EDITS = {
     "listCoverFocusX": 0.2920168067226891,
     "listCoverFocusY": 0.5589144119996509
   },
-  "321": {
-    "coverImageFile": "covers/the-caller-of-the-black-321.jpg"
-  },
   "322": {
     "coverImageFile": "covers/selected-letters-of-h-p-lovecraft-iii-1929-1931-322.jpg",
     "listCoverFocusX": 0.31512605042016806,
@@ -478,13 +472,7 @@ window.BOOK_EDITS = {
     "coverImageFile": "covers/the-arkham-collector-324.jpg"
   },
   "325": {
-    "coverImageFile": "covers/dark-things-325.jpg",
-    "listCoverFocusX": 0.4957983193277311,
-    "listCoverFocusY": 0.2985760332100045
-  },
-  "326": {
-    "listCoverFocusX": 0.5021008403361344,
-    "listCoverFocusY": 0.32591547403196763
+    "coverImageFile": "covers/dark-things-325.jpg"
   },
   "327": {
     "coverImageFile": "covers/the-face-in-the-mirror-327.png",
@@ -502,9 +490,7 @@ window.BOOK_EDITS = {
     "listCoverFocusY": 0.6861200723366294
   },
   "330": {
-    "coverImageFile": "covers/demons-and-dinosaurs-330.jpg",
-    "listCoverFocusX": 0.4012605042016807,
-    "listCoverFocusY": 0.3532834375521203
+    "coverImageFile": "covers/demons-and-dinosaurs-330.jpg"
   },
   "331": {
     "coverImageFile": "covers/thirty-years-of-arkham-house-1939-69-a-history-and-bibliography-331.jpg",
@@ -532,14 +518,12 @@ window.BOOK_EDITS = {
     "listCoverFocusY": 0.7703208001612049
   },
   "336": {
-    "coverImageFile": "covers/the-green-round-336.jpg",
-    "listCoverFocusX": 0.46638655462184875,
-    "listCoverFocusY": 0.8673053963348517
+    "coverImageFile": "covers/the-green-round-336.jpg"
   },
   "337": {
     "coverImageFile": "covers/strange-gateways-337.jpg",
-    "listCoverFocusX": 0.8046218487394958,
-    "listCoverFocusY": 0.538599963320119
+    "listCoverFocusX": 0.7899159663865546,
+    "listCoverFocusY": 0.5303191112805786
   },
   "338": {
     "coverImageFile": "covers/three-tales-of-horror-338.jpg",
@@ -552,9 +536,7 @@ window.BOOK_EDITS = {
     "listCoverFocusY": 0.5160716959885571
   },
   "340": {
-    "coverImageFile": "covers/travellers-by-night-340.jpg",
-    "listCoverFocusX": 0.5168067226890757,
-    "listCoverFocusY": 0.35980831044108824
+    "coverImageFile": "covers/travellers-by-night-340.jpg"
   },
   "341": {
     "listCoverFocusX": 0.7773109243697479,
@@ -563,8 +545,8 @@ window.BOOK_EDITS = {
   },
   "342": {
     "coverImageFile": "covers/black-medicine-342.jpg",
-    "listCoverFocusX": 0.25840336134453784,
-    "listCoverFocusY": 0.32857835274759967
+    "listCoverFocusX": 0.6407563025210085,
+    "listCoverFocusY": 0.6911761339221392
   },
   "343": {
     "coverImageFile": "covers/colonel-markesan-and-less-pleasant-people-343.jpg",
@@ -687,7 +669,7 @@ window.BOOK_EDITS = {
     "coverImageFile": "covers/strayers-from-sheol-368.jpg"
   },
   "369": {
-    "coverImageFile": "covers/invaders-from-the-dark-369.jpg"
+    "description": "Invaders from the Dark is a horror novel by American writer Greye La Spina. It was published by Arkham House in 1960 in an edition of 1,559 copies. It was La Spina's first and only hardcover book.\n\nThe novel was originally serialized in Weird Tales magazine. It appeared in the April, May and June, 1925 issues.\n\nThe story is set in Brooklyn, New York in the mid-1920s and deals with the widow of an Occultist, Portia Differdale, and Princess Tchernova, a wealthy and beautiful Russian werewolf.  Both women desire the same man, Owen Edwardes."
   },
   "370": {
     "listCoverFocusX": 0.40756302521008403,
@@ -824,10 +806,6 @@ window.BOOK_EDITS = {
     "listCoverFocusX": 0.49369747899159666,
     "listCoverFocusY": 0.5121840031330168
   },
-  "401": {
-    "listCoverFocusX": 0.5976890756302521,
-    "listCoverFocusY": 0.5514698294197452
-  },
   "402": {
     "coverImageFile": "covers/west-india-lights-402.jpg",
     "listCoverFocusX": 0.40021008403361347,
@@ -845,8 +823,9 @@ window.BOOK_EDITS = {
     "listCoverFocusY": 0.11125943382798839
   },
   "406": {
-    "listCoverFocusX": 0.2804621848739496,
-    "listCoverFocusY": 0.7757894329821111
+    "coverImageFile": "covers/the-hounds-of-tindalos-book-406.jpg",
+    "listCoverFocusX": 0.3319327731092437,
+    "listCoverFocusY": 0.42026547371666056
   },
   "407": {
     "listCoverFocusX": 0.5913865546218487,
