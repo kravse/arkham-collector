@@ -208,11 +208,15 @@ function renderBookTagsHtml(book) {
 
 function applyTagSearch(rawTag) {
   const tag = viewerTags.formatTagLabel(rawTag);
-  if (!tag || !searchInput) {
+  if (!tag) {
     return;
   }
 
-  searchInput.value = viewerFilters.formatTagSearchQuery(tag);
+  searchTagFilters.length = 0;
+  searchInput.value = "";
+  renderSearchChips();
+  hideTagSuggest();
+  addSearchTag(tag, { silent: true });
   updateSearchClearVisibility();
   closeBookDetail({ programmatic: true });
   renderNow();

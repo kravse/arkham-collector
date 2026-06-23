@@ -10,6 +10,9 @@ const books = applyBookTags(
 const grid = document.getElementById("grid");
 const stats = document.getElementById("stats");
 const searchInput = document.getElementById("search");
+const searchCombobox = document.getElementById("search-combobox");
+const searchChips = document.getElementById("search-chips");
+const searchTagSuggest = document.getElementById("search-tag-suggest");
 const searchClearBtn = document.getElementById("search-clear");
 const viewModeToggle = document.getElementById("view-mode-toggle");
 const sortSelect = document.getElementById("sort");
@@ -1411,9 +1414,19 @@ const viewerMode = (function () {
 /* Generated from scripts/lib/viewer-filters.js — run npm run bundle-viewer */
 
 const viewerFilters = (function () {
+  const TAG_LITERAL = "tag";
   const SAMPLER_ISSUE_TITLE_RE = /^The Arkham Sampler \(Vol\. [IV]+, No\. \d+\)$/;
   const COLLECTOR_ISSUE_TITLE_RE = /^The Arkham Collector \(No\. \d+\)$/;
   const TAG_SEARCH_PREFIX_RE = /^tag:\s*(?:"([^"]*)"|(.+))$/i;
+  const TAG_TOKEN_RE = /tag:\s*(?:"([^"]*)"|(\S+))/gi;
+  const TAG_DRAFT_RE = /^tag:\s*(?:"([^"]*)"?|(\S*))$/i;
+  const TAG_SHORTHAND_DRAFT_RE = /^tag(?:\s+(?:"([^"]*)"?|(\S*)))?$/i;
+  
+  function tagKey(tag) {
+    return String(tag || "")
+      .trim()
+      .toLowerCase();
+  }
   
   function prepareBookSearchIndex(book) {
     book._searchHaystack = [
@@ -1459,6 +1472,138 @@ const viewerFilters = (function () {
     return `tag:${text}`;
   }
   
+  function parseCompoundSearchQuery(query) {
+    const raw = String(query || "");
+    const tagTerms = [];
+    const remainder = raw.replace(TAG_TOKEN_RE, (_, quoted, unquoted) => {
+      const term = String(quoted ?? unquoted ?? "")
+        .trim()
+        .toLowerCase();
+      if (term) {
+        tagTerms.push(term);
+      }
+      return " ";
+    });
+    const textTerms = remainder
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean)
+      .map((term) => term.toLowerCase());
+  
+    return { tagTerms, textTerms };
+  }
+  
+  function serializeCompoundSearchQuery({ tagTerms = [], textTerms = [] }) {
+    const parts = [
+      ...tagTerms.map((term) => formatTagSearchQuery(term)),
+      ...textTerms,
+    ].filter(Boolean);
+    return parts.join(" ").trim();
+  }
+  
+  function isTagDraftPending(draftQuery) {
+    const text = String(draftQuery || "").trim();
+    if (!text) {
+      return false;
+    }
+    const lower = text.toLowerCase();
+    if (
+      lower.length <= TAG_LITERAL.length &&
+      TAG_LITERAL.startsWith(lower)
+    ) {
+      return true;
+    }
+    return parseTagDraftInput(text) !== null;
+  }
+  
+  function buildSearchFilter(chipTags, draftQuery) {
+    const parsed = isTagDraftPending(draftQuery)
+      ? { tagTerms: [], textTerms: [] }
+      : parseCompoundSearchQuery(draftQuery);
+    const tagTerms = [];
+    const seen = new Set();
+  
+    for (const label of chipTags || []) {
+      const term = String(label || "").trim().toLowerCase();
+      if (!term || seen.has(term)) {
+        continue;
+      }
+      seen.add(term);
+      tagTerms.push(term);
+    }
+  
+    for (const term of parsed.tagTerms) {
+      if (!seen.has(term)) {
+        seen.add(term);
+        tagTerms.push(term);
+      }
+    }
+  
+    return { tagTerms, textTerms: parsed.textTerms };
+  }
+  
+  function parseTagDraftInput(input) {
+    const text = String(input || "").trim();
+    if (TAG_DRAFT_RE.test(text)) {
+      const match = text.match(TAG_DRAFT_RE);
+      return {
+        partial: String(match[1] ?? match[2] ?? "").trim(),
+        quoted: /"/.test(text),
+      };
+    }
+    if (TAG_SHORTHAND_DRAFT_RE.test(text)) {
+      const match = text.match(TAG_SHORTHAND_DRAFT_RE);
+      return {
+        partial: String(match[1] ?? match[2] ?? "").trim(),
+        quoted: /"/.test(text.slice(TAG_LITERAL.length)),
+      };
+    }
+    return null;
+  }
+  
+  function absorbTagDraftInput(input, knownTags) {
+    const draft = parseTagDraftInput(input);
+    if (!draft) {
+      return null;
+    }
+    if (!draft.partial) {
+      return { chipLabel: null, remainder: "" };
+    }
+    const chipLabel = resolveTagFilterLabel(draft.partial, knownTags);
+    if (chipLabel) {
+      return { chipLabel, remainder: "" };
+    }
+    return {
+      chipLabel: null,
+      remainder: formatTagSearchQuery(draft.partial),
+    };
+  }
+  
+  function resolveTagFilterLabel(term, knownTags) {
+    const needle = tagKey(term);
+    if (!needle) {
+      return null;
+    }
+    for (const label of knownTags || []) {
+      if (tagKey(label) === needle) {
+        return String(label).trim().toUpperCase();
+      }
+    }
+    return null;
+  }
+  
+  function filterTagSuggestions(partial, knownTags, options = {}) {
+    const { exclude = [], limit } = options;
+    const needle = String(partial || "").trim().toLowerCase();
+    const excluded = new Set((exclude || []).map((label) => tagKey(label)));
+  
+    const matches = (knownTags || [])
+      .filter((label) => !excluded.has(tagKey(label)))
+      .filter((label) => !needle || tagKey(label).includes(needle));
+  
+    return typeof limit === "number" ? matches.slice(0, limit) : matches;
+  }
+  
   function matchesTagSearch(book, term) {
     if (!term) {
       return true;
@@ -1467,15 +1612,35 @@ const viewerFilters = (function () {
     return tags.some((tag) => String(tag).toLowerCase().includes(term));
   }
   
+  function matchesCompoundSearch(book, { tagTerms = [], textTerms = [] }) {
+    for (const term of tagTerms) {
+      if (!matchesTagSearch(book, term)) {
+        return false;
+      }
+    }
+    const haystack = book._searchHaystack || "";
+    for (const term of textTerms) {
+      if (!haystack.includes(term)) {
+        return false;
+      }
+    }
+    return true;
+  }
+  
+  function filterBooksMatchingTagTerms(books, tagTerms) {
+    const terms = (tagTerms || [])
+      .map((term) => String(term || "").trim().toLowerCase())
+      .filter(Boolean);
+    if (!terms.length) {
+      return books || [];
+    }
+    return (books || []).filter((book) =>
+      matchesCompoundSearch(book, { tagTerms: terms, textTerms: [] }),
+    );
+  }
+  
   function matchesSearch(book, query) {
-    const parsed = parseSearchQuery(query);
-    if (!parsed.term) {
-      return true;
-    }
-    if (parsed.mode === "tag") {
-      return matchesTagSearch(book, parsed.term);
-    }
-    return (book._searchHaystack || "").includes(parsed.term);
+    return matchesCompoundSearch(book, parseCompoundSearchQuery(query));
   }
   
   function isMagazineIssue(book) {
@@ -1558,7 +1723,11 @@ const viewerFilters = (function () {
       orderedIds,
       wantIds,
       searchQuery = "",
+      searchFilter,
     } = options;
+  
+    const resolvedSearchFilter =
+      searchFilter || parseCompoundSearchQuery(searchQuery);
   
     return books.filter(
       (book) =>
@@ -1571,7 +1740,7 @@ const viewerFilters = (function () {
           orderedIds,
         ) &&
         passesWantFilter(book, wantOnly, wantIds) &&
-        matchesSearch(book, searchQuery),
+        matchesCompoundSearch(book, resolvedSearchFilter),
     );
   }
   
@@ -1615,8 +1784,18 @@ const viewerFilters = (function () {
   return {
     prepareBookSearchIndex,
     parseSearchQuery,
+    parseCompoundSearchQuery,
+    serializeCompoundSearchQuery,
+    buildSearchFilter,
+    isTagDraftPending,
+    parseTagDraftInput,
+    absorbTagDraftInput,
+    resolveTagFilterLabel,
+    filterTagSuggestions,
     formatTagSearchQuery,
     matchesTagSearch,
+    matchesCompoundSearch,
+    filterBooksMatchingTagTerms,
     matchesSearch,
     isMagazineIssue,
     passesHiddenVisibility,
@@ -1661,14 +1840,14 @@ const viewerTags = (function () {
     return normalizeTag(tag) || String(tag || "").trim().toUpperCase();
   }
   
-  function collectAllKnownTags(tagsByBookId) {
+  function collectTagsFromBooks(books) {
     const seen = new Set();
     const tags = [];
-    for (const bookTags of Object.values(tagsByBookId || {})) {
-      if (!Array.isArray(bookTags)) {
+    for (const book of books || []) {
+      if (!Array.isArray(book?.tags)) {
         continue;
       }
-      for (const tag of bookTags) {
+      for (const tag of book.tags) {
         const label = formatTagLabel(tag);
         if (!label) {
           continue;
@@ -1683,11 +1862,19 @@ const viewerTags = (function () {
     }
     return tags.sort((a, b) => tagKey(a).localeCompare(tagKey(b)));
   }
+  
+  function collectAllKnownTags(tagsByBookId) {
+    const books = Object.values(tagsByBookId || {}).map((bookTags) => ({
+      tags: bookTags,
+    }));
+    return collectTagsFromBooks(books);
+  }
   return {
     tagKey,
     normalizeTag,
     formatTagLabel,
     collectAllKnownTags,
+    collectTagsFromBooks,
   };
 })();
 
@@ -2505,6 +2692,333 @@ const viewerSort = (function () {
 })();
 
 
+/* Search chips, tag autocomplete, and compound query state */
+
+const searchTagFilters = [];
+let searchSuggestIndex = -1;
+let searchRenderTimer = null;
+
+function getKnownSearchTags() {
+  const tagTerms = searchTagFilters.map((label) =>
+    String(label || "").trim().toLowerCase(),
+  );
+  const matchingBooks = viewerFilters.filterBooksMatchingTagTerms(
+    getViewBooksWithoutSearch(),
+    tagTerms,
+  );
+  return viewerTags.collectTagsFromBooks(matchingBooks);
+}
+
+function getSearchFilter() {
+  return viewerFilters.buildSearchFilter(
+    searchTagFilters,
+    searchInput.value,
+  );
+}
+
+function hasActiveSearch() {
+  if (searchTagFilters.length > 0) {
+    return true;
+  }
+  const draft = searchInput.value.trim();
+  return Boolean(draft) && !viewerFilters.isTagDraftPending(draft);
+}
+
+function updateSearchClearVisibility() {
+  searchClearBtn.hidden = !hasActiveSearch();
+}
+
+function renderNow() {
+  if (searchRenderTimer) {
+    clearTimeout(searchRenderTimer);
+    searchRenderTimer = null;
+  }
+  render();
+}
+
+function debouncedRender() {
+  if (searchRenderTimer) {
+    clearTimeout(searchRenderTimer);
+  }
+  searchRenderTimer = setTimeout(() => {
+    searchRenderTimer = null;
+    render();
+  }, 200);
+}
+
+function renderSearchChips() {
+  if (!searchChips) {
+    return;
+  }
+  searchChips.innerHTML = searchTagFilters
+    .map((label, index) => {
+      const safe = viewerCardHtml.escapeHtml(label);
+      return `<span class="search-tag-chip"><span class="search-tag-chip-label">${safe}</span><button type="button" class="search-tag-chip-remove" data-search-tag-index="${index}" aria-label="Remove tag ${safe}">&times;</button></span>`;
+    })
+    .join("");
+}
+
+function hideTagSuggest() {
+  searchSuggestIndex = -1;
+  searchTagSuggest.hidden = true;
+  searchTagSuggest.innerHTML = "";
+  searchInput.setAttribute("aria-expanded", "false");
+}
+
+function getTagSuggestItems() {
+  const draft = viewerFilters.parseTagDraftInput(searchInput.value);
+  if (!draft) {
+    return [];
+  }
+  return viewerFilters.filterTagSuggestions(draft.partial, getKnownSearchTags(), {
+    exclude: searchTagFilters,
+  });
+}
+
+function renderTagSuggest() {
+  const items = getTagSuggestItems();
+  if (!items.length) {
+    hideTagSuggest();
+    return;
+  }
+
+  searchTagSuggest.innerHTML = items
+    .map((label, index) => {
+      const safe = viewerCardHtml.escapeHtml(label);
+      const activeClass = index === searchSuggestIndex ? " active" : "";
+      return `<li class="search-tag-suggest-item${activeClass}" role="option" data-suggest-index="${index}" aria-selected="${index === searchSuggestIndex}">${safe}</li>`;
+    })
+    .join("");
+  searchTagSuggest.hidden = false;
+  searchInput.setAttribute("aria-expanded", "true");
+}
+
+function updateTagSuggest() {
+  const draft = viewerFilters.parseTagDraftInput(searchInput.value);
+  if (!draft) {
+    hideTagSuggest();
+    return;
+  }
+  if (searchSuggestIndex >= getTagSuggestItems().length) {
+    searchSuggestIndex = -1;
+  }
+  renderTagSuggest();
+}
+
+function addSearchTag(label, options = {}) {
+  const known = getKnownSearchTags();
+  const canonical =
+    viewerFilters.resolveTagFilterLabel(label, known) ||
+    viewerTags.formatTagLabel(label);
+  if (!canonical) {
+    return false;
+  }
+  if (
+    searchTagFilters.some(
+      (entry) => viewerTags.tagKey(entry) === viewerTags.tagKey(canonical),
+    )
+  ) {
+    return false;
+  }
+  searchTagFilters.push(canonical);
+  renderSearchChips();
+  if (!options.silent) {
+    updateSearchClearVisibility();
+    updateTagSuggest();
+    debouncedRender();
+  }
+  return true;
+}
+
+function removeSearchTagAt(index) {
+  if (index < 0 || index >= searchTagFilters.length) {
+    return;
+  }
+  searchTagFilters.splice(index, 1);
+  renderSearchChips();
+  updateSearchClearVisibility();
+  updateTagSuggest();
+  renderNow();
+}
+
+function absorbSearchInputTokens() {
+  const trimmed = searchInput.value.trim();
+  const draftAbsorbed = viewerFilters.absorbTagDraftInput(
+    trimmed,
+    getKnownSearchTags(),
+  );
+  if (draftAbsorbed) {
+    if (draftAbsorbed.chipLabel) {
+      addSearchTag(draftAbsorbed.chipLabel, { silent: true });
+    }
+    searchInput.value = draftAbsorbed.remainder;
+    return;
+  }
+
+  const parsed = viewerFilters.parseCompoundSearchQuery(searchInput.value);
+  const known = getKnownSearchTags();
+  const unknownTagParts = [];
+
+  for (const term of parsed.tagTerms) {
+    const label = viewerFilters.resolveTagFilterLabel(term, known);
+    if (label) {
+      addSearchTag(label, { silent: true });
+    } else {
+      unknownTagParts.push(viewerFilters.formatTagSearchQuery(term));
+    }
+  }
+
+  searchInput.value = [...unknownTagParts, ...parsed.textTerms]
+    .join(" ")
+    .trim();
+}
+
+function pickTagSuggestion(index) {
+  const items = getTagSuggestItems();
+  const label = items[index];
+  if (!label) {
+    return;
+  }
+  addSearchTag(label, { silent: true });
+  searchInput.value = "";
+  hideTagSuggest();
+  updateSearchClearVisibility();
+  renderNow();
+}
+
+function clearSearchAll() {
+  searchTagFilters.length = 0;
+  searchInput.value = "";
+  renderSearchChips();
+  hideTagSuggest();
+  updateSearchClearVisibility();
+  renderNow();
+}
+
+function onSearchInput() {
+  updateSearchClearVisibility();
+  updateTagSuggest();
+  debouncedRender();
+}
+
+function onSearchCommit() {
+  absorbSearchInputTokens();
+  hideTagSuggest();
+  updateSearchClearVisibility();
+  renderNow();
+}
+
+searchChips.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-search-tag-index]");
+  if (!button) {
+    return;
+  }
+  removeSearchTagAt(Number(button.dataset.searchTagIndex));
+});
+
+searchTagSuggest.addEventListener("mousedown", (event) => {
+  const item = event.target.closest("[data-suggest-index]");
+  if (!item) {
+    return;
+  }
+  event.preventDefault();
+  pickTagSuggestion(Number(item.dataset.suggestIndex));
+});
+
+searchInput.addEventListener("keydown", (event) => {
+  const items = getTagSuggestItems();
+  const suggestOpen = items.length > 0 && !searchTagSuggest.hidden;
+
+  if (event.key === "Backspace" && !searchInput.value && searchTagFilters.length) {
+    removeSearchTagAt(searchTagFilters.length - 1);
+    return;
+  }
+
+  if (event.key === " " && !suggestOpen) {
+    const draft = viewerFilters.parseTagDraftInput(searchInput.value.trim());
+    if (draft?.partial) {
+      const label = viewerFilters.resolveTagFilterLabel(
+        draft.partial,
+        getKnownSearchTags(),
+      );
+      if (label) {
+        event.preventDefault();
+        addSearchTag(label, { silent: true });
+        searchInput.value = "";
+        updateSearchClearVisibility();
+        updateTagSuggest();
+        renderNow();
+      }
+    }
+    return;
+  }
+
+  if (!suggestOpen) {
+    if (event.key === "Escape") {
+      hideTagSuggest();
+    }
+    return;
+  }
+
+  if (event.key === "ArrowDown") {
+    event.preventDefault();
+    searchSuggestIndex = (searchSuggestIndex + 1) % items.length;
+    renderTagSuggest();
+    return;
+  }
+
+  if (event.key === "ArrowUp") {
+    event.preventDefault();
+    searchSuggestIndex =
+      searchSuggestIndex <= 0 ? items.length - 1 : searchSuggestIndex - 1;
+    renderTagSuggest();
+    return;
+  }
+
+  if (event.key === "Enter") {
+    event.preventDefault();
+    if (searchSuggestIndex >= 0) {
+      pickTagSuggestion(searchSuggestIndex);
+    } else {
+      onSearchCommit();
+    }
+    return;
+  }
+
+  if (event.key === "Escape") {
+    event.preventDefault();
+    hideTagSuggest();
+  }
+});
+
+searchInput.addEventListener("blur", () => {
+  window.setTimeout(() => {
+    absorbSearchInputTokens();
+    hideTagSuggest();
+    updateSearchClearVisibility();
+    renderNow();
+  }, 120);
+});
+
+searchClearBtn.addEventListener("click", () => {
+  clearSearchAll();
+  searchInput.focus();
+});
+
+searchInput.addEventListener("input", onSearchInput);
+searchInput.addEventListener("search", onSearchCommit);
+searchInput.addEventListener("change", onSearchCommit);
+
+document.addEventListener("click", (event) => {
+  if (
+    !searchTagSuggest.hidden &&
+    !event.target.closest(".search-wrap")
+  ) {
+    hideTagSuggest();
+  }
+});
+
+
 /* Sort, search, filters, and visible book list */
 
 let sortedActiveCache = { mode: null, books: null };
@@ -2603,6 +3117,21 @@ function renderStats(visible, all) {
   `;
 }
 
+function getViewBooksWithoutSearch() {
+  return viewerFilters.filterVisibleBooks(getSortedActiveBooks(), {
+    hiddenOnly,
+    showHidden: showHiddenInput.checked,
+    showMagazines,
+    mycroftFilterMode,
+    collectionFilterMode,
+    wantOnly,
+    collectedIds: activeCollectionIds(),
+    orderedIds,
+    wantIds,
+    searchFilter: { tagTerms: [], textTerms: [] },
+  });
+}
+
 function getVisibleBooks() {
   return viewerFilters.filterVisibleBooks(getSortedActiveBooks(), {
     hiddenOnly,
@@ -2614,7 +3143,7 @@ function getVisibleBooks() {
     collectedIds: activeCollectionIds(),
     orderedIds,
     wantIds,
-    searchQuery: searchInput.value.trim(),
+    searchFilter: getSearchFilter(),
   });
 }
 
@@ -3098,24 +3627,25 @@ function render() {
 
   if (!visible.length) {
     let message = "No books match your search.";
+    const activeSearch = hasActiveSearch();
     if (isCollectionAllFilter()) {
-      message = searchInput.value.trim()
+      message = activeSearch
         ? "No books in your collection match your search."
         : "Your collection is empty — open a book and tap Collect to add it.";
     } else if (isOrderedFilterActive()) {
-      message = searchInput.value.trim()
+      message = activeSearch
         ? "No on-order books match your search."
         : "No on-order books to show.";
     } else if (hiddenOnly) {
-      message = searchInput.value.trim()
+      message = activeSearch
         ? "No hidden books match your search."
         : "No hidden books to show.";
     } else if (isMycroftOnlyFilter()) {
-      message = searchInput.value.trim()
+      message = activeSearch
         ? "No Mycroft & Moran books match your search."
         : "No Mycroft & Moran books to show.";
     } else if (wantOnly) {
-      message = searchInput.value.trim()
+      message = activeSearch
         ? "No wanted books match your search."
         : "Your want list is empty — open a book and tap Want to add it.";
     }
@@ -4276,11 +4806,15 @@ function renderBookTagsHtml(book) {
 
 function applyTagSearch(rawTag) {
   const tag = viewerTags.formatTagLabel(rawTag);
-  if (!tag || !searchInput) {
+  if (!tag) {
     return;
   }
 
-  searchInput.value = viewerFilters.formatTagSearchQuery(tag);
+  searchTagFilters.length = 0;
+  searchInput.value = "";
+  renderSearchChips();
+  hideTagSuggest();
+  addSearchTag(tag, { silent: true });
   updateSearchClearVisibility();
   closeBookDetail({ programmatic: true });
   renderNow();
@@ -5061,49 +5595,6 @@ document.addEventListener("keydown", (event) => {
   }
 });
 
-function updateSearchClearVisibility() {
-  searchClearBtn.hidden = !searchInput.value;
-}
-
-let searchRenderTimer = null;
-
-function renderNow() {
-  if (searchRenderTimer) {
-    clearTimeout(searchRenderTimer);
-    searchRenderTimer = null;
-  }
-  render();
-}
-
-function debouncedRender() {
-  if (searchRenderTimer) {
-    clearTimeout(searchRenderTimer);
-  }
-  searchRenderTimer = setTimeout(() => {
-    searchRenderTimer = null;
-    render();
-  }, 200);
-}
-
-function onSearchInput() {
-  updateSearchClearVisibility();
-  debouncedRender();
-}
-
-function onSearchCommit() {
-  updateSearchClearVisibility();
-  renderNow();
-}
-
-searchClearBtn.addEventListener("click", () => {
-  searchInput.value = "";
-  searchInput.focus();
-  onSearchCommit();
-});
-
-searchInput.addEventListener("input", onSearchInput);
-searchInput.addEventListener("search", onSearchCommit);
-searchInput.addEventListener("change", onSearchCommit);
 sortSelect.addEventListener("change", onSortChange);
 showHiddenInput.addEventListener("change", () => {
   refreshBookOrderDialogIfOpen();

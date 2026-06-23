@@ -96,6 +96,21 @@ function renderStats(visible, all) {
   `;
 }
 
+function getViewBooksWithoutSearch() {
+  return viewerFilters.filterVisibleBooks(getSortedActiveBooks(), {
+    hiddenOnly,
+    showHidden: showHiddenInput.checked,
+    showMagazines,
+    mycroftFilterMode,
+    collectionFilterMode,
+    wantOnly,
+    collectedIds: activeCollectionIds(),
+    orderedIds,
+    wantIds,
+    searchFilter: { tagTerms: [], textTerms: [] },
+  });
+}
+
 function getVisibleBooks() {
   return viewerFilters.filterVisibleBooks(getSortedActiveBooks(), {
     hiddenOnly,
@@ -107,6 +122,6 @@ function getVisibleBooks() {
     collectedIds: activeCollectionIds(),
     orderedIds,
     wantIds,
-    searchQuery: searchInput.value.trim(),
+    searchFilter: getSearchFilter(),
   });
 }

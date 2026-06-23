@@ -23,14 +23,14 @@ const viewerTags = (function () {
     return normalizeTag(tag) || String(tag || "").trim().toUpperCase();
   }
   
-  function collectAllKnownTags(tagsByBookId) {
+  function collectTagsFromBooks(books) {
     const seen = new Set();
     const tags = [];
-    for (const bookTags of Object.values(tagsByBookId || {})) {
-      if (!Array.isArray(bookTags)) {
+    for (const book of books || []) {
+      if (!Array.isArray(book?.tags)) {
         continue;
       }
-      for (const tag of bookTags) {
+      for (const tag of book.tags) {
         const label = formatTagLabel(tag);
         if (!label) {
           continue;
@@ -45,10 +45,18 @@ const viewerTags = (function () {
     }
     return tags.sort((a, b) => tagKey(a).localeCompare(tagKey(b)));
   }
+  
+  function collectAllKnownTags(tagsByBookId) {
+    const books = Object.values(tagsByBookId || {}).map((bookTags) => ({
+      tags: bookTags,
+    }));
+    return collectTagsFromBooks(books);
+  }
   return {
     tagKey,
     normalizeTag,
     formatTagLabel,
     collectAllKnownTags,
+    collectTagsFromBooks,
   };
 })();

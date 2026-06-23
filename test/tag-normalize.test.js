@@ -5,6 +5,7 @@ const {
   normalizeTag,
   formatTagLabel,
   collectAllKnownTags,
+  collectTagsFromBooks,
   tagKey,
 } = require("../scripts/lib/tag-normalize");
 
@@ -27,6 +28,17 @@ test("collectAllKnownTags dedupes case-insensitively across books", () => {
       2: ["signed", "Reprint"],
     }),
     ["ARKHAM", "REPRINT", "SIGNED"],
+  );
+});
+
+test("collectTagsFromBooks dedupes tags on book objects", () => {
+  assert.deepEqual(
+    collectTagsFromBooks([
+      { tags: ["Horror", "Signed"] },
+      { tags: ["horror"] },
+      { tags: null },
+    ]),
+    ["HORROR", "SIGNED"],
   );
 });
 

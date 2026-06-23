@@ -477,24 +477,25 @@ function render() {
 
   if (!visible.length) {
     let message = "No books match your search.";
+    const activeSearch = hasActiveSearch();
     if (isCollectionAllFilter()) {
-      message = searchInput.value.trim()
+      message = activeSearch
         ? "No books in your collection match your search."
         : "Your collection is empty — open a book and tap Collect to add it.";
     } else if (isOrderedFilterActive()) {
-      message = searchInput.value.trim()
+      message = activeSearch
         ? "No on-order books match your search."
         : "No on-order books to show.";
     } else if (hiddenOnly) {
-      message = searchInput.value.trim()
+      message = activeSearch
         ? "No hidden books match your search."
         : "No hidden books to show.";
     } else if (isMycroftOnlyFilter()) {
-      message = searchInput.value.trim()
+      message = activeSearch
         ? "No Mycroft & Moran books match your search."
         : "No Mycroft & Moran books to show.";
     } else if (wantOnly) {
-      message = searchInput.value.trim()
+      message = activeSearch
         ? "No wanted books match your search."
         : "Your want list is empty — open a book and tap Want to add it.";
     }

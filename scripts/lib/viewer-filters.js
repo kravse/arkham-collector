@@ -1,6 +1,16 @@
+const TAG_LITERAL = "tag";
 const SAMPLER_ISSUE_TITLE_RE = /^The Arkham Sampler \(Vol\. [IV]+, No\. \d+\)$/;
 const COLLECTOR_ISSUE_TITLE_RE = /^The Arkham Collector \(No\. \d+\)$/;
 const TAG_SEARCH_PREFIX_RE = /^tag:\s*(?:"([^"]*)"|(.+))$/i;
+const TAG_TOKEN_RE = /tag:\s*(?:"([^"]*)"|(\S+))/gi;
+const TAG_DRAFT_RE = /^tag:\s*(?:"([^"]*)"?|(\S*))$/i;
+const TAG_SHORTHAND_DRAFT_RE = /^tag(?:\s+(?:"([^"]*)"?|(\S*)))?$/i;
+
+function tagKey(tag) {
+  return String(tag || "")
+    .trim()
+    .toLowerCase();
+}
 
 function prepareBookSearchIndex(book) {
   book._searchHaystack = [
@@ -46,6 +56,138 @@ function formatTagSearchQuery(tag) {
   return `tag:${text}`;
 }
 
+function parseCompoundSearchQuery(query) {
+  const raw = String(query || "");
+  const tagTerms = [];
+  const remainder = raw.replace(TAG_TOKEN_RE, (_, quoted, unquoted) => {
+    const term = String(quoted ?? unquoted ?? "")
+      .trim()
+      .toLowerCase();
+    if (term) {
+      tagTerms.push(term);
+    }
+    return " ";
+  });
+  const textTerms = remainder
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((term) => term.toLowerCase());
+
+  return { tagTerms, textTerms };
+}
+
+function serializeCompoundSearchQuery({ tagTerms = [], textTerms = [] }) {
+  const parts = [
+    ...tagTerms.map((term) => formatTagSearchQuery(term)),
+    ...textTerms,
+  ].filter(Boolean);
+  return parts.join(" ").trim();
+}
+
+function isTagDraftPending(draftQuery) {
+  const text = String(draftQuery || "").trim();
+  if (!text) {
+    return false;
+  }
+  const lower = text.toLowerCase();
+  if (
+    lower.length <= TAG_LITERAL.length &&
+    TAG_LITERAL.startsWith(lower)
+  ) {
+    return true;
+  }
+  return parseTagDraftInput(text) !== null;
+}
+
+function buildSearchFilter(chipTags, draftQuery) {
+  const parsed = isTagDraftPending(draftQuery)
+    ? { tagTerms: [], textTerms: [] }
+    : parseCompoundSearchQuery(draftQuery);
+  const tagTerms = [];
+  const seen = new Set();
+
+  for (const label of chipTags || []) {
+    const term = String(label || "").trim().toLowerCase();
+    if (!term || seen.has(term)) {
+      continue;
+    }
+    seen.add(term);
+    tagTerms.push(term);
+  }
+
+  for (const term of parsed.tagTerms) {
+    if (!seen.has(term)) {
+      seen.add(term);
+      tagTerms.push(term);
+    }
+  }
+
+  return { tagTerms, textTerms: parsed.textTerms };
+}
+
+function parseTagDraftInput(input) {
+  const text = String(input || "").trim();
+  if (TAG_DRAFT_RE.test(text)) {
+    const match = text.match(TAG_DRAFT_RE);
+    return {
+      partial: String(match[1] ?? match[2] ?? "").trim(),
+      quoted: /"/.test(text),
+    };
+  }
+  if (TAG_SHORTHAND_DRAFT_RE.test(text)) {
+    const match = text.match(TAG_SHORTHAND_DRAFT_RE);
+    return {
+      partial: String(match[1] ?? match[2] ?? "").trim(),
+      quoted: /"/.test(text.slice(TAG_LITERAL.length)),
+    };
+  }
+  return null;
+}
+
+function absorbTagDraftInput(input, knownTags) {
+  const draft = parseTagDraftInput(input);
+  if (!draft) {
+    return null;
+  }
+  if (!draft.partial) {
+    return { chipLabel: null, remainder: "" };
+  }
+  const chipLabel = resolveTagFilterLabel(draft.partial, knownTags);
+  if (chipLabel) {
+    return { chipLabel, remainder: "" };
+  }
+  return {
+    chipLabel: null,
+    remainder: formatTagSearchQuery(draft.partial),
+  };
+}
+
+function resolveTagFilterLabel(term, knownTags) {
+  const needle = tagKey(term);
+  if (!needle) {
+    return null;
+  }
+  for (const label of knownTags || []) {
+    if (tagKey(label) === needle) {
+      return String(label).trim().toUpperCase();
+    }
+  }
+  return null;
+}
+
+function filterTagSuggestions(partial, knownTags, options = {}) {
+  const { exclude = [], limit } = options;
+  const needle = String(partial || "").trim().toLowerCase();
+  const excluded = new Set((exclude || []).map((label) => tagKey(label)));
+
+  const matches = (knownTags || [])
+    .filter((label) => !excluded.has(tagKey(label)))
+    .filter((label) => !needle || tagKey(label).includes(needle));
+
+  return typeof limit === "number" ? matches.slice(0, limit) : matches;
+}
+
 function matchesTagSearch(book, term) {
   if (!term) {
     return true;
@@ -54,15 +196,35 @@ function matchesTagSearch(book, term) {
   return tags.some((tag) => String(tag).toLowerCase().includes(term));
 }
 
+function matchesCompoundSearch(book, { tagTerms = [], textTerms = [] }) {
+  for (const term of tagTerms) {
+    if (!matchesTagSearch(book, term)) {
+      return false;
+    }
+  }
+  const haystack = book._searchHaystack || "";
+  for (const term of textTerms) {
+    if (!haystack.includes(term)) {
+      return false;
+    }
+  }
+  return true;
+}
+
+function filterBooksMatchingTagTerms(books, tagTerms) {
+  const terms = (tagTerms || [])
+    .map((term) => String(term || "").trim().toLowerCase())
+    .filter(Boolean);
+  if (!terms.length) {
+    return books || [];
+  }
+  return (books || []).filter((book) =>
+    matchesCompoundSearch(book, { tagTerms: terms, textTerms: [] }),
+  );
+}
+
 function matchesSearch(book, query) {
-  const parsed = parseSearchQuery(query);
-  if (!parsed.term) {
-    return true;
-  }
-  if (parsed.mode === "tag") {
-    return matchesTagSearch(book, parsed.term);
-  }
-  return (book._searchHaystack || "").includes(parsed.term);
+  return matchesCompoundSearch(book, parseCompoundSearchQuery(query));
 }
 
 function isMagazineIssue(book) {
@@ -145,7 +307,11 @@ function filterVisibleBooks(books, options) {
     orderedIds,
     wantIds,
     searchQuery = "",
+    searchFilter,
   } = options;
+
+  const resolvedSearchFilter =
+    searchFilter || parseCompoundSearchQuery(searchQuery);
 
   return books.filter(
     (book) =>
@@ -158,7 +324,7 @@ function filterVisibleBooks(books, options) {
         orderedIds,
       ) &&
       passesWantFilter(book, wantOnly, wantIds) &&
-      matchesSearch(book, searchQuery),
+      matchesCompoundSearch(book, resolvedSearchFilter),
   );
 }
 
@@ -203,8 +369,18 @@ function pickRandomBook(books) {
 module.exports = {
   prepareBookSearchIndex,
   parseSearchQuery,
+  parseCompoundSearchQuery,
+  serializeCompoundSearchQuery,
+  buildSearchFilter,
+  isTagDraftPending,
+  parseTagDraftInput,
+  absorbTagDraftInput,
+  resolveTagFilterLabel,
+  filterTagSuggestions,
   formatTagSearchQuery,
   matchesTagSearch,
+  matchesCompoundSearch,
+  filterBooksMatchingTagTerms,
   matchesSearch,
   isMagazineIssue,
   passesHiddenVisibility,

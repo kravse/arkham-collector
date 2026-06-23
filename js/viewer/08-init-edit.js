@@ -218,49 +218,6 @@ document.addEventListener("keydown", (event) => {
   }
 });
 
-function updateSearchClearVisibility() {
-  searchClearBtn.hidden = !searchInput.value;
-}
-
-let searchRenderTimer = null;
-
-function renderNow() {
-  if (searchRenderTimer) {
-    clearTimeout(searchRenderTimer);
-    searchRenderTimer = null;
-  }
-  render();
-}
-
-function debouncedRender() {
-  if (searchRenderTimer) {
-    clearTimeout(searchRenderTimer);
-  }
-  searchRenderTimer = setTimeout(() => {
-    searchRenderTimer = null;
-    render();
-  }, 200);
-}
-
-function onSearchInput() {
-  updateSearchClearVisibility();
-  debouncedRender();
-}
-
-function onSearchCommit() {
-  updateSearchClearVisibility();
-  renderNow();
-}
-
-searchClearBtn.addEventListener("click", () => {
-  searchInput.value = "";
-  searchInput.focus();
-  onSearchCommit();
-});
-
-searchInput.addEventListener("input", onSearchInput);
-searchInput.addEventListener("search", onSearchCommit);
-searchInput.addEventListener("change", onSearchCommit);
 sortSelect.addEventListener("change", onSortChange);
 showHiddenInput.addEventListener("change", () => {
   refreshBookOrderDialogIfOpen();

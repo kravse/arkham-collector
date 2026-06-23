@@ -70,6 +70,10 @@ const PARTS = [
     title: "Shared sort helpers (generated from scripts/lib/viewer-sort.js)",
   },
   {
+    file: "04-search.js",
+    title: "Search chips, tag autocomplete, and compound query",
+  },
+  {
     file: "04-catalog.js",
     title: "Sort, search, filters, and visible book list",
   },

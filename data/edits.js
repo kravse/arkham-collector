@@ -879,8 +879,8 @@ window.BOOK_EDITS = {
     "listCoverFocusY": 0.6467837176391172
   },
   "414": {
-    "listCoverFocusX": 0.41386554621848737,
-    "listCoverFocusY": 0.20628494091879737
+    "listCoverFocusX": 0.47478991596638653,
+    "listCoverFocusY": 0.2092287147311767
   },
   "415": {
     "coverImageFile": "covers/the-eye-and-the-finger-415.jpg",

@@ -138,12 +138,28 @@
       <div class="controls">
         <div class="search-row">
           <div class="search-wrap">
-            <input
-              id="search"
-              type="search"
-              placeholder="Search title, author, cover artist, date…"
-              aria-label="Search books"
-            />
+            <div class="search-combobox" id="search-combobox">
+              <div
+                class="search-chips"
+                id="search-chips"
+                aria-label="Search tags"
+              ></div>
+              <input
+                id="search"
+                type="search"
+                placeholder="Search title, author, cover artist, date…"
+                aria-label="Search books"
+                aria-autocomplete="list"
+                aria-controls="search-tag-suggest"
+                aria-expanded="false"
+              />
+            </div>
+            <ul
+              id="search-tag-suggest"
+              class="search-tag-suggest"
+              role="listbox"
+              hidden
+            ></ul>
             <button
               type="button"
               id="search-clear"

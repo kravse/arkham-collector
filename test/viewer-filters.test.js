@@ -2,10 +2,23 @@ const { test } = require("node:test");
 const assert = require("node:assert/strict");
 
 const {
+  collectTagsFromBooks,
+} = require("../scripts/lib/tag-normalize");
+
+const {
   prepareBookSearchIndex,
   parseSearchQuery,
+  parseCompoundSearchQuery,
+  buildSearchFilter,
+  isTagDraftPending,
+  parseTagDraftInput,
+  absorbTagDraftInput,
+  resolveTagFilterLabel,
+  filterTagSuggestions,
   formatTagSearchQuery,
   matchesSearch,
+  matchesCompoundSearch,
+  filterBooksMatchingTagTerms,
   matchesTagSearch,
   isMagazineIssue,
   passesHiddenVisibility,
@@ -61,6 +74,192 @@ test("matchesSearch ignores tags unless query uses tag: prefix", () => {
   assert.equal(matchesSearch(entry, "tag:cthulhu"), true);
   assert.equal(matchesSearch(entry, 'tag:"Cthulhu Mythos"'), true);
   assert.equal(matchesSearch(entry, "tag:signed"), false);
+});
+
+test("parseCompoundSearchQuery splits multiple tags and text terms", () => {
+  assert.deepEqual(
+    parseCompoundSearchQuery('tag:"cthulhu mythos" tag:fantasy 1950s'),
+    {
+      tagTerms: ["cthulhu mythos", "fantasy"],
+      textTerms: ["1950s"],
+    },
+  );
+  assert.deepEqual(parseCompoundSearchQuery("derleth 1950s"), {
+    tagTerms: [],
+    textTerms: ["derleth", "1950s"],
+  });
+});
+
+test("matchesCompoundSearch requires all tag and text terms", () => {
+  const entry = book(4, {
+    title: "Something from 1950",
+    publicationDate: "1950",
+    tags: ["FANTASY", "CTHULHU MYTHOS"],
+  });
+
+  assert.equal(
+    matchesCompoundSearch(entry, {
+      tagTerms: ["fantasy", "cthulhu mythos"],
+      textTerms: ["1950"],
+    }),
+    true,
+  );
+  assert.equal(
+    matchesCompoundSearch(entry, {
+      tagTerms: ["fantasy", "horror"],
+      textTerms: ["1950"],
+    }),
+    false,
+  );
+  assert.equal(
+    matchesCompoundSearch(entry, {
+      tagTerms: ["fantasy"],
+      textTerms: ["1950", "missing"],
+    }),
+    false,
+  );
+});
+
+test("filterBooksMatchingTagTerms keeps books with every tag term", () => {
+  const books = [
+    { id: 1, tags: ["ESSAYS", "HORROR"] },
+    { id: 2, tags: ["ESSAYS"] },
+    { id: 3, tags: ["HORROR"] },
+  ];
+
+  assert.deepEqual(
+    filterBooksMatchingTagTerms(books, ["essays"]).map((book) => book.id),
+    [1, 2],
+  );
+  assert.deepEqual(
+    filterBooksMatchingTagTerms(books, ["essays", "horror"]).map(
+      (book) => book.id,
+    ),
+    [1],
+  );
+  assert.deepEqual(filterBooksMatchingTagTerms(books, []), books);
+});
+
+test("tag suggestions can be scoped to books matching selected tag chips", () => {
+  const books = filterBooksMatchingTagTerms(
+    [
+      { tags: ["ESSAYS", "HORROR"] },
+      { tags: ["ESSAYS", "FANTASY"] },
+      { tags: ["HORROR"] },
+    ],
+    ["essays"],
+  );
+  const known = collectTagsFromBooks(books);
+  assert.deepEqual(known, ["ESSAYS", "FANTASY", "HORROR"]);
+  assert.deepEqual(
+    filterTagSuggestions("", known, { exclude: ["ESSAYS"] }),
+    ["FANTASY", "HORROR"],
+  );
+});
+
+test("buildSearchFilter merges chip tags with draft query", () => {
+  assert.deepEqual(
+    buildSearchFilter(["FANTASY"], 'tag:"cthulhu mythos" 1950s'),
+    {
+      tagTerms: ["fantasy", "cthulhu mythos"],
+      textTerms: ["1950s"],
+    },
+  );
+});
+
+test("isTagDraftPending suppresses search while typing tag or tag:", () => {
+  assert.equal(isTagDraftPending("t"), true);
+  assert.equal(isTagDraftPending("T"), true);
+  assert.equal(isTagDraftPending("ta"), true);
+  assert.equal(isTagDraftPending("tag"), true);
+  assert.equal(isTagDraftPending("tag:"), true);
+  assert.equal(isTagDraftPending('tag:"cth'), true);
+  assert.equal(isTagDraftPending("tag:horror"), true);
+  assert.equal(isTagDraftPending("tag horror"), true);
+  assert.equal(isTagDraftPending("th"), false);
+  assert.equal(isTagDraftPending("tal"), false);
+  assert.equal(isTagDraftPending("tags"), false);
+  assert.equal(isTagDraftPending("derleth"), false);
+  assert.equal(isTagDraftPending(""), false);
+});
+
+test("buildSearchFilter ignores pending tag draft but keeps chips", () => {
+  assert.deepEqual(buildSearchFilter([], "ta"), {
+    tagTerms: [],
+    textTerms: [],
+  });
+  assert.deepEqual(buildSearchFilter(["FANTASY"], "tag:"), {
+    tagTerms: ["fantasy"],
+    textTerms: [],
+  });
+  assert.deepEqual(buildSearchFilter([], "th"), {
+    tagTerms: [],
+    textTerms: ["th"],
+  });
+});
+
+test("resolveTagFilterLabel and filterTagSuggestions use known tags only", () => {
+  const known = ["HORROR", "CTHULHU MYTHOS", "FANTASY"];
+  assert.equal(resolveTagFilterLabel("fantasy", known), "FANTASY");
+  assert.equal(resolveTagFilterLabel("signed", known), null);
+  assert.deepEqual(filterTagSuggestions("cth", known), [
+    "CTHULHU MYTHOS",
+  ]);
+  assert.deepEqual(
+    filterTagSuggestions("cth", known, { exclude: ["CTHULHU MYTHOS"] }),
+    [],
+  );
+  assert.deepEqual(filterTagSuggestions("", known), known);
+  assert.deepEqual(filterTagSuggestions("", known, { limit: 2 }), [
+    "HORROR",
+    "CTHULHU MYTHOS",
+  ]);
+});
+
+test("parseTagDraftInput detects tag autocomplete prefix", () => {
+  assert.deepEqual(parseTagDraftInput("tag"), {
+    partial: "",
+    quoted: false,
+  });
+  assert.deepEqual(parseTagDraftInput("TAG"), {
+    partial: "",
+    quoted: false,
+  });
+  assert.deepEqual(parseTagDraftInput("tag horror"), {
+    partial: "horror",
+    quoted: false,
+  });
+  assert.deepEqual(parseTagDraftInput('tag:"cthul'), {
+    partial: "cthul",
+    quoted: true,
+  });
+  assert.deepEqual(parseTagDraftInput("tag:fant"), {
+    partial: "fant",
+    quoted: false,
+  });
+  assert.equal(parseTagDraftInput("tags"), null);
+  assert.equal(parseTagDraftInput("1950s"), null);
+});
+
+test("absorbTagDraftInput promotes known tags and clears bare tag draft", () => {
+  const known = ["HORROR", "ESSAYS"];
+  assert.deepEqual(absorbTagDraftInput("tag", known), {
+    chipLabel: null,
+    remainder: "",
+  });
+  assert.deepEqual(absorbTagDraftInput("tag essays", known), {
+    chipLabel: "ESSAYS",
+    remainder: "",
+  });
+  assert.deepEqual(absorbTagDraftInput("tag:essays", known), {
+    chipLabel: "ESSAYS",
+    remainder: "",
+  });
+  assert.deepEqual(absorbTagDraftInput("tag signed", known), {
+    chipLabel: null,
+    remainder: "tag:signed",
+  });
+  assert.equal(absorbTagDraftInput("derleth", known), null);
 });
 
 test("parseSearchQuery and formatTagSearchQuery handle tag helper syntax", () => {
