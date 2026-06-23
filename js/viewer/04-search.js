@@ -3,6 +3,43 @@
 const searchTagFilters = [];
 let searchSuggestIndex = -1;
 let searchRenderTimer = null;
+let tagSuggestScrollY = 0;
+
+function isTagSuggestTouchAllowed(target) {
+  return Boolean(target?.closest?.(".search-tag-suggest"));
+}
+
+function preventTagSuggestTouchMove(event) {
+  if (isTagSuggestTouchAllowed(event.target)) {
+    return;
+  }
+  event.preventDefault();
+}
+
+function setTagSuggestScrollLock(locked) {
+  const root = document.documentElement;
+  const isLocked = document.body.classList.contains("search-tag-suggest-open");
+  if (locked === isLocked) {
+    return;
+  }
+
+  if (locked) {
+    tagSuggestScrollY = window.scrollY;
+    root.classList.add("search-tag-suggest-open");
+    document.body.classList.add("search-tag-suggest-open");
+    document.body.style.top = `-${tagSuggestScrollY}px`;
+    document.addEventListener("touchmove", preventTagSuggestTouchMove, {
+      passive: false,
+    });
+    return;
+  }
+
+  root.classList.remove("search-tag-suggest-open");
+  document.body.classList.remove("search-tag-suggest-open");
+  document.body.style.top = "";
+  document.removeEventListener("touchmove", preventTagSuggestTouchMove);
+  window.scrollTo(0, tagSuggestScrollY);
+}
 
 function getKnownSearchTags() {
   const tagTerms = searchTagFilters.map((label) =>
@@ -62,10 +99,6 @@ function renderSearchChips() {
       return `<span class="search-tag-chip"><span class="search-tag-chip-label">${safe}</span><button type="button" class="search-tag-chip-remove" data-search-tag-index="${index}" aria-label="Remove tag ${safe}">&times;</button></span>`;
     })
     .join("");
-}
-
-function setTagSuggestScrollLock(locked) {
-  document.body.classList.toggle("search-tag-suggest-open", locked);
 }
 
 function hideTagSuggest() {

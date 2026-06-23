@@ -233,6 +233,8 @@ select {
   list-style: none;
   max-height: 12rem;
   overflow: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
   border: 1px solid var(--border);
   border-radius: 8px;
   background: var(--panel);
@@ -243,8 +245,15 @@ select {
   display: none;
 }
 
+html.search-tag-suggest-open,
 body.search-tag-suggest-open {
   overflow: hidden;
+  overscroll-behavior: none;
+}
+
+body.search-tag-suggest-open {
+  position: fixed;
+  width: 100%;
 }
 
 .search-tag-suggest-item {
