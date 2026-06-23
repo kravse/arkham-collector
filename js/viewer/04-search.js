@@ -25,9 +25,10 @@ function setTagSuggestScrollLock(locked) {
 
   if (locked) {
     tagSuggestScrollY = window.scrollY;
+    window.scrollTo(0, 0);
     root.classList.add("search-tag-suggest-open");
     document.body.classList.add("search-tag-suggest-open");
-    document.body.style.top = `-${tagSuggestScrollY}px`;
+    document.body.style.top = "0";
     document.addEventListener("touchmove", preventTagSuggestTouchMove, {
       passive: false,
     });
