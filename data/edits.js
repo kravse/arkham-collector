@@ -285,16 +285,22 @@ window.BOOK_EDITS = {
     "coverImageFile": "covers/watchers-at-the-strait-gate-279.webp"
   },
   "280": {
-    "coverImageFile": "covers/one-winter-in-eden-280.jpg"
+    "coverImageFile": "covers/one-winter-in-eden-280.jpg",
+    "listCoverFocusX": 0.5462184873949579,
+    "listCoverFocusY": 0.5109326170456433
   },
   "281": {
-    "coverImageFile": "covers/the-zanzibar-cat-281.jpg"
+    "coverImageFile": "covers/the-zanzibar-cat-281.jpg",
+    "listCoverFocusX": 0.4957983193277311,
+    "listCoverFocusY": 0.31196399030347105
   },
   "282": {
     "coverImageFile": "covers/the-wind-from-a-burning-woman-282.jpg"
   },
   "283": {
-    "coverImageFile": "covers/the-house-of-the-wolf-283.jpg"
+    "coverImageFile": "covers/the-house-of-the-wolf-283.jpg",
+    "listCoverFocusX": 0.7331932773109243,
+    "listCoverFocusY": 0.45587595656316404
   },
   "284": {
     "coverImageFile": "covers/the-darkling-284.jpg"
@@ -403,8 +409,8 @@ window.BOOK_EDITS = {
   },
   "309": {
     "coverImageFile": "covers/harrigans-file-309.jpg",
-    "listCoverFocusX": 0.4432773109243697,
-    "listCoverFocusY": 0.4226207033367648
+    "listCoverFocusX": 0.4180672268907563,
+    "listCoverFocusY": 0.3961639603919843
   },
   "310": {
     "coverImageFile": "covers/x-lucha-and-others-310.png",
@@ -812,7 +818,9 @@ window.BOOK_EDITS = {
     "listCoverFocusY": 0.3468580394885921
   },
   "403": {
-    "coverImageFile": "covers/skull-face-and-others-403.png"
+    "coverImageFile": "covers/skull-face-and-others-403.jpg",
+    "listCoverFocusX": 0.8025210084033614,
+    "listCoverFocusY": 0.2705818036824647
   },
   "404": {
     "listCoverFocusX": 0.4569327731092437,
