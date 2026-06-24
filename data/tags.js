@@ -194,7 +194,9 @@ window.BOOK_TAGS = {
     "NONFICTION"
   ],
   "246": [
+    "ANTHOLOGY",
     "CRITICISM",
+    "ESSAYS",
     "HISTORY",
     "HORROR",
     "NONFICTION"
@@ -216,7 +218,7 @@ window.BOOK_TAGS = {
     "YOUNG ADULT"
   ],
   "250": [
-    "COLLECTION",
+    "ANTHOLOGY",
     "SCIENCE FICTION",
     "SHORT STORIES"
   ],
@@ -234,6 +236,7 @@ window.BOOK_TAGS = {
   "253": [
     "COLLECTION",
     "FANTASY",
+    "HORROR",
     "SCIENCE FICTION",
     "SHORT STORIES"
   ],

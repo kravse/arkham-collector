@@ -173,8 +173,8 @@ window.BOOK_EDITS = {
     "listCoverFocusY": 0.33412707212161813
   },
   "251": {
-    "listCoverFocusX": 0.5010504201680672,
-    "listCoverFocusY": 0.32549171542462724
+    "listCoverFocusX": 0.4957983193277311,
+    "listCoverFocusY": 0.3265636856080628
   },
   "252": {
     "listCoverFocusX": 0.6218487394957983,
@@ -182,8 +182,8 @@ window.BOOK_EDITS = {
   },
   "253": {
     "coverImageFile": "covers/voyages-by-starlight-253.jpg",
-    "listCoverFocusX": 0.5546218487394958,
-    "listCoverFocusY": 0.4711356195876492
+    "listCoverFocusX": 0.6176470588235294,
+    "listCoverFocusY": 0.4648136418622023
   },
   "254": {
     "coverImageFile": "covers/synthesis-other-virtual-realities-254.jpg",
@@ -191,8 +191,8 @@ window.BOOK_EDITS = {
     "listCoverFocusY": 0.5741648590513125
   },
   "255": {
-    "listCoverFocusX": 0.37815126050420167,
-    "listCoverFocusY": 0.38558352822959757
+    "listCoverFocusX": 0.36134453781512604,
+    "listCoverFocusY": 0.38166841225719206
   },
   "256": {
     "listCoverFocusX": 0.5861344537815126,
@@ -261,8 +261,8 @@ window.BOOK_EDITS = {
   },
   "273": {
     "coverImageFile": "covers/dreams-of-dark-and-light-the-great-short-fiction-of-tanith-lee-273.jpg",
-    "listCoverFocusX": 0.5798319327731093,
-    "listCoverFocusY": 0.45754904476182934
+    "listCoverFocusX": 0.523109243697479,
+    "listCoverFocusY": 0.4609559003044577
   },
   "274": {
     "coverImageFile": "covers/dagon-and-other-macabre-tales-274.jpg"
@@ -295,7 +295,9 @@ window.BOOK_EDITS = {
     "listCoverFocusY": 0.31196399030347105
   },
   "282": {
-    "coverImageFile": "covers/the-wind-from-a-burning-woman-282.jpg"
+    "coverImageFile": "covers/the-wind-from-a-burning-woman-282.jpg",
+    "listCoverFocusX": 0.6722689075630253,
+    "listCoverFocusY": 0.3699653114042045
   },
   "283": {
     "coverImageFile": "covers/the-house-of-the-wolf-283.jpg",
@@ -509,8 +511,6 @@ window.BOOK_EDITS = {
   "333": {
     "coverImageFile": "covers/cthulhu-mythos-anthology-333.jpg",
     "description": "Tales of the Cthulhu Mythos, edited by writer August Derleth and published by Arkham House in 1969, is considered the first Cthulhu Mythos anthology. It contained two stories by Lovecraft, a number of reprints of pieces written by members of Lovecraft's circle of correspondents, and several new tales written for the collection by a new generation of Cthulhu Mythos writers. It was published in an edition of 4,024 copies.\n\nDerleth prefaced the collection with \"The Cthulhu Mythos\", an outline of his (sometimes controversial) views on the development and content of the Mythos. In this introduction, Derleth prematurely declared the genre to be dead--\"for certainly the Mythos as an inspiration for new fiction is hardly likely to afford readers with enough that is new and sufficiently different in execution to create a continuing and growing demand\".\n\nLin Carter later wrote that Tales of the Cthulhu Mythos \"marked the beginning of a new era in the history of the Mythos for many reasons, and one of the most important was that it introduced a number of new writers in the Mythos.\"",
-    "listCoverFocusX": 0.6113445378151261,
-    "listCoverFocusY": 0.49604243992733754,
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Cthulhu_Mythos_anthology#Tales_of_the_Cthulhu_Mythos"
   },
   "334": {

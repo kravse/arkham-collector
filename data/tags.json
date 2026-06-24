@@ -195,7 +195,9 @@
       "NONFICTION"
     ],
     "246": [
+      "ANTHOLOGY",
       "CRITICISM",
+      "ESSAYS",
       "HISTORY",
       "HORROR",
       "NONFICTION"
@@ -217,7 +219,7 @@
       "YOUNG ADULT"
     ],
     "250": [
-      "COLLECTION",
+      "ANTHOLOGY",
       "SCIENCE FICTION",
       "SHORT STORIES"
     ],
@@ -235,6 +237,7 @@
     "253": [
       "COLLECTION",
       "FANTASY",
+      "HORROR",
       "SCIENCE FICTION",
       "SHORT STORIES"
     ],
