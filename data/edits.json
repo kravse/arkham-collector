@@ -40,8 +40,6 @@
       "goodreadsUrl": "https://www.goodreads.com/book/show/32767235-wisconsin-murders"
     },
     "222": {
-      "listCoverFocusX": 0.5567226890756303,
-      "listCoverFocusY": 0.7084336445679758,
       "goodreadsUrl": "https://www.goodreads.com/book/show/2510273.The_Exploits_of_Chevalier_Dupin"
     },
     "223": {
@@ -67,14 +65,10 @@
       "listCoverFocusY": 0.12935605370029654
     },
     "228": {
-      "listCoverFocusX": 0.38760504201680673,
-      "listCoverFocusY": 0.6354988714317246,
-      "goodreadsUrl": "https://www.goodreads.com/book/show/10041771-three-problems-for-solar-pons"
+      "listCoverFocusX": 0.4632352941176471,
+      "listCoverFocusY": 0.6045386157818744
     },
     "229": {
-      "coverImageFile": "covers/the-memoirs-of-solar-pons-229.png",
-      "listCoverFocusX": 0.36869747899159666,
-      "listCoverFocusY": 0.49480312118306885,
       "goodreadsUrl": "https://www.goodreads.com/book/show/1831257.The_Memoirs_of_Solar_Pons"
     },
     "230": {
@@ -629,9 +623,7 @@
       "listCoverFocusY": 0.6122533054800794
     },
     "358": {
-      "coverImageFile": "covers/who-fears-the-devil-358.jpg",
-      "listCoverFocusX": 0.4474789915966387,
-      "listCoverFocusY": 0.5538295093761594
+      "coverImageFile": "covers/who-fears-the-devil-358.jpg"
     },
     "359": {
       "listCoverFocusX": 0.41386554621848737,
@@ -665,8 +657,8 @@
       "listCoverFocusY": 0.2659376744413554
     },
     "366": {
-      "listCoverFocusX": 0.6512605042016807,
-      "listCoverFocusY": 0.7715428149882673
+      "listCoverFocusX": 0.42331932773109243,
+      "listCoverFocusY": 0.5637194073463744
     },
     "367": {
       "listCoverFocusX": 0.4327731092436975,
@@ -708,8 +700,8 @@
       "listCoverFocusY": 0.4865712650591355
     },
     "376": {
-      "listCoverFocusX": 0.6397058823529411,
-      "listCoverFocusY": 0.9630140284317588
+      "listCoverFocusX": 0.6292016806722689,
+      "listCoverFocusY": 0.6596689141431115
     },
     "377": {
       "coverImageFile": "covers/spells-and-philtres-377.png"
