@@ -674,9 +674,9 @@ window.BOOK_EDITS = {
     "listCoverFocusY": 0.7186473796298397
   },
   "371": {
-    "coverImageFile": "covers/the-abominations-of-yondo-371.jpg",
-    "listCoverFocusX": 0.45168067226890757,
-    "listCoverFocusY": 0.13182031756231322
+    "coverImageFile": "covers/the-abominations-of-yondo-371.png",
+    "listCoverFocusX": 0.38235294117647056,
+    "listCoverFocusY": 0.10868988548017906
   },
   "372": {
     "goodreadsUrl": "https://www.goodreads.com/book/show/10049265-the-shuttered-room-and-other-pieces"
@@ -771,8 +771,8 @@ window.BOOK_EDITS = {
     "listCoverFocusY": 0.7406389272860934
   },
   "393": {
-    "listCoverFocusX": 0.6502100840336135,
-    "listCoverFocusY": 0.5228178938990615
+    "listCoverFocusX": 0.6512605042016807,
+    "listCoverFocusY": 0.5169100916424854
   },
   "394": {
     "coverImageFile": "covers/nights-black-agents-394.jpg",
@@ -780,11 +780,12 @@ window.BOOK_EDITS = {
     "listCoverFocusY": 0.5337458351785583
   },
   "395": {
-    "coverImageFile": "covers/revelations-in-black-395.jpg"
+    "listCoverFocusX": 0.6365546218487395,
+    "listCoverFocusY": 0.5465170994466607
   },
   "396": {
-    "listCoverFocusX": 0.5640756302521008,
-    "listCoverFocusY": 0.08547367454705417,
+    "listCoverFocusX": 0.4474789915966387,
+    "listCoverFocusY": 0.07715332871636768,
     "goodreadsUrl": "https://www.goodreads.com/book/show/1794059.Dark_Carnival"
   },
   "397": {
@@ -793,7 +794,8 @@ window.BOOK_EDITS = {
     "listCoverFocusY": 0.4504734754483303
   },
   "398": {
-    "coverImageFile": "covers/this-mortal-coil-book-398.jpg"
+    "listCoverFocusX": 0.4474789915966387,
+    "listCoverFocusY": 0.30588863968996394
   },
   "399": {
     "listCoverFocusX": 0.657563025210084,
@@ -867,8 +869,8 @@ window.BOOK_EDITS = {
     "listCoverFocusY": 0.0751332426420247
   },
   "417": {
-    "listCoverFocusX": 0.4789915966386555,
-    "listCoverFocusY": 0.31330438687642304
+    "listCoverFocusX": 0.5651260504201681,
+    "listCoverFocusY": 0.33146972919965745
   },
   "418": {
     "listCoverFocusX": 0.3300970873786408,
