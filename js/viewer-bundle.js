@@ -2180,6 +2180,8 @@ function applyRuntimeSnapshot(runtime) {
   if (sortSelect && runtime.sort) {
     sortSelect.value = runtime.sort;
   }
+  updateViewModeState();
+  updateHeaderFiltersState();
 }
 
 function githubHeaders(token) {
@@ -3622,6 +3624,8 @@ function render() {
   }
 
   updateHeaderLogo();
+  updateViewModeState();
+  updateHeaderFiltersState();
   document.body.classList.toggle(
     "viewing-collection",
     isCollectionFilterActive() && !hiddenOnly && !isMycroftOnlyFilter() && !wantOnly,
@@ -5786,8 +5790,12 @@ document.addEventListener("visibilitychange", () => {
 
 window.addEventListener("pageshow", (event) => {
   if (event.persisted) {
-    pullGistStateIfConfigured();
+    loadUserStateAsync().then(() => {
+      render();
+    });
+    return;
   }
+  pullGistStateIfConfigured();
 });
 
 if (headerFiltersToggle) {

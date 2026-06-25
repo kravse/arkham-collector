@@ -135,6 +135,8 @@ function applyRuntimeSnapshot(runtime) {
   if (sortSelect && runtime.sort) {
     sortSelect.value = runtime.sort;
   }
+  updateViewModeState();
+  updateHeaderFiltersState();
 }
 
 function githubHeaders(token) {

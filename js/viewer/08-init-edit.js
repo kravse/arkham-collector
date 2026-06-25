@@ -296,8 +296,12 @@ document.addEventListener("visibilitychange", () => {
 
 window.addEventListener("pageshow", (event) => {
   if (event.persisted) {
-    pullGistStateIfConfigured();
+    loadUserStateAsync().then(() => {
+      render();
+    });
+    return;
   }
+  pullGistStateIfConfigured();
 });
 
 if (headerFiltersToggle) {

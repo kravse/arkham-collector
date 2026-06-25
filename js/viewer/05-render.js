@@ -431,6 +431,8 @@ function render() {
   }
 
   updateHeaderLogo();
+  updateViewModeState();
+  updateHeaderFiltersState();
   document.body.classList.toggle(
     "viewing-collection",
     isCollectionFilterActive() && !hiddenOnly && !isMycroftOnlyFilter() && !wantOnly,
