@@ -942,8 +942,12 @@ body.viewing-want-filter:not(.view-mode-list) .card .card-body {
   position: relative;
 }
 
+body.viewing-want-filter:not(.view-mode-list) .card:has(.want-rank-card-chip) .title {
+  padding-right: 2.65rem;
+}
+
 body.viewing-want-filter:not(.view-mode-list) .card:has(.want-rank-card-chip) .card-bottom-row {
-  padding-right: 2.85rem;
+  padding-right: 2.65rem;
 }
 
 body.viewing-want-filter:not(.view-mode-list) .want-rank-card-chip {
@@ -954,16 +958,16 @@ body.viewing-want-filter:not(.view-mode-list) .want-rank-card-chip {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 2.5rem;
-  height: 2.5rem;
-  min-width: 2.5rem;
+  width: clamp(1.85rem, 7vw, 2.5rem);
+  height: clamp(1.85rem, 7vw, 2.5rem);
+  min-width: 0;
   padding: 0;
   border-radius: 10px;
   border: 1px solid rgba(120, 200, 150, 0.55);
   background: rgba(16, 28, 22, 0.94);
   color: #b8e8c8;
   font-family: ui-sans-serif, system-ui, sans-serif;
-  font-size: 1rem;
+  font-size: clamp(0.78rem, 3.2vw, 1rem);
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   letter-spacing: 0;

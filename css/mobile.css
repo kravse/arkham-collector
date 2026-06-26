@@ -291,6 +291,17 @@
     gap: 0.15rem;
   }
 
+  body.viewing-want-filter:not(.view-mode-list) .want-rank-card-chip {
+    right: 0.3rem;
+    bottom: 0.3rem;
+    border-radius: 8px;
+  }
+
+  body.viewing-want-filter:not(.view-mode-list) .card:has(.want-rank-card-chip) .title,
+  body.viewing-want-filter:not(.view-mode-list) .card:has(.want-rank-card-chip) .card-bottom-row {
+    padding-right: 2.1rem;
+  }
+
   .date {
     font-size: 0.66rem;
   }
