@@ -2,38 +2,31 @@
 
 let wantRankDragId = null;
 let wantRankPointerDrag = null;
+let wantRankDragStartOrder = null;
+let wantRankLastTargetId = null;
+let wantRankLastGlowRow = null;
+let wantRankDragDirty = false;
+
+const WANT_RANK_ROW_GAP_SLOP = 20;
+
+function isWantRankDragActive() {
+  return wantRankPointerDrag != null;
+}
 
 function canReorderWantRank() {
   return isWantRankedFilterActive() && !hasActiveSearch();
 }
 
-function findWantRankCardAtPoint(clientX, clientY, excludeCard) {
-  const excludeRow = excludeCard?.closest(".want-rank-row");
-  const elements = document.elementsFromPoint(clientX, clientY);
-  if (!Array.isArray(elements)) {
-    return null;
-  }
-
-  for (const element of elements) {
-    if (!element || typeof element.closest !== "function") {
-      continue;
-    }
-
-    const rankRow = element.closest(".want-rank-row");
-    if (rankRow && rankRow !== excludeRow && grid.contains(rankRow)) {
-      const card = rankRow.querySelector(".card");
-      if (card && card !== excludeCard) {
-        return card;
-      }
-    }
-
-    const card = element.closest(".card");
-    if (card && card !== excludeCard && grid.contains(card)) {
-      return card;
-    }
-  }
-
-  return null;
+function findWantRankRowAtPoint(clientX, clientY) {
+  return viewerPointerReorder.findNearestRowAtPoint({
+    root: grid,
+    clientX,
+    clientY,
+    rowSelector: ".want-rank-row",
+    excludeRow: null,
+    gapSlop: WANT_RANK_ROW_GAP_SLOP,
+    elementsFromPoint: document.elementsFromPoint.bind(document),
+  });
 }
 
 function reorderWantToTarget(dragId, targetId) {
@@ -49,9 +42,64 @@ function reorderWantToTarget(dragId, targetId) {
   return true;
 }
 
+function getWantRankRowBookId(row) {
+  const card = row?.querySelector(".card");
+  const bookId = Number(card?.dataset.bookId);
+  return Number.isInteger(bookId) ? bookId : null;
+}
+
+function syncWantRankRowDomOrder() {
+  const rows = [...grid.querySelectorAll(".want-rank-row")];
+  if (!rows.length) {
+    return;
+  }
+
+  const presentIds = rows
+    .map((row) => getWantRankRowBookId(row))
+    .filter((id) => id != null);
+  const orderedIds = viewerWantOrder.orderRowIdsByWantOrder(
+    presentIds,
+    wantOrderIds,
+  );
+  const rowById = new Map(
+    rows
+      .map((row) => [getWantRankRowBookId(row), row])
+      .filter(([id]) => id != null),
+  );
+
+  for (const id of orderedIds) {
+    const row = rowById.get(id);
+    if (row) {
+      grid.appendChild(row);
+    }
+  }
+}
+
+function updateWantRankHandleLabels() {
+  const rankById = new Map(
+    wantOrderIds.map((id, index) => [Number(id), index + 1]),
+  );
+
+  grid.querySelectorAll(".want-rank-row").forEach((row) => {
+    const bookId = getWantRankRowBookId(row);
+    const rank = bookId == null ? null : rankById.get(bookId);
+    const handle = row.querySelector(".want-rank-drag-handle");
+    if (!handle || rank == null) {
+      return;
+    }
+    handle.textContent = String(rank);
+    handle.setAttribute("aria-label", `Drag to reorder — rank ${rank}`);
+  });
+}
+
 function clearWantRankDragState() {
   wantRankDragId = null;
   wantRankPointerDrag = null;
+  wantRankDragStartOrder = null;
+  wantRankLastTargetId = null;
+  wantRankLastGlowRow = null;
+  wantRankDragDirty = false;
+  document.body.classList.remove("want-rank-drag-active");
   grid
     .querySelectorAll(
       ".card-want-rank-dragging, .want-rank-drop-target",
@@ -64,36 +112,55 @@ function clearWantRankDragState() {
     });
 }
 
-function updateWantRankDropTarget(card) {
-  grid.querySelectorAll(".want-rank-drop-target").forEach((row) => {
-    const rowCard = row.querySelector(".card");
-    if (!card || rowCard !== card) {
-      row.classList.remove("want-rank-drop-target");
+function updateWantRankDropTarget(row) {
+  if (row) {
+    wantRankLastGlowRow = row;
+  }
+
+  const glowRow = wantRankLastGlowRow;
+  grid.querySelectorAll(".want-rank-drop-target").forEach((element) => {
+    if (element !== glowRow) {
+      element.classList.remove("want-rank-drop-target");
     }
   });
 
-  if (!card || !wantRankDragId) {
+  if (!glowRow || !wantRankDragId) {
     return;
   }
 
-  const row = card.closest(".want-rank-row");
-  if (!row) {
+  glowRow.classList.add("want-rank-drop-target");
+}
+
+function tryLiveWantRankReorder(targetCard) {
+  if (!targetCard || !wantRankDragId || targetCard === wantRankPointerDrag?.card) {
     return;
   }
 
-  const targetId = Number(card.dataset.bookId);
+  const targetId = Number(targetCard.dataset.bookId);
+  if (!Number.isInteger(targetId) || targetId === wantRankLastTargetId) {
+    return;
+  }
+
+  wantRankLastTargetId = targetId;
   const targetIndex = wantOrderIds.indexOf(targetId);
   if (
-    viewerWantOrder.wouldMoveWantToIndex(
+    !viewerWantOrder.wouldMoveWantToIndex(
       wantOrderIds,
       wantRankDragId,
       targetIndex,
     )
   ) {
-    row.classList.add("want-rank-drop-target");
-  } else {
-    row.classList.remove("want-rank-drop-target");
+    return;
   }
+
+  if (!reorderWantToTarget(wantRankDragId, targetId)) {
+    return;
+  }
+
+  wantRankDragDirty = true;
+  syncWantRankRowDomOrder();
+  updateWantRankHandleLabels();
+  wantRankPointerDrag.card.classList.add("card-want-rank-dragging");
 }
 
 function onWantRankPointerDown(event) {
@@ -121,10 +188,15 @@ function onWantRankPointerDown(event) {
   handle.setPointerCapture(event.pointerId);
 
   wantRankDragId = bookId;
+  wantRankDragStartOrder = [...wantOrderIds];
+  wantRankLastTargetId = null;
+  wantRankLastGlowRow = null;
+  wantRankDragDirty = false;
   wantRankPointerDrag = {
     card,
     pointerId: event.pointerId,
   };
+  document.body.classList.add("want-rank-drag-active");
   card.classList.add("card-want-rank-dragging");
 }
 
@@ -138,12 +210,10 @@ function onWantRankPointerMove(event) {
   }
 
   event.preventDefault();
-  const card = findWantRankCardAtPoint(
-    event.clientX,
-    event.clientY,
-    wantRankPointerDrag.card,
-  );
-  updateWantRankDropTarget(card);
+  const row = findWantRankRowAtPoint(event.clientX, event.clientY);
+  const card = row?.querySelector(".card") ?? null;
+  tryLiveWantRankReorder(card);
+  updateWantRankDropTarget(row);
 }
 
 function finishWantRankPointerDrag(event) {
@@ -155,17 +225,18 @@ function finishWantRankPointerDrag(event) {
   }
 
   if (canReorderWantRank() && wantRankDragId) {
-    const card = findWantRankCardAtPoint(
-      event.clientX,
-      event.clientY,
-      wantRankPointerDrag.card,
-    );
-    if (card) {
-      const targetId = Number(card.dataset.bookId);
-      if (reorderWantToTarget(wantRankDragId, targetId)) {
-        saveUserState();
-        render();
-      }
+    const row = findWantRankRowAtPoint(event.clientX, event.clientY);
+    const card = row?.querySelector(".card") ?? null;
+    if (card && card !== wantRankPointerDrag.card) {
+      tryLiveWantRankReorder(card);
+    }
+
+    if (event.type === "pointercancel" && wantRankDragStartOrder) {
+      setWantOrderIds(wantRankDragStartOrder);
+      syncWantRankRowDomOrder();
+      updateWantRankHandleLabels();
+    } else if (wantRankDragDirty) {
+      saveUserState();
     }
   }
 

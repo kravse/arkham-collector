@@ -66,6 +66,7 @@ const VIEWER_SYNC_ENTRIES = [
       "sortBooksByWantOrder",
       "wouldMoveWantToIndex",
       "reorderWantOrderIds",
+      "orderRowIdsByWantOrder",
     ],
   },
   {
@@ -74,7 +75,7 @@ const VIEWER_SYNC_ENTRIES = [
     globalName: "viewerPointerReorder",
     header:
       "Generated from scripts/lib/viewer-pointer-reorder.js — run npm run bundle-viewer",
-    exports: ["findRowAtPoint"],
+    exports: ["findRowAtPoint", "findNearestRowAtPoint"],
   },
   {
     sources: [path.join(LIB, "viewer-filters.js")],

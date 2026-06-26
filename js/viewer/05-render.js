@@ -474,7 +474,9 @@ function render() {
   updateViewModeState();
   updateHeaderFiltersState();
   updateSortControlState();
-  if (typeof clearWantRankDragState === "function") {
+  const wantRankDragInProgress =
+    typeof isWantRankDragActive === "function" && isWantRankDragActive();
+  if (!wantRankDragInProgress && typeof clearWantRankDragState === "function") {
     clearWantRankDragState();
   }
   document.body.classList.toggle(
@@ -525,6 +527,11 @@ function render() {
   }
 
   renderStats(visible, activeBooks);
+
+  if (wantRankDragInProgress) {
+    syncSettingsHighlightCheckboxes();
+    return;
+  }
 
   if (!visible.length) {
     let message = "No books match your search.";

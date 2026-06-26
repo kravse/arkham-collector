@@ -6,6 +6,7 @@ const {
   sortBooksByWantOrder,
   reorderWantOrderIds,
   wouldMoveWantToIndex,
+  orderRowIdsByWantOrder,
 } = require("../scripts/lib/viewer-want-order");
 const { buildBookOrderIndex } = require("../scripts/lib/viewer-sort");
 
@@ -52,4 +53,9 @@ test("wouldMoveWantToIndex validates indices", () => {
   assert.equal(wouldMoveWantToIndex(order, 1, 2), true);
   assert.equal(wouldMoveWantToIndex(order, 9, 2), false);
   assert.equal(wouldMoveWantToIndex(order, 1, 0), false);
+});
+
+test("orderRowIdsByWantOrder sorts visible row ids by want order", () => {
+  assert.deepEqual(orderRowIdsByWantOrder([3, 1, 2], [2, 3, 1]), [2, 3, 1]);
+  assert.deepEqual(orderRowIdsByWantOrder([1, 99], [2, 3, 1]), [1]);
 });

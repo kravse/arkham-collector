@@ -482,6 +482,7 @@ body.view-mode-list {
   --list-right-rail-edit: calc(
     var(--list-row-pad) + var(--list-edit-width) + var(--list-action-gap)
   );
+  --list-row-height: calc(3.6rem + 5px);
 }
 
 body.view-mode-list .grid {
@@ -496,7 +497,7 @@ body.view-mode-list .card {
   flex-direction: row;
   align-items: stretch;
   width: 100%;
-  min-height: calc(3.6rem + 5px);
+  min-height: var(--list-row-height);
   background: var(--panel);
   isolation: isolate;
 }
@@ -814,7 +815,7 @@ body.view-mode-list .empty {
 
 body.view-mode-list.viewing-want-ranked .want-rank-row {
   display: flex;
-  align-items: stretch;
+  align-items: center;
   gap: 0.45rem;
   width: 100%;
   min-width: 0;
@@ -826,14 +827,12 @@ body.view-mode-list.viewing-want-ranked .want-rank-row .card {
 }
 
 body.view-mode-list.viewing-want-ranked .want-rank-drag-handle {
-  flex: 0 0 auto;
-  align-self: stretch;
+  flex: 0 0 var(--list-row-height);
   display: flex;
   align-items: center;
   justify-content: center;
-  width: auto;
-  aspect-ratio: 1;
-  min-width: 0;
+  width: var(--list-row-height);
+  height: var(--list-row-height);
   padding: 0;
   border: 1px solid rgba(120, 200, 150, 0.45);
   border-radius: 8px;

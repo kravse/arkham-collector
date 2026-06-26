@@ -62,11 +62,17 @@ const viewerWantOrder = (function () {
     next.splice(to, 0, dragId);
     return next;
   }
+  
+  function orderRowIdsByWantOrder(presentRowIds, wantOrderIds) {
+    const present = new Set(presentRowIds.map((id) => Number(id)));
+    return wantOrderIds.filter((id) => present.has(Number(id)));
+  }
   return {
     normalizeWantOrderIds,
     buildWantOrderIndex,
     sortBooksByWantOrder,
     wouldMoveWantToIndex,
     reorderWantOrderIds,
+    orderRowIdsByWantOrder,
   };
 })();

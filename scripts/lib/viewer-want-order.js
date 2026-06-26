@@ -60,6 +60,11 @@ function reorderWantOrderIds(wantOrderIds, dragId, targetId) {
   return next;
 }
 
+function orderRowIdsByWantOrder(presentRowIds, wantOrderIds) {
+  const present = new Set(presentRowIds.map((id) => Number(id)));
+  return wantOrderIds.filter((id) => present.has(Number(id)));
+}
+
 module.exports = {
   normalizeWantIdList,
   normalizeWantMembership,
@@ -68,4 +73,5 @@ module.exports = {
   sortBooksByWantOrder,
   wouldMoveWantToIndex,
   reorderWantOrderIds,
+  orderRowIdsByWantOrder,
 };
