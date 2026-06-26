@@ -3811,8 +3811,8 @@ function updateSortControlState() {
     const badgeText = sortWantBadge.querySelector(".sort-want-badge-text");
     if (badgeText) {
       badgeText.textContent = wantOrderLocked
-        ? "Want sorting locked"
-        : "Want sorting unlocked";
+        ? "sorting locked"
+        : "sorting unlocked";
     }
     sortWantBadge.classList.toggle("is-want-sort-locked", wantOrderLocked);
     sortWantBadge.classList.toggle("is-want-sort-unlocked", !wantOrderLocked);

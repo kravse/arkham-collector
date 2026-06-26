@@ -145,11 +145,6 @@
     font-size: 16px;
   }
 
-  .sort-want-badge-text::before {
-    content: "Sort · ";
-    color: var(--muted);
-  }
-
   .show-hidden-toggle {
     justify-self: start;
     font-size: 0.72rem;
