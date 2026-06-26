@@ -94,20 +94,22 @@ function updateSortControlState() {
     const badgeText = sortWantBadge.querySelector(".sort-want-badge-text");
     if (badgeText) {
       badgeText.textContent = wantOrderLocked
-        ? "Priority order (locked)"
-        : "Priority order";
+        ? "Want sorting locked"
+        : "Want sorting unlocked";
     }
+    sortWantBadge.classList.toggle("is-want-sort-locked", wantOrderLocked);
+    sortWantBadge.classList.toggle("is-want-sort-unlocked", !wantOrderLocked);
     const listHint =
       gridViewMode === "list" && !hasActiveSearch() && !wantOrderLocked
         ? " Drag rank tabs to reorder."
         : gridViewMode === "cards" && !hasActiveSearch() && !wantOrderLocked
           ? " Drag rank chips to reorder."
           : wantOrderLocked
-            ? " Order is locked."
+            ? " Unlock to reorder."
             : "";
     sortWantBadge.setAttribute(
       "aria-label",
-      `Sorted by your want list priority.${listHint}`,
+      `${wantOrderLocked ? "Want sorting locked" : "Want sorting unlocked"}.${listHint}`,
     );
   }
   if (wantOrderLockBtn) {

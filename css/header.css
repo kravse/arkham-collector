@@ -382,6 +382,24 @@ input[type="search"]::-webkit-search-cancel-button {
     box-shadow 0.2s ease;
 }
 
+.sort-want-badge.is-want-sort-unlocked {
+  --want-sort-badge-bg: rgba(72, 168, 118, 0.12);
+  --want-sort-badge-border: rgba(120, 200, 150, 0.38);
+  --want-sort-badge-accent: var(--want-border);
+  background-color: var(--want-sort-badge-bg);
+  border-color: var(--want-sort-badge-border);
+  border-left-color: var(--want-sort-badge-accent);
+}
+
+.sort-want-badge.is-want-sort-locked {
+  --want-sort-badge-bg: rgba(200, 92, 92, 0.1);
+  --want-sort-badge-border: rgba(200, 110, 110, 0.38);
+  --want-sort-badge-accent: rgba(220, 88, 88, 0.72);
+  background-color: var(--want-sort-badge-bg);
+  border-color: var(--want-sort-badge-border);
+  border-left-color: var(--want-sort-badge-accent);
+}
+
 .sort-want-badge.is-locked-drag-denied {
   animation: want-order-locked-flash 0.75s ease;
 }
@@ -389,9 +407,9 @@ input[type="search"]::-webkit-search-cancel-button {
 @keyframes want-order-locked-flash {
   0%,
   100% {
-    border-color: var(--border);
-    border-left-color: var(--want-border);
-    background-color: var(--panel);
+    border-color: var(--want-sort-badge-border, var(--border));
+    border-left-color: var(--want-sort-badge-accent, var(--want-border));
+    background-color: var(--want-sort-badge-bg, var(--panel));
     box-shadow: none;
   }
 
@@ -399,16 +417,16 @@ input[type="search"]::-webkit-search-cancel-button {
   75% {
     border-color: rgba(220, 88, 88, 0.88);
     border-left-color: rgba(220, 88, 88, 0.88);
-    background-color: rgba(220, 88, 88, 0.1);
+    background-color: rgba(220, 88, 88, 0.18);
     box-shadow:
       0 0 0 1px rgba(220, 88, 88, 0.28),
       0 0 8px rgba(220, 88, 88, 0.16);
   }
 
   50% {
-    border-color: var(--border);
-    border-left-color: var(--want-border);
-    background-color: var(--panel);
+    border-color: var(--want-sort-badge-border, var(--border));
+    border-left-color: var(--want-sort-badge-accent, var(--want-border));
+    background-color: var(--want-sort-badge-bg, var(--panel));
     box-shadow: none;
   }
 }
