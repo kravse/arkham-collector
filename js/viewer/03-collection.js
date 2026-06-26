@@ -140,7 +140,7 @@ function applyRuntimeSnapshot(runtime) {
   highlightCollection = runtime.highlightCollection;
   showMagazines = runtime.showMagazines;
   wantRankDragSide = runtime.wantRankDragSide;
-  wantOrderLocked = runtime.wantOrderLocked;
+  wantOrderLocked = runtime.wantOrderLocked === true;
   if (sortSelect && runtime.sort) {
     sortSelect.value = runtime.sort;
   }
@@ -417,7 +417,10 @@ function loadUserState() {
     const saved = localStorage.getItem(viewerUserState.USER_STATE_KEY);
     state = viewerUserState.parseUserState(saved);
     if (!state) {
-      state = viewerUserState.migrateFromLegacy(readLegacyStorageSnapshot());
+      const legacy = readLegacyStorageSnapshot();
+      state = viewerUserState.hasLegacyUserData(legacy)
+        ? viewerUserState.migrateFromLegacy(legacy)
+        : viewerUserState.defaultUserState();
       persistUserState(state);
     }
   } catch (_) {

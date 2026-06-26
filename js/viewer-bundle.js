@@ -814,33 +814,27 @@ const viewerUserState = (function () {
         null,
         normalizeIdArray(snapshot[LEGACY_KEYS.want]),
       ),
-      preferences: {
-        sort: normalizeSort(
-          snapshot[LEGACY_KEYS.sort],
-          base.preferences.sort,
-        ),
-        viewMode: normalizeViewMode(
-          snapshot[LEGACY_KEYS.viewMode],
-          base.preferences.viewMode,
-        ),
-        headerFiltersExpanded: normalizeBoolFlag(
-          snapshot[LEGACY_KEYS.headerFiltersExpanded],
-          base.preferences.headerFiltersExpanded,
-        ),
-        highlightWants: normalizeBoolFlag(
-          snapshot[LEGACY_KEYS.highlightWants],
-          base.preferences.highlightWants,
-        ),
-        highlightCollection: normalizeBoolFlag(
-          snapshot[LEGACY_KEYS.highlightCollection],
-          base.preferences.highlightCollection,
-        ),
-        showMagazines: normalizeBoolFlag(
-          snapshot[LEGACY_KEYS.showMagazines],
-          base.preferences.showMagazines,
-        ),
-      },
+      preferences: normalizePreferences(
+        {
+          sort: snapshot[LEGACY_KEYS.sort],
+          viewMode: snapshot[LEGACY_KEYS.viewMode],
+          headerFiltersExpanded: snapshot[LEGACY_KEYS.headerFiltersExpanded],
+          highlightWants: snapshot[LEGACY_KEYS.highlightWants],
+          highlightCollection: snapshot[LEGACY_KEYS.highlightCollection],
+          showMagazines: snapshot[LEGACY_KEYS.showMagazines],
+        },
+        base,
+      ),
     };
+  }
+  
+  function hasLegacyUserData(snapshot) {
+    if (!snapshot || typeof snapshot !== "object") {
+      return false;
+    }
+    return Object.values(snapshot).some(
+      (value) => value != null && value !== "",
+    );
   }
   
   function migrateV1ToV2(v1) {
@@ -2386,7 +2380,7 @@ function applyRuntimeSnapshot(runtime) {
   highlightCollection = runtime.highlightCollection;
   showMagazines = runtime.showMagazines;
   wantRankDragSide = runtime.wantRankDragSide;
-  wantOrderLocked = runtime.wantOrderLocked;
+  wantOrderLocked = runtime.wantOrderLocked === true;
   if (sortSelect && runtime.sort) {
     sortSelect.value = runtime.sort;
   }
@@ -2663,7 +2657,10 @@ function loadUserState() {
     const saved = localStorage.getItem(viewerUserState.USER_STATE_KEY);
     state = viewerUserState.parseUserState(saved);
     if (!state) {
-      state = viewerUserState.migrateFromLegacy(readLegacyStorageSnapshot());
+      const legacy = readLegacyStorageSnapshot();
+      state = viewerUserState.hasLegacyUserData(legacy)
+        ? viewerUserState.migrateFromLegacy(legacy)
+        : viewerUserState.defaultUserState();
       persistUserState(state);
     }
   } catch (_) {

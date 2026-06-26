@@ -109,6 +109,29 @@ test("buildUserStateFromRuntime roundtrips wantOrderIds through parseUserState",
   assert.deepEqual(parsed.wantIds, [1, 2]);
   assert.deepEqual(parsed.wantOrderIds, [2, 1]);
   assert.equal(parsed.preferences.wantRankDragSide, "left");
+  assert.equal(parsed.preferences.wantOrderLocked, false);
+});
+
+test("buildUserStateFromRuntime defaults wantOrderLocked to unlocked", () => {
+  const built = buildUserStateFromRuntime({
+    storageMode: "local",
+    collectionIds: [],
+    orderedIds: [],
+    wantIds: [],
+    wantOrderIds: [],
+    sort: "date-asc",
+    viewMode: "cards",
+    headerFiltersExpanded: true,
+    highlightWants: true,
+    highlightCollection: true,
+    showMagazines: false,
+  });
+  assert.equal(built.preferences.wantOrderLocked, false);
+});
+
+test("migrateFromLegacy defaults wantOrderLocked to unlocked", () => {
+  const migrated = migrateFromLegacy({});
+  assert.equal(migrated.preferences.wantOrderLocked, false);
 });
 
 test("buildUserStateFromRuntime roundtrips through parseUserState", () => {
