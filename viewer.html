@@ -254,24 +254,18 @@
                 <option value="title-asc">Title A–Z</option>
                 <option value="title-desc">Title Z–A</option>
               </select>
-              <span
+              <button
+                type="button"
                 class="sort-want-badge is-sort-slot-hidden"
                 id="sort-want-badge"
-                role="status"
+                aria-pressed="false"
                 aria-hidden="true"
                 aria-label="Want sorting unlocked"
-                title="Catalog sort is unavailable while viewing your want list"
+                title="Tap to lock want list order"
+                hidden
               >
                 <span class="sort-want-badge-text">sorting unlocked</span>
-                <button
-                  type="button"
-                  class="want-order-lock-btn"
-                  id="want-order-lock-btn"
-                  aria-label="Lock want list order"
-                  aria-pressed="false"
-                  title="Lock want list order"
-                  hidden
-                >
+                <span class="sort-want-badge-lock" aria-hidden="true">
                   <svg
                     class="want-order-lock-icon want-order-lock-icon--unlocked"
                     viewBox="0 0 16 16"
@@ -316,8 +310,8 @@
                       stroke-linecap="round"
                     />
                   </svg>
-                </button>
-              </span>
+                </span>
+              </button>
             </div>
           </div>
           <label class="show-hidden-toggle" id="show-hidden-wrap" hidden>

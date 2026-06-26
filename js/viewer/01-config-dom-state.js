@@ -17,7 +17,6 @@ const searchClearBtn = document.getElementById("search-clear");
 const viewModeToggle = document.getElementById("view-mode-toggle");
 const sortSelect = document.getElementById("sort");
 const sortWantBadge = document.getElementById("sort-want-badge");
-const wantOrderLockBtn = document.getElementById("want-order-lock-btn");
 const sortControlWrap = document.getElementById("sort-control-wrap");
 const bookOrderBtn = document.getElementById("book-order-btn");
 const bookOrderDialog = document.getElementById("book-order-dialog");

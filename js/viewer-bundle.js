@@ -17,7 +17,6 @@ const searchClearBtn = document.getElementById("search-clear");
 const viewModeToggle = document.getElementById("view-mode-toggle");
 const sortSelect = document.getElementById("sort");
 const sortWantBadge = document.getElementById("sort-want-badge");
-const wantOrderLockBtn = document.getElementById("want-order-lock-btn");
 const sortControlWrap = document.getElementById("sort-control-wrap");
 const bookOrderBtn = document.getElementById("book-order-btn");
 const bookOrderDialog = document.getElementById("book-order-dialog");
@@ -3776,11 +3775,19 @@ function matchesSearch(book, query) {
 
 let wantOrderLockJiggleTimer = null;
 
+function toggleWantOrderLock() {
+  wantOrderLocked = !wantOrderLocked;
+  saveUserState();
+  updateSortControlState();
+  render();
+}
+
 function jiggleWantOrderLock() {
-  if (wantOrderLockBtn) {
-    wantOrderLockBtn.classList.remove("is-jiggling");
-    void wantOrderLockBtn.offsetWidth;
-    wantOrderLockBtn.classList.add("is-jiggling");
+  const lockIcon = sortWantBadge?.querySelector(".sort-want-badge-lock");
+  if (lockIcon) {
+    lockIcon.classList.remove("is-jiggling");
+    void lockIcon.offsetWidth;
+    lockIcon.classList.add("is-jiggling");
   }
   if (sortWantBadge) {
     sortWantBadge.classList.remove("is-locked-drag-denied");
@@ -3789,12 +3796,8 @@ function jiggleWantOrderLock() {
   }
   clearTimeout(wantOrderLockJiggleTimer);
   wantOrderLockJiggleTimer = setTimeout(() => {
-    if (wantOrderLockBtn) {
-      wantOrderLockBtn.classList.remove("is-jiggling");
-    }
-    if (sortWantBadge) {
-      sortWantBadge.classList.remove("is-locked-drag-denied");
-    }
+    lockIcon?.classList.remove("is-jiggling");
+    sortWantBadge?.classList.remove("is-locked-drag-denied");
   }, 750);
 }
 
@@ -3806,6 +3809,7 @@ function updateSortControlState() {
     sortSelect.setAttribute("aria-hidden", String(wantSort));
   }
   if (sortWantBadge) {
+    sortWantBadge.hidden = !wantSort;
     sortWantBadge.classList.toggle("is-sort-slot-hidden", !wantSort);
     sortWantBadge.setAttribute("aria-hidden", String(!wantSort));
     const badgeText = sortWantBadge.querySelector(".sort-want-badge-text");
@@ -3816,27 +3820,25 @@ function updateSortControlState() {
     }
     sortWantBadge.classList.toggle("is-want-sort-locked", wantOrderLocked);
     sortWantBadge.classList.toggle("is-want-sort-unlocked", !wantOrderLocked);
+    sortWantBadge.setAttribute("aria-pressed", String(wantOrderLocked));
     const listHint =
       gridViewMode === "list" && !hasActiveSearch() && !wantOrderLocked
         ? " Drag rank tabs to reorder."
         : gridViewMode === "cards" && !hasActiveSearch() && !wantOrderLocked
           ? " Drag rank chips to reorder."
           : wantOrderLocked
-            ? " Unlock to reorder."
-            : "";
+            ? " Tap to unlock and reorder."
+            : " Tap to lock order.";
+    const lockLabel = wantOrderLocked
+      ? "Want sorting locked"
+      : "Want sorting unlocked";
     sortWantBadge.setAttribute(
       "aria-label",
-      `${wantOrderLocked ? "Want sorting locked" : "Want sorting unlocked"}.${listHint}`,
+      `${lockLabel}.${listHint}`,
     );
-  }
-  if (wantOrderLockBtn) {
-    wantOrderLockBtn.hidden = !wantSort;
-    wantOrderLockBtn.setAttribute("aria-pressed", String(wantOrderLocked));
-    const lockLabel = wantOrderLocked
-      ? "Unlock want list order"
-      : "Lock want list order";
-    wantOrderLockBtn.setAttribute("aria-label", lockLabel);
-    wantOrderLockBtn.title = lockLabel;
+    sortWantBadge.title = wantOrderLocked
+      ? "Tap to unlock want list order"
+      : "Tap to lock want list order";
   }
   document.body.classList.toggle(
     "want-order-locked",
@@ -3847,14 +3849,10 @@ function updateSortControlState() {
   }
 }
 
-if (wantOrderLockBtn) {
-  wantOrderLockBtn.addEventListener("click", (event) => {
+if (sortWantBadge) {
+  sortWantBadge.addEventListener("click", (event) => {
     event.preventDefault();
-    event.stopPropagation();
-    wantOrderLocked = !wantOrderLocked;
-    saveUserState();
-    updateSortControlState();
-    render();
+    toggleWantOrderLock();
   });
 }
 
