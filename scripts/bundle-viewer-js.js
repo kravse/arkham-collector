@@ -58,6 +58,11 @@ const PARTS = [
     title: "Shared filter helpers (generated from scripts/lib/viewer-filters.js)",
   },
   {
+    file: "00-viewer-filter-url.js",
+    title:
+      "Filter URL paths (generated from scripts/lib/viewer-filter-url.js)",
+  },
+  {
     file: "00-viewer-tags.js",
     title:
       "Tag helpers (generated from scripts/lib/tag-normalize.js)",
@@ -65,6 +70,10 @@ const PARTS = [
   {
     file: "02-books-parse.js",
     title: "Book list helpers and CSV / title parsing",
+  },
+  {
+    file: "02-filter-url.js",
+    title: "Filter mode URL sync",
   },
   {
     file: "03-collection.js",

@@ -343,7 +343,9 @@ if (viewModeToggle) {
 }
 
 function startViewer() {
+  applyFiltersFromUrl();
   loadUserStateAsync().then(() => {
+    syncFilterUrlFromState({ replace: true });
     render();
     openBookDetailFromLocation();
   });

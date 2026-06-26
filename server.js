@@ -30,6 +30,7 @@ const {
   getAllTags,
   normalizeTags,
 } = require("./scripts/lib/tags");
+const { FILTER_PATH_SEGMENTS } = require("./scripts/lib/viewer-filter-url");
 
 const ROOT = __dirname;
 const DATA_DIR = path.join(ROOT, "data");
@@ -388,6 +389,12 @@ app.use(
 app.get("/", (_req, res) => {
   res.sendFile(path.join(ROOT, "viewer.html"));
 });
+
+for (const segment of FILTER_PATH_SEGMENTS) {
+  app.get(`/${segment}`, (_req, res) => {
+    res.sendFile(path.join(ROOT, "viewer.html"));
+  });
+}
 
 app.use((error, _req, res, _next) => {
   res.status(400).json({ error: error.message });

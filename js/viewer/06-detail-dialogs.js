@@ -1,11 +1,19 @@
 /* Book detail overlay, settings, and attribution dialogs */
 
 function detailPageUrl(bookId) {
-  return `${window.location.pathname}${window.location.search}#book/${bookId}`;
+  return `${detailPageBaseUrl()}#book/${bookId}`;
 }
 
 function detailPageBaseUrl() {
-  return `${window.location.pathname}${window.location.search}`;
+  return viewerFilterUrl.buildFilterUrl(
+    viewerFilterUrl.currentFilterSnapshot({
+      collectionFilterMode,
+      wantFilterMode,
+      mycroftFilterMode,
+      hiddenOnly,
+    }),
+    window.location.search,
+  );
 }
 
 function parseDetailBookIdFromHash() {

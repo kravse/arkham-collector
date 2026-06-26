@@ -97,6 +97,22 @@ const VIEWER_SYNC_ENTRIES = [
     ],
   },
   {
+    sources: [path.join(LIB, "viewer-filter-url.js")],
+    target: "00-viewer-filter-url.js",
+    globalName: "viewerFilterUrl",
+    header:
+      "Generated from scripts/lib/viewer-filter-url.js — run npm run bundle-viewer",
+    exports: [
+      "DEFAULT_FILTERS",
+      "FILTER_PATH_SEGMENTS",
+      "normalizePathname",
+      "parseFilterPath",
+      "buildFilterPath",
+      "buildFilterUrl",
+      "currentFilterSnapshot",
+    ],
+  },
+  {
     sources: [path.join(LIB, "viewer-filters.js")],
     target: "00-viewer-filters.js",
     globalName: "viewerFilters",

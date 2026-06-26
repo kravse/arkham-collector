@@ -1995,6 +1995,110 @@ const viewerFilters = (function () {
 })();
 
 
+/* Generated from scripts/lib/viewer-filter-url.js — run npm run bundle-viewer */
+
+const viewerFilterUrl = (function () {
+  const DEFAULT_FILTERS = {
+    collectionFilterMode: null,
+    wantFilterMode: null,
+    mycroftFilterMode: null,
+    hiddenOnly: false,
+  };
+  
+  const FILTER_BY_SEGMENT = {
+    collection: {
+      collectionFilterMode: "collection",
+    },
+    ordered: {
+      collectionFilterMode: "ordered",
+    },
+    want: {
+      wantFilterMode: "want",
+    },
+    "mycroft-moran": {
+      mycroftFilterMode: "only",
+    },
+    "mycroft-hidden": {
+      mycroftFilterMode: "hidden",
+    },
+    hidden: {
+      hiddenOnly: true,
+    },
+  };
+  
+  const FILTER_PATH_SEGMENTS = Object.keys(FILTER_BY_SEGMENT);
+  
+  function normalizePathname(pathname) {
+    if (!pathname || pathname === "/") {
+      return "";
+    }
+    let path = String(pathname);
+    path = path.replace(/\/index\.html$/i, "");
+    path = path.replace(/\/viewer\.html$/i, "");
+    path = path.replace(/\/+$/, "");
+    return path === "/" ? "" : path;
+  }
+  
+  function parseFilterPath(pathname) {
+    const normalized = normalizePathname(pathname);
+    if (!normalized) {
+      return { ...DEFAULT_FILTERS };
+    }
+    const segment = normalized.replace(/^\//, "").split("/")[0];
+    const match = FILTER_BY_SEGMENT[segment];
+    if (!match) {
+      return { ...DEFAULT_FILTERS };
+    }
+    return { ...DEFAULT_FILTERS, ...match };
+  }
+  
+  function buildFilterPath(filters) {
+    if (filters?.hiddenOnly) {
+      return "/hidden";
+    }
+    if (filters?.wantFilterMode === "want") {
+      return "/want";
+    }
+    if (filters?.collectionFilterMode === "ordered") {
+      return "/ordered";
+    }
+    if (filters?.collectionFilterMode === "collection") {
+      return "/collection";
+    }
+    if (filters?.mycroftFilterMode === "only") {
+      return "/mycroft-moran";
+    }
+    if (filters?.mycroftFilterMode === "hidden") {
+      return "/mycroft-hidden";
+    }
+    return "/";
+  }
+  
+  function buildFilterUrl(filters, search = "", hash = "") {
+    const path = buildFilterPath(filters);
+    return `${path}${search || ""}${hash || ""}`;
+  }
+  
+  function currentFilterSnapshot(filters) {
+    return {
+      collectionFilterMode: filters?.collectionFilterMode ?? null,
+      wantFilterMode: filters?.wantFilterMode ?? null,
+      mycroftFilterMode: filters?.mycroftFilterMode ?? null,
+      hiddenOnly: Boolean(filters?.hiddenOnly),
+    };
+  }
+  return {
+    DEFAULT_FILTERS,
+    FILTER_PATH_SEGMENTS,
+    normalizePathname,
+    parseFilterPath,
+    buildFilterPath,
+    buildFilterUrl,
+    currentFilterSnapshot,
+  };
+})();
+
+
 /* Generated from scripts/lib/tag-normalize.js — run npm run bundle-viewer */
 
 const viewerTags = (function () {
@@ -2235,6 +2339,55 @@ function exportableCollectionIds() {
   }
   return ids;
 }
+
+
+/* Filter mode ↔ URL path sync (/want, /collection, etc.) */
+
+function currentFilterStateForUrl() {
+  return viewerFilterUrl.currentFilterSnapshot({
+    collectionFilterMode,
+    wantFilterMode,
+    mycroftFilterMode,
+    hiddenOnly,
+  });
+}
+
+function applyFiltersFromUrl() {
+  const parsed = viewerFilterUrl.parseFilterPath(window.location.pathname);
+  collectionFilterMode = parsed.collectionFilterMode;
+  wantFilterMode = parsed.wantFilterMode;
+  mycroftFilterMode = parsed.mycroftFilterMode;
+  hiddenOnly = parsed.hiddenOnly;
+}
+
+function syncFilterUrlFromState(options = {}) {
+  const nextPath = viewerFilterUrl.buildFilterPath(currentFilterStateForUrl());
+  const nextUrl = `${nextPath}${window.location.search}${window.location.hash}`;
+  const currentUrl = `${window.location.pathname}${window.location.search}${window.location.hash}`;
+  if (nextUrl === currentUrl) {
+    return false;
+  }
+  const usePush = options.replace === false;
+  if (usePush) {
+    history.pushState(history.state, "", nextUrl);
+  } else {
+    history.replaceState(history.state, "", nextUrl);
+  }
+  return true;
+}
+
+function notifyFilterChange(options = {}) {
+  syncFilterUrlFromState(options);
+  render();
+}
+
+window.addEventListener("popstate", () => {
+  applyFiltersFromUrl();
+  if (typeof handleDetailPopState === "function") {
+    handleDetailPopState();
+  }
+  render();
+});
 
 
 /* Collection, want list, storage mode, and user state */
@@ -4573,17 +4726,29 @@ function render() {
   }
 
   syncSettingsHighlightCheckboxes();
+
+  if (typeof syncFilterUrlFromState === "function") {
+    syncFilterUrlFromState({ replace: true });
+  }
 }
 
 
 /* Book detail overlay, settings, and attribution dialogs */
 
 function detailPageUrl(bookId) {
-  return `${window.location.pathname}${window.location.search}#book/${bookId}`;
+  return `${detailPageBaseUrl()}#book/${bookId}`;
 }
 
 function detailPageBaseUrl() {
-  return `${window.location.pathname}${window.location.search}`;
+  return viewerFilterUrl.buildFilterUrl(
+    viewerFilterUrl.currentFilterSnapshot({
+      collectionFilterMode,
+      wantFilterMode,
+      mycroftFilterMode,
+      hiddenOnly,
+    }),
+    window.location.search,
+  );
 }
 
 function parseDetailBookIdFromHash() {
@@ -6519,17 +6684,17 @@ stats.addEventListener("click", (event) => {
   if (event.target.closest("#collection-filter-toggle")) {
     cycleCollectionFilter();
     wantFilterMode = null;
-    render();
+    notifyFilterChange({ replace: false });
     return;
   }
   if (event.target.closest("#hidden-filter-toggle")) {
     hiddenOnly = !hiddenOnly;
-    render();
+    notifyFilterChange({ replace: false });
     return;
   }
   if (event.target.closest("#mycroft-filter-toggle")) {
     cycleMycroftFilter();
-    render();
+    notifyFilterChange({ replace: false });
     return;
   }
   if (event.target.closest("#want-filter-toggle")) {
@@ -6537,7 +6702,7 @@ stats.addEventListener("click", (event) => {
     if (wantFilterMode != null) {
       collectionFilterMode = null;
     }
-    render();
+    notifyFilterChange({ replace: false });
     return;
   }
 });
@@ -6558,8 +6723,6 @@ if (headerLogo) {
 
 
 /* Detail overlay and cover lightbox event listeners */
-
-window.addEventListener("popstate", handleDetailPopState);
 
 bookDetailCloseBtn.addEventListener("click", closeBookDetail);
 bookDetailCover.addEventListener("click", handleCoverZoomTrigger);
@@ -7029,7 +7192,9 @@ if (viewModeToggle) {
 }
 
 function startViewer() {
+  applyFiltersFromUrl();
   loadUserStateAsync().then(() => {
+    syncFilterUrlFromState({ replace: true });
     render();
     openBookDetailFromLocation();
   });

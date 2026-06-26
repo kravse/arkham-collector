@@ -612,4 +612,8 @@ function render() {
   }
 
   syncSettingsHighlightCheckboxes();
+
+  if (typeof syncFilterUrlFromState === "function") {
+    syncFilterUrlFromState({ replace: true });
+  }
 }

@@ -159,6 +159,11 @@ async function buildStaticSiteAsync() {
   const html = applyBuildHtmlTransforms(fs.readFileSync(VIEWER_HTML, "utf8"));
   fs.writeFileSync(path.join(BUILD_DIR, "robots.txt"), ROBOTS_NO_CRAWL);
   fs.writeFileSync(path.join(BUILD_DIR, "index.html"), html);
+  fs.writeFileSync(path.join(BUILD_DIR, "404.html"), html);
+  fs.writeFileSync(
+    path.join(BUILD_DIR, "_redirects"),
+    "/*    /index.html   200\n",
+  );
 
   const buildDataDir = path.join(BUILD_DIR, "data");
   fs.mkdirSync(buildDataDir, { recursive: true });

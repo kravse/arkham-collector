@@ -1,7 +1,5 @@
 /* Detail overlay and cover lightbox event listeners */
 
-window.addEventListener("popstate", handleDetailPopState);
-
 bookDetailCloseBtn.addEventListener("click", closeBookDetail);
 bookDetailCover.addEventListener("click", handleCoverZoomTrigger);
 bookDetailPrevBtn.addEventListener("click", (event) => {

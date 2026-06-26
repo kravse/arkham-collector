@@ -48,17 +48,17 @@ stats.addEventListener("click", (event) => {
   if (event.target.closest("#collection-filter-toggle")) {
     cycleCollectionFilter();
     wantFilterMode = null;
-    render();
+    notifyFilterChange({ replace: false });
     return;
   }
   if (event.target.closest("#hidden-filter-toggle")) {
     hiddenOnly = !hiddenOnly;
-    render();
+    notifyFilterChange({ replace: false });
     return;
   }
   if (event.target.closest("#mycroft-filter-toggle")) {
     cycleMycroftFilter();
-    render();
+    notifyFilterChange({ replace: false });
     return;
   }
   if (event.target.closest("#want-filter-toggle")) {
@@ -66,7 +66,7 @@ stats.addEventListener("click", (event) => {
     if (wantFilterMode != null) {
       collectionFilterMode = null;
     }
-    render();
+    notifyFilterChange({ replace: false });
     return;
   }
 });
