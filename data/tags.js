@@ -454,7 +454,7 @@ window.BOOK_TAGS = {
   "288": [
     "COLLECTION",
     "HORROR",
-    "SHORT STORIES",
+    "NOVEL",
     "SUPERNATURAL FICTION"
   ],
   "289": [
