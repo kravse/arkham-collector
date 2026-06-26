@@ -68,6 +68,46 @@ const viewerWantOrder = (function () {
     return wantOrderIds.filter((id) => present.has(Number(id)));
   }
   
+  function normalizeRect(rect) {
+    return {
+      left: rect.left,
+      top: rect.top,
+      right: rect.right != null ? rect.right : rect.left + rect.width,
+      bottom: rect.bottom != null ? rect.bottom : rect.top + rect.height,
+    };
+  }
+  
+  function rectOverlapArea(a, b) {
+    const ra = normalizeRect(a);
+    const rb = normalizeRect(b);
+    const width = Math.max(0, Math.min(ra.right, rb.right) - Math.max(ra.left, rb.left));
+    const height = Math.max(0, Math.min(ra.bottom, rb.bottom) - Math.max(ra.top, rb.top));
+    return width * height;
+  }
+  
+  /**
+   * Pick the card the floating (lifted) card overlaps most. `cardRects`
+   * includes the dragged card's own slot, so "still mostly over my own
+   * slot" resolves to the drag id and we return null (no target). Returns
+   * null when there is no overlap at all (released outside the grid).
+   */
+  function pickOverlapTargetId(floatingRect, cardRects, dragId) {
+    const drag = Number(dragId);
+    let bestId = null;
+    let bestArea = 0;
+    for (const item of cardRects) {
+      const area = rectOverlapArea(floatingRect, item.rect);
+      if (area > bestArea) {
+        bestArea = area;
+        bestId = Number(item.id);
+      }
+    }
+    if (bestArea <= 0) {
+      return null;
+    }
+    return bestId === drag ? null : bestId;
+  }
+  
   function buildWantDisplayRankById(wantOrderIds, visibleIds) {
     const visible = new Set(
       (visibleIds instanceof Set ? [...visibleIds] : visibleIds).map(Number),
@@ -90,6 +130,8 @@ const viewerWantOrder = (function () {
     sortBooksByWantOrder,
     wouldMoveWantToIndex,
     reorderWantOrderIds,
+    rectOverlapArea,
+    pickOverlapTargetId,
     orderRowIdsByWantOrder,
     buildWantDisplayRankById,
   };

@@ -9,6 +9,10 @@ grid.addEventListener("click", (event) => {
     return;
   }
 
+  if (typeof consumeWantRankClickSuppress === "function" && consumeWantRankClickSuppress()) {
+    return;
+  }
+
   const editButton = event.target.closest(".edit-book-btn");
   if (editButton) {
     event.preventDefault();

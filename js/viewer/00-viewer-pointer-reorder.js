@@ -103,8 +103,144 @@ const viewerPointerReorder = (function () {
   
     return best;
   }
+  
+  function findNearestGridItemAtPoint(options) {
+    const {
+      root,
+      clientX,
+      clientY,
+      itemSelector,
+      excludeItem,
+      elementsFromPoint,
+      gapSlop = 12,
+      getItemRect,
+    } = options;
+  
+    const direct = findRowAtPoint({
+      root,
+      clientX,
+      clientY,
+      rowSelector: itemSelector,
+      excludeRow: excludeItem,
+      elementsFromPoint,
+    });
+    if (direct) {
+      return direct;
+    }
+  
+    if (!root || !itemSelector || typeof root.querySelectorAll !== "function") {
+      return null;
+    }
+  
+    const items = root.querySelectorAll(itemSelector);
+    let best = null;
+    let bestDist = Infinity;
+    let bestReading = Infinity;
+  
+    for (const item of items) {
+      if (item === excludeItem || !root.contains(item)) {
+        continue;
+      }
+  
+      const rect =
+        typeof getItemRect === "function"
+          ? getItemRect(item)
+          : typeof item.getBoundingClientRect === "function"
+            ? item.getBoundingClientRect()
+            : null;
+      if (!rect) {
+        continue;
+      }
+  
+      const expandedLeft = rect.left - gapSlop;
+      const expandedRight = rect.right + gapSlop;
+      const expandedTop = rect.top - gapSlop;
+      const expandedBottom = rect.bottom + gapSlop;
+      if (
+        clientX < expandedLeft ||
+        clientX > expandedRight ||
+        clientY < expandedTop ||
+        clientY > expandedBottom
+      ) {
+        continue;
+      }
+  
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+      const dist = Math.hypot(clientX - centerX, clientY - centerY);
+      const reading = rect.top * 10000 + rect.left;
+      if (
+        dist < bestDist - 0.5 ||
+        (Math.abs(dist - bestDist) <= 0.5 && reading < bestReading)
+      ) {
+        bestDist = dist;
+        bestReading = reading;
+        best = item;
+      }
+    }
+  
+    return best;
+  }
+  
+  function findClosestGridItemAtPoint(options) {
+    const {
+      root,
+      clientX,
+      clientY,
+      itemSelector,
+      excludeItem,
+      getItemRect,
+      maxDistance = Infinity,
+    } = options;
+  
+    if (!root || !itemSelector || typeof root.querySelectorAll !== "function") {
+      return null;
+    }
+  
+    const items = root.querySelectorAll(itemSelector);
+    let best = null;
+    let bestDist = Infinity;
+    let bestReading = Infinity;
+  
+    for (const item of items) {
+      if (item === excludeItem || !root.contains(item)) {
+        continue;
+      }
+  
+      const rect =
+        typeof getItemRect === "function"
+          ? getItemRect(item)
+          : typeof item.getBoundingClientRect === "function"
+            ? item.getBoundingClientRect()
+            : null;
+      if (!rect) {
+        continue;
+      }
+  
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+      const dist = Math.hypot(clientX - centerX, clientY - centerY);
+      if (dist > maxDistance) {
+        continue;
+      }
+  
+      const reading = rect.top * 10000 + rect.left;
+      if (
+        dist < bestDist - 0.5 ||
+        (Math.abs(dist - bestDist) <= 0.5 && reading < bestReading)
+      ) {
+        bestDist = dist;
+        bestReading = reading;
+        best = item;
+      }
+    }
+  
+    return best;
+  }
   return {
     findRowAtPoint,
     findNearestRowAtPoint,
+    findNearestGridItemAtPoint,
+    findClosestGridItemAtPoint,
   };
 })();

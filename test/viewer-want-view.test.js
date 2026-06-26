@@ -34,10 +34,11 @@ test("usesWantPrioritySort and shouldDisableCatalogSort follow want filter", () 
   assert.equal(shouldDisableCatalogSort(null), false);
 });
 
-test("canReorderWantList requires want filter, list view, and no search", () => {
+test("canReorderWantList requires want filter, no search, and list or card view", () => {
   assert.equal(canReorderWantList(WANT_FILTER, "list", false), true);
-  assert.equal(canReorderWantList(WANT_FILTER, "cards", false), false);
+  assert.equal(canReorderWantList(WANT_FILTER, "cards", false), true);
   assert.equal(canReorderWantList(WANT_FILTER, "list", true), false);
+  assert.equal(canReorderWantList(WANT_FILTER, "cards", true), false);
   assert.equal(canReorderWantList(null, "list", false), false);
 });
 

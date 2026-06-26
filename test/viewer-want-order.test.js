@@ -5,6 +5,8 @@ const {
   normalizeWantOrderIds,
   sortBooksByWantOrder,
   reorderWantOrderIds,
+  rectOverlapArea,
+  pickOverlapTargetId,
   wouldMoveWantToIndex,
   orderRowIdsByWantOrder,
   buildWantDisplayRankById,
@@ -47,6 +49,39 @@ test("reorderWantOrderIds moves drag id into target slot", () => {
     reorderWantOrderIds([1, 2, 3, 4], 4, 2),
     [1, 4, 2, 3],
   );
+});
+
+function rect(left, top, width, height) {
+  return { left, top, width, height };
+}
+
+test("rectOverlapArea computes intersection area", () => {
+  assert.equal(rectOverlapArea(rect(0, 0, 100, 100), rect(50, 50, 100, 100)), 2500);
+  assert.equal(rectOverlapArea(rect(0, 0, 100, 100), rect(200, 0, 100, 100)), 0);
+});
+
+test("pickOverlapTargetId picks the most-overlapped non-drag card", () => {
+  const cards = [
+    { id: 1, rect: rect(0, 0, 100, 120) },
+    { id: 2, rect: rect(110, 0, 100, 120) },
+    { id: 3, rect: rect(220, 0, 100, 120) },
+  ];
+  // Floating box mostly over card 2.
+  assert.equal(pickOverlapTargetId(rect(95, 0, 100, 120), cards, 1), 2);
+});
+
+test("pickOverlapTargetId returns null when mostly over its own slot", () => {
+  const cards = [
+    { id: 1, rect: rect(0, 0, 100, 120) },
+    { id: 2, rect: rect(110, 0, 100, 120) },
+  ];
+  // Floating box barely nudged from card 1's slot — own slot wins.
+  assert.equal(pickOverlapTargetId(rect(10, 0, 100, 120), cards, 1), null);
+});
+
+test("pickOverlapTargetId returns null when released outside all cards", () => {
+  const cards = [{ id: 1, rect: rect(0, 0, 100, 120) }];
+  assert.equal(pickOverlapTargetId(rect(500, 500, 100, 120), cards, 9), null);
 });
 
 test("wouldMoveWantToIndex validates indices", () => {

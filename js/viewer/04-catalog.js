@@ -70,7 +70,9 @@ function updateSortControlState() {
     const listHint =
       gridViewMode === "list" && !hasActiveSearch()
         ? " Drag rank tabs to reorder."
-        : "";
+        : gridViewMode === "cards" && !hasActiveSearch()
+          ? " Drag rank chips to reorder."
+          : "";
     sortWantBadge.setAttribute(
       "aria-label",
       `Sorted by your want list priority.${listHint}`,

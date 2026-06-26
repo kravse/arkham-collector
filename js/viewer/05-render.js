@@ -180,7 +180,7 @@ function renderHideButton(book) {
 }
 
 function renderCardWantBadge(book) {
-  if (isInCollection(book) || !isWanted(book)) {
+  if (isInCollection(book) || !isWanted(book) || isWantFilterActive()) {
     return "";
   }
 
@@ -344,14 +344,16 @@ function ensureListCoverPreviewObserver() {
   listCoverPreviewObserver.observe(grid);
 }
 
-function renderWantRankDragHandle(book) {
-  if (
-    !viewerWantView.shouldShowWantRankHandles(
-      wantFilterMode,
-      gridViewMode,
-      hasActiveSearch(),
-    )
-  ) {
+function canShowWantRankControls() {
+  return viewerWantView.canReorderWantList(
+    wantFilterMode,
+    gridViewMode,
+    hasActiveSearch(),
+  );
+}
+
+function renderWantRankListHandle(book) {
+  if (!canShowWantRankControls() || gridViewMode !== "list") {
     return "";
   }
   const rank = wantDisplayRankById?.get(Number(book.id));
@@ -360,6 +362,23 @@ function renderWantRankDragHandle(book) {
   }
   return `<span
     class="want-rank-drag-handle"
+    aria-label="Drag to reorder — rank ${rank}"
+    role="button"
+    tabindex="0"
+    data-book-id="${book.id}"
+  >${rank}</span>`;
+}
+
+function renderWantRankCardChip(book) {
+  if (!canShowWantRankControls() || gridViewMode === "list") {
+    return "";
+  }
+  const rank = wantDisplayRankById?.get(Number(book.id));
+  if (!rank) {
+    return "";
+  }
+  return `<span
+    class="want-rank-drag-handle want-rank-card-chip"
     aria-label="Drag to reorder — rank ${rank}"
     role="button"
     tabindex="0"
@@ -381,11 +400,13 @@ function renderCard(book) {
   const coverVariant = listMode ? "list" : "card";
   const imageHtml = renderCover(book, book.coverCacheKey, coverVariant);
   const coverActions = renderCoverActions(book);
-  const dragHandle = renderWantRankDragHandle(book);
+  const listHandle = renderWantRankListHandle(book);
+  const cardChip = renderWantRankCardChip(book);
 
   const imprintBadge = viewerCardHtml.renderImprintBadge(book, "card");
   const wantBadge = renderCardWantBadge(book);
   const ownedBadge = renderOwnedBadge(book);
+  const hideCardMeta = isWantFilterActive() && !listMode;
   const bottomRow = renderCardBottomRow(
     listMode ? "" : imprintBadge,
     wantBadge,
@@ -423,17 +444,22 @@ function renderCard(book) {
       <div class="card-list-head">
         ${listPrimaryHtml}
       </div>
-      ${viewerCardHtml.renderBookMetaHtml(book)}
+      ${hideCardMeta ? "" : viewerCardHtml.renderBookMetaHtml(book)}
       ${bottomRow}
+      ${cardChip}
     </div>
   </article>`;
 
-  if (dragHandle) {
+  if (listHandle) {
     const rowContent =
       wantRankDragSide === "right"
-        ? `${cardMarkup}${dragHandle}`
-        : `${dragHandle}${cardMarkup}`;
+        ? `${cardMarkup}${listHandle}`
+        : `${listHandle}${cardMarkup}`;
     return `<div class="want-rank-row">${rowContent}</div>`;
+  }
+
+  if (cardChip) {
+    return `<div class="want-rank-row want-rank-row--card">${cardMarkup}</div>`;
   }
 
   return cardMarkup;
@@ -520,8 +546,10 @@ function render() {
         "Mycroft & Moran titles hidden — click the stat again to show all books";
     } else if (isWantFilterActive() && isWantViewExclusive()) {
       pageSubtitle.textContent = hasActiveSearch()
-        ? "Search narrows your want list — clear search to reorder in list view"
-        : "Your want list — drag ranks in list view; tap WANT to show all books";
+        ? "Search narrows your want list — clear search to reorder"
+        : gridViewMode === "list"
+          ? "Your want list — drag rank tabs to reorder; tap WANT to show all books"
+          : "Your want list — drag rank chips to reorder; tap WANT to show all books";
     } else {
       pageSubtitle.textContent =
         "A publishing house of horror and weird fiction—founded in 1939 to rescue Lovecraft from the pulps.";
@@ -567,11 +595,7 @@ function render() {
     return;
   }
 
-  wantDisplayRankById = viewerWantView.shouldShowWantRankHandles(
-    wantFilterMode,
-    gridViewMode,
-    hasActiveSearch(),
-  )
+  wantDisplayRankById = canShowWantRankControls()
     ? viewerWantOrder.buildWantDisplayRankById(
         wantOrderIds,
         visible.map((book) => book.id),

@@ -25,7 +25,7 @@ const viewerWantView = (function () {
   function canReorderWantList(wantFilterMode, viewMode, hasActiveSearch) {
     return (
       isWantFilterActive(wantFilterMode) &&
-      viewMode === "list" &&
+      (viewMode === "list" || viewMode === "cards") &&
       !hasActiveSearch
     );
   }

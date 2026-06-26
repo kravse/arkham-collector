@@ -4,6 +4,8 @@ const assert = require("node:assert/strict");
 const {
   findRowAtPoint,
   findNearestRowAtPoint,
+  findNearestGridItemAtPoint,
+  findClosestGridItemAtPoint,
 } = require("../scripts/lib/viewer-pointer-reorder");
 
 function mockRow(id, root) {
@@ -100,4 +102,62 @@ test("findNearestRowAtPoint falls back to the closest row in a vertical gap", ()
   });
 
   assert.equal(found, rowA);
+});
+
+test("findNearestGridItemAtPoint falls back to the nearest card in a grid gap", () => {
+  const itemA = { id: "a" };
+  const itemB = { id: "b" };
+  const root = {
+    contains(el) {
+      return el === itemA || el === itemB;
+    },
+    querySelectorAll() {
+      return [itemA, itemB];
+    },
+  };
+  const rects = new Map([
+    [itemA, { left: 0, right: 100, top: 0, bottom: 120, width: 100, height: 120 }],
+    [itemB, { left: 116, right: 216, top: 0, bottom: 120, width: 100, height: 120 }],
+  ]);
+
+  const found = findNearestGridItemAtPoint({
+    root,
+    clientX: 108,
+    clientY: 60,
+    itemSelector: ".item",
+    excludeItem: null,
+    gapSlop: 12,
+    elementsFromPoint: () => [root],
+    getItemRect: (item) => rects.get(item),
+  });
+
+  assert.equal(found, itemA);
+});
+
+test("findClosestGridItemAtPoint picks the nearest card by center distance", () => {
+  const itemA = { id: "a" };
+  const itemB = { id: "b" };
+  const root = {
+    contains(el) {
+      return el === itemA || el === itemB;
+    },
+    querySelectorAll() {
+      return [itemA, itemB];
+    },
+  };
+  const rects = new Map([
+    [itemA, { left: 0, right: 100, top: 0, bottom: 120, width: 100, height: 120 }],
+    [itemB, { left: 116, right: 216, top: 0, bottom: 120, width: 100, height: 120 }],
+  ]);
+
+  const found = findClosestGridItemAtPoint({
+    root,
+    clientX: 95,
+    clientY: 60,
+    itemSelector: ".card",
+    excludeItem: null,
+    getItemRect: (item) => rects.get(item),
+  });
+
+  assert.equal(found, itemA);
 });

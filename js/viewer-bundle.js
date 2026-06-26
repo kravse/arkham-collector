@@ -2955,6 +2955,46 @@ const viewerWantOrder = (function () {
     return wantOrderIds.filter((id) => present.has(Number(id)));
   }
   
+  function normalizeRect(rect) {
+    return {
+      left: rect.left,
+      top: rect.top,
+      right: rect.right != null ? rect.right : rect.left + rect.width,
+      bottom: rect.bottom != null ? rect.bottom : rect.top + rect.height,
+    };
+  }
+  
+  function rectOverlapArea(a, b) {
+    const ra = normalizeRect(a);
+    const rb = normalizeRect(b);
+    const width = Math.max(0, Math.min(ra.right, rb.right) - Math.max(ra.left, rb.left));
+    const height = Math.max(0, Math.min(ra.bottom, rb.bottom) - Math.max(ra.top, rb.top));
+    return width * height;
+  }
+  
+  /**
+   * Pick the card the floating (lifted) card overlaps most. `cardRects`
+   * includes the dragged card's own slot, so "still mostly over my own
+   * slot" resolves to the drag id and we return null (no target). Returns
+   * null when there is no overlap at all (released outside the grid).
+   */
+  function pickOverlapTargetId(floatingRect, cardRects, dragId) {
+    const drag = Number(dragId);
+    let bestId = null;
+    let bestArea = 0;
+    for (const item of cardRects) {
+      const area = rectOverlapArea(floatingRect, item.rect);
+      if (area > bestArea) {
+        bestArea = area;
+        bestId = Number(item.id);
+      }
+    }
+    if (bestArea <= 0) {
+      return null;
+    }
+    return bestId === drag ? null : bestId;
+  }
+  
   function buildWantDisplayRankById(wantOrderIds, visibleIds) {
     const visible = new Set(
       (visibleIds instanceof Set ? [...visibleIds] : visibleIds).map(Number),
@@ -2977,6 +3017,8 @@ const viewerWantOrder = (function () {
     sortBooksByWantOrder,
     wouldMoveWantToIndex,
     reorderWantOrderIds,
+    rectOverlapArea,
+    pickOverlapTargetId,
     orderRowIdsByWantOrder,
     buildWantDisplayRankById,
   };
@@ -3088,9 +3130,145 @@ const viewerPointerReorder = (function () {
   
     return best;
   }
+  
+  function findNearestGridItemAtPoint(options) {
+    const {
+      root,
+      clientX,
+      clientY,
+      itemSelector,
+      excludeItem,
+      elementsFromPoint,
+      gapSlop = 12,
+      getItemRect,
+    } = options;
+  
+    const direct = findRowAtPoint({
+      root,
+      clientX,
+      clientY,
+      rowSelector: itemSelector,
+      excludeRow: excludeItem,
+      elementsFromPoint,
+    });
+    if (direct) {
+      return direct;
+    }
+  
+    if (!root || !itemSelector || typeof root.querySelectorAll !== "function") {
+      return null;
+    }
+  
+    const items = root.querySelectorAll(itemSelector);
+    let best = null;
+    let bestDist = Infinity;
+    let bestReading = Infinity;
+  
+    for (const item of items) {
+      if (item === excludeItem || !root.contains(item)) {
+        continue;
+      }
+  
+      const rect =
+        typeof getItemRect === "function"
+          ? getItemRect(item)
+          : typeof item.getBoundingClientRect === "function"
+            ? item.getBoundingClientRect()
+            : null;
+      if (!rect) {
+        continue;
+      }
+  
+      const expandedLeft = rect.left - gapSlop;
+      const expandedRight = rect.right + gapSlop;
+      const expandedTop = rect.top - gapSlop;
+      const expandedBottom = rect.bottom + gapSlop;
+      if (
+        clientX < expandedLeft ||
+        clientX > expandedRight ||
+        clientY < expandedTop ||
+        clientY > expandedBottom
+      ) {
+        continue;
+      }
+  
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+      const dist = Math.hypot(clientX - centerX, clientY - centerY);
+      const reading = rect.top * 10000 + rect.left;
+      if (
+        dist < bestDist - 0.5 ||
+        (Math.abs(dist - bestDist) <= 0.5 && reading < bestReading)
+      ) {
+        bestDist = dist;
+        bestReading = reading;
+        best = item;
+      }
+    }
+  
+    return best;
+  }
+  
+  function findClosestGridItemAtPoint(options) {
+    const {
+      root,
+      clientX,
+      clientY,
+      itemSelector,
+      excludeItem,
+      getItemRect,
+      maxDistance = Infinity,
+    } = options;
+  
+    if (!root || !itemSelector || typeof root.querySelectorAll !== "function") {
+      return null;
+    }
+  
+    const items = root.querySelectorAll(itemSelector);
+    let best = null;
+    let bestDist = Infinity;
+    let bestReading = Infinity;
+  
+    for (const item of items) {
+      if (item === excludeItem || !root.contains(item)) {
+        continue;
+      }
+  
+      const rect =
+        typeof getItemRect === "function"
+          ? getItemRect(item)
+          : typeof item.getBoundingClientRect === "function"
+            ? item.getBoundingClientRect()
+            : null;
+      if (!rect) {
+        continue;
+      }
+  
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+      const dist = Math.hypot(clientX - centerX, clientY - centerY);
+      if (dist > maxDistance) {
+        continue;
+      }
+  
+      const reading = rect.top * 10000 + rect.left;
+      if (
+        dist < bestDist - 0.5 ||
+        (Math.abs(dist - bestDist) <= 0.5 && reading < bestReading)
+      ) {
+        bestDist = dist;
+        bestReading = reading;
+        best = item;
+      }
+    }
+  
+    return best;
+  }
   return {
     findRowAtPoint,
     findNearestRowAtPoint,
+    findNearestGridItemAtPoint,
+    findClosestGridItemAtPoint,
   };
 })();
 
@@ -3122,7 +3300,7 @@ const viewerWantView = (function () {
   function canReorderWantList(wantFilterMode, viewMode, hasActiveSearch) {
     return (
       isWantFilterActive(wantFilterMode) &&
-      viewMode === "list" &&
+      (viewMode === "list" || viewMode === "cards") &&
       !hasActiveSearch
     );
   }
@@ -3587,7 +3765,9 @@ function updateSortControlState() {
     const listHint =
       gridViewMode === "list" && !hasActiveSearch()
         ? " Drag rank tabs to reorder."
-        : "";
+        : gridViewMode === "cards" && !hasActiveSearch()
+          ? " Drag rank chips to reorder."
+          : "";
     sortWantBadge.setAttribute(
       "aria-label",
       `Sorted by your want list priority.${listHint}`,
@@ -3883,7 +4063,7 @@ function renderHideButton(book) {
 }
 
 function renderCardWantBadge(book) {
-  if (isInCollection(book) || !isWanted(book)) {
+  if (isInCollection(book) || !isWanted(book) || isWantFilterActive()) {
     return "";
   }
 
@@ -4047,14 +4227,16 @@ function ensureListCoverPreviewObserver() {
   listCoverPreviewObserver.observe(grid);
 }
 
-function renderWantRankDragHandle(book) {
-  if (
-    !viewerWantView.shouldShowWantRankHandles(
-      wantFilterMode,
-      gridViewMode,
-      hasActiveSearch(),
-    )
-  ) {
+function canShowWantRankControls() {
+  return viewerWantView.canReorderWantList(
+    wantFilterMode,
+    gridViewMode,
+    hasActiveSearch(),
+  );
+}
+
+function renderWantRankListHandle(book) {
+  if (!canShowWantRankControls() || gridViewMode !== "list") {
     return "";
   }
   const rank = wantDisplayRankById?.get(Number(book.id));
@@ -4063,6 +4245,23 @@ function renderWantRankDragHandle(book) {
   }
   return `<span
     class="want-rank-drag-handle"
+    aria-label="Drag to reorder — rank ${rank}"
+    role="button"
+    tabindex="0"
+    data-book-id="${book.id}"
+  >${rank}</span>`;
+}
+
+function renderWantRankCardChip(book) {
+  if (!canShowWantRankControls() || gridViewMode === "list") {
+    return "";
+  }
+  const rank = wantDisplayRankById?.get(Number(book.id));
+  if (!rank) {
+    return "";
+  }
+  return `<span
+    class="want-rank-drag-handle want-rank-card-chip"
     aria-label="Drag to reorder — rank ${rank}"
     role="button"
     tabindex="0"
@@ -4084,11 +4283,13 @@ function renderCard(book) {
   const coverVariant = listMode ? "list" : "card";
   const imageHtml = renderCover(book, book.coverCacheKey, coverVariant);
   const coverActions = renderCoverActions(book);
-  const dragHandle = renderWantRankDragHandle(book);
+  const listHandle = renderWantRankListHandle(book);
+  const cardChip = renderWantRankCardChip(book);
 
   const imprintBadge = viewerCardHtml.renderImprintBadge(book, "card");
   const wantBadge = renderCardWantBadge(book);
   const ownedBadge = renderOwnedBadge(book);
+  const hideCardMeta = isWantFilterActive() && !listMode;
   const bottomRow = renderCardBottomRow(
     listMode ? "" : imprintBadge,
     wantBadge,
@@ -4126,17 +4327,22 @@ function renderCard(book) {
       <div class="card-list-head">
         ${listPrimaryHtml}
       </div>
-      ${viewerCardHtml.renderBookMetaHtml(book)}
+      ${hideCardMeta ? "" : viewerCardHtml.renderBookMetaHtml(book)}
       ${bottomRow}
+      ${cardChip}
     </div>
   </article>`;
 
-  if (dragHandle) {
+  if (listHandle) {
     const rowContent =
       wantRankDragSide === "right"
-        ? `${cardMarkup}${dragHandle}`
-        : `${dragHandle}${cardMarkup}`;
+        ? `${cardMarkup}${listHandle}`
+        : `${listHandle}${cardMarkup}`;
     return `<div class="want-rank-row">${rowContent}</div>`;
+  }
+
+  if (cardChip) {
+    return `<div class="want-rank-row want-rank-row--card">${cardMarkup}</div>`;
   }
 
   return cardMarkup;
@@ -4223,8 +4429,10 @@ function render() {
         "Mycroft & Moran titles hidden — click the stat again to show all books";
     } else if (isWantFilterActive() && isWantViewExclusive()) {
       pageSubtitle.textContent = hasActiveSearch()
-        ? "Search narrows your want list — clear search to reorder in list view"
-        : "Your want list — drag ranks in list view; tap WANT to show all books";
+        ? "Search narrows your want list — clear search to reorder"
+        : gridViewMode === "list"
+          ? "Your want list — drag rank tabs to reorder; tap WANT to show all books"
+          : "Your want list — drag rank chips to reorder; tap WANT to show all books";
     } else {
       pageSubtitle.textContent =
         "A publishing house of horror and weird fiction—founded in 1939 to rescue Lovecraft from the pulps.";
@@ -4270,11 +4478,7 @@ function render() {
     return;
   }
 
-  wantDisplayRankById = viewerWantView.shouldShowWantRankHandles(
-    wantFilterMode,
-    gridViewMode,
-    hasActiveSearch(),
-  )
+  wantDisplayRankById = canShowWantRankControls()
     ? viewerWantOrder.buildWantDisplayRankById(
         wantOrderIds,
         visible.map((book) => book.id),
@@ -5889,19 +6093,26 @@ function refreshBookOrderDialogIfOpen() {
 }
 
 
-/* Want list drag reorder (list view only) */
+/* Want list drag reorder (list and card view, shared lift-and-drop) */
 
 let wantRankDragId = null;
 let wantRankPointerDrag = null;
-let wantRankDragStartOrder = null;
-let wantRankLastTargetId = null;
-let wantRankLastGlowRow = null;
-let wantRankDragDirty = false;
+let wantRankTargetEl = null;
+let wantRankTargetId = null;
+let wantRankSuppressClick = false;
 
-const WANT_RANK_ROW_GAP_SLOP = 20;
+const WANT_LIST_ROW_SELECTOR = ".want-rank-row:not(.want-rank-row--card)";
 
 function isWantRankDragActive() {
   return wantRankPointerDrag != null;
+}
+
+function consumeWantRankClickSuppress() {
+  if (!wantRankSuppressClick) {
+    return false;
+  }
+  wantRankSuppressClick = false;
+  return true;
 }
 
 function canReorderWantRank() {
@@ -5912,156 +6123,206 @@ function canReorderWantRank() {
   );
 }
 
-function findWantRankRowAtPoint(clientX, clientY) {
-  return viewerPointerReorder.findNearestRowAtPoint({
-    root: grid,
-    clientX,
-    clientY,
-    rowSelector: ".want-rank-row",
-    excludeRow: null,
-    gapSlop: WANT_RANK_ROW_GAP_SLOP,
-    elementsFromPoint: document.elementsFromPoint.bind(document),
-  });
-}
-
-function reorderWantToTarget(dragId, targetId) {
-  const next = viewerWantOrder.reorderWantOrderIds(
-    wantOrderIds,
-    dragId,
-    targetId,
-  );
-  if (next === wantOrderIds) {
-    return false;
-  }
-  setWantOrderIds(next);
-  return true;
-}
-
 function getWantRankRowBookId(row) {
   const card = row?.querySelector(".card");
   const bookId = Number(card?.dataset.bookId);
   return Number.isInteger(bookId) ? bookId : null;
 }
 
-function syncWantRankRowDomOrder() {
-  const rows = [...grid.querySelectorAll(".want-rank-row")];
-  if (!rows.length) {
+/* In list view we lift the whole row; in card view we lift just the card. The
+   targeting, highlight, and commit logic is identical for both. */
+function getWantLiftConfig() {
+  if (gridViewMode === "list") {
+    return {
+      liftSelector: ".want-rank-row",
+      targetSelector: WANT_LIST_ROW_SELECTOR,
+      floatingClass: "want-rank-row-floating",
+      getId: getWantRankRowBookId,
+    };
+  }
+  return {
+    liftSelector: ".card",
+    targetSelector: ".want-rank-row--card .card",
+    floatingClass: "want-rank-card-floating",
+    getId: (el) => Number(el.dataset.bookId),
+  };
+}
+
+function collectWantTargetRects(config) {
+  return [...grid.querySelectorAll(config.targetSelector)]
+    .map((el) => ({
+      id: config.getId(el),
+      el,
+      rect: el.getBoundingClientRect(),
+    }))
+    .filter((item) => Number.isInteger(item.id));
+}
+
+function currentFloatingRect(clientX, clientY) {
+  const drag = wantRankPointerDrag;
+  const left = clientX - drag.offsetX;
+  const top = clientY - drag.offsetY;
+  return {
+    left,
+    top,
+    width: drag.width,
+    height: drag.height,
+    right: left + drag.width,
+    bottom: top + drag.height,
+  };
+}
+
+function highlightWantTarget(targetId, rects) {
+  if (targetId === wantRankTargetId) {
     return;
   }
-
-  const presentIds = rows
-    .map((row) => getWantRankRowBookId(row))
-    .filter((id) => id != null);
-  const orderedIds = viewerWantOrder.orderRowIdsByWantOrder(
-    presentIds,
-    wantOrderIds,
-  );
-  const rowById = new Map(
-    rows
-      .map((row) => [getWantRankRowBookId(row), row])
-      .filter(([id]) => id != null),
-  );
-
-  for (const id of orderedIds) {
-    const row = rowById.get(id);
-    if (row) {
-      grid.appendChild(row);
-    }
+  if (wantRankTargetEl) {
+    wantRankTargetEl.classList.remove("want-rank-drop-target");
+  }
+  wantRankTargetId = targetId;
+  wantRankTargetEl =
+    targetId == null
+      ? null
+      : rects.find((item) => item.id === targetId)?.el ?? null;
+  if (wantRankTargetEl) {
+    wantRankTargetEl.classList.add("want-rank-drop-target");
   }
 }
 
-function updateWantRankHandleLabels() {
-  const rows = [...grid.querySelectorAll(".want-rank-row")];
-  const presentIds = rows
-    .map((row) => getWantRankRowBookId(row))
-    .filter((id) => id != null);
-  const rankById = viewerWantOrder.buildWantDisplayRankById(
-    wantOrderIds,
-    presentIds,
-  );
-
-  grid.querySelectorAll(".want-rank-row").forEach((row) => {
-    const bookId = getWantRankRowBookId(row);
-    const rank = bookId == null ? null : rankById.get(bookId);
-    const handle = row.querySelector(".want-rank-drag-handle");
-    if (!handle || rank == null) {
-      return;
-    }
-    handle.textContent = String(rank);
-    handle.setAttribute("aria-label", `Drag to reorder — rank ${rank}`);
-  });
+function teardownWantLift() {
+  const drag = wantRankPointerDrag;
+  if (drag?.clone) {
+    drag.clone.remove();
+  }
+  if (drag?.liftEl) {
+    drag.liftEl.classList.remove("want-rank-card-lift-source");
+  }
+  if (wantRankTargetEl) {
+    wantRankTargetEl.classList.remove("want-rank-drop-target");
+  }
+  wantRankTargetEl = null;
+  wantRankTargetId = null;
 }
 
 function clearWantRankDragState() {
+  teardownWantLift();
   wantRankDragId = null;
   wantRankPointerDrag = null;
-  wantRankDragStartOrder = null;
-  wantRankLastTargetId = null;
-  wantRankLastGlowRow = null;
-  wantRankDragDirty = false;
   document.body.classList.remove("want-rank-drag-active");
   grid
-    .querySelectorAll(
-      ".card-want-rank-dragging, .want-rank-drop-target",
-    )
+    .querySelectorAll(".want-rank-drop-target, .want-rank-card-lift-source")
     .forEach((element) => {
       element.classList.remove(
-        "card-want-rank-dragging",
         "want-rank-drop-target",
+        "want-rank-card-lift-source",
       );
     });
 }
 
-function updateWantRankDropTarget(row) {
-  if (row) {
-    wantRankLastGlowRow = row;
-  }
+function onWantRankPointerMoveDrag(clientX, clientY) {
+  const drag = wantRankPointerDrag;
+  drag.clone.style.left = `${clientX - drag.offsetX}px`;
+  drag.clone.style.top = `${clientY - drag.offsetY}px`;
 
-  const glowRow = wantRankLastGlowRow;
-  grid.querySelectorAll(".want-rank-drop-target").forEach((element) => {
-    if (element !== glowRow) {
-      element.classList.remove("want-rank-drop-target");
-    }
-  });
-
-  if (!glowRow || !wantRankDragId) {
-    return;
-  }
-
-  glowRow.classList.add("want-rank-drop-target");
+  const floatingRect = currentFloatingRect(clientX, clientY);
+  const rects = collectWantTargetRects(drag.config);
+  const targetId = viewerWantOrder.pickOverlapTargetId(
+    floatingRect,
+    rects,
+    wantRankDragId,
+  );
+  highlightWantTarget(targetId, rects);
 }
 
-function tryLiveWantRankReorder(targetCard) {
-  if (!targetCard || !wantRankDragId || targetCard === wantRankPointerDrag?.card) {
-    return;
+function commitWantDrop(clientX, clientY) {
+  const drag = wantRankPointerDrag;
+  const floatingRect = currentFloatingRect(clientX, clientY);
+  const rects = collectWantTargetRects(drag.config);
+  let targetId = viewerWantOrder.pickOverlapTargetId(
+    floatingRect,
+    rects,
+    wantRankDragId,
+  );
+  // Fall back to the highlighted target from the last pointermove — release
+  // coords can differ slightly from where the user saw the glow.
+  if (targetId == null && wantRankTargetId != null) {
+    targetId = wantRankTargetId;
+  }
+  if (targetId == null) {
+    return wantOrderIds;
   }
 
-  const targetId = Number(targetCard.dataset.bookId);
-  if (!Number.isInteger(targetId) || targetId === wantRankLastTargetId) {
-    return;
-  }
-
-  wantRankLastTargetId = targetId;
-  const targetIndex = wantOrderIds.indexOf(targetId);
-  if (
-    !viewerWantOrder.wouldMoveWantToIndex(
-      wantOrderIds,
-      wantRankDragId,
-      targetIndex,
-    )
-  ) {
-    return;
-  }
-
-  if (!reorderWantToTarget(wantRankDragId, targetId)) {
-    return;
-  }
-
-  wantRankDragDirty = true;
-  syncWantRankRowDomOrder();
-  updateWantRankHandleLabels();
-  wantRankPointerDrag.card.classList.add("card-want-rank-dragging");
+  return viewerWantOrder.reorderWantOrderIds(
+    wantOrderIds,
+    wantRankDragId,
+    targetId,
+  );
 }
+
+function finishWantDrag(event) {
+  const cancelled = event.type === "pointercancel";
+  let next = wantOrderIds;
+  if (!cancelled && canReorderWantRank() && wantRankDragId) {
+    next = commitWantDrop(event.clientX, event.clientY);
+  }
+
+  teardownWantLift();
+
+  if (next === wantOrderIds) {
+    return false;
+  }
+
+  setWantOrderIds(next);
+  wantRankSuppressClick = true;
+  saveUserState();
+  return true;
+}
+
+function onWantRankPointerDownDrag(event, handle) {
+  const config = getWantLiftConfig();
+  const liftEl = handle.closest(config.liftSelector);
+  if (!liftEl) {
+    return false;
+  }
+
+  const id = config.getId(liftEl);
+  if (!Number.isInteger(id)) {
+    return false;
+  }
+
+  const rect = liftEl.getBoundingClientRect();
+  const clone = liftEl.cloneNode(true);
+  clone.classList.add(config.floatingClass);
+  clone.classList.remove("want-rank-drop-target");
+  clone.style.position = "fixed";
+  clone.style.left = `${rect.left}px`;
+  clone.style.top = `${rect.top}px`;
+  clone.style.width = `${rect.width}px`;
+  clone.style.height = `${rect.height}px`;
+  clone.style.margin = "0";
+  clone.style.pointerEvents = "none";
+  document.body.appendChild(clone);
+
+  liftEl.classList.add("want-rank-card-lift-source");
+
+  wantRankDragId = id;
+  wantRankTargetEl = null;
+  wantRankTargetId = null;
+  wantRankPointerDrag = {
+    config,
+    liftEl,
+    pointerId: event.pointerId,
+    clone,
+    offsetX: event.clientX - rect.left,
+    offsetY: event.clientY - rect.top,
+    width: rect.width,
+    height: rect.height,
+  };
+  document.body.classList.add("want-rank-drag-active");
+  return true;
+}
+
+/* --- Shared pointer handlers --- */
 
 function onWantRankPointerDown(event) {
   if (!canReorderWantRank() || event.button !== 0) {
@@ -6073,31 +6334,13 @@ function onWantRankPointerDown(event) {
     return;
   }
 
-  const row = handle.closest(".want-rank-row");
-  const card = row?.querySelector(".card");
-  if (!card) {
-    return;
-  }
-
-  const bookId = Number(card.dataset.bookId);
-  if (!Number.isInteger(bookId)) {
-    return;
-  }
-
   event.preventDefault();
+  event.stopPropagation();
   handle.setPointerCapture(event.pointerId);
 
-  wantRankDragId = bookId;
-  wantRankDragStartOrder = [...wantOrderIds];
-  wantRankLastTargetId = null;
-  wantRankLastGlowRow = null;
-  wantRankDragDirty = false;
-  wantRankPointerDrag = {
-    card,
-    pointerId: event.pointerId,
-  };
-  document.body.classList.add("want-rank-drag-active");
-  card.classList.add("card-want-rank-dragging");
+  if (!onWantRankPointerDownDrag(event, handle)) {
+    handle.releasePointerCapture(event.pointerId);
+  }
 }
 
 function onWantRankPointerMove(event) {
@@ -6110,10 +6353,7 @@ function onWantRankPointerMove(event) {
   }
 
   event.preventDefault();
-  const row = findWantRankRowAtPoint(event.clientX, event.clientY);
-  const card = row?.querySelector(".card") ?? null;
-  tryLiveWantRankReorder(card);
-  updateWantRankDropTarget(row);
+  onWantRankPointerMoveDrag(event.clientX, event.clientY);
 }
 
 function finishWantRankPointerDrag(event) {
@@ -6124,23 +6364,13 @@ function finishWantRankPointerDrag(event) {
     return;
   }
 
-  if (canReorderWantRank() && wantRankDragId) {
-    const row = findWantRankRowAtPoint(event.clientX, event.clientY);
-    const card = row?.querySelector(".card") ?? null;
-    if (card && card !== wantRankPointerDrag.card) {
-      tryLiveWantRankReorder(card);
-    }
-
-    if (event.type === "pointercancel" && wantRankDragStartOrder) {
-      setWantOrderIds(wantRankDragStartOrder);
-      syncWantRankRowDomOrder();
-      updateWantRankHandleLabels();
-    } else if (wantRankDragDirty) {
-      saveUserState();
-    }
-  }
+  const shouldRender = finishWantDrag(event);
 
   clearWantRankDragState();
+
+  if (shouldRender) {
+    render();
+  }
 }
 
 grid.addEventListener("pointerdown", onWantRankPointerDown);
@@ -6157,6 +6387,10 @@ let randomCardLogoTapTimes = [];
 
 grid.addEventListener("click", (event) => {
   if (event.target.closest(".want-rank-drag-handle")) {
+    return;
+  }
+
+  if (typeof consumeWantRankClickSuppress === "function" && consumeWantRankClickSuppress()) {
     return;
   }
 
