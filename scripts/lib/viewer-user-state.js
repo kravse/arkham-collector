@@ -43,8 +43,18 @@ function defaultUserState() {
       highlightCollection: true,
       showMagazines: false,
       wantListRanking: true,
+      wantRankDragSide: "right",
     },
   };
+}
+
+const WANT_RANK_DRAG_SIDES = new Set(["left", "right"]);
+
+function normalizeWantRankDragSide(raw, fallback = "right") {
+  if (raw && WANT_RANK_DRAG_SIDES.has(raw)) {
+    return raw;
+  }
+  return fallback;
 }
 
 function emptyCollectionSlot() {
@@ -233,6 +243,10 @@ function normalizePreferences(raw, base) {
       typeof raw?.wantListRanking === "boolean"
         ? raw.wantListRanking
         : base.preferences.wantListRanking,
+    wantRankDragSide: normalizeWantRankDragSide(
+      raw?.wantRankDragSide,
+      base.preferences.wantRankDragSide,
+    ),
   };
 }
 
@@ -426,6 +440,7 @@ function buildUserStateFromRuntime(snapshot, options = {}) {
         typeof snapshot.wantListRanking === "boolean"
           ? snapshot.wantListRanking
           : true,
+      wantRankDragSide: normalizeWantRankDragSide(snapshot.wantRankDragSide),
     },
   };
 }
@@ -446,6 +461,7 @@ function applyUserStateToRuntime(state) {
     highlightCollection: parsed.preferences.highlightCollection,
     showMagazines: parsed.preferences.showMagazines,
     wantListRanking: parsed.preferences.wantListRanking,
+    wantRankDragSide: parsed.preferences.wantRankDragSide,
   };
 }
 
@@ -472,6 +488,8 @@ module.exports = {
   normalizeSort,
   normalizeBoolFlag,
   normalizeStorageMode,
+  normalizeWantRankDragSide,
+  WANT_RANK_DRAG_SIDES,
   migrateFromLegacy,
   migrateV1ToV2,
   parseUserState,

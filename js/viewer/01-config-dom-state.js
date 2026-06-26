@@ -92,6 +92,9 @@ const importCollectionInput = document.getElementById("import-collection-input")
 const importCollectionStatus = document.getElementById("import-collection-status");
 const highlightWantsInput = document.getElementById("highlight-wants");
 const wantListRankingInput = document.getElementById("want-list-ranking");
+const wantRankDragSideLeftInput = document.getElementById("want-rank-drag-side-left");
+const wantRankDragSideRightInput = document.getElementById("want-rank-drag-side-right");
+const wantRankDragSideOption = document.getElementById("want-rank-drag-side-option");
 const highlightCollectionInput = document.getElementById("highlight-collection");
 const showMagazinesInput = document.getElementById("show-magazines");
 const showMagazinesOption = document.getElementById("show-magazines-option");
@@ -132,6 +135,7 @@ let highlightWants = true;
 let highlightCollection = true;
 let showMagazines = false;
 let wantListRanking = true;
+let wantRankDragSide = "right";
 let detailBookId = null;
 let bookOrderIds = Array.isArray(window.BOOK_ORDER)
   ? window.BOOK_ORDER.map((id) => Number(id))
@@ -211,6 +215,15 @@ function syncSettingsHighlightCheckboxes() {
   }
   if (wantListRankingInput) {
     wantListRankingInput.checked = wantListRanking;
+  }
+  if (wantRankDragSideOption) {
+    wantRankDragSideOption.hidden = !wantListRanking;
+  }
+  if (wantRankDragSideLeftInput) {
+    wantRankDragSideLeftInput.checked = wantRankDragSide === "left";
+  }
+  if (wantRankDragSideRightInput) {
+    wantRankDragSideRightInput.checked = wantRankDragSide === "right";
   }
   if (highlightCollectionInput) {
     highlightCollectionInput.checked = highlightCollection;

@@ -421,7 +421,11 @@ function renderCard(book) {
   </article>`;
 
   if (dragHandle) {
-    return `<div class="want-rank-row">${dragHandle}${cardMarkup}</div>`;
+    const rowContent =
+      wantRankDragSide === "right"
+        ? `${cardMarkup}${dragHandle}`
+        : `${dragHandle}${cardMarkup}`;
+    return `<div class="want-rank-row">${rowContent}</div>`;
   }
 
   return cardMarkup;

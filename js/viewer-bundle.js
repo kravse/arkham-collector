@@ -92,6 +92,9 @@ const importCollectionInput = document.getElementById("import-collection-input")
 const importCollectionStatus = document.getElementById("import-collection-status");
 const highlightWantsInput = document.getElementById("highlight-wants");
 const wantListRankingInput = document.getElementById("want-list-ranking");
+const wantRankDragSideLeftInput = document.getElementById("want-rank-drag-side-left");
+const wantRankDragSideRightInput = document.getElementById("want-rank-drag-side-right");
+const wantRankDragSideOption = document.getElementById("want-rank-drag-side-option");
 const highlightCollectionInput = document.getElementById("highlight-collection");
 const showMagazinesInput = document.getElementById("show-magazines");
 const showMagazinesOption = document.getElementById("show-magazines-option");
@@ -132,6 +135,7 @@ let highlightWants = true;
 let highlightCollection = true;
 let showMagazines = false;
 let wantListRanking = true;
+let wantRankDragSide = "right";
 let detailBookId = null;
 let bookOrderIds = Array.isArray(window.BOOK_ORDER)
   ? window.BOOK_ORDER.map((id) => Number(id))
@@ -211,6 +215,15 @@ function syncSettingsHighlightCheckboxes() {
   }
   if (wantListRankingInput) {
     wantListRankingInput.checked = wantListRanking;
+  }
+  if (wantRankDragSideOption) {
+    wantRankDragSideOption.hidden = !wantListRanking;
+  }
+  if (wantRankDragSideLeftInput) {
+    wantRankDragSideLeftInput.checked = wantRankDragSide === "left";
+  }
+  if (wantRankDragSideRightInput) {
+    wantRankDragSideRightInput.checked = wantRankDragSide === "right";
   }
   if (highlightCollectionInput) {
     highlightCollectionInput.checked = highlightCollection;
@@ -573,8 +586,18 @@ const viewerUserState = (function () {
         highlightCollection: true,
         showMagazines: false,
         wantListRanking: true,
+        wantRankDragSide: "right",
       },
     };
+  }
+  
+  const WANT_RANK_DRAG_SIDES = new Set(["left", "right"]);
+  
+  function normalizeWantRankDragSide(raw, fallback = "right") {
+    if (raw && WANT_RANK_DRAG_SIDES.has(raw)) {
+      return raw;
+    }
+    return fallback;
   }
   
   function emptyCollectionSlot() {
@@ -763,6 +786,10 @@ const viewerUserState = (function () {
         typeof raw?.wantListRanking === "boolean"
           ? raw.wantListRanking
           : base.preferences.wantListRanking,
+      wantRankDragSide: normalizeWantRankDragSide(
+        raw?.wantRankDragSide,
+        base.preferences.wantRankDragSide,
+      ),
     };
   }
   
@@ -956,6 +983,7 @@ const viewerUserState = (function () {
           typeof snapshot.wantListRanking === "boolean"
             ? snapshot.wantListRanking
             : true,
+        wantRankDragSide: normalizeWantRankDragSide(snapshot.wantRankDragSide),
       },
     };
   }
@@ -976,6 +1004,7 @@ const viewerUserState = (function () {
       highlightCollection: parsed.preferences.highlightCollection,
       showMagazines: parsed.preferences.showMagazines,
       wantListRanking: parsed.preferences.wantListRanking,
+      wantRankDragSide: parsed.preferences.wantRankDragSide,
     };
   }
   
@@ -2371,6 +2400,7 @@ function collectRuntimeSnapshot() {
     highlightCollection,
     showMagazines,
     wantListRanking,
+    wantRankDragSide,
   };
 }
 
@@ -2389,6 +2419,7 @@ function applyRuntimeSnapshot(runtime) {
   highlightCollection = runtime.highlightCollection;
   showMagazines = runtime.showMagazines;
   wantListRanking = runtime.wantListRanking;
+  wantRankDragSide = runtime.wantRankDragSide;
   if (!wantListRanking && wantFilterMode === "ranked") {
     wantFilterMode = null;
   }
@@ -4000,7 +4031,11 @@ function renderCard(book) {
   </article>`;
 
   if (dragHandle) {
-    return `<div class="want-rank-row">${dragHandle}${cardMarkup}</div>`;
+    const rowContent =
+      wantRankDragSide === "right"
+        ? `${cardMarkup}${dragHandle}`
+        : `${dragHandle}${cardMarkup}`;
+    return `<div class="want-rank-row">${rowContent}</div>`;
   }
 
   return cardMarkup;
@@ -6333,6 +6368,29 @@ if (wantListRankingInput) {
     if (!wantListRanking && wantFilterMode === "ranked") {
       wantFilterMode = null;
     }
+    syncSettingsHighlightCheckboxes();
+    saveUserState();
+    render();
+  });
+}
+
+if (wantRankDragSideLeftInput) {
+  wantRankDragSideLeftInput.addEventListener("change", () => {
+    if (!wantRankDragSideLeftInput.checked) {
+      return;
+    }
+    wantRankDragSide = "left";
+    saveUserState();
+    render();
+  });
+}
+
+if (wantRankDragSideRightInput) {
+  wantRankDragSideRightInput.addEventListener("change", () => {
+    if (!wantRankDragSideRightInput.checked) {
+      return;
+    }
+    wantRankDragSide = "right";
     saveUserState();
     render();
   });

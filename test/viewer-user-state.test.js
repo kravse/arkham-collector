@@ -104,11 +104,13 @@ test("buildUserStateFromRuntime roundtrips wantOrderIds through parseUserState",
     highlightCollection: false,
     showMagazines: true,
     wantListRanking: false,
+    wantRankDragSide: "left",
   });
   const parsed = parseUserState(serializeUserState(built));
   assert.deepEqual(parsed.wantIds, [1, 2]);
   assert.deepEqual(parsed.wantOrderIds, [2, 1]);
   assert.equal(parsed.preferences.wantListRanking, false);
+  assert.equal(parsed.preferences.wantRankDragSide, "left");
 });
 
 test("buildUserStateFromRuntime roundtrips through parseUserState", () => {
@@ -223,6 +225,7 @@ test("defaultUserState matches first-visit defaults", () => {
   assert.equal(state.storageMode, "local");
   assert.deepEqual(state.collectionIds, []);
   assert.equal(state.preferences.highlightWants, true);
+  assert.equal(state.preferences.wantRankDragSide, "right");
 });
 
 test("normalizeIdArray rejects invalid JSON arrays", () => {

@@ -218,7 +218,12 @@
   }
 
   body.view-mode-list.viewing-want-ranked .want-rank-row {
-    gap: 0.28rem;
+    gap: 0.36rem;
+  }
+
+  body.view-mode-list.viewing-want-ranked .want-rank-drag-handle {
+    font-size: 0.84rem;
+    border-radius: 7px;
   }
 
   body.view-mode-list .card {

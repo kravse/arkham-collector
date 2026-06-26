@@ -195,6 +195,29 @@ if (wantListRankingInput) {
     if (!wantListRanking && wantFilterMode === "ranked") {
       wantFilterMode = null;
     }
+    syncSettingsHighlightCheckboxes();
+    saveUserState();
+    render();
+  });
+}
+
+if (wantRankDragSideLeftInput) {
+  wantRankDragSideLeftInput.addEventListener("change", () => {
+    if (!wantRankDragSideLeftInput.checked) {
+      return;
+    }
+    wantRankDragSide = "left";
+    saveUserState();
+    render();
+  });
+}
+
+if (wantRankDragSideRightInput) {
+  wantRankDragSideRightInput.addEventListener("change", () => {
+    if (!wantRankDragSideRightInput.checked) {
+      return;
+    }
+    wantRankDragSide = "right";
     saveUserState();
     render();
   });

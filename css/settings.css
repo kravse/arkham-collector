@@ -185,6 +185,26 @@
   overflow: hidden;
 }
 
+.settings-control-group--nested {
+  margin: 0.55rem 0.65rem 0.65rem;
+  border-color: rgba(255, 255, 255, 0.06);
+  background: rgba(10, 12, 16, 0.45);
+}
+
+.settings-control-group--nested[hidden] {
+  display: none;
+}
+
+.settings-control-group-label {
+  margin: 0;
+  padding: 0.55rem 0.65rem 0.35rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: rgba(232, 234, 237, 0.62);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
 .settings-control-row {
   position: relative;
   display: flex;

@@ -121,6 +121,7 @@ function collectRuntimeSnapshot() {
     highlightCollection,
     showMagazines,
     wantListRanking,
+    wantRankDragSide,
   };
 }
 
@@ -139,6 +140,7 @@ function applyRuntimeSnapshot(runtime) {
   highlightCollection = runtime.highlightCollection;
   showMagazines = runtime.showMagazines;
   wantListRanking = runtime.wantListRanking;
+  wantRankDragSide = runtime.wantRankDragSide;
   if (!wantListRanking && wantFilterMode === "ranked") {
     wantFilterMode = null;
   }
