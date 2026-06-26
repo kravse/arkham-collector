@@ -224,6 +224,7 @@ test("defaultUserState matches first-visit defaults", () => {
   assert.deepEqual(state.collectionIds, []);
   assert.equal(state.preferences.highlightWants, true);
   assert.equal(state.preferences.wantRankDragSide, "right");
+  assert.equal(state.preferences.wantOrderLocked, false);
 });
 
 test("normalizeIdArray rejects invalid JSON arrays", () => {

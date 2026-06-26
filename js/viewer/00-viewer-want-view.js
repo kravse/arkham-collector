@@ -22,16 +22,26 @@ const viewerWantView = (function () {
     return isWantFilterActive(wantFilterMode);
   }
   
-  function canReorderWantList(wantFilterMode, viewMode, hasActiveSearch) {
+  function canReorderWantList(
+    wantFilterMode,
+    viewMode,
+    hasActiveSearch,
+    wantOrderLocked = false,
+  ) {
+    return (
+      isWantFilterActive(wantFilterMode) &&
+      (viewMode === "list" || viewMode === "cards") &&
+      !hasActiveSearch &&
+      !wantOrderLocked
+    );
+  }
+  
+  function shouldShowWantRankHandles(wantFilterMode, viewMode, hasActiveSearch) {
     return (
       isWantFilterActive(wantFilterMode) &&
       (viewMode === "list" || viewMode === "cards") &&
       !hasActiveSearch
     );
-  }
-  
-  function shouldShowWantRankHandles(wantFilterMode, viewMode, hasActiveSearch) {
-    return canReorderWantList(wantFilterMode, viewMode, hasActiveSearch);
   }
   return {
     WANT_FILTER,

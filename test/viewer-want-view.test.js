@@ -34,17 +34,17 @@ test("usesWantPrioritySort and shouldDisableCatalogSort follow want filter", () 
   assert.equal(shouldDisableCatalogSort(null), false);
 });
 
-test("canReorderWantList requires want filter, no search, and list or card view", () => {
+test("canReorderWantList requires want filter, no search, list or card view, and unlocked order", () => {
   assert.equal(canReorderWantList(WANT_FILTER, "list", false), true);
   assert.equal(canReorderWantList(WANT_FILTER, "cards", false), true);
   assert.equal(canReorderWantList(WANT_FILTER, "list", true), false);
   assert.equal(canReorderWantList(WANT_FILTER, "cards", true), false);
   assert.equal(canReorderWantList(null, "list", false), false);
+  assert.equal(canReorderWantList(WANT_FILTER, "list", false, true), false);
 });
 
-test("shouldShowWantRankHandles matches canReorderWantList", () => {
-  assert.equal(
-    shouldShowWantRankHandles(WANT_FILTER, "list", false),
-    canReorderWantList(WANT_FILTER, "list", false),
-  );
+test("shouldShowWantRankHandles ignores lock but requires want filter and no search", () => {
+  assert.equal(shouldShowWantRankHandles(WANT_FILTER, "list", false), true);
+  assert.equal(shouldShowWantRankHandles(WANT_FILTER, "list", true), false);
+  assert.equal(shouldShowWantRankHandles(null, "list", false), false);
 });

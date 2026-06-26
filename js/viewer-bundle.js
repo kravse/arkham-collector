@@ -17,6 +17,7 @@ const searchClearBtn = document.getElementById("search-clear");
 const viewModeToggle = document.getElementById("view-mode-toggle");
 const sortSelect = document.getElementById("sort");
 const sortWantBadge = document.getElementById("sort-want-badge");
+const wantOrderLockBtn = document.getElementById("want-order-lock-btn");
 const sortControlWrap = document.getElementById("sort-control-wrap");
 const bookOrderBtn = document.getElementById("book-order-btn");
 const bookOrderDialog = document.getElementById("book-order-dialog");
@@ -135,6 +136,7 @@ let highlightWants = true;
 let highlightCollection = true;
 let showMagazines = false;
 let wantRankDragSide = "right";
+let wantOrderLocked = false;
 let detailBookId = null;
 let bookOrderIds = Array.isArray(window.BOOK_ORDER)
   ? window.BOOK_ORDER.map((id) => Number(id))
@@ -571,6 +573,7 @@ const viewerUserState = (function () {
         highlightCollection: true,
         showMagazines: false,
         wantRankDragSide: "right",
+        wantOrderLocked: false,
       },
     };
   }
@@ -746,6 +749,10 @@ const viewerUserState = (function () {
     return fallback;
   }
   
+  function normalizeWantOrderLocked(raw, fallback = false) {
+    return typeof raw === "boolean" ? raw : fallback;
+  }
+  
   function normalizePreferences(raw, base) {
     return {
       sort: normalizeSort(raw?.sort, base.preferences.sort),
@@ -769,6 +776,10 @@ const viewerUserState = (function () {
       wantRankDragSide: normalizeWantRankDragSide(
         raw?.wantRankDragSide,
         base.preferences.wantRankDragSide,
+      ),
+      wantOrderLocked: normalizeWantOrderLocked(
+        raw?.wantOrderLocked,
+        base.preferences.wantOrderLocked,
       ),
     };
   }
@@ -960,6 +971,7 @@ const viewerUserState = (function () {
         highlightCollection: Boolean(snapshot.highlightCollection),
         showMagazines: Boolean(snapshot.showMagazines),
         wantRankDragSide: normalizeWantRankDragSide(snapshot.wantRankDragSide),
+        wantOrderLocked: normalizeWantOrderLocked(snapshot.wantOrderLocked),
       },
     };
   }
@@ -980,6 +992,7 @@ const viewerUserState = (function () {
       highlightCollection: parsed.preferences.highlightCollection,
       showMagazines: parsed.preferences.showMagazines,
       wantRankDragSide: parsed.preferences.wantRankDragSide,
+      wantOrderLocked: parsed.preferences.wantOrderLocked,
     };
   }
   
@@ -2354,6 +2367,7 @@ function collectRuntimeSnapshot() {
     highlightCollection,
     showMagazines,
     wantRankDragSide,
+    wantOrderLocked,
   };
 }
 
@@ -2372,6 +2386,7 @@ function applyRuntimeSnapshot(runtime) {
   highlightCollection = runtime.highlightCollection;
   showMagazines = runtime.showMagazines;
   wantRankDragSide = runtime.wantRankDragSide;
+  wantOrderLocked = runtime.wantOrderLocked;
   if (sortSelect && runtime.sort) {
     sortSelect.value = runtime.sort;
   }
@@ -3297,16 +3312,26 @@ const viewerWantView = (function () {
     return isWantFilterActive(wantFilterMode);
   }
   
-  function canReorderWantList(wantFilterMode, viewMode, hasActiveSearch) {
+  function canReorderWantList(
+    wantFilterMode,
+    viewMode,
+    hasActiveSearch,
+    wantOrderLocked = false,
+  ) {
+    return (
+      isWantFilterActive(wantFilterMode) &&
+      (viewMode === "list" || viewMode === "cards") &&
+      !hasActiveSearch &&
+      !wantOrderLocked
+    );
+  }
+  
+  function shouldShowWantRankHandles(wantFilterMode, viewMode, hasActiveSearch) {
     return (
       isWantFilterActive(wantFilterMode) &&
       (viewMode === "list" || viewMode === "cards") &&
       !hasActiveSearch
     );
-  }
-  
-  function shouldShowWantRankHandles(wantFilterMode, viewMode, hasActiveSearch) {
-    return canReorderWantList(wantFilterMode, viewMode, hasActiveSearch);
   }
   return {
     WANT_FILTER,
@@ -3752,6 +3777,30 @@ function matchesSearch(book, query) {
   return viewerFilters.matchesSearch(book, query);
 }
 
+let wantOrderLockJiggleTimer = null;
+
+function jiggleWantOrderLock() {
+  if (wantOrderLockBtn) {
+    wantOrderLockBtn.classList.remove("is-jiggling");
+    void wantOrderLockBtn.offsetWidth;
+    wantOrderLockBtn.classList.add("is-jiggling");
+  }
+  if (sortWantBadge) {
+    sortWantBadge.classList.remove("is-locked-drag-denied");
+    void sortWantBadge.offsetWidth;
+    sortWantBadge.classList.add("is-locked-drag-denied");
+  }
+  clearTimeout(wantOrderLockJiggleTimer);
+  wantOrderLockJiggleTimer = setTimeout(() => {
+    if (wantOrderLockBtn) {
+      wantOrderLockBtn.classList.remove("is-jiggling");
+    }
+    if (sortWantBadge) {
+      sortWantBadge.classList.remove("is-locked-drag-denied");
+    }
+  }, 750);
+}
+
 function updateSortControlState() {
   const wantSort = viewerWantView.shouldDisableCatalogSort(wantFilterMode);
   if (sortSelect) {
@@ -3762,20 +3811,52 @@ function updateSortControlState() {
   if (sortWantBadge) {
     sortWantBadge.classList.toggle("is-sort-slot-hidden", !wantSort);
     sortWantBadge.setAttribute("aria-hidden", String(!wantSort));
+    const badgeText = sortWantBadge.querySelector(".sort-want-badge-text");
+    if (badgeText) {
+      badgeText.textContent = wantOrderLocked
+        ? "Priority order (locked)"
+        : "Priority order";
+    }
     const listHint =
-      gridViewMode === "list" && !hasActiveSearch()
+      gridViewMode === "list" && !hasActiveSearch() && !wantOrderLocked
         ? " Drag rank tabs to reorder."
-        : gridViewMode === "cards" && !hasActiveSearch()
+        : gridViewMode === "cards" && !hasActiveSearch() && !wantOrderLocked
           ? " Drag rank chips to reorder."
-          : "";
+          : wantOrderLocked
+            ? " Order is locked."
+            : "";
     sortWantBadge.setAttribute(
       "aria-label",
       `Sorted by your want list priority.${listHint}`,
     );
   }
+  if (wantOrderLockBtn) {
+    wantOrderLockBtn.hidden = !wantSort;
+    wantOrderLockBtn.setAttribute("aria-pressed", String(wantOrderLocked));
+    const lockLabel = wantOrderLocked
+      ? "Unlock want list order"
+      : "Lock want list order";
+    wantOrderLockBtn.setAttribute("aria-label", lockLabel);
+    wantOrderLockBtn.title = lockLabel;
+  }
+  document.body.classList.toggle(
+    "want-order-locked",
+    wantSort && wantOrderLocked,
+  );
   if (sortControlWrap) {
     sortControlWrap.classList.toggle("sort-control-want-order", wantSort);
   }
+}
+
+if (wantOrderLockBtn) {
+  wantOrderLockBtn.addEventListener("click", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    wantOrderLocked = !wantOrderLocked;
+    saveUserState();
+    updateSortControlState();
+    render();
+  });
 }
 
 function renderWantFilterButton() {
@@ -4228,7 +4309,7 @@ function ensureListCoverPreviewObserver() {
 }
 
 function canShowWantRankControls() {
-  return viewerWantView.canReorderWantList(
+  return viewerWantView.shouldShowWantRankHandles(
     wantFilterMode,
     gridViewMode,
     hasActiveSearch(),
@@ -6120,6 +6201,7 @@ function canReorderWantRank() {
     wantFilterMode,
     gridViewMode,
     hasActiveSearch(),
+    wantOrderLocked,
   );
 }
 
@@ -6325,12 +6407,23 @@ function onWantRankPointerDownDrag(event, handle) {
 /* --- Shared pointer handlers --- */
 
 function onWantRankPointerDown(event) {
-  if (!canReorderWantRank() || event.button !== 0) {
+  if (event.button !== 0) {
     return;
   }
 
   const handle = event.target.closest(".want-rank-drag-handle");
   if (!handle) {
+    return;
+  }
+
+  if (wantOrderLocked) {
+    if (typeof jiggleWantOrderLock === "function") {
+      jiggleWantOrderLock();
+    }
+    return;
+  }
+
+  if (!canReorderWantRank()) {
     return;
   }
 

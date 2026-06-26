@@ -43,6 +43,7 @@ function defaultUserState() {
       highlightCollection: true,
       showMagazines: false,
       wantRankDragSide: "right",
+      wantOrderLocked: false,
     },
   };
 }
@@ -218,6 +219,10 @@ function normalizeViewMode(raw, fallback = "cards") {
   return fallback;
 }
 
+function normalizeWantOrderLocked(raw, fallback = false) {
+  return typeof raw === "boolean" ? raw : fallback;
+}
+
 function normalizePreferences(raw, base) {
   return {
     sort: normalizeSort(raw?.sort, base.preferences.sort),
@@ -241,6 +246,10 @@ function normalizePreferences(raw, base) {
     wantRankDragSide: normalizeWantRankDragSide(
       raw?.wantRankDragSide,
       base.preferences.wantRankDragSide,
+    ),
+    wantOrderLocked: normalizeWantOrderLocked(
+      raw?.wantOrderLocked,
+      base.preferences.wantOrderLocked,
     ),
   };
 }
@@ -432,6 +441,7 @@ function buildUserStateFromRuntime(snapshot, options = {}) {
       highlightCollection: Boolean(snapshot.highlightCollection),
       showMagazines: Boolean(snapshot.showMagazines),
       wantRankDragSide: normalizeWantRankDragSide(snapshot.wantRankDragSide),
+      wantOrderLocked: normalizeWantOrderLocked(snapshot.wantOrderLocked),
     },
   };
 }
@@ -452,6 +462,7 @@ function applyUserStateToRuntime(state) {
     highlightCollection: parsed.preferences.highlightCollection,
     showMagazines: parsed.preferences.showMagazines,
     wantRankDragSide: parsed.preferences.wantRankDragSide,
+    wantOrderLocked: parsed.preferences.wantOrderLocked,
   };
 }
 

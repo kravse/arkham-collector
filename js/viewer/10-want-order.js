@@ -25,6 +25,7 @@ function canReorderWantRank() {
     wantFilterMode,
     gridViewMode,
     hasActiveSearch(),
+    wantOrderLocked,
   );
 }
 
@@ -230,12 +231,23 @@ function onWantRankPointerDownDrag(event, handle) {
 /* --- Shared pointer handlers --- */
 
 function onWantRankPointerDown(event) {
-  if (!canReorderWantRank() || event.button !== 0) {
+  if (event.button !== 0) {
     return;
   }
 
   const handle = event.target.closest(".want-rank-drag-handle");
   if (!handle) {
+    return;
+  }
+
+  if (wantOrderLocked) {
+    if (typeof jiggleWantOrderLock === "function") {
+      jiggleWantOrderLock();
+    }
+    return;
+  }
+
+  if (!canReorderWantRank()) {
     return;
   }
 

@@ -863,6 +863,14 @@ body.viewing-want.view-mode-list .want-rank-drag-handle:active {
   cursor: grabbing;
 }
 
+body.want-order-locked .want-rank-drag-handle {
+  cursor: default;
+}
+
+body.want-order-locked .want-rank-drag-handle:active {
+  cursor: default;
+}
+
 body.viewing-want.view-mode-list .want-rank-row.want-rank-card-lift-source {
   opacity: 0.32;
   filter: saturate(0.6);
@@ -989,6 +997,14 @@ body.viewing-want-filter:not(.view-mode-list) .want-rank-card-chip {
 
 body.viewing-want-filter:not(.view-mode-list) .want-rank-card-chip:active {
   cursor: grabbing;
+}
+
+body.want-order-locked .want-rank-card-chip {
+  cursor: default;
+}
+
+body.want-order-locked .want-rank-card-chip:active {
+  cursor: default;
 }
 
 body.viewing-want-filter:not(.view-mode-list) .card.want-rank-card-lift-source {

@@ -121,6 +121,7 @@ function collectRuntimeSnapshot() {
     highlightCollection,
     showMagazines,
     wantRankDragSide,
+    wantOrderLocked,
   };
 }
 
@@ -139,6 +140,7 @@ function applyRuntimeSnapshot(runtime) {
   highlightCollection = runtime.highlightCollection;
   showMagazines = runtime.showMagazines;
   wantRankDragSide = runtime.wantRankDragSide;
+  wantOrderLocked = runtime.wantOrderLocked;
   if (sortSelect && runtime.sort) {
     sortSelect.value = runtime.sort;
   }

@@ -42,7 +42,7 @@ A visual catalog for collectors and readers of [Arkham House](https://en.wikiped
 
 | Key | Contents |
 |-----|----------|
-| `arkham-user-state` | Unified v2 state: collection ids, want list (`wantIds`), want priority order (`wantOrderIds`), ordered titles, display preferences (including `wantRankDragSide`), and `storageMode` (`local` or `gist`). Older per-key entries migrate on first load. |
+| `arkham-user-state` | Unified v2 state: collection ids, want list (`wantIds`), want priority order (`wantOrderIds`), ordered titles, display preferences (including `wantRankDragSide`, `wantOrderLocked`), and `storageMode` (`local` or `gist`). Older per-key entries migrate on first load. |
 | `arkham-gist-sync` | GitHub Gist credentials only (`token`, `gistId`) when GitHub Gist sync is connected—not included in the synced Gist file. |
 
 **Gist sync security:** The PAT is stored in your browser’s `localStorage`. Use a throwaway GitHub account and a fine-grained PAT limited to gist read/write. This device only never sends data to GitHub.

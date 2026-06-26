@@ -345,7 +345,7 @@ function ensureListCoverPreviewObserver() {
 }
 
 function canShowWantRankControls() {
-  return viewerWantView.canReorderWantList(
+  return viewerWantView.shouldShowWantRankHandles(
     wantFilterMode,
     gridViewMode,
     hasActiveSearch(),

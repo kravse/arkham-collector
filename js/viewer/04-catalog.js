@@ -57,6 +57,30 @@ function matchesSearch(book, query) {
   return viewerFilters.matchesSearch(book, query);
 }
 
+let wantOrderLockJiggleTimer = null;
+
+function jiggleWantOrderLock() {
+  if (wantOrderLockBtn) {
+    wantOrderLockBtn.classList.remove("is-jiggling");
+    void wantOrderLockBtn.offsetWidth;
+    wantOrderLockBtn.classList.add("is-jiggling");
+  }
+  if (sortWantBadge) {
+    sortWantBadge.classList.remove("is-locked-drag-denied");
+    void sortWantBadge.offsetWidth;
+    sortWantBadge.classList.add("is-locked-drag-denied");
+  }
+  clearTimeout(wantOrderLockJiggleTimer);
+  wantOrderLockJiggleTimer = setTimeout(() => {
+    if (wantOrderLockBtn) {
+      wantOrderLockBtn.classList.remove("is-jiggling");
+    }
+    if (sortWantBadge) {
+      sortWantBadge.classList.remove("is-locked-drag-denied");
+    }
+  }, 750);
+}
+
 function updateSortControlState() {
   const wantSort = viewerWantView.shouldDisableCatalogSort(wantFilterMode);
   if (sortSelect) {
@@ -67,20 +91,52 @@ function updateSortControlState() {
   if (sortWantBadge) {
     sortWantBadge.classList.toggle("is-sort-slot-hidden", !wantSort);
     sortWantBadge.setAttribute("aria-hidden", String(!wantSort));
+    const badgeText = sortWantBadge.querySelector(".sort-want-badge-text");
+    if (badgeText) {
+      badgeText.textContent = wantOrderLocked
+        ? "Priority order (locked)"
+        : "Priority order";
+    }
     const listHint =
-      gridViewMode === "list" && !hasActiveSearch()
+      gridViewMode === "list" && !hasActiveSearch() && !wantOrderLocked
         ? " Drag rank tabs to reorder."
-        : gridViewMode === "cards" && !hasActiveSearch()
+        : gridViewMode === "cards" && !hasActiveSearch() && !wantOrderLocked
           ? " Drag rank chips to reorder."
-          : "";
+          : wantOrderLocked
+            ? " Order is locked."
+            : "";
     sortWantBadge.setAttribute(
       "aria-label",
       `Sorted by your want list priority.${listHint}`,
     );
   }
+  if (wantOrderLockBtn) {
+    wantOrderLockBtn.hidden = !wantSort;
+    wantOrderLockBtn.setAttribute("aria-pressed", String(wantOrderLocked));
+    const lockLabel = wantOrderLocked
+      ? "Unlock want list order"
+      : "Lock want list order";
+    wantOrderLockBtn.setAttribute("aria-label", lockLabel);
+    wantOrderLockBtn.title = lockLabel;
+  }
+  document.body.classList.toggle(
+    "want-order-locked",
+    wantSort && wantOrderLocked,
+  );
   if (sortControlWrap) {
     sortControlWrap.classList.toggle("sort-control-want-order", wantSort);
   }
+}
+
+if (wantOrderLockBtn) {
+  wantOrderLockBtn.addEventListener("click", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    wantOrderLocked = !wantOrderLocked;
+    saveUserState();
+    updateSortControlState();
+    render();
+  });
 }
 
 function renderWantFilterButton() {
