@@ -909,10 +909,6 @@ window.BOOK_EDITS = {
     "hidden": true,
     "deleted": true
   },
-  "429": {
-    "listCoverFocusX": 0.5588235294117647,
-    "listCoverFocusY": 0.5107500975986967
-  },
   "430": {
     "listCoverFocusX": 0.4852941176470588,
     "listCoverFocusY": 0.7732387874218338

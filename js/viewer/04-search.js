@@ -225,8 +225,10 @@ function pickTagSuggestion(index) {
   if (!label) {
     return;
   }
+  const draft = viewerFilters.parseTagDraftInput(searchInput.value);
+  const prefix = draft?.prefix?.trim() || "";
   addSearchTag(label, { silent: true });
-  searchInput.value = "";
+  searchInput.value = prefix;
   hideTagSuggest();
   updateSearchClearVisibility();
   renderNow();
@@ -290,7 +292,7 @@ searchInput.addEventListener("keydown", (event) => {
       if (label) {
         event.preventDefault();
         addSearchTag(label, { silent: true });
-        searchInput.value = "";
+        searchInput.value = draft.prefix?.trim() || "";
         updateSearchClearVisibility();
         updateTagSuggest();
         renderNow();

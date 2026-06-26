@@ -176,9 +176,12 @@ test("isTagDraftPending suppresses search while typing tag or tag:", () => {
   assert.equal(isTagDraftPending('tag:"cth'), true);
   assert.equal(isTagDraftPending("tag:horror"), true);
   assert.equal(isTagDraftPending("tag horror"), true);
+  assert.equal(isTagDraftPending("80s tag"), true);
+  assert.equal(isTagDraftPending("80s tag:hor"), true);
   assert.equal(isTagDraftPending("th"), false);
   assert.equal(isTagDraftPending("tal"), false);
   assert.equal(isTagDraftPending("tags"), false);
+  assert.equal(isTagDraftPending("80s tags"), false);
   assert.equal(isTagDraftPending("derleth"), false);
   assert.equal(isTagDraftPending(""), false);
 });
@@ -195,6 +198,10 @@ test("buildSearchFilter ignores pending tag draft but keeps chips", () => {
   assert.deepEqual(buildSearchFilter([], "th"), {
     tagTerms: [],
     textTerms: ["th"],
+  });
+  assert.deepEqual(buildSearchFilter([], "80s tag:hor"), {
+    tagTerms: [],
+    textTerms: ["80s"],
   });
 });
 
@@ -220,25 +227,46 @@ test("parseTagDraftInput detects tag autocomplete prefix", () => {
   assert.deepEqual(parseTagDraftInput("tag"), {
     partial: "",
     quoted: false,
+    prefix: "",
   });
   assert.deepEqual(parseTagDraftInput("TAG"), {
     partial: "",
     quoted: false,
+    prefix: "",
   });
   assert.deepEqual(parseTagDraftInput("tag horror"), {
     partial: "horror",
     quoted: false,
+    prefix: "",
   });
   assert.deepEqual(parseTagDraftInput('tag:"cthul'), {
     partial: "cthul",
     quoted: true,
+    prefix: "",
   });
   assert.deepEqual(parseTagDraftInput("tag:fant"), {
     partial: "fant",
     quoted: false,
+    prefix: "",
+  });
+  assert.deepEqual(parseTagDraftInput("80s tag"), {
+    partial: "",
+    quoted: false,
+    prefix: "80s",
+  });
+  assert.deepEqual(parseTagDraftInput("80s tag:hor"), {
+    partial: "hor",
+    quoted: false,
+    prefix: "80s",
+  });
+  assert.deepEqual(parseTagDraftInput('derleth tag:"cthul'), {
+    partial: "cthul",
+    quoted: true,
+    prefix: "derleth",
   });
   assert.equal(parseTagDraftInput("tags"), null);
   assert.equal(parseTagDraftInput("1950s"), null);
+  assert.equal(parseTagDraftInput("80s tags"), null);
 });
 
 test("absorbTagDraftInput promotes known tags and clears bare tag draft", () => {
@@ -258,6 +286,14 @@ test("absorbTagDraftInput promotes known tags and clears bare tag draft", () => 
   assert.deepEqual(absorbTagDraftInput("tag signed", known), {
     chipLabel: null,
     remainder: "tag:signed",
+  });
+  assert.deepEqual(absorbTagDraftInput("80s tag essays", known), {
+    chipLabel: "ESSAYS",
+    remainder: "80s",
+  });
+  assert.deepEqual(absorbTagDraftInput("80s tag signed", known), {
+    chipLabel: null,
+    remainder: "80s tag:signed",
   });
   assert.equal(absorbTagDraftInput("derleth", known), null);
 });

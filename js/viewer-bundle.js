@@ -1420,8 +1420,6 @@ const viewerFilters = (function () {
   const COLLECTOR_ISSUE_TITLE_RE = /^The Arkham Collector \(No\. \d+\)$/;
   const TAG_SEARCH_PREFIX_RE = /^tag:\s*(?:"([^"]*)"|(.+))$/i;
   const TAG_TOKEN_RE = /tag:\s*(?:"([^"]*)"|(\S+))/gi;
-  const TAG_DRAFT_RE = /^tag:\s*(?:"([^"]*)"?|(\S*))$/i;
-  const TAG_SHORTHAND_DRAFT_RE = /^tag(?:\s+(?:"([^"]*)"?|(\S*)))?$/i;
   
   function tagKey(tag) {
     return String(tag || "")
@@ -1518,9 +1516,18 @@ const viewerFilters = (function () {
   }
   
   function buildSearchFilter(chipTags, draftQuery) {
-    const parsed = isTagDraftPending(draftQuery)
-      ? { tagTerms: [], textTerms: [] }
-      : parseCompoundSearchQuery(draftQuery);
+    const trimmed = String(draftQuery || "").trim();
+    const draft = parseTagDraftInput(trimmed);
+    let parsed;
+    if (draft) {
+      parsed = draft.prefix
+        ? parseCompoundSearchQuery(draft.prefix)
+        : { tagTerms: [], textTerms: [] };
+    } else if (isTagDraftPending(trimmed)) {
+      parsed = { tagTerms: [], textTerms: [] };
+    } else {
+      parsed = parseCompoundSearchQuery(trimmed);
+    }
     const tagTerms = [];
     const seen = new Set();
   
@@ -1545,20 +1552,28 @@ const viewerFilters = (function () {
   
   function parseTagDraftInput(input) {
     const text = String(input || "").trim();
-    if (TAG_DRAFT_RE.test(text)) {
-      const match = text.match(TAG_DRAFT_RE);
+    if (!text) {
+      return null;
+    }
+  
+    const colonMatch = text.match(/(?:^|\s)tag:\s*(?:"([^"]*)"?|(\S*))$/i);
+    if (colonMatch) {
       return {
-        partial: String(match[1] ?? match[2] ?? "").trim(),
-        quoted: /"/.test(text),
+        partial: String(colonMatch[1] ?? colonMatch[2] ?? "").trim(),
+        quoted: /"/.test(colonMatch[0]),
+        prefix: text.slice(0, colonMatch.index).trim(),
       };
     }
-    if (TAG_SHORTHAND_DRAFT_RE.test(text)) {
-      const match = text.match(TAG_SHORTHAND_DRAFT_RE);
+  
+    const shorthandMatch = text.match(/(?:^|\s)tag(?:\s+(?:"([^"]*)"?|(\S*)))?$/i);
+    if (shorthandMatch) {
       return {
-        partial: String(match[1] ?? match[2] ?? "").trim(),
-        quoted: /"/.test(text.slice(TAG_LITERAL.length)),
+        partial: String(shorthandMatch[1] ?? shorthandMatch[2] ?? "").trim(),
+        quoted: /"/.test(shorthandMatch[0]),
+        prefix: text.slice(0, shorthandMatch.index).trim(),
       };
     }
+  
     return null;
   }
   
@@ -1567,16 +1582,18 @@ const viewerFilters = (function () {
     if (!draft) {
       return null;
     }
+    const prefix = draft.prefix || "";
     if (!draft.partial) {
-      return { chipLabel: null, remainder: "" };
+      return { chipLabel: null, remainder: prefix };
     }
     const chipLabel = resolveTagFilterLabel(draft.partial, knownTags);
     if (chipLabel) {
-      return { chipLabel, remainder: "" };
+      return { chipLabel, remainder: prefix };
     }
+    const formatted = formatTagSearchQuery(draft.partial);
     return {
       chipLabel: null,
-      remainder: formatTagSearchQuery(draft.partial),
+      remainder: prefix ? `${prefix} ${formatted}` : formatted,
     };
   }
   
@@ -2922,8 +2939,10 @@ function pickTagSuggestion(index) {
   if (!label) {
     return;
   }
+  const draft = viewerFilters.parseTagDraftInput(searchInput.value);
+  const prefix = draft?.prefix?.trim() || "";
   addSearchTag(label, { silent: true });
-  searchInput.value = "";
+  searchInput.value = prefix;
   hideTagSuggest();
   updateSearchClearVisibility();
   renderNow();
@@ -2987,7 +3006,7 @@ searchInput.addEventListener("keydown", (event) => {
       if (label) {
         event.preventDefault();
         addSearchTag(label, { silent: true });
-        searchInput.value = "";
+        searchInput.value = draft.prefix?.trim() || "";
         updateSearchClearVisibility();
         updateTagSuggest();
         renderNow();
