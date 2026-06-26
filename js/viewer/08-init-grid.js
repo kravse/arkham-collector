@@ -5,6 +5,10 @@ const RANDOM_CARD_LOGO_TAP_COUNT = 3;
 let randomCardLogoTapTimes = [];
 
 grid.addEventListener("click", (event) => {
+  if (event.target.closest(".want-rank-drag-handle")) {
+    return;
+  }
+
   const editButton = event.target.closest(".edit-book-btn");
   if (editButton) {
     event.preventDefault();
@@ -39,7 +43,7 @@ grid.addEventListener("click", (event) => {
 stats.addEventListener("click", (event) => {
   if (event.target.closest("#collection-filter-toggle")) {
     cycleCollectionFilter();
-    wantOnly = false;
+    wantFilterMode = null;
     render();
     return;
   }
@@ -54,9 +58,12 @@ stats.addEventListener("click", (event) => {
     return;
   }
   if (event.target.closest("#want-filter-toggle")) {
-    const next = !wantOnly;
-    wantOnly = next;
-    if (next) {
+    const prev = wantFilterMode;
+    cycleWantFilter();
+    if (wantFilterMode === "ranked" && prev === "want") {
+      clearSearchState();
+    }
+    if (wantFilterMode != null) {
       collectionFilterMode = null;
     }
     render();

@@ -4,7 +4,6 @@ function parseArgs(argv) {
     limit: Infinity,
     skipDownload: false,
     delayMs: 2000,
-    syncCollection: false,
     reconcileCovers: false,
     fillCovers: false,
     dryRun: false,
@@ -65,8 +64,6 @@ function parseArgs(argv) {
       options.output = argv[++i];
     } else if (arg === "--skip-download") {
       options.skipDownload = true;
-    } else if (arg === "--sync-collection") {
-      options.syncCollection = true;
     } else if (arg === "--reconcile-covers") {
       options.reconcileCovers = true;
     } else if (arg === "--fill-covers") {
@@ -92,9 +89,6 @@ const SCRAPE_MODES = new Set([
 ]);
 
 function getScriptMode(args) {
-  if (args.syncCollection) {
-    return "syncCollection";
-  }
   if (args.reconcileCovers) {
     return "reconcileCovers";
   }

@@ -174,57 +174,288 @@
   background: rgba(28, 24, 18, 0.92);
 }
 
-.settings-collection-options,
-.settings-highlight-options {
+.settings-control-group {
   display: flex;
   flex-direction: column;
-  gap: 0.55rem;
   margin: 0;
   padding: 0;
-  border: 0;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  background: rgba(15, 17, 21, 0.55);
+  overflow: hidden;
 }
 
-.settings-collection-option {
+.settings-control-row {
+  position: relative;
   display: flex;
   align-items: flex-start;
-  gap: 0.45rem;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.62rem 0.65rem;
   cursor: pointer;
-  color: var(--text);
+  transition: background 0.15s ease;
 }
 
-.settings-collection-option input {
-  margin: 0.15rem 0 0;
-  accent-color: var(--accent);
+.settings-control-row + .settings-control-row,
+.settings-control-action + .settings-control-action,
+.settings-control-action + .settings-control-row,
+.settings-control-row + .settings-control-action {
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-.settings-collection-option[hidden] {
+.settings-control-row:hover,
+.settings-control-action:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.settings-control-row[hidden] {
   display: none;
 }
 
-.settings-collection-action {
-  display: block;
-  width: 100%;
-  margin-top: 0.55rem;
-  padding: 0.45rem 0.65rem;
-  border: 1px solid rgba(210, 178, 128, 0.28);
-  border-radius: 8px;
-  background: rgba(15, 17, 21, 0.85);
-  color: var(--text);
-  font: inherit;
+.settings-control-row > input:not(.settings-switch-input) {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.settings-control-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 0.14rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.settings-control-label {
   font-size: 0.78rem;
-  cursor: pointer;
+  line-height: 1.35;
+  color: var(--text);
+}
+
+.settings-control-hint {
+  font-size: 0.68rem;
+  line-height: 1.35;
+  color: rgba(232, 234, 237, 0.48);
+}
+
+.settings-choice-mark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 1.22rem;
+  height: 1.22rem;
+  margin-top: 0.1rem;
+  border: 1.5px solid rgba(255, 255, 255, 0.22);
+  border-radius: 50%;
   transition:
     border-color 0.15s ease,
     background 0.15s ease;
 }
 
-.settings-collection-action:hover {
-  border-color: rgba(210, 178, 128, 0.45);
-  background: rgba(28, 24, 18, 0.92);
+.settings-choice-mark::after {
+  content: "";
+  width: 0.46rem;
+  height: 0.46rem;
+  border-radius: 50%;
+  background: var(--accent);
+  opacity: 0;
+  transform: scale(0.6);
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s ease;
 }
 
-.settings-collection-action[hidden] {
+.settings-control-row input:checked ~ .settings-choice-mark {
+  border-color: rgba(210, 178, 128, 0.55);
+  background: rgba(201, 162, 39, 0.14);
+}
+
+.settings-control-row input:checked ~ .settings-choice-mark::after {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.settings-control-row input:focus-visible ~ .settings-choice-mark {
+  outline: 2px solid rgba(210, 178, 128, 0.45);
+  outline-offset: 2px;
+}
+
+.settings-switch-input {
+  position: relative;
+  flex-shrink: 0;
+  width: 2.4rem;
+  height: 1.38rem;
+  margin: 0.1rem 0 0;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.settings-switch-input::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0.13rem;
+  width: 1.02rem;
+  height: 1.02rem;
+  border-radius: 50%;
+  background: rgba(232, 234, 237, 0.92);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+  transform: translateY(-50%);
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease;
+}
+
+.settings-switch-input:checked {
+  background: rgba(201, 162, 39, 0.52);
+  border-color: rgba(210, 178, 128, 0.55);
+}
+
+.settings-switch-input:checked::before {
+  transform: translate(1.02rem, -50%);
+  background: #f3efe4;
+}
+
+.settings-switch-input:focus-visible {
+  outline: 2px solid rgba(210, 178, 128, 0.45);
+  outline-offset: 2px;
+}
+
+.settings-switch-input:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.settings-control-action {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0.62rem 0.65rem;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 0.78rem;
+  line-height: 1.35;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+}
+
+.settings-control-action .settings-control-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 0.14rem;
+}
+
+.settings-control-action--primary .settings-control-label {
+  font-weight: 500;
+}
+
+.settings-control-action:hover {
+  color: #f3efe4;
+}
+
+.settings-control-action:focus-visible {
+  outline: 2px solid rgba(210, 178, 128, 0.45);
+  outline-offset: -2px;
+}
+
+.settings-control-action[hidden] {
   display: none;
+}
+
+.settings-collection-csv-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.62rem 0.65rem;
+}
+
+.settings-collection-csv-row + .settings-collection-csv-row {
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.settings-collection-csv-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin: 0;
+  padding: 0.38rem 0.78rem;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    color 0.15s ease,
+    border-color 0.15s ease,
+    background 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.settings-collection-csv-btn--import {
+  border-color: rgba(130, 180, 245, 0.4);
+  background: rgba(72, 128, 210, 0.2);
+  color: #c8daf0;
+}
+
+.settings-collection-csv-btn--import:hover:not(:disabled) {
+  color: #e0ebf8;
+  border-color: rgba(140, 180, 230, 0.58);
+  background: rgba(72, 112, 168, 0.32);
+  box-shadow: 0 0 0 1px rgba(72, 112, 168, 0.16);
+}
+
+.settings-collection-csv-btn--export {
+  border-color: rgba(210, 178, 128, 0.42);
+  background: rgba(201, 162, 39, 0.2);
+  color: #e8d4a8;
+}
+
+.settings-collection-csv-btn--export:hover:not(:disabled) {
+  color: #fff3d6;
+  border-color: rgba(224, 196, 148, 0.62);
+  background: rgba(201, 162, 39, 0.3);
+  box-shadow: 0 0 0 1px rgba(201, 162, 39, 0.14);
+}
+
+.settings-collection-csv-btn:focus-visible {
+  outline: 2px solid rgba(210, 178, 128, 0.45);
+  outline-offset: 2px;
+}
+
+.settings-collection-csv-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.settings-section > .settings-control-group + .settings-control-group {
+  margin-top: 0.55rem;
 }
 
 .settings-collection-hint {
@@ -272,8 +503,8 @@
 }
 
 .settings-gist-steps {
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
   background: rgba(15, 17, 21, 0.55);
   overflow: hidden;
 }
@@ -330,10 +561,10 @@
   align-items: center;
   justify-content: space-between;
   gap: 0.65rem;
-  padding: 0.45rem 0.55rem;
-  border: 1px solid rgba(210, 178, 128, 0.28);
-  border-radius: 8px;
-  background: rgba(15, 17, 21, 0.85);
+  padding: 0.58rem 0.65rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  background: rgba(15, 17, 21, 0.55);
 }
 
 .settings-gist-saved[hidden] {

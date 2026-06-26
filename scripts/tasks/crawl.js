@@ -1,5 +1,5 @@
 const fs = require("fs");
-const { IMPRINTS, SOURCE_URL, ARKHAM_LOCAL, COLLECTION_CSV } = require("../config");
+const { IMPRINTS, SOURCE_URL, ARKHAM_LOCAL } = require("../config");
 const { state, delayMs } = require("../state");
 const { formatEta } = require("../lib/text");
 const { extractBibliography, readLocalHtml } = require("../lib/wiki-bibliography");
@@ -10,7 +10,6 @@ const {
   buildBookRecord,
   writeOutput,
 } = require("../lib/books");
-const { syncCollectionFromCsv } = require("../lib/collection");
 
 async function main() {
   console.log(
@@ -94,10 +93,6 @@ async function main() {
   };
 
   const { jsonPath, jsPath } = writeOutput(payload);
-
-  if (fs.existsSync(COLLECTION_CSV)) {
-    syncCollectionFromCsv();
-  }
 
   console.log("");
   console.log(`Done. Wrote ${books.length} books.`);

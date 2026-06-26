@@ -20,6 +20,11 @@ const PARTS = [
       "Card HTML helpers (generated from scripts/lib/viewer-card-html.js)",
   },
   {
+    file: "00-viewer-want-order-normalize.js",
+    title:
+      "Want order normalization (generated from scripts/lib/viewer-want-order-normalize.js)",
+  },
+  {
     file: "00-viewer-user-state.js",
     title:
       "Unified user state persistence (generated from scripts/lib/viewer-user-state.js)",
@@ -70,6 +75,15 @@ const PARTS = [
     title: "Shared sort helpers (generated from scripts/lib/viewer-sort.js)",
   },
   {
+    file: "00-viewer-want-order.js",
+    title: "Want list order helpers (generated from scripts/lib/viewer-want-order.js)",
+  },
+  {
+    file: "00-viewer-pointer-reorder.js",
+    title:
+      "Pointer reorder helpers (generated from scripts/lib/viewer-pointer-reorder.js)",
+  },
+  {
     file: "04-search.js",
     title: "Search chips, tag autocomplete, and compound query",
   },
@@ -100,6 +114,10 @@ const PARTS = [
   {
     file: "09-order.js",
     title: "Admin book order dialog",
+  },
+  {
+    file: "10-want-order.js",
+    title: "Want list priority drag reorder",
   },
   {
     file: "08-init-grid.js",

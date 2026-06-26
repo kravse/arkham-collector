@@ -311,8 +311,37 @@ const viewerFilters = (function () {
     return true;
   }
   
-  function passesWantFilter(book, wantOnly, wantIds) {
-    return !wantOnly || wantIds.has(book.id);
+  function passesWantFilter(book, wantFilterMode, wantIds) {
+    if (wantFilterMode == null) {
+      return true;
+    }
+    return wantIds.has(book.id);
+  }
+  
+  function cycleWantFilter(wantFilterMode, hasAnyWants, wantListRankingEnabled = true) {
+    if (!hasAnyWants) {
+      return wantFilterMode === "want" ? null : "want";
+    }
+    if (!wantListRankingEnabled) {
+      if (wantFilterMode === null) {
+        return "want";
+      }
+      return null;
+    }
+    if (wantFilterMode === null) {
+      return "want";
+    }
+    if (wantFilterMode === "want") {
+      return "ranked";
+    }
+    return null;
+  }
+  
+  function hasAnyWants(books, wantIds, visibilityOptions) {
+    return books.some(
+      (book) =>
+        passesBookVisibility(book, visibilityOptions) && wantIds.has(book.id),
+    );
   }
   
   function filterVisibleBooks(books, options) {
@@ -322,7 +351,7 @@ const viewerFilters = (function () {
       showMagazines,
       mycroftFilterMode,
       collectionFilterMode,
-      wantOnly,
+      wantFilterMode,
       collectedIds,
       orderedIds,
       wantIds,
@@ -343,7 +372,7 @@ const viewerFilters = (function () {
           collectedIds,
           orderedIds,
         ) &&
-        passesWantFilter(book, wantOnly, wantIds) &&
+        passesWantFilter(book, wantFilterMode, wantIds) &&
         matchesCompoundSearch(book, resolvedSearchFilter),
     );
   }
@@ -414,6 +443,8 @@ const viewerFilters = (function () {
     cycleMycroftFilter,
     cycleCollectionFilter,
     hasAnyOrderedBooks,
+    cycleWantFilter,
+    hasAnyWants,
     pickRandomBook,
   };
 })();

@@ -1,5 +1,5 @@
 const fs = require("fs");
-const { IMPRINTS, SOURCE_URL, MYCROFT_LOCAL, COLLECTION_CSV } = require("../config");
+const { IMPRINTS, SOURCE_URL, MYCROFT_LOCAL } = require("../config");
 const { state, delayMs } = require("../state");
 const { formatEta, slugify } = require("../lib/text");
 const { wikiTitleFromHref } = require("../lib/wiki-urls");
@@ -13,7 +13,6 @@ const {
 } = require("../lib/books");
 const { bookHasLocalCover, downloadCover } = require("../lib/covers-files");
 const { loadEdits, hasCoverEdit } = require("../lib/edits");
-const { syncCollectionFromCsv } = require("../lib/collection");
 
 async function crawlMycroftOnly() {
   const imprintConfig = IMPRINTS.mycroft_moran;
@@ -108,10 +107,6 @@ async function crawlMycroftOnly() {
   };
 
   const { jsonPath, jsPath } = writeOutput(payload);
-
-  if (fs.existsSync(COLLECTION_CSV)) {
-    syncCollectionFromCsv();
-  }
 
   const mycroftCount = mergedBooks.filter(
     (book) => book.imprint === "mycroft_moran",

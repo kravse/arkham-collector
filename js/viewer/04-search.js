@@ -234,12 +234,16 @@ function pickTagSuggestion(index) {
   renderNow();
 }
 
-function clearSearchAll() {
+function clearSearchState() {
   searchTagFilters.length = 0;
   searchInput.value = "";
   renderSearchChips();
   hideTagSuggest();
   updateSearchClearVisibility();
+}
+
+function clearSearchAll() {
+  clearSearchState();
   renderNow();
 }
 

@@ -9,7 +9,6 @@
     "crawl:mycroft": "node scripts/index.js --mycroft-only",
     "crawl:mycroft:local": "node scripts/index.js --mycroft-only --local",
     "crawl:test": "node scripts/index.js --limit 5",
-    "sync-collection": "node scripts/index.js --sync-collection",
     "sync-publication-dates": "node scripts/index.js --sync-publication-dates --local",
     "sync-authors": "node scripts/index.js --sync-authors",
     "sync-descriptions": "node scripts/index.js --sync-descriptions",

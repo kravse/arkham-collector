@@ -502,6 +502,53 @@ input[type="search"]::-webkit-search-cancel-button {
   background: rgba(72, 168, 118, 0.14);
 }
 
+.stat.want-stat.stat-toggle.want-ranked-filter {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #e8f8ee;
+  border: 1px dashed rgba(120, 200, 150, 0.72);
+  background: rgba(56, 140, 96, 0.28);
+  box-shadow:
+    0 0 0 1px rgba(72, 168, 118, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.stat.want-stat .want-ranked-button-content {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.32rem;
+  line-height: 1;
+}
+
+.stat.want-stat .want-ranked-label {
+  display: block;
+  line-height: 1;
+}
+
+.stat.want-stat.stat-toggle.want-ranked-filter:hover {
+  color: #f4fff8;
+  border-color: rgba(140, 220, 170, 0.85);
+  background: rgba(64, 152, 104, 0.34);
+}
+
+.stat.want-stat .want-ranked-icon {
+  display: block;
+  width: 0.82rem;
+  height: auto;
+  flex-shrink: 0;
+}
+
+body.viewing-want-ranked .sort-control-disabled select {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+body.viewing-want-ranked .sort-control-disabled .sort-label {
+  opacity: 0.7;
+}
+
 .stat.mycroft-stat.stat-toggle:hover {
   color: #c8d8f0;
   border-color: rgba(120, 160, 210, 0.42);

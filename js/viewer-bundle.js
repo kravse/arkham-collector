@@ -91,6 +91,7 @@ const importCollectionBtn = document.getElementById("import-collection-btn");
 const importCollectionInput = document.getElementById("import-collection-input");
 const importCollectionStatus = document.getElementById("import-collection-status");
 const highlightWantsInput = document.getElementById("highlight-wants");
+const wantListRankingInput = document.getElementById("want-list-ranking");
 const highlightCollectionInput = document.getElementById("highlight-collection");
 const showMagazinesInput = document.getElementById("show-magazines");
 const showMagazinesOption = document.getElementById("show-magazines-option");
@@ -118,8 +119,9 @@ let editingBookId = null;
 let collectionFilterMode = null;
 let hiddenOnly = false;
 let mycroftFilterMode = null;
-let wantOnly = false;
+let wantFilterMode = null;
 let wantIds = new Set();
+let wantOrderIds = [];
 let collectionIds = new Set();
 let orderedIds = new Set();
 let storageMode = "local";
@@ -129,6 +131,7 @@ let gridViewMode = "cards";
 let highlightWants = true;
 let highlightCollection = true;
 let showMagazines = false;
+let wantListRanking = true;
 let detailBookId = null;
 let bookOrderIds = Array.isArray(window.BOOK_ORDER)
   ? window.BOOK_ORDER.map((id) => Number(id))
@@ -147,6 +150,49 @@ function setBookOrderIds(next) {
   invalidateSortedCache();
 }
 
+function setWantOrderIds(next) {
+  wantOrderIds = viewerWantOrderNormalize.normalizeWantOrderIds(next, [...wantIds]);
+  invalidateSortedCache();
+}
+
+function syncWantMembership(bookId, wanted) {
+  const id = Number(bookId);
+  if (!Number.isFinite(id)) {
+    return;
+  }
+  if (wanted) {
+    if (wantIds.has(id)) {
+      return;
+    }
+    wantIds.add(id);
+    wantOrderIds = [...wantOrderIds, id];
+    if (collectionIds.has(id)) {
+      collectionIds.delete(id);
+    }
+    if (orderedIds.has(id)) {
+      orderedIds.delete(id);
+    }
+  } else if (wantIds.has(id)) {
+    wantIds.delete(id);
+    wantOrderIds = wantOrderIds.filter((entry) => entry !== id);
+  } else {
+    return;
+  }
+  invalidateSortedCache();
+}
+
+function getEffectiveViewMode() {
+  return wantFilterMode === "ranked" ? "list" : gridViewMode;
+}
+
+function isWantFilterActive() {
+  return wantFilterMode != null;
+}
+
+function isWantRankedFilterActive() {
+  return wantListRanking && wantFilterMode === "ranked";
+}
+
 rebuildBookOrderIndex();
 
 function updateSortControlVisibility() {
@@ -163,6 +209,9 @@ function syncSettingsHighlightCheckboxes() {
   if (highlightWantsInput) {
     highlightWantsInput.checked = highlightWants;
   }
+  if (wantListRankingInput) {
+    wantListRankingInput.checked = wantListRanking;
+  }
   if (highlightCollectionInput) {
     highlightCollectionInput.checked = highlightCollection;
   }
@@ -175,7 +224,7 @@ function syncSettingsHighlightCheckboxes() {
 }
 
 function shouldHighlightWantsOnCards() {
-  return highlightWants || wantOnly;
+  return highlightWants || isWantFilterActive();
 }
 
 function shouldHighlightCollectionOnCards() {
@@ -406,6 +455,77 @@ const viewerCardHtml = (function () {
 })();
 
 
+/* Generated from scripts/lib/viewer-want-order-normalize.js — run npm run bundle-viewer */
+
+const viewerWantOrderNormalize = (function () {
+  function normalizeWantIdList(raw) {
+    if (raw == null || raw === "") {
+      return [];
+    }
+    try {
+      const parsed = typeof raw === "string" ? JSON.parse(raw) : raw;
+      if (!Array.isArray(parsed)) {
+        return [];
+      }
+      const ids = [];
+      const seen = new Set();
+      for (const entry of parsed) {
+        if (entry == null || entry === "") {
+          continue;
+        }
+        const id = Number(entry);
+        if (!Number.isFinite(id) || !Number.isInteger(id) || seen.has(id)) {
+          continue;
+        }
+        seen.add(id);
+        ids.push(id);
+      }
+      return ids;
+    } catch (_) {
+      return [];
+    }
+  }
+  
+  function normalizeWantMembership(raw) {
+    if (Array.isArray(raw)) {
+      return normalizeWantIdList(raw);
+    }
+    if (raw && typeof raw === "object" && Array.isArray(raw.wantIds)) {
+      return normalizeWantIdList(raw.wantIds);
+    }
+    return normalizeWantIdList(raw);
+  }
+  
+  function normalizeWantOrderIds(raw, wantIds) {
+    const membership = normalizeWantMembership(wantIds);
+    const membershipSet = new Set(membership);
+    const ordered = [];
+    const seen = new Set();
+  
+    for (const id of normalizeWantIdList(raw)) {
+      if (!membershipSet.has(id) || seen.has(id)) {
+        continue;
+      }
+      seen.add(id);
+      ordered.push(id);
+    }
+  
+    for (const id of membership) {
+      if (!seen.has(id)) {
+        ordered.push(id);
+      }
+    }
+  
+    return ordered;
+  }
+  return {
+    normalizeWantIdList,
+    normalizeWantMembership,
+    normalizeWantOrderIds,
+  };
+})();
+
+
 /* Generated from scripts/lib/viewer-user-state.js — run npm run bundle-viewer */
 
 const viewerUserState = (function () {
@@ -434,7 +554,6 @@ const viewerUserState = (function () {
     "title-desc",
   ]);
   
-  const SORT_LEGACY = { default: "date-asc", title: "title-asc" };
   
   function defaultUserState() {
     return {
@@ -445,6 +564,7 @@ const viewerUserState = (function () {
       orderedIds: [],
       collections: defaultCollections(),
       wantIds: [],
+      wantOrderIds: [],
       preferences: {
         sort: "date-asc",
         viewMode: "cards",
@@ -452,6 +572,7 @@ const viewerUserState = (function () {
         highlightWants: true,
         highlightCollection: true,
         showMagazines: false,
+        wantListRanking: true,
       },
     };
   }
@@ -524,6 +645,7 @@ const viewerUserState = (function () {
       collectionIds: [],
       orderedIds: [],
       wantIds: [],
+      wantOrderIds: [],
       collections: {
         local: localSlot,
         gist: emptyCollectionSlot(),
@@ -637,6 +759,10 @@ const viewerUserState = (function () {
         typeof raw?.showMagazines === "boolean"
           ? raw.showMagazines
           : base.preferences.showMagazines,
+      wantListRanking:
+        typeof raw?.wantListRanking === "boolean"
+          ? raw.wantListRanking
+          : base.preferences.wantListRanking,
     };
   }
   
@@ -666,6 +792,10 @@ const viewerUserState = (function () {
         normalizeIdArray(snapshot[LEGACY_KEYS.ordered]),
       ),
       wantIds: normalizeIdArray(snapshot[LEGACY_KEYS.want]),
+      wantOrderIds: viewerWantOrderNormalize.normalizeWantOrderIds(
+        null,
+        normalizeIdArray(snapshot[LEGACY_KEYS.want]),
+      ),
       preferences: {
         sort: normalizeSort(
           snapshot[LEGACY_KEYS.sort],
@@ -707,6 +837,7 @@ const viewerUserState = (function () {
       orderedIds,
       collections: normalizeCollections(null, collectionIds, orderedIds),
       wantIds: normalizeIdArray(v1.wantIds),
+      wantOrderIds: viewerWantOrderNormalize.normalizeWantOrderIds(null, normalizeIdArray(v1.wantIds)),
       preferences: normalizePreferences(v1.preferences, base),
     };
   }
@@ -760,6 +891,7 @@ const viewerUserState = (function () {
       const base = defaultUserState();
       const collectionIds = normalizeIdArray(parsed.collectionIds);
       const orderedIds = normalizeIdArray(parsed.orderedIds);
+      const wantIds = normalizeIdArray(parsed.wantIds);
       return {
         version: USER_STATE_VERSION,
         updatedAt:
@@ -772,7 +904,8 @@ const viewerUserState = (function () {
           collectionIds,
           orderedIds,
         ),
-        wantIds: normalizeIdArray(parsed.wantIds),
+        wantIds,
+        wantOrderIds: viewerWantOrderNormalize.normalizeWantOrderIds(parsed.wantOrderIds, wantIds),
         preferences: normalizePreferences(parsed.preferences, base),
       };
     } catch (_) {
@@ -802,6 +935,7 @@ const viewerUserState = (function () {
       orderedIds,
     );
     collections[mode] = { collectionIds, orderedIds };
+    const wantIds = normalizeIdArray(snapshot.wantIds);
     return {
       version: USER_STATE_VERSION,
       updatedAt: new Date().toISOString(),
@@ -809,7 +943,8 @@ const viewerUserState = (function () {
       collectionIds,
       orderedIds,
       collections,
-      wantIds: normalizeIdArray(snapshot.wantIds),
+      wantIds,
+      wantOrderIds: viewerWantOrderNormalize.normalizeWantOrderIds(snapshot.wantOrderIds, wantIds),
       preferences: {
         sort: normalizeSort(snapshot.sort),
         viewMode: normalizeViewMode(snapshot.viewMode),
@@ -817,6 +952,10 @@ const viewerUserState = (function () {
         highlightWants: Boolean(snapshot.highlightWants),
         highlightCollection: Boolean(snapshot.highlightCollection),
         showMagazines: Boolean(snapshot.showMagazines),
+        wantListRanking:
+          typeof snapshot.wantListRanking === "boolean"
+            ? snapshot.wantListRanking
+            : true,
       },
     };
   }
@@ -829,12 +968,14 @@ const viewerUserState = (function () {
       collectionIds: active.collectionIds,
       orderedIds: active.orderedIds,
       wantIds: parsed.wantIds,
+      wantOrderIds: parsed.wantOrderIds,
       sort: parsed.preferences.sort,
       viewMode: parsed.preferences.viewMode,
       headerFiltersExpanded: parsed.preferences.headerFiltersExpanded,
       highlightWants: parsed.preferences.highlightWants,
       highlightCollection: parsed.preferences.highlightCollection,
       showMagazines: parsed.preferences.showMagazines,
+      wantListRanking: parsed.preferences.wantListRanking,
     };
   }
   
@@ -1725,8 +1866,37 @@ const viewerFilters = (function () {
     return true;
   }
   
-  function passesWantFilter(book, wantOnly, wantIds) {
-    return !wantOnly || wantIds.has(book.id);
+  function passesWantFilter(book, wantFilterMode, wantIds) {
+    if (wantFilterMode == null) {
+      return true;
+    }
+    return wantIds.has(book.id);
+  }
+  
+  function cycleWantFilter(wantFilterMode, hasAnyWants, wantListRankingEnabled = true) {
+    if (!hasAnyWants) {
+      return wantFilterMode === "want" ? null : "want";
+    }
+    if (!wantListRankingEnabled) {
+      if (wantFilterMode === null) {
+        return "want";
+      }
+      return null;
+    }
+    if (wantFilterMode === null) {
+      return "want";
+    }
+    if (wantFilterMode === "want") {
+      return "ranked";
+    }
+    return null;
+  }
+  
+  function hasAnyWants(books, wantIds, visibilityOptions) {
+    return books.some(
+      (book) =>
+        passesBookVisibility(book, visibilityOptions) && wantIds.has(book.id),
+    );
   }
   
   function filterVisibleBooks(books, options) {
@@ -1736,7 +1906,7 @@ const viewerFilters = (function () {
       showMagazines,
       mycroftFilterMode,
       collectionFilterMode,
-      wantOnly,
+      wantFilterMode,
       collectedIds,
       orderedIds,
       wantIds,
@@ -1757,7 +1927,7 @@ const viewerFilters = (function () {
           collectedIds,
           orderedIds,
         ) &&
-        passesWantFilter(book, wantOnly, wantIds) &&
+        passesWantFilter(book, wantFilterMode, wantIds) &&
         matchesCompoundSearch(book, resolvedSearchFilter),
     );
   }
@@ -1828,6 +1998,8 @@ const viewerFilters = (function () {
     cycleMycroftFilter,
     cycleCollectionFilter,
     hasAnyOrderedBooks,
+    cycleWantFilter,
+    hasAnyWants,
     pickRandomBook,
   };
 })();
@@ -2010,6 +2182,22 @@ function passesCollectionFilter(book) {
   );
 }
 
+function cycleWantFilter() {
+  wantFilterMode = viewerFilters.cycleWantFilter(
+    wantFilterMode,
+    hasAnyWants(),
+    wantListRanking,
+  );
+}
+
+function hasAnyWants() {
+  return viewerFilters.hasAnyWants(getActiveBooks(), wantIds, {
+    hiddenOnly,
+    showHidden: showHiddenInput.checked,
+    showMagazines,
+  });
+}
+
 function cycleCollectionFilter() {
   collectionFilterMode = viewerFilters.cycleCollectionFilter(
     collectionFilterMode,
@@ -2175,18 +2363,24 @@ function collectRuntimeSnapshot() {
     collectionIds: [...collectionIds],
     orderedIds: [...orderedIds],
     wantIds: [...wantIds],
+    wantOrderIds: [...wantOrderIds],
     sort: sortSelect.value,
     viewMode: gridViewMode,
     headerFiltersExpanded,
     highlightWants,
     highlightCollection,
     showMagazines,
+    wantListRanking,
   };
 }
 
 function applyRuntimeSnapshot(runtime) {
   storageMode = viewerUserState.normalizeStorageMode(runtime.storageMode);
   wantIds = new Set(runtime.wantIds);
+  wantOrderIds = viewerWantOrderNormalize.normalizeWantOrderIds(
+    runtime.wantOrderIds,
+    runtime.wantIds,
+  );
   collectionIds = new Set(runtime.collectionIds);
   orderedIds = new Set(runtime.orderedIds);
   gridViewMode = runtime.viewMode;
@@ -2194,6 +2388,10 @@ function applyRuntimeSnapshot(runtime) {
   highlightWants = runtime.highlightWants;
   highlightCollection = runtime.highlightCollection;
   showMagazines = runtime.showMagazines;
+  wantListRanking = runtime.wantListRanking;
+  if (!wantListRanking && wantFilterMode === "ranked") {
+    wantFilterMode = null;
+  }
   if (sortSelect && runtime.sort) {
     sortSelect.value = runtime.sort;
   }
@@ -2553,15 +2751,16 @@ function updateHeaderFiltersState() {
 }
 
 function updateViewModeState() {
-  document.body.classList.toggle("view-mode-list", gridViewMode === "list");
+  const effectiveList = getEffectiveViewMode() === "list";
+  document.body.classList.toggle("view-mode-list", effectiveList);
   if (!viewModeToggle) {
     return;
   }
-  const listMode = gridViewMode === "list";
-  viewModeToggle.setAttribute("aria-pressed", String(listMode));
+  const listPreference = gridViewMode === "list";
+  viewModeToggle.setAttribute("aria-pressed", String(listPreference));
   viewModeToggle.setAttribute(
     "aria-label",
-    listMode ? "Switch to grid view" : "Switch to list view",
+    listPreference ? "Switch to grid view" : "Switch to list view",
   );
 }
 
@@ -2574,17 +2773,7 @@ function toggleWant(bookId) {
   if (!Number.isFinite(id)) {
     return;
   }
-  if (wantIds.has(id)) {
-    wantIds.delete(id);
-  } else {
-    wantIds.add(id);
-    if (collectionIds.has(id)) {
-      collectionIds.delete(id);
-    }
-    if (orderedIds.has(id)) {
-      orderedIds.delete(id);
-    }
-  }
+  syncWantMembership(id, !wantIds.has(id));
   saveUserState();
   render();
   if (!bookDetailDialog.hidden) {
@@ -2606,7 +2795,11 @@ function toggleCollection(bookId) {
     collectionIds.add(id);
   } else {
     orderedIds.add(id);
-    wantIds.delete(id);
+    if (wantIds.has(id)) {
+      wantIds.delete(id);
+      wantOrderIds = wantOrderIds.filter((entry) => entry !== id);
+      invalidateSortedCache();
+    }
   }
 
   saveUserState();
@@ -2708,6 +2901,123 @@ const viewerSort = (function () {
     compareOrderTiebreak,
     compareCanonical,
     sortBooks,
+  };
+})();
+
+
+/* Generated from scripts/lib/viewer-want-order.js — run npm run bundle-viewer */
+
+const viewerWantOrder = (function () {
+  const {
+    normalizeWantIdList,
+    normalizeWantMembership,
+    normalizeWantOrderIds,
+  } = viewerWantOrderNormalize;
+  
+  function compareWantOrderTiebreak(a, b, bookOrderIndex) {
+    const indexA = bookOrderIndex.has(a.id) ? bookOrderIndex.get(a.id) : a.id;
+    const indexB = bookOrderIndex.has(b.id) ? bookOrderIndex.get(b.id) : b.id;
+    if (indexA !== indexB) {
+      return indexA - indexB;
+    }
+    return a.id - b.id;
+  }
+  
+  function buildWantOrderIndex(wantOrderIds) {
+    return new Map(wantOrderIds.map((id, index) => [Number(id), index]));
+  }
+  
+  function sortBooksByWantOrder(books, wantOrderIds, bookOrderIndex) {
+    const wantOrderIndex = buildWantOrderIndex(wantOrderIds);
+    const copy = [...books];
+    return copy.sort((a, b) => {
+      const indexA = wantOrderIndex.has(a.id)
+        ? wantOrderIndex.get(a.id)
+        : Number.MAX_SAFE_INTEGER;
+      const indexB = wantOrderIndex.has(b.id)
+        ? wantOrderIndex.get(b.id)
+        : Number.MAX_SAFE_INTEGER;
+      if (indexA !== indexB) {
+        return indexA - indexB;
+      }
+      return compareWantOrderTiebreak(a, b, bookOrderIndex);
+    });
+  }
+  
+  function wouldMoveWantToIndex(wantOrderIds, dragId, targetIndex) {
+    const from = wantOrderIds.indexOf(dragId);
+    if (
+      from < 0 ||
+      targetIndex < 0 ||
+      targetIndex >= wantOrderIds.length ||
+      from === targetIndex
+    ) {
+      return false;
+    }
+    return true;
+  }
+  
+  function reorderWantOrderIds(wantOrderIds, dragId, targetId) {
+    const from = wantOrderIds.indexOf(dragId);
+    const to = wantOrderIds.indexOf(targetId);
+    if (from < 0 || to < 0 || from === to) {
+      return wantOrderIds;
+    }
+  
+    const next = [...wantOrderIds];
+    next.splice(from, 1);
+    next.splice(to, 0, dragId);
+    return next;
+  }
+  return {
+    normalizeWantOrderIds,
+    buildWantOrderIndex,
+    sortBooksByWantOrder,
+    wouldMoveWantToIndex,
+    reorderWantOrderIds,
+  };
+})();
+
+
+/* Generated from scripts/lib/viewer-pointer-reorder.js — run npm run bundle-viewer */
+
+const viewerPointerReorder = (function () {
+  /**
+   * Pointer/touch list reorder helpers (HTML5 drag does not work on touch).
+   */
+  function findRowAtPoint(options) {
+    const {
+      root,
+      clientX,
+      clientY,
+      rowSelector,
+      excludeRow,
+      elementsFromPoint,
+    } = options;
+  
+    if (!root || !rowSelector || typeof elementsFromPoint !== "function") {
+      return null;
+    }
+  
+    const elements = elementsFromPoint(clientX, clientY);
+    if (!Array.isArray(elements)) {
+      return null;
+    }
+  
+    for (const element of elements) {
+      if (!element || typeof element.closest !== "function") {
+        continue;
+      }
+      const row = element.closest(rowSelector);
+      if (row && row !== excludeRow && root.contains(row)) {
+        return row;
+      }
+    }
+  
+    return null;
+  }
+  return {
+    findRowAtPoint,
   };
 })();
 
@@ -2948,12 +3258,16 @@ function pickTagSuggestion(index) {
   renderNow();
 }
 
-function clearSearchAll() {
+function clearSearchState() {
   searchTagFilters.length = 0;
   searchInput.value = "";
   renderSearchChips();
   hideTagSuggest();
   updateSearchClearVisibility();
+}
+
+function clearSearchAll() {
+  clearSearchState();
   renderNow();
 }
 
@@ -3083,10 +3397,10 @@ document.addEventListener("click", (event) => {
 
 /* Sort, search, filters, and visible book list */
 
-let sortedActiveCache = { mode: null, books: null };
+let sortedActiveCache = { key: null, books: null };
 
 function invalidateSortedCache() {
-  sortedActiveCache.mode = null;
+  sortedActiveCache.key = null;
   sortedActiveCache.books = null;
 }
 
@@ -3098,18 +3412,35 @@ function compareCanonical(a, b) {
   return viewerSort.compareCanonical(a, b, bookOrderIndex);
 }
 
+function getSortedActiveBooksCacheKey() {
+  return `${sortSelect.value}:${wantFilterMode ?? "off"}`;
+}
+
 function getSortedActiveBooks() {
-  const mode = sortSelect.value;
-  if (sortedActiveCache.mode === mode && sortedActiveCache.books) {
+  const cacheKey = getSortedActiveBooksCacheKey();
+  if (sortedActiveCache.key === cacheKey && sortedActiveCache.books) {
     return sortedActiveCache.books;
   }
-  const sorted = sortBooks(getActiveBooks(), mode);
-  sortedActiveCache.mode = mode;
+  let sorted;
+  if (wantFilterMode === "ranked") {
+    const wantBooks = getActiveBooks().filter((book) => wantIds.has(book.id));
+    sorted = viewerWantOrder.sortBooksByWantOrder(
+      wantBooks,
+      wantOrderIds,
+      bookOrderIndex,
+    );
+  } else {
+    sorted = sortBooks(getActiveBooks(), sortSelect.value);
+  }
+  sortedActiveCache.key = cacheKey;
   sortedActiveCache.books = sorted;
   return sorted;
 }
 
 function onSortChange() {
+  if (sortSelect.disabled) {
+    return;
+  }
   invalidateSortedCache();
   saveUserState();
   render();
@@ -3121,6 +3452,42 @@ function sortBooks(list, mode) {
 
 function matchesSearch(book, query) {
   return viewerFilters.matchesSearch(book, query);
+}
+
+function updateSortControlState() {
+  const ranked = wantFilterMode === "ranked";
+  if (sortSelect) {
+    sortSelect.disabled = ranked;
+    sortSelect.setAttribute("aria-disabled", String(ranked));
+  }
+  if (sortControlWrap) {
+    sortControlWrap.classList.toggle("sort-control-disabled", ranked);
+  }
+}
+
+const WANT_RANK_ICON = `<svg class="want-ranked-icon" viewBox="0 0 16 12" fill="none" aria-hidden="true"><path d="M1 2h14M1 6h14M1 10h14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>`;
+
+function renderWantFilterButton() {
+  const active = isWantFilterActive();
+  const ranked = isWantRankedFilterActive();
+  const classes = [
+    "stat",
+    "want-stat",
+    "stat-toggle",
+    active ? "active" : "",
+    ranked ? "want-ranked-filter" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+  const label = ranked
+    ? `<span class="want-ranked-button-content"><span class="want-ranked-label">WANT</span>${WANT_RANK_ICON}</span>`
+    : "WANT";
+  const ariaLabel = ranked
+    ? "Want list sorted by priority — tap to show all books"
+    : active
+      ? "Viewing want list — tap to sort by priority"
+      : "Filter to want list";
+  return `<button type="button" class="${classes}" id="want-filter-toggle" aria-pressed="${active}" aria-label="${ariaLabel}">${label}</button>`;
 }
 
 function getStatTotal(activeBooks) {
@@ -3165,7 +3532,7 @@ function renderStats(visible, all) {
     hasMycroft
       ? `<button type="button" class="${mycroftToggleClass}" id="mycroft-filter-toggle" aria-pressed="${isMycroftOnlyFilter()}"><span class="mycroft-stat-label">MYCROFT &amp; MORAN</span></button>`
       : "",
-    `<button type="button" class="stat want-stat stat-toggle${wantOnly ? " active" : ""}" id="want-filter-toggle" aria-pressed="${wantOnly}">WANT</button>`,
+    renderWantFilterButton(),
     hiddenCount && viewerMode.shouldShowHiddenStatFilter(serveEnabled, hiddenCount)
       ? `<button type="button" class="stat hidden-stat stat-toggle${hiddenOnly ? " active" : ""}" id="hidden-filter-toggle" aria-pressed="${hiddenOnly}">HIDDEN</button>`
       : "",
@@ -3186,7 +3553,7 @@ function getViewBooksWithoutSearch() {
     showMagazines,
     mycroftFilterMode,
     collectionFilterMode,
-    wantOnly,
+    wantFilterMode,
     collectedIds: activeCollectionIds(),
     orderedIds,
     wantIds,
@@ -3201,7 +3568,7 @@ function getVisibleBooks() {
     showMagazines,
     mycroftFilterMode,
     collectionFilterMode,
-    wantOnly,
+    wantFilterMode,
     collectedIds: activeCollectionIds(),
     orderedIds,
     wantIds,
@@ -3527,7 +3894,7 @@ function layoutListCoverPreviewImage(img) {
 }
 
 function layoutListCoverPreviews() {
-  if (gridViewMode !== "list") {
+  if (getEffectiveViewMode() !== "list") {
     return;
   }
 
@@ -3554,6 +3921,23 @@ function ensureListCoverPreviewObserver() {
   listCoverPreviewObserver.observe(grid);
 }
 
+function renderWantRankDragHandle(book) {
+  if (!isWantRankedFilterActive() || hasActiveSearch()) {
+    return "";
+  }
+  const rank = wantOrderIds.indexOf(book.id) + 1;
+  if (rank < 1) {
+    return "";
+  }
+  return `<span
+    class="want-rank-drag-handle"
+    aria-label="Drag to reorder — rank ${rank}"
+    role="button"
+    tabindex="0"
+    data-book-id="${book.id}"
+  >${rank}</span>`;
+}
+
 function renderCard(book) {
   let collectionClass = "";
   if (shouldHighlightCollectionOnCards()) {
@@ -3564,29 +3948,30 @@ function renderCard(book) {
     }
   }
   const hiddenClass = book.hidden ? " hidden-book" : "";
-  const coverVariant = gridViewMode === "list" ? "list" : "card";
+  const listMode = getEffectiveViewMode() === "list";
+  const coverVariant = listMode ? "list" : "card";
   const imageHtml = renderCover(book, book.coverCacheKey, coverVariant);
   const coverActions = renderCoverActions(book);
+  const dragHandle = renderWantRankDragHandle(book);
 
   const imprintBadge = viewerCardHtml.renderImprintBadge(book, "card");
   const wantBadge = renderCardWantBadge(book);
   const ownedBadge = renderOwnedBadge(book);
   const bottomRow = renderCardBottomRow(
-    gridViewMode === "list" ? "" : imprintBadge,
+    listMode ? "" : imprintBadge,
     wantBadge,
     "",
     ownedBadge,
   );
-  const listPrimaryHtml =
-    gridViewMode === "list"
-      ? `<div class="card-list-primary">
+  const listPrimaryHtml = listMode
+    ? `<div class="card-list-primary">
           <h2 class="title">${book.title || "Untitled"}</h2>
           <div class="card-list-meta">
             ${book.publicationDate ? `<div class="date">${book.publicationDate}</div>` : ""}
             ${imprintBadge}
           </div>
         </div>`
-      : `<div class="card-list-primary">
+    : `<div class="card-list-primary">
           <h2 class="title">${book.title || "Untitled"}</h2>
           ${book.publicationDate ? `<div class="date">${book.publicationDate}</div>` : ""}
         </div>`;
@@ -3598,7 +3983,7 @@ function renderCard(book) {
   const wantedClass =
     isWanted(book) && shouldHighlightWantsOnCards() ? " wanted" : "";
 
-  return `
+  const cardMarkup = `
   <article class="card${collectionClass}${wantedClass}${hiddenClass}" data-book-id="${book.id}">
     <div class="cover-wrap">
       ${coverActions}
@@ -3612,8 +3997,13 @@ function renderCard(book) {
       ${viewerCardHtml.renderBookMetaHtml(book)}
       ${bottomRow}
     </div>
-  </article>
-`;
+  </article>`;
+
+  if (dragHandle) {
+    return `<div class="want-rank-row">${dragHandle}${cardMarkup}</div>`;
+  }
+
+  return cardMarkup;
 }
 
 function updateHeaderLogo() {
@@ -3625,6 +4015,15 @@ function updateHeaderLogo() {
     pageTitle.textContent = title;
   }
   document.title = title;
+}
+
+function isWantViewExclusive() {
+  return (
+    isWantFilterActive() &&
+    !isCollectionFilterActive() &&
+    !hiddenOnly &&
+    !isMycroftOnlyFilter()
+  );
 }
 
 function render() {
@@ -3642,20 +4041,29 @@ function render() {
     collectionFilterMode = null;
   }
 
+  if (isWantRankedFilterActive() && wantIds.size === 0) {
+    wantFilterMode = null;
+  }
+
   updateHeaderLogo();
   updateViewModeState();
   updateHeaderFiltersState();
+  updateSortControlState();
+  if (typeof clearWantRankDragState === "function") {
+    clearWantRankDragState();
+  }
   document.body.classList.toggle(
     "viewing-collection",
-    isCollectionFilterActive() && !hiddenOnly && !isMycroftOnlyFilter() && !wantOnly,
+    isCollectionFilterActive() && !hiddenOnly && !isMycroftOnlyFilter() && !isWantFilterActive(),
   );
   document.body.classList.toggle(
     "viewing-hidden",
-    hiddenOnly && !isCollectionFilterActive() && !isMycroftOnlyFilter() && !wantOnly,
+    hiddenOnly && !isCollectionFilterActive() && !isMycroftOnlyFilter() && !isWantFilterActive(),
   );
+  document.body.classList.toggle("viewing-want", isWantViewExclusive());
   document.body.classList.toggle(
-    "viewing-want",
-    wantOnly && !isCollectionFilterActive() && !hiddenOnly && !isMycroftOnlyFilter(),
+    "viewing-want-ranked",
+    isWantRankedFilterActive() && isWantViewExclusive(),
   );
   document.body.classList.toggle("viewing-mycroft-hidden", isMycroftHiddenFilter());
   if (pageSubtitle) {
@@ -3678,9 +4086,13 @@ function render() {
     } else if (isMycroftHiddenFilter()) {
       pageSubtitle.textContent =
         "Mycroft & Moran titles hidden — click the stat again to show all books";
-    } else if (wantOnly) {
+    } else if (isWantRankedFilterActive() && isWantViewExclusive()) {
+      pageSubtitle.textContent = hasActiveSearch()
+        ? "Clear search to reorder — tap WANT again to show all books"
+        : "Drag numbers to set priority — tap WANT again to show all books";
+    } else if (isWantFilterActive() && isWantViewExclusive()) {
       pageSubtitle.textContent =
-        "Viewing your want list — click the stat again to show all books";
+        "Viewing your want list — tap WANT again to sort by priority";
     } else {
       pageSubtitle.textContent =
         "A publishing house of horror and weird fiction—founded in 1939 to rescue Lovecraft from the pulps.";
@@ -3708,7 +4120,7 @@ function render() {
       message = activeSearch
         ? "No Mycroft & Moran books match your search."
         : "No Mycroft & Moran books to show.";
-    } else if (wantOnly) {
+    } else if (isWantFilterActive()) {
       message = activeSearch
         ? "No wanted books match your search."
         : "Your want list is empty — open a book and tap Want to add it.";
@@ -4962,6 +5374,7 @@ function applyTagSearch(rawTag) {
 /* Admin book order dialog */
 
 let bookOrderDragId = null;
+let bookOrderPointerDrag = null;
 
 function getBookById(bookId) {
   return books.find((entry) => entry.id === bookId) || null;
@@ -5002,9 +5415,6 @@ function wouldMoveBookToIndex(order, bookId, targetIndex) {
 
   const next = [...order];
   next.splice(from, 1);
-  if (from < targetIndex) {
-    targetIndex -= 1;
-  }
   next.splice(targetIndex, 0, bookId);
   return isValidBookOrder(next);
 }
@@ -5055,7 +5465,6 @@ function renderBookOrderList() {
         <div class="order-dialog-row" data-book-id="${id}">
           <span
             class="order-dialog-drag-handle"
-            draggable="true"
             aria-label="Drag to reorder"
             role="button"
             tabindex="0"
@@ -5178,18 +5587,29 @@ function reorderBookToTarget(dragId, targetId) {
 
   const next = [...workingBookOrder];
   next.splice(from, 1);
-  let insertAt = to;
-  if (from < to) {
-    insertAt -= 1;
-  }
-  next.splice(insertAt, 0, dragId);
+  next.splice(to, 0, dragId);
   workingBookOrder = next;
   bookOrderDirty = true;
   renderBookOrderList();
 }
 
+function findBookOrderRowAtPoint(clientX, clientY, excludeRow) {
+  if (!bookOrderList) {
+    return null;
+  }
+  return viewerPointerReorder.findRowAtPoint({
+    root: bookOrderList,
+    clientX,
+    clientY,
+    rowSelector: ".order-dialog-row",
+    excludeRow,
+    elementsFromPoint: document.elementsFromPoint.bind(document),
+  });
+}
+
 function clearBookOrderDragState() {
   bookOrderDragId = null;
+  bookOrderPointerDrag = null;
   if (!bookOrderList) {
     return;
   }
@@ -5200,7 +5620,34 @@ function clearBookOrderDragState() {
     });
 }
 
-function onBookOrderDragStart(event) {
+function updateBookOrderDropTarget(row) {
+  if (!bookOrderList) {
+    return;
+  }
+  bookOrderList
+    .querySelectorAll(".order-dialog-row-drop-target")
+    .forEach((element) => {
+      if (element !== row) {
+        element.classList.remove("order-dialog-row-drop-target");
+      }
+    });
+
+  if (!row || !bookOrderDragId) {
+    return;
+  }
+
+  const targetId = Number(row.dataset.bookId);
+  const targetIndex = workingBookOrder.indexOf(targetId);
+  if (wouldMoveBookToIndex(workingBookOrder, bookOrderDragId, targetIndex)) {
+    row.classList.add("order-dialog-row-drop-target");
+  }
+}
+
+function onBookOrderPointerDown(event) {
+  if (event.button !== 0) {
+    return;
+  }
+
   const handle = event.target.closest(".order-dialog-drag-handle");
   if (!handle) {
     return;
@@ -5216,63 +5663,54 @@ function onBookOrderDragStart(event) {
     return;
   }
 
+  event.preventDefault();
+  handle.setPointerCapture(event.pointerId);
+
   bookOrderDragId = bookId;
+  bookOrderPointerDrag = {
+    row,
+    pointerId: event.pointerId,
+  };
   row.classList.add("order-dialog-row-dragging");
-  event.dataTransfer.effectAllowed = "move";
-  event.dataTransfer.setData("text/plain", String(bookId));
 }
 
-function onBookOrderDragOver(event) {
-  if (!bookOrderDragId) {
-    return;
-  }
-
-  const row = event.target.closest(".order-dialog-row");
-  if (!row) {
-    return;
-  }
-
-  const targetId = Number(row.dataset.bookId);
-  const targetIndex = workingBookOrder.indexOf(targetId);
-  bookOrderList
-    .querySelectorAll(".order-dialog-row-drop-target")
-    .forEach((element) => {
-      if (element !== row) {
-        element.classList.remove("order-dialog-row-drop-target");
-      }
-    });
-
-  if (!wouldMoveBookToIndex(workingBookOrder, bookOrderDragId, targetIndex)) {
-    event.dataTransfer.dropEffect = "none";
+function onBookOrderPointerMove(event) {
+  if (
+    !bookOrderPointerDrag ||
+    bookOrderPointerDrag.pointerId !== event.pointerId
+  ) {
     return;
   }
 
   event.preventDefault();
-  event.dataTransfer.dropEffect = "move";
-  row.classList.add("order-dialog-row-drop-target");
+  const row = findBookOrderRowAtPoint(
+    event.clientX,
+    event.clientY,
+    bookOrderPointerDrag.row,
+  );
+  updateBookOrderDropTarget(row);
 }
 
-function onBookOrderDragLeave(event) {
-  const row = event.target.closest(".order-dialog-row");
-  if (row) {
-    row.classList.remove("order-dialog-row-drop-target");
-  }
-}
-
-function onBookOrderDrop(event) {
-  event.preventDefault();
-  const row = event.target.closest(".order-dialog-row");
-  if (!row || !bookOrderDragId) {
-    clearBookOrderDragState();
+function finishBookOrderPointerDrag(event) {
+  if (
+    !bookOrderPointerDrag ||
+    bookOrderPointerDrag.pointerId !== event.pointerId
+  ) {
     return;
   }
 
-  const targetId = Number(row.dataset.bookId);
-  reorderBookToTarget(bookOrderDragId, targetId);
-  clearBookOrderDragState();
-}
+  if (bookOrderDragId) {
+    const row = findBookOrderRowAtPoint(
+      event.clientX,
+      event.clientY,
+      bookOrderPointerDrag.row,
+    );
+    if (row) {
+      const targetId = Number(row.dataset.bookId);
+      reorderBookToTarget(bookOrderDragId, targetId);
+    }
+  }
 
-function onBookOrderDragEnd() {
   clearBookOrderDragState();
 }
 
@@ -5303,6 +5741,186 @@ function refreshBookOrderDialogIfOpen() {
 }
 
 
+/* Want list priority drag reorder (list view, ranked mode) */
+
+let wantRankDragId = null;
+let wantRankPointerDrag = null;
+
+function canReorderWantRank() {
+  return isWantRankedFilterActive() && !hasActiveSearch();
+}
+
+function findWantRankCardAtPoint(clientX, clientY, excludeCard) {
+  const excludeRow = excludeCard?.closest(".want-rank-row");
+  const elements = document.elementsFromPoint(clientX, clientY);
+  if (!Array.isArray(elements)) {
+    return null;
+  }
+
+  for (const element of elements) {
+    if (!element || typeof element.closest !== "function") {
+      continue;
+    }
+
+    const rankRow = element.closest(".want-rank-row");
+    if (rankRow && rankRow !== excludeRow && grid.contains(rankRow)) {
+      const card = rankRow.querySelector(".card");
+      if (card && card !== excludeCard) {
+        return card;
+      }
+    }
+
+    const card = element.closest(".card");
+    if (card && card !== excludeCard && grid.contains(card)) {
+      return card;
+    }
+  }
+
+  return null;
+}
+
+function reorderWantToTarget(dragId, targetId) {
+  const next = viewerWantOrder.reorderWantOrderIds(
+    wantOrderIds,
+    dragId,
+    targetId,
+  );
+  if (next === wantOrderIds) {
+    return false;
+  }
+  setWantOrderIds(next);
+  return true;
+}
+
+function clearWantRankDragState() {
+  wantRankDragId = null;
+  wantRankPointerDrag = null;
+  grid
+    .querySelectorAll(
+      ".card-want-rank-dragging, .want-rank-drop-target",
+    )
+    .forEach((element) => {
+      element.classList.remove(
+        "card-want-rank-dragging",
+        "want-rank-drop-target",
+      );
+    });
+}
+
+function updateWantRankDropTarget(card) {
+  grid.querySelectorAll(".want-rank-drop-target").forEach((row) => {
+    const rowCard = row.querySelector(".card");
+    if (!card || rowCard !== card) {
+      row.classList.remove("want-rank-drop-target");
+    }
+  });
+
+  if (!card || !wantRankDragId) {
+    return;
+  }
+
+  const row = card.closest(".want-rank-row");
+  if (!row) {
+    return;
+  }
+
+  const targetId = Number(card.dataset.bookId);
+  const targetIndex = wantOrderIds.indexOf(targetId);
+  if (
+    viewerWantOrder.wouldMoveWantToIndex(
+      wantOrderIds,
+      wantRankDragId,
+      targetIndex,
+    )
+  ) {
+    row.classList.add("want-rank-drop-target");
+  } else {
+    row.classList.remove("want-rank-drop-target");
+  }
+}
+
+function onWantRankPointerDown(event) {
+  if (!canReorderWantRank() || event.button !== 0) {
+    return;
+  }
+
+  const handle = event.target.closest(".want-rank-drag-handle");
+  if (!handle) {
+    return;
+  }
+
+  const row = handle.closest(".want-rank-row");
+  const card = row?.querySelector(".card");
+  if (!card) {
+    return;
+  }
+
+  const bookId = Number(card.dataset.bookId);
+  if (!Number.isInteger(bookId)) {
+    return;
+  }
+
+  event.preventDefault();
+  handle.setPointerCapture(event.pointerId);
+
+  wantRankDragId = bookId;
+  wantRankPointerDrag = {
+    card,
+    pointerId: event.pointerId,
+  };
+  card.classList.add("card-want-rank-dragging");
+}
+
+function onWantRankPointerMove(event) {
+  if (
+    !wantRankPointerDrag ||
+    wantRankPointerDrag.pointerId !== event.pointerId ||
+    !canReorderWantRank()
+  ) {
+    return;
+  }
+
+  event.preventDefault();
+  const card = findWantRankCardAtPoint(
+    event.clientX,
+    event.clientY,
+    wantRankPointerDrag.card,
+  );
+  updateWantRankDropTarget(card);
+}
+
+function finishWantRankPointerDrag(event) {
+  if (
+    !wantRankPointerDrag ||
+    wantRankPointerDrag.pointerId !== event.pointerId
+  ) {
+    return;
+  }
+
+  if (canReorderWantRank() && wantRankDragId) {
+    const card = findWantRankCardAtPoint(
+      event.clientX,
+      event.clientY,
+      wantRankPointerDrag.card,
+    );
+    if (card) {
+      const targetId = Number(card.dataset.bookId);
+      if (reorderWantToTarget(wantRankDragId, targetId)) {
+        saveUserState();
+        render();
+      }
+    }
+  }
+
+  clearWantRankDragState();
+}
+
+grid.addEventListener("pointerdown", onWantRankPointerDown);
+grid.addEventListener("pointermove", onWantRankPointerMove);
+grid.addEventListener("pointerup", finishWantRankPointerDrag);
+grid.addEventListener("pointercancel", finishWantRankPointerDrag);
+
+
 /* Grid and header filter event listeners */
 
 const RANDOM_CARD_LOGO_TAP_MS = 1200;
@@ -5310,6 +5928,10 @@ const RANDOM_CARD_LOGO_TAP_COUNT = 3;
 let randomCardLogoTapTimes = [];
 
 grid.addEventListener("click", (event) => {
+  if (event.target.closest(".want-rank-drag-handle")) {
+    return;
+  }
+
   const editButton = event.target.closest(".edit-book-btn");
   if (editButton) {
     event.preventDefault();
@@ -5344,7 +5966,7 @@ grid.addEventListener("click", (event) => {
 stats.addEventListener("click", (event) => {
   if (event.target.closest("#collection-filter-toggle")) {
     cycleCollectionFilter();
-    wantOnly = false;
+    wantFilterMode = null;
     render();
     return;
   }
@@ -5359,9 +5981,12 @@ stats.addEventListener("click", (event) => {
     return;
   }
   if (event.target.closest("#want-filter-toggle")) {
-    const next = !wantOnly;
-    wantOnly = next;
-    if (next) {
+    const prev = wantFilterMode;
+    cycleWantFilter();
+    if (wantFilterMode === "ranked" && prev === "want") {
+      clearSearchState();
+    }
+    if (wantFilterMode != null) {
       collectionFilterMode = null;
     }
     render();
@@ -5702,6 +6327,17 @@ if (highlightWantsInput) {
   });
 }
 
+if (wantListRankingInput) {
+  wantListRankingInput.addEventListener("change", () => {
+    wantListRanking = wantListRankingInput.checked;
+    if (!wantListRanking && wantFilterMode === "ranked") {
+      wantFilterMode = null;
+    }
+    saveUserState();
+    render();
+  });
+}
+
 if (highlightCollectionInput) {
   highlightCollectionInput.addEventListener("change", () => {
     highlightCollection = highlightCollectionInput.checked;
@@ -5750,11 +6386,10 @@ if (bookOrderDialog) {
 
 if (bookOrderList) {
   bookOrderList.addEventListener("click", onBookOrderListClick);
-  bookOrderList.addEventListener("dragstart", onBookOrderDragStart);
-  bookOrderList.addEventListener("dragover", onBookOrderDragOver);
-  bookOrderList.addEventListener("dragleave", onBookOrderDragLeave);
-  bookOrderList.addEventListener("drop", onBookOrderDrop);
-  bookOrderList.addEventListener("dragend", onBookOrderDragEnd);
+  bookOrderList.addEventListener("pointerdown", onBookOrderPointerDown);
+  bookOrderList.addEventListener("pointermove", onBookOrderPointerMove);
+  bookOrderList.addEventListener("pointerup", finishBookOrderPointerDrag);
+  bookOrderList.addEventListener("pointercancel", finishBookOrderPointerDrag);
 }
 
 attributionBtn.addEventListener("click", () => {

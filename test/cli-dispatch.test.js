@@ -5,7 +5,6 @@ const { parseArgs } = require("../scripts/cli");
 const { resolveTaskId } = require("../scripts/lib/cli-dispatch");
 
 test("resolveTaskId maps flags to task ids", () => {
-  assert.equal(resolveTaskId(parseArgs(["--sync-collection"])), "syncCollection");
   assert.equal(resolveTaskId(parseArgs(["--compact-edits"])), "compactEdits");
   assert.equal(
     resolveTaskId(parseArgs(["--import-tags-from-csv", "--csv", "tags.csv"])),

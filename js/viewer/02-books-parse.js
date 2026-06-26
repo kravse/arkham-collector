@@ -111,6 +111,22 @@ function passesCollectionFilter(book) {
   );
 }
 
+function cycleWantFilter() {
+  wantFilterMode = viewerFilters.cycleWantFilter(
+    wantFilterMode,
+    hasAnyWants(),
+    wantListRanking,
+  );
+}
+
+function hasAnyWants() {
+  return viewerFilters.hasAnyWants(getActiveBooks(), wantIds, {
+    hiddenOnly,
+    showHidden: showHiddenInput.checked,
+    showMagazines,
+  });
+}
+
 function cycleCollectionFilter() {
   collectionFilterMode = viewerFilters.cycleCollectionFilter(
     collectionFilterMode,

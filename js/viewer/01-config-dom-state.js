@@ -91,6 +91,7 @@ const importCollectionBtn = document.getElementById("import-collection-btn");
 const importCollectionInput = document.getElementById("import-collection-input");
 const importCollectionStatus = document.getElementById("import-collection-status");
 const highlightWantsInput = document.getElementById("highlight-wants");
+const wantListRankingInput = document.getElementById("want-list-ranking");
 const highlightCollectionInput = document.getElementById("highlight-collection");
 const showMagazinesInput = document.getElementById("show-magazines");
 const showMagazinesOption = document.getElementById("show-magazines-option");
@@ -118,8 +119,9 @@ let editingBookId = null;
 let collectionFilterMode = null;
 let hiddenOnly = false;
 let mycroftFilterMode = null;
-let wantOnly = false;
+let wantFilterMode = null;
 let wantIds = new Set();
+let wantOrderIds = [];
 let collectionIds = new Set();
 let orderedIds = new Set();
 let storageMode = "local";
@@ -129,6 +131,7 @@ let gridViewMode = "cards";
 let highlightWants = true;
 let highlightCollection = true;
 let showMagazines = false;
+let wantListRanking = true;
 let detailBookId = null;
 let bookOrderIds = Array.isArray(window.BOOK_ORDER)
   ? window.BOOK_ORDER.map((id) => Number(id))
@@ -147,6 +150,49 @@ function setBookOrderIds(next) {
   invalidateSortedCache();
 }
 
+function setWantOrderIds(next) {
+  wantOrderIds = viewerWantOrderNormalize.normalizeWantOrderIds(next, [...wantIds]);
+  invalidateSortedCache();
+}
+
+function syncWantMembership(bookId, wanted) {
+  const id = Number(bookId);
+  if (!Number.isFinite(id)) {
+    return;
+  }
+  if (wanted) {
+    if (wantIds.has(id)) {
+      return;
+    }
+    wantIds.add(id);
+    wantOrderIds = [...wantOrderIds, id];
+    if (collectionIds.has(id)) {
+      collectionIds.delete(id);
+    }
+    if (orderedIds.has(id)) {
+      orderedIds.delete(id);
+    }
+  } else if (wantIds.has(id)) {
+    wantIds.delete(id);
+    wantOrderIds = wantOrderIds.filter((entry) => entry !== id);
+  } else {
+    return;
+  }
+  invalidateSortedCache();
+}
+
+function getEffectiveViewMode() {
+  return wantFilterMode === "ranked" ? "list" : gridViewMode;
+}
+
+function isWantFilterActive() {
+  return wantFilterMode != null;
+}
+
+function isWantRankedFilterActive() {
+  return wantListRanking && wantFilterMode === "ranked";
+}
+
 rebuildBookOrderIndex();
 
 function updateSortControlVisibility() {
@@ -163,6 +209,9 @@ function syncSettingsHighlightCheckboxes() {
   if (highlightWantsInput) {
     highlightWantsInput.checked = highlightWants;
   }
+  if (wantListRankingInput) {
+    wantListRankingInput.checked = wantListRanking;
+  }
   if (highlightCollectionInput) {
     highlightCollectionInput.checked = highlightCollection;
   }
@@ -175,7 +224,7 @@ function syncSettingsHighlightCheckboxes() {
 }
 
 function shouldHighlightWantsOnCards() {
-  return highlightWants || wantOnly;
+  return highlightWants || isWantFilterActive();
 }
 
 function shouldHighlightCollectionOnCards() {

@@ -10,7 +10,7 @@
 
   .header-actions {
     align-self: flex-start;
-    padding-top: 0.05rem;
+    padding-top: calc((3.25rem - 2.75rem) / 2);
   }
 
   .header-filters-toggle {
@@ -202,6 +202,10 @@
     text-overflow: ellipsis;
   }
 
+  .stat.want-stat .want-ranked-icon {
+    width: 0.76rem;
+  }
+
   .grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 0.45rem;
@@ -211,6 +215,10 @@
     display: flex;
     flex-direction: column;
     gap: 0.24rem;
+  }
+
+  body.view-mode-list.viewing-want-ranked .want-rank-row {
+    gap: 0.28rem;
   }
 
   body.view-mode-list .card {

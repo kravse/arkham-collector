@@ -34,15 +34,15 @@ A visual catalog for collectors and readers of [Arkham House](https://en.wikiped
 
 1. Open a card → **Collect** to mark a copy you own (tap again to remove).
 2. Toggle **want** on titles you are hunting.
-3. Filter with **COLLECTION** or **WANT** in the header. If you have on-order titles, **COLLECTION** cycles: all books → your collection → on-order only → all books.
-4. **Gear** (bottom bar): under **Collection storage**, choose **This device only** (default) or **Sync with GitHub Gist**. GitHub Gist sync only activates after a successful **Connect**; until then you stay on this device. Connecting loads existing Gist data if present, or creates an empty Gist. While connected, the viewer pulls from GitHub on each page load and when you return to the tab. **Clear** or closing settings without a working token returns you to this device only. To move local data to GitHub Gist, export CSV locally then import after connecting.
+3. Filter with **COLLECTION** or **WANT** in the header. If you have on-order titles, **COLLECTION** cycles: all books → your collection → on-order only → all books. If you have wants, **WANT** cycles: all books → your want list (catalog sort) → ranked want list (list view, drag rows to set priority) → all books. Disable **Want list ranking** in gear → Settings → Card display for a simpler WANT filter (all → wants → all).
+4. **Gear** (bottom bar): under **Collection storage**, choose **This device only** (default) or **Sync with GitHub Gist**. Under **Card display**, toggle want highlighting, want list ranking, and collection highlighting. GitHub Gist sync only activates after a successful **Connect**; until then you stay on this device. Connecting loads existing Gist data if present, or creates an empty Gist. While connected, the viewer pulls from GitHub on each page load and when you return to the tab. **Clear** or closing settings without a working token returns you to this device only. To move local data to GitHub Gist, export CSV locally then import after connecting.
 5. **Import collection CSV** / **Export collection CSV** (gear → Settings): import replaces collected titles for the **active storage option only** (this device and GitHub Gist keep separate collections), clears on-order titles for that option, and leaves your want list alone. Works on this device or with GitHub Gist sync (Gist upload happens immediately when connected).
 
 ### Browser storage keys
 
 | Key | Contents |
 |-----|----------|
-| `arkham-user-state` | Unified v2 state: collection ids, want list, ordered titles, display preferences, and `storageMode` (`local` or `gist`). Older per-key entries migrate on first load. |
+| `arkham-user-state` | Unified v2 state: collection ids, want list (`wantIds`), want priority order (`wantOrderIds`), ordered titles, display preferences (including `wantListRanking`), and `storageMode` (`local` or `gist`). Older per-key entries migrate on first load. |
 | `arkham-gist-sync` | GitHub Gist credentials only (`token`, `gistId`) when GitHub Gist sync is connected—not included in the synced Gist file. |
 
 **Gist sync security:** The PAT is stored in your browser’s `localStorage`. Use a throwaway GitHub account and a fine-grained PAT limited to gist read/write. This device only never sends data to GitHub.
@@ -83,7 +83,7 @@ At load time, [`js/book-edits.js`](js/book-edits.js) merges scraped rows with ed
 
 **Dev API:** `GET /api/tags` returns all known tags; `PATCH /api/books/:id/tags` with `{ "tags": [ … ] }` saves a book’s tag list (400 on invalid input). `GET /api/book-order` returns the normalized id list; `PUT /api/book-order` with `{ "order": [ … ] }` saves it (400 if order breaks year sequence or omits books).
 
-**Maintainer sample CSV:** [`my_collection/my_collection.csv`](my_collection/my_collection.csv) is synced by `npm run sync-collection` for script/testing use; it is not loaded in the visitor viewer.
+**Maintainer backup CSV:** [`my_collection/my_collection.csv`](my_collection/my_collection.csv) is a personal backup of collected titles (same shape as export/import). It is not loaded by the viewer; use Settings import/export or Gist sync for live collection data.
 
 **First-time scrape** (optional, overwrites scraped data):
 
@@ -137,7 +137,6 @@ Entry point: `node scripts/index.js`. Common flags: `--yes`, `--local`, `--limit
 
 | Script | Purpose |
 |--------|---------|
-| `sync-collection` | CSV → `collection.js` (also runs on `build` / `serve`) |
 | `compact-edits` | Drop edit fields that match scraped data |
 | `shrink-cover-masters` | Resize large cover masters in `covers/` in place (skips `*.card.webp`, `*.detail.webp`, and `*.list.webp`) |
 | `shrink-cover-masters:dry-run` | Preview master cover shrink without writing |
@@ -161,7 +160,7 @@ Entry point: `node scripts/index.js`. Common flags: `--yes`, `--local`, `--limit
 | `css/` | Styles; load order in [`scripts/css-manifest.js`](scripts/css-manifest.js) (bundled to `css/viewer.css` in `build/`) |
 | `data/` | Catalog + edits + tags + descriptions |
 | `covers/` | Cover images |
-| `my_collection/` | Maintainer sample CSV + `collection.js` |
+| `my_collection/` | Maintainer backup CSV (`my_collection.csv`); not loaded by the site |
 | `scripts/` | Crawler CLI (`index.js`, task registry, `lib/`, `tasks/`) |
 | `build/` | Generated deploy output |
 | `server.js` | Dev API for edits, tags, uploads, and book order |

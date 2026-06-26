@@ -1,7 +1,4 @@
 function resolveTaskId(args) {
-  if (args.syncCollection) {
-    return "syncCollection";
-  }
   if (args.reconcileCovers) {
     return "reconcileCovers";
   }

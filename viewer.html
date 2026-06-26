@@ -411,9 +411,9 @@
         >
           <section class="settings-section">
             <h3 class="settings-section-title">Collection storage</h3>
-            <fieldset class="settings-collection-options">
+            <fieldset class="settings-control-group">
               <legend class="visually-hidden">Collection storage</legend>
-              <label class="settings-collection-option">
+              <label class="settings-control-row">
                 <input
                   type="radio"
                   name="storage-mode"
@@ -421,16 +421,28 @@
                   value="local"
                   checked
                 />
-                This device only
+                <span class="settings-control-copy">
+                  <span class="settings-control-label">This device only</span>
+                  <span class="settings-control-hint"
+                    >Keep your collection in this browser only.</span
+                  >
+                </span>
+                <span class="settings-choice-mark" aria-hidden="true"></span>
               </label>
-              <label class="settings-collection-option">
+              <label class="settings-control-row">
                 <input
                   type="radio"
                   name="storage-mode"
                   id="storage-mode-gist"
                   value="gist"
                 />
-                Sync with GitHub Gist
+                <span class="settings-control-copy">
+                  <span class="settings-control-label">GitHub Gist sync</span>
+                  <span class="settings-control-hint"
+                    >Sync collected titles to a private GitHub Gist.</span
+                  >
+                </span>
+                <span class="settings-choice-mark" aria-hidden="true"></span>
               </label>
             </fieldset>
             <div id="gist-sync-panel" class="settings-gist-panel" hidden>
@@ -518,23 +530,55 @@
                     autocomplete="off"
                   />
                 </label>
-                <button
-                  type="button"
-                  id="gist-connect-btn"
-                  class="settings-collection-action"
-                >
-                  Connect
-                </button>
+                <div class="settings-control-group">
+                  <button
+                    type="button"
+                    id="gist-connect-btn"
+                    class="settings-control-action settings-control-action--primary"
+                  >
+                    <span class="settings-control-copy">
+                      <span class="settings-control-label">Connect</span>
+                      <span class="settings-control-hint"
+                        >Save your token and load or create the Gist.</span
+                      >
+                    </span>
+                  </button>
+                </div>
               </div>
               <p id="gist-sync-status" class="settings-collection-hint"></p>
             </div>
-            <button
-              type="button"
-              id="import-collection-btn"
-              class="settings-collection-action"
-            >
-              Import collection CSV
-            </button>
+            <div class="settings-control-group" role="group" aria-label="Collection CSV">
+              <div class="settings-collection-csv-row">
+                <span class="settings-control-copy">
+                  <span class="settings-control-label">Import collection CSV</span>
+                  <span class="settings-control-hint"
+                    >Replace collected titles from a CSV file.</span
+                  >
+                </span>
+                <button
+                  type="button"
+                  id="import-collection-btn"
+                  class="settings-collection-csv-btn settings-collection-csv-btn--import"
+                >
+                  Import
+                </button>
+              </div>
+              <div class="settings-collection-csv-row">
+                <span class="settings-control-copy">
+                  <span class="settings-control-label">Export collection CSV</span>
+                  <span class="settings-control-hint"
+                    >Download your collected titles as a CSV file.</span
+                  >
+                </span>
+                <button
+                  type="button"
+                  id="export-collection-btn"
+                  class="settings-collection-csv-btn settings-collection-csv-btn--export"
+                >
+                  Export
+                </button>
+              </div>
+            </div>
             <input
               type="file"
               id="import-collection-input"
@@ -546,34 +590,67 @@
               class="settings-collection-hint"
               hidden
             ></p>
-            <button
-              type="button"
-              id="export-collection-btn"
-              class="settings-collection-action"
-            >
-              Export collection CSV
-            </button>
           </section>
           <hr class="settings-divider" aria-hidden="true" />
           <section class="settings-section">
             <h3 class="settings-section-title">Card display</h3>
-            <fieldset class="settings-highlight-options">
+            <fieldset class="settings-control-group">
               <legend class="visually-hidden">Card highlighting</legend>
-              <label class="settings-collection-option">
-                <input type="checkbox" id="highlight-wants" checked />
-                Highlight wants
+              <label class="settings-control-row">
+                <span class="settings-control-copy">
+                  <span class="settings-control-label">Highlight wants</span>
+                  <span class="settings-control-hint"
+                    >Show green styling on books in your want list.</span
+                  >
+                </span>
+                <input
+                  type="checkbox"
+                  class="settings-switch-input"
+                  id="highlight-wants"
+                  checked
+                />
               </label>
-              <label class="settings-collection-option">
-                <input type="checkbox" id="highlight-collection" checked />
-                Highlight collection
+              <label class="settings-control-row">
+                <span class="settings-control-copy">
+                  <span class="settings-control-label">Want list ranking</span>
+                  <span class="settings-control-hint"
+                    >Add a ranked want filter and drag-to-reorder in list
+                    view.</span
+                  >
+                </span>
+                <input
+                  type="checkbox"
+                  class="settings-switch-input"
+                  id="want-list-ranking"
+                  checked
+                />
               </label>
-              <label
-                class="settings-collection-option"
-                id="show-magazines-option"
-                hidden
-              >
-                <input type="checkbox" id="show-magazines" />
-                Show magazines
+              <label class="settings-control-row">
+                <span class="settings-control-copy">
+                  <span class="settings-control-label">Highlight collection</span>
+                  <span class="settings-control-hint"
+                    >Show gold styling on owned and on-order books.</span
+                  >
+                </span>
+                <input
+                  type="checkbox"
+                  class="settings-switch-input"
+                  id="highlight-collection"
+                  checked
+                />
+              </label>
+              <label class="settings-control-row" id="show-magazines-option" hidden>
+                <span class="settings-control-copy">
+                  <span class="settings-control-label">Show magazines</span>
+                  <span class="settings-control-hint"
+                    >Include magazine issues in the catalog grid.</span
+                  >
+                </span>
+                <input
+                  type="checkbox"
+                  class="settings-switch-input"
+                  id="show-magazines"
+                />
               </label>
             </fieldset>
           </section>

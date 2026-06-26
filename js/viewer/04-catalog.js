@@ -1,9 +1,9 @@
 /* Sort, search, filters, and visible book list */
 
-let sortedActiveCache = { mode: null, books: null };
+let sortedActiveCache = { key: null, books: null };
 
 function invalidateSortedCache() {
-  sortedActiveCache.mode = null;
+  sortedActiveCache.key = null;
   sortedActiveCache.books = null;
 }
 
@@ -15,18 +15,35 @@ function compareCanonical(a, b) {
   return viewerSort.compareCanonical(a, b, bookOrderIndex);
 }
 
+function getSortedActiveBooksCacheKey() {
+  return `${sortSelect.value}:${wantFilterMode ?? "off"}`;
+}
+
 function getSortedActiveBooks() {
-  const mode = sortSelect.value;
-  if (sortedActiveCache.mode === mode && sortedActiveCache.books) {
+  const cacheKey = getSortedActiveBooksCacheKey();
+  if (sortedActiveCache.key === cacheKey && sortedActiveCache.books) {
     return sortedActiveCache.books;
   }
-  const sorted = sortBooks(getActiveBooks(), mode);
-  sortedActiveCache.mode = mode;
+  let sorted;
+  if (wantFilterMode === "ranked") {
+    const wantBooks = getActiveBooks().filter((book) => wantIds.has(book.id));
+    sorted = viewerWantOrder.sortBooksByWantOrder(
+      wantBooks,
+      wantOrderIds,
+      bookOrderIndex,
+    );
+  } else {
+    sorted = sortBooks(getActiveBooks(), sortSelect.value);
+  }
+  sortedActiveCache.key = cacheKey;
   sortedActiveCache.books = sorted;
   return sorted;
 }
 
 function onSortChange() {
+  if (sortSelect.disabled) {
+    return;
+  }
   invalidateSortedCache();
   saveUserState();
   render();
@@ -38,6 +55,42 @@ function sortBooks(list, mode) {
 
 function matchesSearch(book, query) {
   return viewerFilters.matchesSearch(book, query);
+}
+
+function updateSortControlState() {
+  const ranked = wantFilterMode === "ranked";
+  if (sortSelect) {
+    sortSelect.disabled = ranked;
+    sortSelect.setAttribute("aria-disabled", String(ranked));
+  }
+  if (sortControlWrap) {
+    sortControlWrap.classList.toggle("sort-control-disabled", ranked);
+  }
+}
+
+const WANT_RANK_ICON = `<svg class="want-ranked-icon" viewBox="0 0 16 12" fill="none" aria-hidden="true"><path d="M1 2h14M1 6h14M1 10h14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>`;
+
+function renderWantFilterButton() {
+  const active = isWantFilterActive();
+  const ranked = isWantRankedFilterActive();
+  const classes = [
+    "stat",
+    "want-stat",
+    "stat-toggle",
+    active ? "active" : "",
+    ranked ? "want-ranked-filter" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+  const label = ranked
+    ? `<span class="want-ranked-button-content"><span class="want-ranked-label">WANT</span>${WANT_RANK_ICON}</span>`
+    : "WANT";
+  const ariaLabel = ranked
+    ? "Want list sorted by priority — tap to show all books"
+    : active
+      ? "Viewing want list — tap to sort by priority"
+      : "Filter to want list";
+  return `<button type="button" class="${classes}" id="want-filter-toggle" aria-pressed="${active}" aria-label="${ariaLabel}">${label}</button>`;
 }
 
 function getStatTotal(activeBooks) {
@@ -82,7 +135,7 @@ function renderStats(visible, all) {
     hasMycroft
       ? `<button type="button" class="${mycroftToggleClass}" id="mycroft-filter-toggle" aria-pressed="${isMycroftOnlyFilter()}"><span class="mycroft-stat-label">MYCROFT &amp; MORAN</span></button>`
       : "",
-    `<button type="button" class="stat want-stat stat-toggle${wantOnly ? " active" : ""}" id="want-filter-toggle" aria-pressed="${wantOnly}">WANT</button>`,
+    renderWantFilterButton(),
     hiddenCount && viewerMode.shouldShowHiddenStatFilter(serveEnabled, hiddenCount)
       ? `<button type="button" class="stat hidden-stat stat-toggle${hiddenOnly ? " active" : ""}" id="hidden-filter-toggle" aria-pressed="${hiddenOnly}">HIDDEN</button>`
       : "",
@@ -103,7 +156,7 @@ function getViewBooksWithoutSearch() {
     showMagazines,
     mycroftFilterMode,
     collectionFilterMode,
-    wantOnly,
+    wantFilterMode,
     collectedIds: activeCollectionIds(),
     orderedIds,
     wantIds,
@@ -118,7 +171,7 @@ function getVisibleBooks() {
     showMagazines,
     mycroftFilterMode,
     collectionFilterMode,
-    wantOnly,
+    wantFilterMode,
     collectedIds: activeCollectionIds(),
     orderedIds,
     wantIds,

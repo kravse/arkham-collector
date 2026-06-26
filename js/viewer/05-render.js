@@ -315,7 +315,7 @@ function layoutListCoverPreviewImage(img) {
 }
 
 function layoutListCoverPreviews() {
-  if (gridViewMode !== "list") {
+  if (getEffectiveViewMode() !== "list") {
     return;
   }
 
@@ -342,6 +342,23 @@ function ensureListCoverPreviewObserver() {
   listCoverPreviewObserver.observe(grid);
 }
 
+function renderWantRankDragHandle(book) {
+  if (!isWantRankedFilterActive() || hasActiveSearch()) {
+    return "";
+  }
+  const rank = wantOrderIds.indexOf(book.id) + 1;
+  if (rank < 1) {
+    return "";
+  }
+  return `<span
+    class="want-rank-drag-handle"
+    aria-label="Drag to reorder — rank ${rank}"
+    role="button"
+    tabindex="0"
+    data-book-id="${book.id}"
+  >${rank}</span>`;
+}
+
 function renderCard(book) {
   let collectionClass = "";
   if (shouldHighlightCollectionOnCards()) {
@@ -352,29 +369,30 @@ function renderCard(book) {
     }
   }
   const hiddenClass = book.hidden ? " hidden-book" : "";
-  const coverVariant = gridViewMode === "list" ? "list" : "card";
+  const listMode = getEffectiveViewMode() === "list";
+  const coverVariant = listMode ? "list" : "card";
   const imageHtml = renderCover(book, book.coverCacheKey, coverVariant);
   const coverActions = renderCoverActions(book);
+  const dragHandle = renderWantRankDragHandle(book);
 
   const imprintBadge = viewerCardHtml.renderImprintBadge(book, "card");
   const wantBadge = renderCardWantBadge(book);
   const ownedBadge = renderOwnedBadge(book);
   const bottomRow = renderCardBottomRow(
-    gridViewMode === "list" ? "" : imprintBadge,
+    listMode ? "" : imprintBadge,
     wantBadge,
     "",
     ownedBadge,
   );
-  const listPrimaryHtml =
-    gridViewMode === "list"
-      ? `<div class="card-list-primary">
+  const listPrimaryHtml = listMode
+    ? `<div class="card-list-primary">
           <h2 class="title">${book.title || "Untitled"}</h2>
           <div class="card-list-meta">
             ${book.publicationDate ? `<div class="date">${book.publicationDate}</div>` : ""}
             ${imprintBadge}
           </div>
         </div>`
-      : `<div class="card-list-primary">
+    : `<div class="card-list-primary">
           <h2 class="title">${book.title || "Untitled"}</h2>
           ${book.publicationDate ? `<div class="date">${book.publicationDate}</div>` : ""}
         </div>`;
@@ -386,7 +404,7 @@ function renderCard(book) {
   const wantedClass =
     isWanted(book) && shouldHighlightWantsOnCards() ? " wanted" : "";
 
-  return `
+  const cardMarkup = `
   <article class="card${collectionClass}${wantedClass}${hiddenClass}" data-book-id="${book.id}">
     <div class="cover-wrap">
       ${coverActions}
@@ -400,8 +418,13 @@ function renderCard(book) {
       ${viewerCardHtml.renderBookMetaHtml(book)}
       ${bottomRow}
     </div>
-  </article>
-`;
+  </article>`;
+
+  if (dragHandle) {
+    return `<div class="want-rank-row">${dragHandle}${cardMarkup}</div>`;
+  }
+
+  return cardMarkup;
 }
 
 function updateHeaderLogo() {
@@ -413,6 +436,15 @@ function updateHeaderLogo() {
     pageTitle.textContent = title;
   }
   document.title = title;
+}
+
+function isWantViewExclusive() {
+  return (
+    isWantFilterActive() &&
+    !isCollectionFilterActive() &&
+    !hiddenOnly &&
+    !isMycroftOnlyFilter()
+  );
 }
 
 function render() {
@@ -430,20 +462,29 @@ function render() {
     collectionFilterMode = null;
   }
 
+  if (isWantRankedFilterActive() && wantIds.size === 0) {
+    wantFilterMode = null;
+  }
+
   updateHeaderLogo();
   updateViewModeState();
   updateHeaderFiltersState();
+  updateSortControlState();
+  if (typeof clearWantRankDragState === "function") {
+    clearWantRankDragState();
+  }
   document.body.classList.toggle(
     "viewing-collection",
-    isCollectionFilterActive() && !hiddenOnly && !isMycroftOnlyFilter() && !wantOnly,
+    isCollectionFilterActive() && !hiddenOnly && !isMycroftOnlyFilter() && !isWantFilterActive(),
   );
   document.body.classList.toggle(
     "viewing-hidden",
-    hiddenOnly && !isCollectionFilterActive() && !isMycroftOnlyFilter() && !wantOnly,
+    hiddenOnly && !isCollectionFilterActive() && !isMycroftOnlyFilter() && !isWantFilterActive(),
   );
+  document.body.classList.toggle("viewing-want", isWantViewExclusive());
   document.body.classList.toggle(
-    "viewing-want",
-    wantOnly && !isCollectionFilterActive() && !hiddenOnly && !isMycroftOnlyFilter(),
+    "viewing-want-ranked",
+    isWantRankedFilterActive() && isWantViewExclusive(),
   );
   document.body.classList.toggle("viewing-mycroft-hidden", isMycroftHiddenFilter());
   if (pageSubtitle) {
@@ -466,9 +507,13 @@ function render() {
     } else if (isMycroftHiddenFilter()) {
       pageSubtitle.textContent =
         "Mycroft & Moran titles hidden — click the stat again to show all books";
-    } else if (wantOnly) {
+    } else if (isWantRankedFilterActive() && isWantViewExclusive()) {
+      pageSubtitle.textContent = hasActiveSearch()
+        ? "Clear search to reorder — tap WANT again to show all books"
+        : "Drag numbers to set priority — tap WANT again to show all books";
+    } else if (isWantFilterActive() && isWantViewExclusive()) {
       pageSubtitle.textContent =
-        "Viewing your want list — click the stat again to show all books";
+        "Viewing your want list — tap WANT again to sort by priority";
     } else {
       pageSubtitle.textContent =
         "A publishing house of horror and weird fiction—founded in 1939 to rescue Lovecraft from the pulps.";
@@ -496,7 +541,7 @@ function render() {
       message = activeSearch
         ? "No Mycroft & Moran books match your search."
         : "No Mycroft & Moran books to show.";
-    } else if (wantOnly) {
+    } else if (isWantFilterActive()) {
       message = activeSearch
         ? "No wanted books match your search."
         : "Your want list is empty — open a book and tap Want to add it.";

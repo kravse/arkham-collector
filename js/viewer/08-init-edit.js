@@ -189,6 +189,17 @@ if (highlightWantsInput) {
   });
 }
 
+if (wantListRankingInput) {
+  wantListRankingInput.addEventListener("change", () => {
+    wantListRanking = wantListRankingInput.checked;
+    if (!wantListRanking && wantFilterMode === "ranked") {
+      wantFilterMode = null;
+    }
+    saveUserState();
+    render();
+  });
+}
+
 if (highlightCollectionInput) {
   highlightCollectionInput.addEventListener("change", () => {
     highlightCollection = highlightCollectionInput.checked;
@@ -237,11 +248,10 @@ if (bookOrderDialog) {
 
 if (bookOrderList) {
   bookOrderList.addEventListener("click", onBookOrderListClick);
-  bookOrderList.addEventListener("dragstart", onBookOrderDragStart);
-  bookOrderList.addEventListener("dragover", onBookOrderDragOver);
-  bookOrderList.addEventListener("dragleave", onBookOrderDragLeave);
-  bookOrderList.addEventListener("drop", onBookOrderDrop);
-  bookOrderList.addEventListener("dragend", onBookOrderDragEnd);
+  bookOrderList.addEventListener("pointerdown", onBookOrderPointerDown);
+  bookOrderList.addEventListener("pointermove", onBookOrderPointerMove);
+  bookOrderList.addEventListener("pointerup", finishBookOrderPointerDrag);
+  bookOrderList.addEventListener("pointercancel", finishBookOrderPointerDrag);
 }
 
 attributionBtn.addEventListener("click", () => {

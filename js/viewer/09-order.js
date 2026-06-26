@@ -1,6 +1,7 @@
 /* Admin book order dialog */
 
 let bookOrderDragId = null;
+let bookOrderPointerDrag = null;
 
 function getBookById(bookId) {
   return books.find((entry) => entry.id === bookId) || null;
@@ -41,9 +42,6 @@ function wouldMoveBookToIndex(order, bookId, targetIndex) {
 
   const next = [...order];
   next.splice(from, 1);
-  if (from < targetIndex) {
-    targetIndex -= 1;
-  }
   next.splice(targetIndex, 0, bookId);
   return isValidBookOrder(next);
 }
@@ -94,7 +92,6 @@ function renderBookOrderList() {
         <div class="order-dialog-row" data-book-id="${id}">
           <span
             class="order-dialog-drag-handle"
-            draggable="true"
             aria-label="Drag to reorder"
             role="button"
             tabindex="0"
@@ -217,18 +214,29 @@ function reorderBookToTarget(dragId, targetId) {
 
   const next = [...workingBookOrder];
   next.splice(from, 1);
-  let insertAt = to;
-  if (from < to) {
-    insertAt -= 1;
-  }
-  next.splice(insertAt, 0, dragId);
+  next.splice(to, 0, dragId);
   workingBookOrder = next;
   bookOrderDirty = true;
   renderBookOrderList();
 }
 
+function findBookOrderRowAtPoint(clientX, clientY, excludeRow) {
+  if (!bookOrderList) {
+    return null;
+  }
+  return viewerPointerReorder.findRowAtPoint({
+    root: bookOrderList,
+    clientX,
+    clientY,
+    rowSelector: ".order-dialog-row",
+    excludeRow,
+    elementsFromPoint: document.elementsFromPoint.bind(document),
+  });
+}
+
 function clearBookOrderDragState() {
   bookOrderDragId = null;
+  bookOrderPointerDrag = null;
   if (!bookOrderList) {
     return;
   }
@@ -239,7 +247,34 @@ function clearBookOrderDragState() {
     });
 }
 
-function onBookOrderDragStart(event) {
+function updateBookOrderDropTarget(row) {
+  if (!bookOrderList) {
+    return;
+  }
+  bookOrderList
+    .querySelectorAll(".order-dialog-row-drop-target")
+    .forEach((element) => {
+      if (element !== row) {
+        element.classList.remove("order-dialog-row-drop-target");
+      }
+    });
+
+  if (!row || !bookOrderDragId) {
+    return;
+  }
+
+  const targetId = Number(row.dataset.bookId);
+  const targetIndex = workingBookOrder.indexOf(targetId);
+  if (wouldMoveBookToIndex(workingBookOrder, bookOrderDragId, targetIndex)) {
+    row.classList.add("order-dialog-row-drop-target");
+  }
+}
+
+function onBookOrderPointerDown(event) {
+  if (event.button !== 0) {
+    return;
+  }
+
   const handle = event.target.closest(".order-dialog-drag-handle");
   if (!handle) {
     return;
@@ -255,63 +290,54 @@ function onBookOrderDragStart(event) {
     return;
   }
 
+  event.preventDefault();
+  handle.setPointerCapture(event.pointerId);
+
   bookOrderDragId = bookId;
+  bookOrderPointerDrag = {
+    row,
+    pointerId: event.pointerId,
+  };
   row.classList.add("order-dialog-row-dragging");
-  event.dataTransfer.effectAllowed = "move";
-  event.dataTransfer.setData("text/plain", String(bookId));
 }
 
-function onBookOrderDragOver(event) {
-  if (!bookOrderDragId) {
-    return;
-  }
-
-  const row = event.target.closest(".order-dialog-row");
-  if (!row) {
-    return;
-  }
-
-  const targetId = Number(row.dataset.bookId);
-  const targetIndex = workingBookOrder.indexOf(targetId);
-  bookOrderList
-    .querySelectorAll(".order-dialog-row-drop-target")
-    .forEach((element) => {
-      if (element !== row) {
-        element.classList.remove("order-dialog-row-drop-target");
-      }
-    });
-
-  if (!wouldMoveBookToIndex(workingBookOrder, bookOrderDragId, targetIndex)) {
-    event.dataTransfer.dropEffect = "none";
+function onBookOrderPointerMove(event) {
+  if (
+    !bookOrderPointerDrag ||
+    bookOrderPointerDrag.pointerId !== event.pointerId
+  ) {
     return;
   }
 
   event.preventDefault();
-  event.dataTransfer.dropEffect = "move";
-  row.classList.add("order-dialog-row-drop-target");
+  const row = findBookOrderRowAtPoint(
+    event.clientX,
+    event.clientY,
+    bookOrderPointerDrag.row,
+  );
+  updateBookOrderDropTarget(row);
 }
 
-function onBookOrderDragLeave(event) {
-  const row = event.target.closest(".order-dialog-row");
-  if (row) {
-    row.classList.remove("order-dialog-row-drop-target");
-  }
-}
-
-function onBookOrderDrop(event) {
-  event.preventDefault();
-  const row = event.target.closest(".order-dialog-row");
-  if (!row || !bookOrderDragId) {
-    clearBookOrderDragState();
+function finishBookOrderPointerDrag(event) {
+  if (
+    !bookOrderPointerDrag ||
+    bookOrderPointerDrag.pointerId !== event.pointerId
+  ) {
     return;
   }
 
-  const targetId = Number(row.dataset.bookId);
-  reorderBookToTarget(bookOrderDragId, targetId);
-  clearBookOrderDragState();
-}
+  if (bookOrderDragId) {
+    const row = findBookOrderRowAtPoint(
+      event.clientX,
+      event.clientY,
+      bookOrderPointerDrag.row,
+    );
+    if (row) {
+      const targetId = Number(row.dataset.bookId);
+      reorderBookToTarget(bookOrderDragId, targetId);
+    }
+  }
 
-function onBookOrderDragEnd() {
   clearBookOrderDragState();
 }
 

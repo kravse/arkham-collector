@@ -3,8 +3,6 @@ const path = require("path");
 const ROOT = path.join(__dirname, "..");
 const DATA_DIR = path.join(ROOT, "data");
 const COVERS_DIR = path.join(ROOT, "covers");
-const COLLECTION_CSV = path.join(ROOT, "my_collection", "my_collection.csv");
-const COLLECTION_JS = path.join(ROOT, "my_collection", "collection.js");
 const EXAMPLES_DIR = path.join(ROOT, "examples");
 const ARKHAM_LOCAL = path.join(EXAMPLES_DIR, "Arkham House - Wikipedia.html");
 const MYCROFT_LOCAL = path.join(
@@ -43,8 +41,6 @@ module.exports = {
   ROOT,
   DATA_DIR,
   COVERS_DIR,
-  COLLECTION_CSV,
-  COLLECTION_JS,
   EXAMPLES_DIR,
   ARKHAM_LOCAL,
   MYCROFT_LOCAL,

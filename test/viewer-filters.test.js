@@ -30,6 +30,8 @@ const {
   cycleMycroftFilter,
   cycleCollectionFilter,
   hasAnyOrderedBooks,
+  cycleWantFilter,
+  hasAnyWants,
   isOrdered,
   pickRandomBook,
 } = require("../scripts/lib/viewer-filters");
@@ -424,15 +426,34 @@ test("ordered excludes collected when both sets contain the same id", () => {
   assert.equal(isOrdered(book(1), collectedIds, orderedIds), false);
 });
 
-test("passesWantFilter only restricts when wantOnly is active", () => {
+test("passesWantFilter only restricts when want filter mode is active", () => {
   const wantIds = new Set([5]);
   const wanted = book(5);
   const other = book(6);
 
-  assert.equal(passesWantFilter(wanted, false, wantIds), true);
-  assert.equal(passesWantFilter(other, false, wantIds), true);
-  assert.equal(passesWantFilter(wanted, true, wantIds), true);
-  assert.equal(passesWantFilter(other, true, wantIds), false);
+  assert.equal(passesWantFilter(wanted, null, wantIds), true);
+  assert.equal(passesWantFilter(other, null, wantIds), true);
+  assert.equal(passesWantFilter(wanted, "want", wantIds), true);
+  assert.equal(passesWantFilter(other, "want", wantIds), false);
+  assert.equal(passesWantFilter(wanted, "ranked", wantIds), true);
+  assert.equal(passesWantFilter(other, "ranked", wantIds), false);
+});
+
+test("cycleWantFilter rotates want -> ranked -> off when wants exist", () => {
+  assert.equal(cycleWantFilter(null, true), "want");
+  assert.equal(cycleWantFilter("want", true), "ranked");
+  assert.equal(cycleWantFilter("ranked", true), null);
+});
+
+test("cycleWantFilter skips ranked when want list ranking is disabled", () => {
+  assert.equal(cycleWantFilter(null, true, false), "want");
+  assert.equal(cycleWantFilter("want", true, false), null);
+  assert.equal(cycleWantFilter("ranked", true, false), null);
+});
+
+test("cycleWantFilter skips ranked when no wants exist", () => {
+  assert.equal(cycleWantFilter(null, false), "want");
+  assert.equal(cycleWantFilter("want", false), null);
 });
 
 test("filterVisibleBooks combines search, want, collection, and imprint filters", () => {
@@ -449,7 +470,7 @@ test("filterVisibleBooks combines search, want, collection, and imprint filters"
     ...defaultVisibility(),
     mycroftFilterMode: null,
     collectionFilterMode: "collection",
-    wantOnly: false,
+    wantFilterMode: null,
     collectedIds,
     orderedIds,
     wantIds,
@@ -465,7 +486,7 @@ test("filterVisibleBooks combines search, want, collection, and imprint filters"
     ...defaultVisibility(),
     mycroftFilterMode: null,
     collectionFilterMode: null,
-    wantOnly: true,
+    wantFilterMode: "want",
     collectedIds,
     orderedIds,
     wantIds,
@@ -481,7 +502,7 @@ test("filterVisibleBooks combines search, want, collection, and imprint filters"
     ...defaultVisibility(),
     mycroftFilterMode: "only",
     collectionFilterMode: null,
-    wantOnly: false,
+    wantFilterMode: null,
     collectedIds,
     orderedIds,
     wantIds,

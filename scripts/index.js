@@ -3,7 +3,6 @@
 const { state, initState } = require("./state");
 const { SCRAPE_MODES, getScriptMode, printCustomDataWarning } = require("./cli");
 const { resolveTaskId } = require("./lib/cli-dispatch");
-const { syncCollectionFromCsv } = require("./lib/collection");
 const { reconcileCoversFromDisk } = require("./tasks/reconcile-covers");
 const { fillMissingCovers } = require("./tasks/fill-covers");
 const { crawlMycroftOnly } = require("./tasks/crawl-mycroft");
@@ -32,7 +31,6 @@ function fail(error) {
 }
 
 const TASKS = {
-  syncCollection: () => syncCollectionFromCsv(),
   reconcileCovers: () => reconcileCoversFromDisk(),
   fillCovers: () => fillMissingCovers(),
   mycroftOnly: () => crawlMycroftOnly(),

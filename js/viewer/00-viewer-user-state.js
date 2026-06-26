@@ -26,7 +26,6 @@ const viewerUserState = (function () {
     "title-desc",
   ]);
   
-  const SORT_LEGACY = { default: "date-asc", title: "title-asc" };
   
   function defaultUserState() {
     return {
@@ -37,6 +36,7 @@ const viewerUserState = (function () {
       orderedIds: [],
       collections: defaultCollections(),
       wantIds: [],
+      wantOrderIds: [],
       preferences: {
         sort: "date-asc",
         viewMode: "cards",
@@ -44,6 +44,7 @@ const viewerUserState = (function () {
         highlightWants: true,
         highlightCollection: true,
         showMagazines: false,
+        wantListRanking: true,
       },
     };
   }
@@ -116,6 +117,7 @@ const viewerUserState = (function () {
       collectionIds: [],
       orderedIds: [],
       wantIds: [],
+      wantOrderIds: [],
       collections: {
         local: localSlot,
         gist: emptyCollectionSlot(),
@@ -229,6 +231,10 @@ const viewerUserState = (function () {
         typeof raw?.showMagazines === "boolean"
           ? raw.showMagazines
           : base.preferences.showMagazines,
+      wantListRanking:
+        typeof raw?.wantListRanking === "boolean"
+          ? raw.wantListRanking
+          : base.preferences.wantListRanking,
     };
   }
   
@@ -258,6 +264,10 @@ const viewerUserState = (function () {
         normalizeIdArray(snapshot[LEGACY_KEYS.ordered]),
       ),
       wantIds: normalizeIdArray(snapshot[LEGACY_KEYS.want]),
+      wantOrderIds: viewerWantOrderNormalize.normalizeWantOrderIds(
+        null,
+        normalizeIdArray(snapshot[LEGACY_KEYS.want]),
+      ),
       preferences: {
         sort: normalizeSort(
           snapshot[LEGACY_KEYS.sort],
@@ -299,6 +309,7 @@ const viewerUserState = (function () {
       orderedIds,
       collections: normalizeCollections(null, collectionIds, orderedIds),
       wantIds: normalizeIdArray(v1.wantIds),
+      wantOrderIds: viewerWantOrderNormalize.normalizeWantOrderIds(null, normalizeIdArray(v1.wantIds)),
       preferences: normalizePreferences(v1.preferences, base),
     };
   }
@@ -352,6 +363,7 @@ const viewerUserState = (function () {
       const base = defaultUserState();
       const collectionIds = normalizeIdArray(parsed.collectionIds);
       const orderedIds = normalizeIdArray(parsed.orderedIds);
+      const wantIds = normalizeIdArray(parsed.wantIds);
       return {
         version: USER_STATE_VERSION,
         updatedAt:
@@ -364,7 +376,8 @@ const viewerUserState = (function () {
           collectionIds,
           orderedIds,
         ),
-        wantIds: normalizeIdArray(parsed.wantIds),
+        wantIds,
+        wantOrderIds: viewerWantOrderNormalize.normalizeWantOrderIds(parsed.wantOrderIds, wantIds),
         preferences: normalizePreferences(parsed.preferences, base),
       };
     } catch (_) {
@@ -394,6 +407,7 @@ const viewerUserState = (function () {
       orderedIds,
     );
     collections[mode] = { collectionIds, orderedIds };
+    const wantIds = normalizeIdArray(snapshot.wantIds);
     return {
       version: USER_STATE_VERSION,
       updatedAt: new Date().toISOString(),
@@ -401,7 +415,8 @@ const viewerUserState = (function () {
       collectionIds,
       orderedIds,
       collections,
-      wantIds: normalizeIdArray(snapshot.wantIds),
+      wantIds,
+      wantOrderIds: viewerWantOrderNormalize.normalizeWantOrderIds(snapshot.wantOrderIds, wantIds),
       preferences: {
         sort: normalizeSort(snapshot.sort),
         viewMode: normalizeViewMode(snapshot.viewMode),
@@ -409,6 +424,10 @@ const viewerUserState = (function () {
         highlightWants: Boolean(snapshot.highlightWants),
         highlightCollection: Boolean(snapshot.highlightCollection),
         showMagazines: Boolean(snapshot.showMagazines),
+        wantListRanking:
+          typeof snapshot.wantListRanking === "boolean"
+            ? snapshot.wantListRanking
+            : true,
       },
     };
   }
@@ -421,12 +440,14 @@ const viewerUserState = (function () {
       collectionIds: active.collectionIds,
       orderedIds: active.orderedIds,
       wantIds: parsed.wantIds,
+      wantOrderIds: parsed.wantOrderIds,
       sort: parsed.preferences.sort,
       viewMode: parsed.preferences.viewMode,
       headerFiltersExpanded: parsed.preferences.headerFiltersExpanded,
       highlightWants: parsed.preferences.highlightWants,
       highlightCollection: parsed.preferences.highlightCollection,
       showMagazines: parsed.preferences.showMagazines,
+      wantListRanking: parsed.preferences.wantListRanking,
     };
   }
   

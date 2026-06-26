@@ -113,18 +113,24 @@ function collectRuntimeSnapshot() {
     collectionIds: [...collectionIds],
     orderedIds: [...orderedIds],
     wantIds: [...wantIds],
+    wantOrderIds: [...wantOrderIds],
     sort: sortSelect.value,
     viewMode: gridViewMode,
     headerFiltersExpanded,
     highlightWants,
     highlightCollection,
     showMagazines,
+    wantListRanking,
   };
 }
 
 function applyRuntimeSnapshot(runtime) {
   storageMode = viewerUserState.normalizeStorageMode(runtime.storageMode);
   wantIds = new Set(runtime.wantIds);
+  wantOrderIds = viewerWantOrderNormalize.normalizeWantOrderIds(
+    runtime.wantOrderIds,
+    runtime.wantIds,
+  );
   collectionIds = new Set(runtime.collectionIds);
   orderedIds = new Set(runtime.orderedIds);
   gridViewMode = runtime.viewMode;
@@ -132,6 +138,10 @@ function applyRuntimeSnapshot(runtime) {
   highlightWants = runtime.highlightWants;
   highlightCollection = runtime.highlightCollection;
   showMagazines = runtime.showMagazines;
+  wantListRanking = runtime.wantListRanking;
+  if (!wantListRanking && wantFilterMode === "ranked") {
+    wantFilterMode = null;
+  }
   if (sortSelect && runtime.sort) {
     sortSelect.value = runtime.sort;
   }
@@ -491,15 +501,16 @@ function updateHeaderFiltersState() {
 }
 
 function updateViewModeState() {
-  document.body.classList.toggle("view-mode-list", gridViewMode === "list");
+  const effectiveList = getEffectiveViewMode() === "list";
+  document.body.classList.toggle("view-mode-list", effectiveList);
   if (!viewModeToggle) {
     return;
   }
-  const listMode = gridViewMode === "list";
-  viewModeToggle.setAttribute("aria-pressed", String(listMode));
+  const listPreference = gridViewMode === "list";
+  viewModeToggle.setAttribute("aria-pressed", String(listPreference));
   viewModeToggle.setAttribute(
     "aria-label",
-    listMode ? "Switch to grid view" : "Switch to list view",
+    listPreference ? "Switch to grid view" : "Switch to list view",
   );
 }
 
@@ -512,17 +523,7 @@ function toggleWant(bookId) {
   if (!Number.isFinite(id)) {
     return;
   }
-  if (wantIds.has(id)) {
-    wantIds.delete(id);
-  } else {
-    wantIds.add(id);
-    if (collectionIds.has(id)) {
-      collectionIds.delete(id);
-    }
-    if (orderedIds.has(id)) {
-      orderedIds.delete(id);
-    }
-  }
+  syncWantMembership(id, !wantIds.has(id));
   saveUserState();
   render();
   if (!bookDetailDialog.hidden) {
@@ -544,7 +545,11 @@ function toggleCollection(bookId) {
     collectionIds.add(id);
   } else {
     orderedIds.add(id);
-    wantIds.delete(id);
+    if (wantIds.has(id)) {
+      wantIds.delete(id);
+      wantOrderIds = wantOrderIds.filter((entry) => entry !== id);
+      invalidateSortedCache();
+    }
   }
 
   saveUserState();

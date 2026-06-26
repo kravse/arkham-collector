@@ -7,8 +7,6 @@ const path = require("path");
 const { saveEdits } = require("../scripts/lib/edits");
 const { saveTags } = require("../scripts/lib/tags");
 const { saveBookOrder } = require("../scripts/lib/book-order");
-const { syncCollectionFromCsv, parseCollectionCsv } = require("../scripts/lib/collection");
-const { writeJsGlobal } = require("../scripts/lib/static-data");
 
 function tempDataDir() {
   return fs.mkdtempSync(path.join(os.tmpdir(), "arkham-writers-"));
@@ -56,21 +54,5 @@ test("saveBookOrder writes order json and BOOK_ORDER js global", () => {
   assert.equal(
     fs.readFileSync(jsPath, "utf8"),
     "window.BOOK_ORDER = [\n  1,\n  2,\n  3\n];\n",
-  );
-});
-
-test("collection sync writes MY_COLLECTION js global", () => {
-  const dir = tempDataDir();
-  const csvPath = path.join(dir, "my_collection.csv");
-  const jsPath = path.join(dir, "collection.js");
-  fs.writeFileSync(
-    csvPath,
-    'Title,Author,Year\n"Test Book","Author",1940\n',
-  );
-  const items = parseCollectionCsv(fs.readFileSync(csvPath, "utf8"));
-  writeJsGlobal(jsPath, "MY_COLLECTION", items);
-  assert.equal(
-    fs.readFileSync(jsPath, "utf8"),
-    'window.MY_COLLECTION = [\n  {\n    "title": "Test Book",\n    "author": "Author",\n    "year": "1940",\n    "status": ""\n  }\n];\n',
   );
 });

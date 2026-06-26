@@ -30,6 +30,53 @@ const VIEWER_SYNC_ENTRIES = [
     exports: ["compareOrderTiebreak", "compareCanonical", "sortBooks"],
   },
   {
+    sources: [path.join(LIB, "viewer-want-order-normalize.js")],
+    target: "00-viewer-want-order-normalize.js",
+    globalName: "viewerWantOrderNormalize",
+    header:
+      "Generated from scripts/lib/viewer-want-order-normalize.js — run npm run bundle-viewer",
+    exports: [
+      "normalizeWantIdList",
+      "normalizeWantMembership",
+      "normalizeWantOrderIds",
+    ],
+  },
+  {
+    sources: [path.join(LIB, "viewer-want-order.js")],
+    target: "00-viewer-want-order.js",
+    globalName: "viewerWantOrder",
+    header:
+      "Generated from scripts/lib/viewer-want-order.js — run npm run bundle-viewer",
+    transformBody(body) {
+      return body
+        .replace(
+          /const \{\n  normalizeWantIdList,\n  normalizeWantMembership,\n  normalizeWantOrderIds,\n\} = require\("\.\/viewer-want-order-normalize"\);\n\n/,
+          `const {
+  normalizeWantIdList,
+  normalizeWantMembership,
+  normalizeWantOrderIds,
+} = viewerWantOrderNormalize;
+
+`,
+        );
+    },
+    exports: [
+      "normalizeWantOrderIds",
+      "buildWantOrderIndex",
+      "sortBooksByWantOrder",
+      "wouldMoveWantToIndex",
+      "reorderWantOrderIds",
+    ],
+  },
+  {
+    sources: [path.join(LIB, "viewer-pointer-reorder.js")],
+    target: "00-viewer-pointer-reorder.js",
+    globalName: "viewerPointerReorder",
+    header:
+      "Generated from scripts/lib/viewer-pointer-reorder.js — run npm run bundle-viewer",
+    exports: ["findRowAtPoint"],
+  },
+  {
     sources: [path.join(LIB, "viewer-filters.js")],
     target: "00-viewer-filters.js",
     globalName: "viewerFilters",
@@ -64,6 +111,8 @@ const VIEWER_SYNC_ENTRIES = [
       "cycleMycroftFilter",
       "cycleCollectionFilter",
       "hasAnyOrderedBooks",
+      "cycleWantFilter",
+      "hasAnyWants",
       "pickRandomBook",
     ],
   },
@@ -91,6 +140,17 @@ const VIEWER_SYNC_ENTRIES = [
     globalName: "viewerUserState",
     header:
       "Generated from scripts/lib/viewer-user-state.js — run npm run bundle-viewer",
+    transformBody(body) {
+      return body
+        .replace(
+          /const \{ normalizeWantOrderIds \} = require\("\.\/viewer-want-order-normalize"\);\n/,
+          "",
+        )
+        .replace(
+          /normalizeWantOrderIds\(/g,
+          "viewerWantOrderNormalize.normalizeWantOrderIds(",
+        );
+    },
     exports: [
       "USER_STATE_KEY",
       "USER_STATE_VERSION",

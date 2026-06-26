@@ -16,14 +16,7 @@ const {
   loadBookOrder,
   saveBookOrder,
 } = require("./scripts/lib/book-order");
-const {
-  htmlToPlainText,
-  sanitizeSingleLineText,
-  sanitizeUrlInput,
-  slugify,
-} = require("./scripts/lib/text");
-const { syncCollectionFromCsv } = require("./scripts/lib/collection");
-const { COLLECTION_CSV } = require("./scripts/config");
+const { htmlToPlainText, sanitizeSingleLineText, sanitizeUrlInput, slugify } = require("./scripts/lib/text");
 const {
   saveBookCoverUpload,
   createCoverUploadMiddleware,
@@ -399,14 +392,6 @@ app.get("/", (_req, res) => {
 app.use((error, _req, res, _next) => {
   res.status(400).json({ error: error.message });
 });
-
-if (fs.existsSync(COLLECTION_CSV)) {
-  try {
-    syncCollectionFromCsv();
-  } catch (error) {
-    console.warn(`Collection sync skipped: ${error.message}`);
-  }
-}
 
 app.listen(PORT, () => {
   console.log(`Arkham viewer running at http://localhost:${PORT}`);

@@ -32,7 +32,7 @@ Do not edit the plan files in `.cursor/plans/` for this — only `README.md`. Ke
 | `scripts/` | Wikipedia crawler and data-sync CLI (CommonJS modules) |
 | `data/books.json`, `data/books.js`, `data/descriptions.js` | Scraped catalog: full JSON on disk; viewer loads slim `BOOKS` + `BOOK_DESCRIPTIONS` |
 | `data/edits.json`, `data/edits.js` | Manual edits keyed by book id (`window.BOOK_EDITS`); written only by `server.js` — only fields differing from scraped `books.json` (plus `hidden`, `deleted`); `npm run compact-edits` prunes redundant rows |
-| `my_collection/` | Sample owned-books CSV + `collection.js`; shipped in all builds; gear settings toggle sample (`arkham-sample-collection`) vs own (`arkham-collection`) |
+| `my_collection/` | Maintainer backup CSV (`my_collection.csv`); not loaded by the viewer |
 | `covers/` | Downloaded cover images |
 | `examples/` | Saved Wikipedia HTML for `--local` crawls |
 | `build.js` → `build/` | Static site (`npm run build`): read-only viewer, `css/viewer.css`, slim books + descriptions JS, no `books.json` in deploy |
@@ -88,7 +88,7 @@ Entry point for all npm crawl/sync scripts: `node scripts/index.js`
 
 ## Viewer app JavaScript
 
-App logic lives in `js/viewer/` (eight topic files, one shared IIFE) and ships as `js/viewer-bundle.js`. Edit the partials, then `npm run bundle-viewer` (also runs at the start of `npm run build`). Follow existing patterns: vanilla JS, `localStorage` for want-list (`arkham-want-list`), sample collection (`arkham-sample-collection`, seeded from CSV), own collection (`arkham-collection`), and active mode (`arkham-collection-source`); gear settings can reset sample to CSV defaults; `getVisibleBooks()` for filtered order; descriptions editable via the edit dialog (stored in `edits.json`).
+App logic lives in `js/viewer/` (eight topic files, one shared IIFE) and ships as `js/viewer-bundle.js`. Edit the partials, then `npm run bundle-viewer` (also runs at the start of `npm run build`). Follow existing patterns: vanilla JS, unified user state (`arkham-user-state` v2) for collection, wants, and preferences; optional GitHub Gist sync; `getVisibleBooks()` for filtered order; descriptions editable via the edit dialog (stored in `edits.json`).
 
 `js/book-edits.js` merges `window.BOOKS` with `window.BOOK_EDITS` at startup; `js/book-layers.js` attaches `window.BOOK_TAGS`. Linked from `viewer.html`, copied in `build.js` via `copyDirectory("js")`.
 

@@ -90,12 +90,34 @@ test("parseUserState upgrades v1 unified state to v2", () => {
   assert.deepEqual(parsed.collectionIds, [5]);
 });
 
+test("buildUserStateFromRuntime roundtrips wantOrderIds through parseUserState", () => {
+  const built = buildUserStateFromRuntime({
+    storageMode: "gist",
+    collectionIds: [7, 3, 3],
+    orderedIds: [9],
+    wantIds: [1, 2],
+    wantOrderIds: [2, 1],
+    sort: "date-desc",
+    viewMode: "list",
+    headerFiltersExpanded: false,
+    highlightWants: true,
+    highlightCollection: false,
+    showMagazines: true,
+    wantListRanking: false,
+  });
+  const parsed = parseUserState(serializeUserState(built));
+  assert.deepEqual(parsed.wantIds, [1, 2]);
+  assert.deepEqual(parsed.wantOrderIds, [2, 1]);
+  assert.equal(parsed.preferences.wantListRanking, false);
+});
+
 test("buildUserStateFromRuntime roundtrips through parseUserState", () => {
   const built = buildUserStateFromRuntime({
     storageMode: "gist",
     collectionIds: [7, 3, 3],
     orderedIds: [9],
     wantIds: [1],
+    wantOrderIds: [1],
     sort: "date-desc",
     viewMode: "list",
     headerFiltersExpanded: false,
