@@ -25,7 +25,7 @@ function getSortedActiveBooks() {
     return sortedActiveCache.books;
   }
   let sorted;
-  if (wantFilterMode === "ranked") {
+  if (viewerWantView.usesWantPrioritySort(wantFilterMode)) {
     const wantBooks = getActiveBooks().filter((book) => wantIds.has(book.id));
     sorted = viewerWantOrder.sortBooksByWantOrder(
       wantBooks,
@@ -58,39 +58,43 @@ function matchesSearch(book, query) {
 }
 
 function updateSortControlState() {
-  const ranked = wantFilterMode === "ranked";
+  const wantSort = viewerWantView.shouldDisableCatalogSort(wantFilterMode);
   if (sortSelect) {
-    sortSelect.disabled = ranked;
-    sortSelect.setAttribute("aria-disabled", String(ranked));
+    sortSelect.disabled = wantSort;
+    sortSelect.classList.toggle("is-sort-slot-hidden", wantSort);
+    sortSelect.setAttribute("aria-hidden", String(wantSort));
+  }
+  if (sortWantBadge) {
+    sortWantBadge.classList.toggle("is-sort-slot-hidden", !wantSort);
+    sortWantBadge.setAttribute("aria-hidden", String(!wantSort));
+    const listHint =
+      gridViewMode === "list" && !hasActiveSearch()
+        ? " Drag rank tabs to reorder."
+        : "";
+    sortWantBadge.setAttribute(
+      "aria-label",
+      `Sorted by your want list priority.${listHint}`,
+    );
   }
   if (sortControlWrap) {
-    sortControlWrap.classList.toggle("sort-control-disabled", ranked);
+    sortControlWrap.classList.toggle("sort-control-want-order", wantSort);
   }
 }
 
-const WANT_RANK_ICON = `<svg class="want-ranked-icon" viewBox="0 0 16 12" fill="none" aria-hidden="true"><path d="M1 2h14M1 6h14M1 10h14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>`;
-
 function renderWantFilterButton() {
   const active = isWantFilterActive();
-  const ranked = isWantRankedFilterActive();
   const classes = [
     "stat",
     "want-stat",
     "stat-toggle",
     active ? "active" : "",
-    ranked ? "want-ranked-filter" : "",
   ]
     .filter(Boolean)
     .join(" ");
-  const label = ranked
-    ? `<span class="want-ranked-button-content"><span class="want-ranked-label">WANT</span>${WANT_RANK_ICON}</span>`
-    : "WANT";
-  const ariaLabel = ranked
-    ? "Want list sorted by priority — tap to show all books"
-    : active
-      ? "Viewing want list — tap to sort by priority"
-      : "Filter to want list";
-  return `<button type="button" class="${classes}" id="want-filter-toggle" aria-pressed="${active}" aria-label="${ariaLabel}">${label}</button>`;
+  const ariaLabel = active
+    ? "Viewing want list — tap to show all books"
+    : "Filter to want list";
+  return `<button type="button" class="${classes}" id="want-filter-toggle" aria-pressed="${active}" aria-label="${ariaLabel}">WANT</button>`;
 }
 
 function getStatTotal(activeBooks) {

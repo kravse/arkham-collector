@@ -112,10 +112,9 @@ function passesCollectionFilter(book) {
 }
 
 function cycleWantFilter() {
-  wantFilterMode = viewerFilters.cycleWantFilter(
+  wantFilterMode = viewerWantView.cycleWantFilter(
     wantFilterMode,
     hasAnyWants(),
-    wantListRanking,
   );
 }
 

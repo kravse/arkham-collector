@@ -44,7 +44,6 @@ const viewerUserState = (function () {
         highlightWants: true,
         highlightCollection: true,
         showMagazines: false,
-        wantListRanking: true,
         wantRankDragSide: "right",
       },
     };
@@ -241,10 +240,6 @@ const viewerUserState = (function () {
         typeof raw?.showMagazines === "boolean"
           ? raw.showMagazines
           : base.preferences.showMagazines,
-      wantListRanking:
-        typeof raw?.wantListRanking === "boolean"
-          ? raw.wantListRanking
-          : base.preferences.wantListRanking,
       wantRankDragSide: normalizeWantRankDragSide(
         raw?.wantRankDragSide,
         base.preferences.wantRankDragSide,
@@ -438,10 +433,6 @@ const viewerUserState = (function () {
         highlightWants: Boolean(snapshot.highlightWants),
         highlightCollection: Boolean(snapshot.highlightCollection),
         showMagazines: Boolean(snapshot.showMagazines),
-        wantListRanking:
-          typeof snapshot.wantListRanking === "boolean"
-            ? snapshot.wantListRanking
-            : true,
         wantRankDragSide: normalizeWantRankDragSide(snapshot.wantRankDragSide),
       },
     };
@@ -462,7 +453,6 @@ const viewerUserState = (function () {
       highlightWants: parsed.preferences.highlightWants,
       highlightCollection: parsed.preferences.highlightCollection,
       showMagazines: parsed.preferences.showMagazines,
-      wantListRanking: parsed.preferences.wantListRanking,
       wantRankDragSide: parsed.preferences.wantRankDragSide,
     };
   }

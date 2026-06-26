@@ -67,6 +67,7 @@ const VIEWER_SYNC_ENTRIES = [
       "wouldMoveWantToIndex",
       "reorderWantOrderIds",
       "orderRowIdsByWantOrder",
+      "buildWantDisplayRankById",
     ],
   },
   {
@@ -76,6 +77,22 @@ const VIEWER_SYNC_ENTRIES = [
     header:
       "Generated from scripts/lib/viewer-pointer-reorder.js — run npm run bundle-viewer",
     exports: ["findRowAtPoint", "findNearestRowAtPoint"],
+  },
+  {
+    sources: [path.join(LIB, "viewer-want-view.js")],
+    target: "00-viewer-want-view.js",
+    globalName: "viewerWantView",
+    header:
+      "Generated from scripts/lib/viewer-want-view.js — run npm run bundle-viewer",
+    exports: [
+      "WANT_FILTER",
+      "isWantFilterActive",
+      "cycleWantFilter",
+      "usesWantPrioritySort",
+      "shouldDisableCatalogSort",
+      "canReorderWantList",
+      "shouldShowWantRankHandles",
+    ],
   },
   {
     sources: [path.join(LIB, "viewer-filters.js")],
@@ -112,7 +129,6 @@ const VIEWER_SYNC_ENTRIES = [
       "cycleMycroftFilter",
       "cycleCollectionFilter",
       "hasAnyOrderedBooks",
-      "cycleWantFilter",
       "hasAnyWants",
       "pickRandomBook",
     ],

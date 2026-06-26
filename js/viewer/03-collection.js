@@ -120,7 +120,6 @@ function collectRuntimeSnapshot() {
     highlightWants,
     highlightCollection,
     showMagazines,
-    wantListRanking,
     wantRankDragSide,
   };
 }
@@ -139,11 +138,7 @@ function applyRuntimeSnapshot(runtime) {
   highlightWants = runtime.highlightWants;
   highlightCollection = runtime.highlightCollection;
   showMagazines = runtime.showMagazines;
-  wantListRanking = runtime.wantListRanking;
   wantRankDragSide = runtime.wantRankDragSide;
-  if (!wantListRanking && wantFilterMode === "ranked") {
-    wantFilterMode = null;
-  }
   if (sortSelect && runtime.sort) {
     sortSelect.value = runtime.sort;
   }
@@ -503,8 +498,8 @@ function updateHeaderFiltersState() {
 }
 
 function updateViewModeState() {
-  const effectiveList = getEffectiveViewMode() === "list";
-  document.body.classList.toggle("view-mode-list", effectiveList);
+  const listMode = gridViewMode === "list";
+  document.body.classList.toggle("view-mode-list", listMode);
   if (!viewModeToggle) {
     return;
   }

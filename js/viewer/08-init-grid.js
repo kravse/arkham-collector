@@ -58,11 +58,7 @@ stats.addEventListener("click", (event) => {
     return;
   }
   if (event.target.closest("#want-filter-toggle")) {
-    const prev = wantFilterMode;
     cycleWantFilter();
-    if (wantFilterMode === "ranked" && prev === "want") {
-      clearSearchState();
-    }
     if (wantFilterMode != null) {
       collectionFilterMode = null;
     }

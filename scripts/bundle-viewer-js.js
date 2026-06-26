@@ -84,6 +84,10 @@ const PARTS = [
       "Pointer reorder helpers (generated from scripts/lib/viewer-pointer-reorder.js)",
   },
   {
+    file: "00-viewer-want-view.js",
+    title: "Want filter view rules (generated from scripts/lib/viewer-want-view.js)",
+  },
+  {
     file: "04-search.js",
     title: "Search chips, tag autocomplete, and compound query",
   },

@@ -247,12 +247,43 @@
         <div class="controls-secondary">
           <div class="sort-control" id="sort-control-wrap">
             <label class="sort-label" for="sort">Sort</label>
-            <select id="sort" aria-label="Sort books">
-              <option value="date-asc" selected>Oldest first</option>
-              <option value="date-desc">Newest first</option>
-              <option value="title-asc">Title A–Z</option>
-              <option value="title-desc">Title Z–A</option>
-            </select>
+            <div class="sort-value-slot">
+              <select id="sort" aria-label="Sort books">
+                <option value="date-asc" selected>Oldest first</option>
+                <option value="date-desc">Newest first</option>
+                <option value="title-asc">Title A–Z</option>
+                <option value="title-desc">Title Z–A</option>
+              </select>
+              <span
+                class="sort-want-badge is-sort-slot-hidden"
+                id="sort-want-badge"
+                role="status"
+                aria-hidden="true"
+                aria-label="Sorted by your want list priority"
+                title="Catalog sort is unavailable while viewing your want list"
+              >
+                <span class="sort-want-badge-text">Priority order</span>
+                <svg
+                  class="sort-want-badge-icon"
+                  viewBox="0 0 12 12"
+                  fill="none"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M1.75 2.5h1.1M1.75 6h1.1M1.75 9.5h1.1"
+                    stroke="currentColor"
+                    stroke-width="1.15"
+                    stroke-linecap="round"
+                  />
+                  <path
+                    d="M4.75 2.5H10.25M4.75 6H9.25M4.75 9.5H7.75"
+                    stroke="currentColor"
+                    stroke-width="1.15"
+                    stroke-linecap="round"
+                  />
+                </svg>
+              </span>
+            </div>
           </div>
           <label class="show-hidden-toggle" id="show-hidden-wrap" hidden>
             <input id="show-hidden" type="checkbox" />
@@ -610,28 +641,15 @@
                   checked
                 />
               </label>
-              <label class="settings-control-row">
-                <span class="settings-control-copy">
-                  <span class="settings-control-label">Want list ranking</span>
-                  <span class="settings-control-hint"
-                    >Add a ranked want filter and drag-to-reorder in list
-                    view.</span
-                  >
-                </span>
-                <input
-                  type="checkbox"
-                  class="settings-switch-input"
-                  id="want-list-ranking"
-                  checked
-                />
-              </label>
               <fieldset
                 id="want-rank-drag-side-option"
                 class="settings-control-group settings-control-group--nested"
-                hidden
               >
                 <legend class="visually-hidden">Want rank drag handle side</legend>
                 <p class="settings-control-group-label">Want rank drag handle</p>
+                <p class="settings-control-group-intro settings-control-hint">
+                  In list view, drag rank tabs to set priority.
+                </p>
                 <label class="settings-control-row">
                   <input
                     type="radio"

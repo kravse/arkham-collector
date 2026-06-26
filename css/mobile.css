@@ -122,6 +122,10 @@
     min-width: 0;
   }
 
+  .sort-value-slot {
+    width: 100%;
+  }
+
   .sort-label {
     display: none;
   }
@@ -131,6 +135,19 @@
     min-width: 0;
     padding-top: 0.5rem;
     padding-bottom: 0.5rem;
+  }
+
+  .sort-want-badge {
+    width: 100%;
+    min-width: 0;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    font-size: 16px;
+  }
+
+  .sort-want-badge-text::before {
+    content: "Sort · ";
+    color: var(--muted);
   }
 
   .show-hidden-toggle {
@@ -202,10 +219,6 @@
     text-overflow: ellipsis;
   }
 
-  .stat.want-stat .want-ranked-icon {
-    width: 0.76rem;
-  }
-
   .grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 0.45rem;
@@ -221,11 +234,11 @@
     --list-row-height: calc(3.18rem + 5px);
   }
 
-  body.view-mode-list.viewing-want-ranked .want-rank-row {
+  body.viewing-want.view-mode-list .want-rank-row {
     gap: 0.36rem;
   }
 
-  body.view-mode-list.viewing-want-ranked .want-rank-drag-handle {
+  body.viewing-want.view-mode-list .want-rank-drag-handle {
     font-size: 0.84rem;
     border-radius: 7px;
   }

@@ -315,25 +315,6 @@ function passesWantFilter(book, wantFilterMode, wantIds) {
   return wantIds.has(book.id);
 }
 
-function cycleWantFilter(wantFilterMode, hasAnyWants, wantListRankingEnabled = true) {
-  if (!hasAnyWants) {
-    return wantFilterMode === "want" ? null : "want";
-  }
-  if (!wantListRankingEnabled) {
-    if (wantFilterMode === null) {
-      return "want";
-    }
-    return null;
-  }
-  if (wantFilterMode === null) {
-    return "want";
-  }
-  if (wantFilterMode === "want") {
-    return "ranked";
-  }
-  return null;
-}
-
 function hasAnyWants(books, wantIds, visibilityOptions) {
   return books.some(
     (book) =>
@@ -441,7 +422,6 @@ module.exports = {
   cycleMycroftFilter,
   cycleCollectionFilter,
   hasAnyOrderedBooks,
-  cycleWantFilter,
   hasAnyWants,
   pickRandomBook,
 };

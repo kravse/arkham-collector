@@ -16,6 +16,7 @@ const searchTagSuggest = document.getElementById("search-tag-suggest");
 const searchClearBtn = document.getElementById("search-clear");
 const viewModeToggle = document.getElementById("view-mode-toggle");
 const sortSelect = document.getElementById("sort");
+const sortWantBadge = document.getElementById("sort-want-badge");
 const sortControlWrap = document.getElementById("sort-control-wrap");
 const bookOrderBtn = document.getElementById("book-order-btn");
 const bookOrderDialog = document.getElementById("book-order-dialog");
@@ -91,7 +92,6 @@ const importCollectionBtn = document.getElementById("import-collection-btn");
 const importCollectionInput = document.getElementById("import-collection-input");
 const importCollectionStatus = document.getElementById("import-collection-status");
 const highlightWantsInput = document.getElementById("highlight-wants");
-const wantListRankingInput = document.getElementById("want-list-ranking");
 const wantRankDragSideLeftInput = document.getElementById("want-rank-drag-side-left");
 const wantRankDragSideRightInput = document.getElementById("want-rank-drag-side-right");
 const wantRankDragSideOption = document.getElementById("want-rank-drag-side-option");
@@ -134,7 +134,6 @@ let gridViewMode = "cards";
 let highlightWants = true;
 let highlightCollection = true;
 let showMagazines = false;
-let wantListRanking = true;
 let wantRankDragSide = "right";
 let detailBookId = null;
 let bookOrderIds = Array.isArray(window.BOOK_ORDER)
@@ -185,16 +184,8 @@ function syncWantMembership(bookId, wanted) {
   invalidateSortedCache();
 }
 
-function getEffectiveViewMode() {
-  return wantFilterMode === "ranked" ? "list" : gridViewMode;
-}
-
 function isWantFilterActive() {
-  return wantFilterMode != null;
-}
-
-function isWantRankedFilterActive() {
-  return wantListRanking && wantFilterMode === "ranked";
+  return viewerWantView.isWantFilterActive(wantFilterMode);
 }
 
 rebuildBookOrderIndex();
@@ -212,12 +203,6 @@ function activeCollectionIds() {
 function syncSettingsHighlightCheckboxes() {
   if (highlightWantsInput) {
     highlightWantsInput.checked = highlightWants;
-  }
-  if (wantListRankingInput) {
-    wantListRankingInput.checked = wantListRanking;
-  }
-  if (wantRankDragSideOption) {
-    wantRankDragSideOption.hidden = !wantListRanking;
   }
   if (wantRankDragSideLeftInput) {
     wantRankDragSideLeftInput.checked = wantRankDragSide === "left";
@@ -585,7 +570,6 @@ const viewerUserState = (function () {
         highlightWants: true,
         highlightCollection: true,
         showMagazines: false,
-        wantListRanking: true,
         wantRankDragSide: "right",
       },
     };
@@ -782,10 +766,6 @@ const viewerUserState = (function () {
         typeof raw?.showMagazines === "boolean"
           ? raw.showMagazines
           : base.preferences.showMagazines,
-      wantListRanking:
-        typeof raw?.wantListRanking === "boolean"
-          ? raw.wantListRanking
-          : base.preferences.wantListRanking,
       wantRankDragSide: normalizeWantRankDragSide(
         raw?.wantRankDragSide,
         base.preferences.wantRankDragSide,
@@ -979,10 +959,6 @@ const viewerUserState = (function () {
         highlightWants: Boolean(snapshot.highlightWants),
         highlightCollection: Boolean(snapshot.highlightCollection),
         showMagazines: Boolean(snapshot.showMagazines),
-        wantListRanking:
-          typeof snapshot.wantListRanking === "boolean"
-            ? snapshot.wantListRanking
-            : true,
         wantRankDragSide: normalizeWantRankDragSide(snapshot.wantRankDragSide),
       },
     };
@@ -1003,7 +979,6 @@ const viewerUserState = (function () {
       highlightWants: parsed.preferences.highlightWants,
       highlightCollection: parsed.preferences.highlightCollection,
       showMagazines: parsed.preferences.showMagazines,
-      wantListRanking: parsed.preferences.wantListRanking,
       wantRankDragSide: parsed.preferences.wantRankDragSide,
     };
   }
@@ -1902,25 +1877,6 @@ const viewerFilters = (function () {
     return wantIds.has(book.id);
   }
   
-  function cycleWantFilter(wantFilterMode, hasAnyWants, wantListRankingEnabled = true) {
-    if (!hasAnyWants) {
-      return wantFilterMode === "want" ? null : "want";
-    }
-    if (!wantListRankingEnabled) {
-      if (wantFilterMode === null) {
-        return "want";
-      }
-      return null;
-    }
-    if (wantFilterMode === null) {
-      return "want";
-    }
-    if (wantFilterMode === "want") {
-      return "ranked";
-    }
-    return null;
-  }
-  
   function hasAnyWants(books, wantIds, visibilityOptions) {
     return books.some(
       (book) =>
@@ -2027,7 +1983,6 @@ const viewerFilters = (function () {
     cycleMycroftFilter,
     cycleCollectionFilter,
     hasAnyOrderedBooks,
-    cycleWantFilter,
     hasAnyWants,
     pickRandomBook,
   };
@@ -2212,10 +2167,9 @@ function passesCollectionFilter(book) {
 }
 
 function cycleWantFilter() {
-  wantFilterMode = viewerFilters.cycleWantFilter(
+  wantFilterMode = viewerWantView.cycleWantFilter(
     wantFilterMode,
     hasAnyWants(),
-    wantListRanking,
   );
 }
 
@@ -2399,7 +2353,6 @@ function collectRuntimeSnapshot() {
     highlightWants,
     highlightCollection,
     showMagazines,
-    wantListRanking,
     wantRankDragSide,
   };
 }
@@ -2418,11 +2371,7 @@ function applyRuntimeSnapshot(runtime) {
   highlightWants = runtime.highlightWants;
   highlightCollection = runtime.highlightCollection;
   showMagazines = runtime.showMagazines;
-  wantListRanking = runtime.wantListRanking;
   wantRankDragSide = runtime.wantRankDragSide;
-  if (!wantListRanking && wantFilterMode === "ranked") {
-    wantFilterMode = null;
-  }
   if (sortSelect && runtime.sort) {
     sortSelect.value = runtime.sort;
   }
@@ -2782,8 +2731,8 @@ function updateHeaderFiltersState() {
 }
 
 function updateViewModeState() {
-  const effectiveList = getEffectiveViewMode() === "list";
-  document.body.classList.toggle("view-mode-list", effectiveList);
+  const listMode = gridViewMode === "list";
+  document.body.classList.toggle("view-mode-list", listMode);
   if (!viewModeToggle) {
     return;
   }
@@ -3005,6 +2954,23 @@ const viewerWantOrder = (function () {
     const present = new Set(presentRowIds.map((id) => Number(id)));
     return wantOrderIds.filter((id) => present.has(Number(id)));
   }
+  
+  function buildWantDisplayRankById(wantOrderIds, visibleIds) {
+    const visible = new Set(
+      (visibleIds instanceof Set ? [...visibleIds] : visibleIds).map(Number),
+    );
+    const rankById = new Map();
+    let rank = 0;
+    for (const id of wantOrderIds) {
+      const numericId = Number(id);
+      if (!visible.has(numericId)) {
+        continue;
+      }
+      rank += 1;
+      rankById.set(numericId, rank);
+    }
+    return rankById;
+  }
   return {
     normalizeWantOrderIds,
     buildWantOrderIndex,
@@ -3012,6 +2978,7 @@ const viewerWantOrder = (function () {
     wouldMoveWantToIndex,
     reorderWantOrderIds,
     orderRowIdsByWantOrder,
+    buildWantDisplayRankById,
   };
 })();
 
@@ -3124,6 +3091,53 @@ const viewerPointerReorder = (function () {
   return {
     findRowAtPoint,
     findNearestRowAtPoint,
+  };
+})();
+
+
+/* Generated from scripts/lib/viewer-want-view.js — run npm run bundle-viewer */
+
+const viewerWantView = (function () {
+  const WANT_FILTER = "want";
+  
+  function isWantFilterActive(wantFilterMode) {
+    return wantFilterMode === WANT_FILTER;
+  }
+  
+  function cycleWantFilter(wantFilterMode, hasAnyWants) {
+    if (!hasAnyWants) {
+      return wantFilterMode === WANT_FILTER ? null : WANT_FILTER;
+    }
+    return wantFilterMode === WANT_FILTER ? null : WANT_FILTER;
+  }
+  
+  function usesWantPrioritySort(wantFilterMode) {
+    return isWantFilterActive(wantFilterMode);
+  }
+  
+  function shouldDisableCatalogSort(wantFilterMode) {
+    return isWantFilterActive(wantFilterMode);
+  }
+  
+  function canReorderWantList(wantFilterMode, viewMode, hasActiveSearch) {
+    return (
+      isWantFilterActive(wantFilterMode) &&
+      viewMode === "list" &&
+      !hasActiveSearch
+    );
+  }
+  
+  function shouldShowWantRankHandles(wantFilterMode, viewMode, hasActiveSearch) {
+    return canReorderWantList(wantFilterMode, viewMode, hasActiveSearch);
+  }
+  return {
+    WANT_FILTER,
+    isWantFilterActive,
+    cycleWantFilter,
+    usesWantPrioritySort,
+    shouldDisableCatalogSort,
+    canReorderWantList,
+    shouldShowWantRankHandles,
   };
 })();
 
@@ -3528,7 +3542,7 @@ function getSortedActiveBooks() {
     return sortedActiveCache.books;
   }
   let sorted;
-  if (wantFilterMode === "ranked") {
+  if (viewerWantView.usesWantPrioritySort(wantFilterMode)) {
     const wantBooks = getActiveBooks().filter((book) => wantIds.has(book.id));
     sorted = viewerWantOrder.sortBooksByWantOrder(
       wantBooks,
@@ -3561,39 +3575,43 @@ function matchesSearch(book, query) {
 }
 
 function updateSortControlState() {
-  const ranked = wantFilterMode === "ranked";
+  const wantSort = viewerWantView.shouldDisableCatalogSort(wantFilterMode);
   if (sortSelect) {
-    sortSelect.disabled = ranked;
-    sortSelect.setAttribute("aria-disabled", String(ranked));
+    sortSelect.disabled = wantSort;
+    sortSelect.classList.toggle("is-sort-slot-hidden", wantSort);
+    sortSelect.setAttribute("aria-hidden", String(wantSort));
+  }
+  if (sortWantBadge) {
+    sortWantBadge.classList.toggle("is-sort-slot-hidden", !wantSort);
+    sortWantBadge.setAttribute("aria-hidden", String(!wantSort));
+    const listHint =
+      gridViewMode === "list" && !hasActiveSearch()
+        ? " Drag rank tabs to reorder."
+        : "";
+    sortWantBadge.setAttribute(
+      "aria-label",
+      `Sorted by your want list priority.${listHint}`,
+    );
   }
   if (sortControlWrap) {
-    sortControlWrap.classList.toggle("sort-control-disabled", ranked);
+    sortControlWrap.classList.toggle("sort-control-want-order", wantSort);
   }
 }
 
-const WANT_RANK_ICON = `<svg class="want-ranked-icon" viewBox="0 0 16 12" fill="none" aria-hidden="true"><path d="M1 2h14M1 6h14M1 10h14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>`;
-
 function renderWantFilterButton() {
   const active = isWantFilterActive();
-  const ranked = isWantRankedFilterActive();
   const classes = [
     "stat",
     "want-stat",
     "stat-toggle",
     active ? "active" : "",
-    ranked ? "want-ranked-filter" : "",
   ]
     .filter(Boolean)
     .join(" ");
-  const label = ranked
-    ? `<span class="want-ranked-button-content"><span class="want-ranked-label">WANT</span>${WANT_RANK_ICON}</span>`
-    : "WANT";
-  const ariaLabel = ranked
-    ? "Want list sorted by priority — tap to show all books"
-    : active
-      ? "Viewing want list — tap to sort by priority"
-      : "Filter to want list";
-  return `<button type="button" class="${classes}" id="want-filter-toggle" aria-pressed="${active}" aria-label="${ariaLabel}">${label}</button>`;
+  const ariaLabel = active
+    ? "Viewing want list — tap to show all books"
+    : "Filter to want list";
+  return `<button type="button" class="${classes}" id="want-filter-toggle" aria-pressed="${active}" aria-label="${ariaLabel}">WANT</button>`;
 }
 
 function getStatTotal(activeBooks) {
@@ -3684,6 +3702,8 @@ function getVisibleBooks() {
 
 
 /* Covers, cards, stats, and main grid render */
+
+let wantDisplayRankById = null;
 
 const coverZoomLensIcon = `
 <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
@@ -4000,7 +4020,7 @@ function layoutListCoverPreviewImage(img) {
 }
 
 function layoutListCoverPreviews() {
-  if (getEffectiveViewMode() !== "list") {
+  if (gridViewMode !== "list") {
     return;
   }
 
@@ -4028,11 +4048,17 @@ function ensureListCoverPreviewObserver() {
 }
 
 function renderWantRankDragHandle(book) {
-  if (!isWantRankedFilterActive() || hasActiveSearch()) {
+  if (
+    !viewerWantView.shouldShowWantRankHandles(
+      wantFilterMode,
+      gridViewMode,
+      hasActiveSearch(),
+    )
+  ) {
     return "";
   }
-  const rank = wantOrderIds.indexOf(book.id) + 1;
-  if (rank < 1) {
+  const rank = wantDisplayRankById?.get(Number(book.id));
+  if (!rank) {
     return "";
   }
   return `<span
@@ -4054,7 +4080,7 @@ function renderCard(book) {
     }
   }
   const hiddenClass = book.hidden ? " hidden-book" : "";
-  const listMode = getEffectiveViewMode() === "list";
+  const listMode = gridViewMode === "list";
   const coverVariant = listMode ? "list" : "card";
   const imageHtml = renderCover(book, book.coverCacheKey, coverVariant);
   const coverActions = renderCoverActions(book);
@@ -4151,7 +4177,7 @@ function render() {
     collectionFilterMode = null;
   }
 
-  if (isWantRankedFilterActive() && wantIds.size === 0) {
+  if (isWantFilterActive() && wantIds.size === 0) {
     wantFilterMode = null;
   }
 
@@ -4173,10 +4199,7 @@ function render() {
     hiddenOnly && !isCollectionFilterActive() && !isMycroftOnlyFilter() && !isWantFilterActive(),
   );
   document.body.classList.toggle("viewing-want", isWantViewExclusive());
-  document.body.classList.toggle(
-    "viewing-want-ranked",
-    isWantRankedFilterActive() && isWantViewExclusive(),
-  );
+  document.body.classList.toggle("viewing-want-filter", isWantFilterActive());
   document.body.classList.toggle("viewing-mycroft-hidden", isMycroftHiddenFilter());
   if (pageSubtitle) {
     if (isCollectionAllFilter() && hiddenOnly) {
@@ -4198,13 +4221,10 @@ function render() {
     } else if (isMycroftHiddenFilter()) {
       pageSubtitle.textContent =
         "Mycroft & Moran titles hidden — click the stat again to show all books";
-    } else if (isWantRankedFilterActive() && isWantViewExclusive()) {
-      pageSubtitle.textContent = hasActiveSearch()
-        ? "Clear search to reorder — tap WANT again to show all books"
-        : "Drag numbers to set priority — tap WANT again to show all books";
     } else if (isWantFilterActive() && isWantViewExclusive()) {
-      pageSubtitle.textContent =
-        "Viewing your want list — tap WANT again to sort by priority";
+      pageSubtitle.textContent = hasActiveSearch()
+        ? "Search narrows your want list — clear search to reorder in list view"
+        : "Your want list — drag ranks in list view; tap WANT to show all books";
     } else {
       pageSubtitle.textContent =
         "A publishing house of horror and weird fiction—founded in 1939 to rescue Lovecraft from the pulps.";
@@ -4249,6 +4269,17 @@ function render() {
     syncSettingsHighlightCheckboxes();
     return;
   }
+
+  wantDisplayRankById = viewerWantView.shouldShowWantRankHandles(
+    wantFilterMode,
+    gridViewMode,
+    hasActiveSearch(),
+  )
+    ? viewerWantOrder.buildWantDisplayRankById(
+        wantOrderIds,
+        visible.map((book) => book.id),
+      )
+    : null;
 
   grid.innerHTML = visible.map(renderCard).join("");
   layoutListCoverPreviews();
@@ -5858,7 +5889,7 @@ function refreshBookOrderDialogIfOpen() {
 }
 
 
-/* Want list priority drag reorder (list view, ranked mode) */
+/* Want list drag reorder (list view only) */
 
 let wantRankDragId = null;
 let wantRankPointerDrag = null;
@@ -5874,7 +5905,11 @@ function isWantRankDragActive() {
 }
 
 function canReorderWantRank() {
-  return isWantRankedFilterActive() && !hasActiveSearch();
+  return viewerWantView.canReorderWantList(
+    wantFilterMode,
+    gridViewMode,
+    hasActiveSearch(),
+  );
 }
 
 function findWantRankRowAtPoint(clientX, clientY) {
@@ -5936,8 +5971,13 @@ function syncWantRankRowDomOrder() {
 }
 
 function updateWantRankHandleLabels() {
-  const rankById = new Map(
-    wantOrderIds.map((id, index) => [Number(id), index + 1]),
+  const rows = [...grid.querySelectorAll(".want-rank-row")];
+  const presentIds = rows
+    .map((row) => getWantRankRowBookId(row))
+    .filter((id) => id != null);
+  const rankById = viewerWantOrder.buildWantDisplayRankById(
+    wantOrderIds,
+    presentIds,
   );
 
   grid.querySelectorAll(".want-rank-row").forEach((row) => {
@@ -6169,11 +6209,7 @@ stats.addEventListener("click", (event) => {
     return;
   }
   if (event.target.closest("#want-filter-toggle")) {
-    const prev = wantFilterMode;
     cycleWantFilter();
-    if (wantFilterMode === "ranked" && prev === "want") {
-      clearSearchState();
-    }
     if (wantFilterMode != null) {
       collectionFilterMode = null;
     }
@@ -6510,18 +6546,6 @@ if (importCollectionBtn && importCollectionInput) {
 if (highlightWantsInput) {
   highlightWantsInput.addEventListener("change", () => {
     highlightWants = highlightWantsInput.checked;
-    saveUserState();
-    render();
-  });
-}
-
-if (wantListRankingInput) {
-  wantListRankingInput.addEventListener("change", () => {
-    wantListRanking = wantListRankingInput.checked;
-    if (!wantListRanking && wantFilterMode === "ranked") {
-      wantFilterMode = null;
-    }
-    syncSettingsHighlightCheckboxes();
     saveUserState();
     render();
   });

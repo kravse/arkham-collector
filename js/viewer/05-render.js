@@ -1,5 +1,7 @@
 /* Covers, cards, stats, and main grid render */
 
+let wantDisplayRankById = null;
+
 const coverZoomLensIcon = `
 <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
   <circle cx="8.5" cy="8.5" r="4.75" stroke="currentColor" stroke-width="1.5" />
@@ -315,7 +317,7 @@ function layoutListCoverPreviewImage(img) {
 }
 
 function layoutListCoverPreviews() {
-  if (getEffectiveViewMode() !== "list") {
+  if (gridViewMode !== "list") {
     return;
   }
 
@@ -343,11 +345,17 @@ function ensureListCoverPreviewObserver() {
 }
 
 function renderWantRankDragHandle(book) {
-  if (!isWantRankedFilterActive() || hasActiveSearch()) {
+  if (
+    !viewerWantView.shouldShowWantRankHandles(
+      wantFilterMode,
+      gridViewMode,
+      hasActiveSearch(),
+    )
+  ) {
     return "";
   }
-  const rank = wantOrderIds.indexOf(book.id) + 1;
-  if (rank < 1) {
+  const rank = wantDisplayRankById?.get(Number(book.id));
+  if (!rank) {
     return "";
   }
   return `<span
@@ -369,7 +377,7 @@ function renderCard(book) {
     }
   }
   const hiddenClass = book.hidden ? " hidden-book" : "";
-  const listMode = getEffectiveViewMode() === "list";
+  const listMode = gridViewMode === "list";
   const coverVariant = listMode ? "list" : "card";
   const imageHtml = renderCover(book, book.coverCacheKey, coverVariant);
   const coverActions = renderCoverActions(book);
@@ -466,7 +474,7 @@ function render() {
     collectionFilterMode = null;
   }
 
-  if (isWantRankedFilterActive() && wantIds.size === 0) {
+  if (isWantFilterActive() && wantIds.size === 0) {
     wantFilterMode = null;
   }
 
@@ -488,10 +496,7 @@ function render() {
     hiddenOnly && !isCollectionFilterActive() && !isMycroftOnlyFilter() && !isWantFilterActive(),
   );
   document.body.classList.toggle("viewing-want", isWantViewExclusive());
-  document.body.classList.toggle(
-    "viewing-want-ranked",
-    isWantRankedFilterActive() && isWantViewExclusive(),
-  );
+  document.body.classList.toggle("viewing-want-filter", isWantFilterActive());
   document.body.classList.toggle("viewing-mycroft-hidden", isMycroftHiddenFilter());
   if (pageSubtitle) {
     if (isCollectionAllFilter() && hiddenOnly) {
@@ -513,13 +518,10 @@ function render() {
     } else if (isMycroftHiddenFilter()) {
       pageSubtitle.textContent =
         "Mycroft & Moran titles hidden — click the stat again to show all books";
-    } else if (isWantRankedFilterActive() && isWantViewExclusive()) {
-      pageSubtitle.textContent = hasActiveSearch()
-        ? "Clear search to reorder — tap WANT again to show all books"
-        : "Drag numbers to set priority — tap WANT again to show all books";
     } else if (isWantFilterActive() && isWantViewExclusive()) {
-      pageSubtitle.textContent =
-        "Viewing your want list — tap WANT again to sort by priority";
+      pageSubtitle.textContent = hasActiveSearch()
+        ? "Search narrows your want list — clear search to reorder in list view"
+        : "Your want list — drag ranks in list view; tap WANT to show all books";
     } else {
       pageSubtitle.textContent =
         "A publishing house of horror and weird fiction—founded in 1939 to rescue Lovecraft from the pulps.";
@@ -564,6 +566,17 @@ function render() {
     syncSettingsHighlightCheckboxes();
     return;
   }
+
+  wantDisplayRankById = viewerWantView.shouldShowWantRankHandles(
+    wantFilterMode,
+    gridViewMode,
+    hasActiveSearch(),
+  )
+    ? viewerWantOrder.buildWantDisplayRankById(
+        wantOrderIds,
+        visible.map((book) => book.id),
+      )
+    : null;
 
   grid.innerHTML = visible.map(renderCard).join("");
   layoutListCoverPreviews();

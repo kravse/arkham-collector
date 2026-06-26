@@ -34,15 +34,15 @@ A visual catalog for collectors and readers of [Arkham House](https://en.wikiped
 
 1. Open a card → **Collect** to mark a copy you own (tap again to remove).
 2. Toggle **want** on titles you are hunting.
-3. Filter with **COLLECTION** or **WANT** in the header. If you have on-order titles, **COLLECTION** cycles: all books → your collection → on-order only → all books. If you have wants, **WANT** cycles: all books → your want list (catalog sort) → ranked want list (list view, drag rows to set priority) → all books. Disable **Want list ranking** in gear → Settings → Card display for a simpler WANT filter (all → wants → all).
-4. **Gear** (bottom bar): under **Collection storage**, choose **This device only** (default) or **Sync with GitHub Gist**. Under **Card display**, toggle want highlighting, want list ranking, and collection highlighting. GitHub Gist sync only activates after a successful **Connect**; until then you stay on this device. Connecting loads existing Gist data if present, or creates an empty Gist. While connected, the viewer pulls from GitHub on each page load and when you return to the tab. **Clear** or closing settings without a working token returns you to this device only. To move local data to GitHub Gist, export CSV locally then import after connecting.
+3. Filter with **COLLECTION** or **WANT** in the header. If you have on-order titles, **COLLECTION** cycles: all books → your collection → on-order only → all books. If you have wants, **WANT** toggles: all books ↔ your want list (priority order; drag ranks in list view).
+4. **Gear** (bottom bar): under **Collection storage**, choose **This device only** (default) or **Sync with GitHub Gist**. Under **Card display**, toggle want highlighting, set want rank drag handle side, and collection highlighting. GitHub Gist sync only activates after a successful **Connect**; until then you stay on this device. Connecting loads existing Gist data if present, or creates an empty Gist. While connected, the viewer pulls from GitHub on each page load and when you return to the tab. **Clear** or closing settings without a working token returns you to this device only. To move local data to GitHub Gist, export CSV locally then import after connecting.
 5. **Import collection CSV** / **Export collection CSV** (gear → Settings): import replaces collected titles for the **active storage option only** (this device and GitHub Gist keep separate collections), clears on-order titles for that option, and leaves your want list alone. Works on this device or with GitHub Gist sync (Gist upload happens immediately when connected).
 
 ### Browser storage keys
 
 | Key | Contents |
 |-----|----------|
-| `arkham-user-state` | Unified v2 state: collection ids, want list (`wantIds`), want priority order (`wantOrderIds`), ordered titles, display preferences (including `wantListRanking`), and `storageMode` (`local` or `gist`). Older per-key entries migrate on first load. |
+| `arkham-user-state` | Unified v2 state: collection ids, want list (`wantIds`), want priority order (`wantOrderIds`), ordered titles, display preferences (including `wantRankDragSide`), and `storageMode` (`local` or `gist`). Older per-key entries migrate on first load. |
 | `arkham-gist-sync` | GitHub Gist credentials only (`token`, `gistId`) when GitHub Gist sync is connected—not included in the synced Gist file. |
 
 **Gist sync security:** The PAT is stored in your browser’s `localStorage`. Use a throwaway GitHub account and a fine-grained PAT limited to gist read/write. This device only never sends data to GitHub.

@@ -42,7 +42,6 @@ function defaultUserState() {
       highlightWants: true,
       highlightCollection: true,
       showMagazines: false,
-      wantListRanking: true,
       wantRankDragSide: "right",
     },
   };
@@ -239,10 +238,6 @@ function normalizePreferences(raw, base) {
       typeof raw?.showMagazines === "boolean"
         ? raw.showMagazines
         : base.preferences.showMagazines,
-    wantListRanking:
-      typeof raw?.wantListRanking === "boolean"
-        ? raw.wantListRanking
-        : base.preferences.wantListRanking,
     wantRankDragSide: normalizeWantRankDragSide(
       raw?.wantRankDragSide,
       base.preferences.wantRankDragSide,
@@ -436,10 +431,6 @@ function buildUserStateFromRuntime(snapshot, options = {}) {
       highlightWants: Boolean(snapshot.highlightWants),
       highlightCollection: Boolean(snapshot.highlightCollection),
       showMagazines: Boolean(snapshot.showMagazines),
-      wantListRanking:
-        typeof snapshot.wantListRanking === "boolean"
-          ? snapshot.wantListRanking
-          : true,
       wantRankDragSide: normalizeWantRankDragSide(snapshot.wantRankDragSide),
     },
   };
@@ -460,7 +451,6 @@ function applyUserStateToRuntime(state) {
     highlightWants: parsed.preferences.highlightWants,
     highlightCollection: parsed.preferences.highlightCollection,
     showMagazines: parsed.preferences.showMagazines,
-    wantListRanking: parsed.preferences.wantListRanking,
     wantRankDragSide: parsed.preferences.wantRankDragSide,
   };
 }

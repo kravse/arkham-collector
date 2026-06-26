@@ -30,7 +30,6 @@ const {
   cycleMycroftFilter,
   cycleCollectionFilter,
   hasAnyOrderedBooks,
-  cycleWantFilter,
   hasAnyWants,
   isOrdered,
   pickRandomBook,
@@ -435,25 +434,6 @@ test("passesWantFilter only restricts when want filter mode is active", () => {
   assert.equal(passesWantFilter(other, null, wantIds), true);
   assert.equal(passesWantFilter(wanted, "want", wantIds), true);
   assert.equal(passesWantFilter(other, "want", wantIds), false);
-  assert.equal(passesWantFilter(wanted, "ranked", wantIds), true);
-  assert.equal(passesWantFilter(other, "ranked", wantIds), false);
-});
-
-test("cycleWantFilter rotates want -> ranked -> off when wants exist", () => {
-  assert.equal(cycleWantFilter(null, true), "want");
-  assert.equal(cycleWantFilter("want", true), "ranked");
-  assert.equal(cycleWantFilter("ranked", true), null);
-});
-
-test("cycleWantFilter skips ranked when want list ranking is disabled", () => {
-  assert.equal(cycleWantFilter(null, true, false), "want");
-  assert.equal(cycleWantFilter("want", true, false), null);
-  assert.equal(cycleWantFilter("ranked", true, false), null);
-});
-
-test("cycleWantFilter skips ranked when no wants exist", () => {
-  assert.equal(cycleWantFilter(null, false), "want");
-  assert.equal(cycleWantFilter("want", false), null);
 });
 
 test("filterVisibleBooks combines search, want, collection, and imprint filters", () => {

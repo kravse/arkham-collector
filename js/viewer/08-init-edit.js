@@ -189,18 +189,6 @@ if (highlightWantsInput) {
   });
 }
 
-if (wantListRankingInput) {
-  wantListRankingInput.addEventListener("change", () => {
-    wantListRanking = wantListRankingInput.checked;
-    if (!wantListRanking && wantFilterMode === "ranked") {
-      wantFilterMode = null;
-    }
-    syncSettingsHighlightCheckboxes();
-    saveUserState();
-    render();
-  });
-}
-
 if (wantRankDragSideLeftInput) {
   wantRankDragSideLeftInput.addEventListener("change", () => {
     if (!wantRankDragSideLeftInput.checked) {

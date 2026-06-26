@@ -65,6 +65,23 @@ function orderRowIdsByWantOrder(presentRowIds, wantOrderIds) {
   return wantOrderIds.filter((id) => present.has(Number(id)));
 }
 
+function buildWantDisplayRankById(wantOrderIds, visibleIds) {
+  const visible = new Set(
+    (visibleIds instanceof Set ? [...visibleIds] : visibleIds).map(Number),
+  );
+  const rankById = new Map();
+  let rank = 0;
+  for (const id of wantOrderIds) {
+    const numericId = Number(id);
+    if (!visible.has(numericId)) {
+      continue;
+    }
+    rank += 1;
+    rankById.set(numericId, rank);
+  }
+  return rankById;
+}
+
 module.exports = {
   normalizeWantIdList,
   normalizeWantMembership,
@@ -74,4 +91,5 @@ module.exports = {
   wouldMoveWantToIndex,
   reorderWantOrderIds,
   orderRowIdsByWantOrder,
+  buildWantDisplayRankById,
 };

@@ -7,6 +7,7 @@ const {
   reorderWantOrderIds,
   wouldMoveWantToIndex,
   orderRowIdsByWantOrder,
+  buildWantDisplayRankById,
 } = require("../scripts/lib/viewer-want-order");
 const { buildBookOrderIndex } = require("../scripts/lib/viewer-sort");
 
@@ -58,4 +59,22 @@ test("wouldMoveWantToIndex validates indices", () => {
 test("orderRowIdsByWantOrder sorts visible row ids by want order", () => {
   assert.deepEqual(orderRowIdsByWantOrder([3, 1, 2], [2, 3, 1]), [2, 3, 1]);
   assert.deepEqual(orderRowIdsByWantOrder([1, 99], [2, 3, 1]), [1]);
+});
+
+test("buildWantDisplayRankById numbers visible wants without gaps", () => {
+  const ranks = buildWantDisplayRankById([10, 20, 30, 40], [20, 40]);
+  assert.equal(ranks.get(20), 1);
+  assert.equal(ranks.get(40), 2);
+  assert.equal(ranks.get(10), undefined);
+  assert.equal(ranks.get(30), undefined);
+
+  const allVisible = buildWantDisplayRankById([2, 1, 3], [1, 2, 3]);
+  assert.deepEqual(
+    [...allVisible.entries()],
+    [
+      [2, 1],
+      [1, 2],
+      [3, 3],
+    ],
+  );
 });

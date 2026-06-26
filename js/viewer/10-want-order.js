@@ -1,4 +1,4 @@
-/* Want list priority drag reorder (list view, ranked mode) */
+/* Want list drag reorder (list view only) */
 
 let wantRankDragId = null;
 let wantRankPointerDrag = null;
@@ -14,7 +14,11 @@ function isWantRankDragActive() {
 }
 
 function canReorderWantRank() {
-  return isWantRankedFilterActive() && !hasActiveSearch();
+  return viewerWantView.canReorderWantList(
+    wantFilterMode,
+    gridViewMode,
+    hasActiveSearch(),
+  );
 }
 
 function findWantRankRowAtPoint(clientX, clientY) {
@@ -76,8 +80,13 @@ function syncWantRankRowDomOrder() {
 }
 
 function updateWantRankHandleLabels() {
-  const rankById = new Map(
-    wantOrderIds.map((id, index) => [Number(id), index + 1]),
+  const rows = [...grid.querySelectorAll(".want-rank-row")];
+  const presentIds = rows
+    .map((row) => getWantRankRowBookId(row))
+    .filter((id) => id != null);
+  const rankById = viewerWantOrder.buildWantDisplayRankById(
+    wantOrderIds,
+    presentIds,
   );
 
   grid.querySelectorAll(".want-rank-row").forEach((row) => {

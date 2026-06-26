@@ -16,6 +16,7 @@ const searchTagSuggest = document.getElementById("search-tag-suggest");
 const searchClearBtn = document.getElementById("search-clear");
 const viewModeToggle = document.getElementById("view-mode-toggle");
 const sortSelect = document.getElementById("sort");
+const sortWantBadge = document.getElementById("sort-want-badge");
 const sortControlWrap = document.getElementById("sort-control-wrap");
 const bookOrderBtn = document.getElementById("book-order-btn");
 const bookOrderDialog = document.getElementById("book-order-dialog");
@@ -91,7 +92,6 @@ const importCollectionBtn = document.getElementById("import-collection-btn");
 const importCollectionInput = document.getElementById("import-collection-input");
 const importCollectionStatus = document.getElementById("import-collection-status");
 const highlightWantsInput = document.getElementById("highlight-wants");
-const wantListRankingInput = document.getElementById("want-list-ranking");
 const wantRankDragSideLeftInput = document.getElementById("want-rank-drag-side-left");
 const wantRankDragSideRightInput = document.getElementById("want-rank-drag-side-right");
 const wantRankDragSideOption = document.getElementById("want-rank-drag-side-option");
@@ -134,7 +134,6 @@ let gridViewMode = "cards";
 let highlightWants = true;
 let highlightCollection = true;
 let showMagazines = false;
-let wantListRanking = true;
 let wantRankDragSide = "right";
 let detailBookId = null;
 let bookOrderIds = Array.isArray(window.BOOK_ORDER)
@@ -185,16 +184,8 @@ function syncWantMembership(bookId, wanted) {
   invalidateSortedCache();
 }
 
-function getEffectiveViewMode() {
-  return wantFilterMode === "ranked" ? "list" : gridViewMode;
-}
-
 function isWantFilterActive() {
-  return wantFilterMode != null;
-}
-
-function isWantRankedFilterActive() {
-  return wantListRanking && wantFilterMode === "ranked";
+  return viewerWantView.isWantFilterActive(wantFilterMode);
 }
 
 rebuildBookOrderIndex();
@@ -212,12 +203,6 @@ function activeCollectionIds() {
 function syncSettingsHighlightCheckboxes() {
   if (highlightWantsInput) {
     highlightWantsInput.checked = highlightWants;
-  }
-  if (wantListRankingInput) {
-    wantListRankingInput.checked = wantListRanking;
-  }
-  if (wantRankDragSideOption) {
-    wantRankDragSideOption.hidden = !wantListRanking;
   }
   if (wantRankDragSideLeftInput) {
     wantRankDragSideLeftInput.checked = wantRankDragSide === "left";

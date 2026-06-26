@@ -813,7 +813,7 @@ body.view-mode-list .empty {
   width: 100%;
 }
 
-body.view-mode-list.viewing-want-ranked .want-rank-row {
+body.viewing-want.view-mode-list .want-rank-row {
   display: flex;
   align-items: center;
   gap: 0.45rem;
@@ -821,12 +821,12 @@ body.view-mode-list.viewing-want-ranked .want-rank-row {
   min-width: 0;
 }
 
-body.view-mode-list.viewing-want-ranked .want-rank-row .card {
+body.viewing-want.view-mode-list .want-rank-row .card {
   flex: 1;
   min-width: 0;
 }
 
-body.view-mode-list.viewing-want-ranked .want-rank-drag-handle {
+body.viewing-want.view-mode-list .want-rank-drag-handle {
   flex: 0 0 var(--list-row-height);
   display: flex;
   align-items: center;
@@ -850,8 +850,8 @@ body.view-mode-list.viewing-want-ranked .want-rank-drag-handle {
   pointer-events: auto;
 }
 
-body.view-mode-list.viewing-want-ranked .want-rank-row .card,
-body.view-mode-list.viewing-want-ranked .want-rank-drag-handle {
+body.viewing-want.view-mode-list .want-rank-row .card,
+body.viewing-want.view-mode-list .want-rank-drag-handle {
   transition:
     border-color 0.15s ease,
     background 0.15s ease,
@@ -859,15 +859,15 @@ body.view-mode-list.viewing-want-ranked .want-rank-drag-handle {
     color 0.15s ease;
 }
 
-body.view-mode-list.viewing-want-ranked .want-rank-drag-handle:active {
+body.viewing-want.view-mode-list .want-rank-drag-handle:active {
   cursor: grabbing;
 }
 
-body.view-mode-list.viewing-want-ranked .card-want-rank-dragging {
+body.viewing-want.view-mode-list .card-want-rank-dragging {
   opacity: 0.72;
 }
 
-body.view-mode-list.viewing-want-ranked .want-rank-row.want-rank-drop-target .card {
+body.viewing-want.view-mode-list .want-rank-row.want-rank-drop-target .card {
   border-color: rgba(140, 220, 170, 0.88);
   background: linear-gradient(
     135deg,
@@ -882,7 +882,7 @@ body.view-mode-list.viewing-want-ranked .want-rank-row.want-rank-drop-target .ca
     0 0 24px rgba(72, 168, 118, 0.28);
 }
 
-body.view-mode-list.viewing-want-ranked
+body.viewing-want.view-mode-list
   .want-rank-row.want-rank-drop-target
   .card.wanted::after {
   background: color-mix(
@@ -892,7 +892,7 @@ body.view-mode-list.viewing-want-ranked
   );
 }
 
-body.view-mode-list.viewing-want-ranked
+body.viewing-want.view-mode-list
   .want-rank-row.want-rank-drop-target
   .want-rank-drag-handle {
   border-color: rgba(160, 232, 188, 0.92);

@@ -103,13 +103,11 @@ test("buildUserStateFromRuntime roundtrips wantOrderIds through parseUserState",
     highlightWants: true,
     highlightCollection: false,
     showMagazines: true,
-    wantListRanking: false,
     wantRankDragSide: "left",
   });
   const parsed = parseUserState(serializeUserState(built));
   assert.deepEqual(parsed.wantIds, [1, 2]);
   assert.deepEqual(parsed.wantOrderIds, [2, 1]);
-  assert.equal(parsed.preferences.wantListRanking, false);
   assert.equal(parsed.preferences.wantRankDragSide, "left");
 });
 
