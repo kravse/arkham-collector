@@ -247,9 +247,7 @@ window.BOOK_EDITS = {
     "listCoverFocusY": 0.1399285888671875
   },
   "271": {
-    "coverImageFile": "covers/the-jaguar-hunter-271.jpg",
-    "listCoverFocusX": 0.47478991596638653,
-    "listCoverFocusY": 0.4955386655661908
+    "coverImageFile": "covers/the-jaguar-hunter-271.jpg"
   },
   "272": {
     "coverImageFile": "covers/tales-of-the-quintana-roo-272.jpg"
