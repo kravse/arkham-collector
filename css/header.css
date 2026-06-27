@@ -424,6 +424,8 @@ input[type="search"]::-webkit-search-cancel-button {
   display: flex;
   align-items: center;
   gap: 0.55rem;
+  flex: 1;
+  min-width: 0;
 }
 
 .sort-value-slot {
@@ -431,7 +433,9 @@ input[type="search"]::-webkit-search-cancel-button {
   grid-template-columns: 1fr;
   grid-template-rows: 1fr;
   align-items: stretch;
+  flex: 1;
   min-width: 0;
+  width: 100%;
 }
 
 .sort-value-slot > select,
@@ -616,6 +620,25 @@ input[type="search"]::-webkit-search-cancel-button {
   font-size: 0.8rem;
   color: var(--muted);
   white-space: nowrap;
+}
+
+@media (min-width: 641px) {
+  .sort-label {
+    display: none;
+  }
+
+  .sort-control {
+    gap: 0;
+  }
+
+  .sort-bar {
+    flex: 1 1 auto;
+  }
+
+  #sort,
+  .sort-want-badge {
+    width: 100%;
+  }
 }
 
 .show-hidden-toggle {

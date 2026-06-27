@@ -317,7 +317,7 @@ function applyFieldSearch(fieldKey, rawValue) {
   updateSearchClearVisibility();
   closeBookDetail({ programmatic: true });
   renderNow();
-  searchInput.focus();
+  searchInput.blur();
   grid.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
