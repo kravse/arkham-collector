@@ -275,21 +275,3 @@ function renderBookTagsHtml(book) {
   const editableClass = editable ? " book-detail-tags--editable" : "";
   return `<div class="book-detail-tags${editableClass}" aria-label="Tags">${chips}</div>`;
 }
-
-function applyTagSearch(rawTag) {
-  const tag = viewerTags.formatTagLabel(rawTag);
-  if (!tag) {
-    return;
-  }
-
-  searchTagFilters.length = 0;
-  searchInput.value = "";
-  renderSearchChips();
-  hideTagSuggest();
-  addSearchTag(tag, { silent: true });
-  updateSearchClearVisibility();
-  closeBookDetail({ programmatic: true });
-  renderNow();
-  searchInput.focus();
-  grid.scrollIntoView({ behavior: "smooth", block: "start" });
-}

@@ -92,8 +92,6 @@
   }
 
   .search-row {
-    flex: 1 1 auto;
-    min-width: 0;
     width: 100%;
     max-width: 100%;
   }
@@ -101,11 +99,6 @@
   .search-wrap {
     flex: 1;
     min-width: 0;
-  }
-
-  .view-mode-toggle {
-    min-height: 0;
-    align-self: stretch;
   }
 
   .controls-secondary {
@@ -116,9 +109,24 @@
     width: 100%;
   }
 
-  .sort-control {
-    display: block;
+  .sort-bar {
+    display: flex;
+    align-items: stretch;
+    gap: 0.45rem;
     width: 100%;
+    min-width: 0;
+  }
+
+  .sort-bar .view-mode-toggle {
+    flex-shrink: 0;
+    align-self: stretch;
+    width: 2.35rem;
+    min-height: 2.35rem;
+  }
+
+  .sort-bar .sort-control {
+    display: block;
+    flex: 1;
     min-width: 0;
   }
 
@@ -133,16 +141,20 @@
   #sort {
     width: 100%;
     min-width: 0;
-    padding-top: 0.5rem;
-    padding-bottom: 0.5rem;
   }
 
-  .sort-want-badge {
-    width: 100%;
-    min-width: 0;
-    padding-top: 0.5rem;
-    padding-bottom: 0.5rem;
-    font-size: 16px;
+  .sort-bar #sort {
+    font-size: 0.8125rem;
+    padding-top: 0.55rem;
+    padding-bottom: 0.55rem;
+    min-height: 2.35rem;
+  }
+
+  .sort-bar .sort-want-badge {
+    font-size: 0.8125rem;
+    padding-top: 0.55rem;
+    padding-bottom: 0.55rem;
+    min-height: 2.35rem;
   }
 
   .show-hidden-toggle {
@@ -165,6 +177,10 @@
   .search-wrap input[type="search"] {
     font-size: 16px;
     padding-right: 0;
+  }
+
+  .search-wrap input[type="search"]::placeholder {
+    font-size: 0.8125em;
   }
 
   main {

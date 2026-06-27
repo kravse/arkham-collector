@@ -27,9 +27,19 @@
   --tag-bg: rgba(72, 128, 210, 0.12);
   --tag-border: rgba(130, 180, 245, 0.28);
   --tag-text: rgba(184, 200, 220, 0.82);
+  --search-field-tag-bg: var(--tag-bg);
+  --search-field-tag-border: var(--tag-border);
+  --search-field-tag-text: var(--tag-text);
+  --search-field-author-bg: rgba(196, 140, 48, 0.14);
+  --search-field-author-border: rgba(210, 165, 88, 0.34);
+  --search-field-author-text: rgba(232, 205, 160, 0.88);
+  --search-field-cover-bg: rgba(56, 168, 138, 0.14);
+  --search-field-cover-border: rgba(96, 196, 168, 0.34);
+  --search-field-cover-text: rgba(176, 228, 210, 0.88);
   --tag-font:
     ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
     Roboto, "Helvetica Neue", Arial, sans-serif;
+  --search-field-font: var(--tag-font);
   --layout-wide-max: 1000px;
 }
 

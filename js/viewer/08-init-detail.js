@@ -25,11 +25,19 @@ bookDetailDialog.addEventListener("click", (event) => {
     return;
   }
 
+  const fieldChip = event.target.closest(".book-detail-field-chip");
+  if (fieldChip) {
+    event.preventDefault();
+    event.stopPropagation();
+    applyFieldSearch(fieldChip.dataset.searchField, fieldChip.textContent);
+    return;
+  }
+
   const tagButton = event.target.closest(".book-detail-tag");
   if (tagButton) {
     event.preventDefault();
     event.stopPropagation();
-    applyTagSearch(tagButton.textContent);
+    applyFieldSearch("tag", tagButton.textContent);
     return;
   }
 

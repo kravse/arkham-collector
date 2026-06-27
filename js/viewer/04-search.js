@@ -1,71 +1,89 @@
-/* Search chips, tag autocomplete, and compound query state */
+/* Search chips, field autocomplete, and compound query state */
 
-const searchTagFilters = [];
+/** @type {{ type: string, label: string }[]} */
+const searchFilterChips = [];
 let searchSuggestIndex = -1;
 let searchRenderTimer = null;
-let tagSuggestScrollY = 0;
+let suggestScrollY = 0;
 
-function isTagSuggestTouchAllowed(target) {
-  return Boolean(target?.closest?.(".search-tag-suggest"));
+function isSuggestTouchAllowed(target) {
+  return Boolean(target?.closest?.(".search-field-suggest"));
 }
 
-function preventTagSuggestTouchMove(event) {
-  if (isTagSuggestTouchAllowed(event.target)) {
+function preventSuggestTouchMove(event) {
+  if (isSuggestTouchAllowed(event.target)) {
     return;
   }
   event.preventDefault();
 }
 
-function setTagSuggestScrollLock(locked) {
+function setSuggestScrollLock(locked) {
   const root = document.documentElement;
-  const isLocked = document.body.classList.contains("search-tag-suggest-open");
+  const isLocked = document.body.classList.contains("search-field-suggest-open");
   if (locked === isLocked) {
     return;
   }
 
   if (locked) {
-    tagSuggestScrollY = window.scrollY;
+    suggestScrollY = window.scrollY;
     window.scrollTo(0, 0);
-    root.classList.add("search-tag-suggest-open");
-    document.body.classList.add("search-tag-suggest-open");
+    root.classList.add("search-field-suggest-open");
+    document.body.classList.add("search-field-suggest-open");
     document.body.style.top = "0";
-    document.addEventListener("touchmove", preventTagSuggestTouchMove, {
+    document.addEventListener("touchmove", preventSuggestTouchMove, {
       passive: false,
     });
     return;
   }
 
-  root.classList.remove("search-tag-suggest-open");
-  document.body.classList.remove("search-tag-suggest-open");
+  root.classList.remove("search-field-suggest-open");
+  document.body.classList.remove("search-field-suggest-open");
   document.body.style.top = "";
-  document.removeEventListener("touchmove", preventTagSuggestTouchMove);
-  window.scrollTo(0, tagSuggestScrollY);
+  document.removeEventListener("touchmove", preventSuggestTouchMove);
+  window.scrollTo(0, suggestScrollY);
 }
 
-function getKnownSearchTags() {
-  const tagTerms = searchTagFilters.map((label) =>
-    String(label || "").trim().toLowerCase(),
-  );
-  const matchingBooks = viewerFilters.filterBooksMatchingTagTerms(
+function getActiveSuggestField() {
+  return viewerSearchFields.getActiveDraftField(searchInput.value);
+}
+
+function getKnownFieldValues(fieldKey) {
+  const field = viewerSearchFields.getFieldByKey(fieldKey);
+  if (!field) {
+    return [];
+  }
+  const scopedBooks = viewerFilters.filterBooksMatchingFieldTerms(
     getViewBooksWithoutSearch(),
-    tagTerms,
+    viewerSearchFields.chipsToFieldTermsPartial(
+      searchFilterChips,
+      fieldKey,
+    ),
   );
-  return viewerTags.collectTagsFromBooks(matchingBooks);
+  return field.collectValues(scopedBooks);
 }
 
 function getSearchFilter() {
   return viewerFilters.buildSearchFilter(
-    searchTagFilters,
+    searchFilterChips,
     searchInput.value,
   );
 }
 
 function hasActiveSearch() {
-  if (searchTagFilters.length > 0) {
+  if (searchFilterChips.length > 0) {
     return true;
   }
   const draft = searchInput.value.trim();
-  return Boolean(draft) && !viewerFilters.isTagDraftPending(draft);
+  if (!draft || viewerFilters.isSearchDraftBlockingText(draft)) {
+    return false;
+  }
+  const filter = viewerFilters.buildSearchFilter([], draft);
+  return (
+    filter.textTerms.length > 0 ||
+    viewerSearchFields.SEARCH_FIELD_TYPES.some(
+      (field) => (filter.fieldTerms[field.key] || []).length > 0,
+    )
+  );
 }
 
 function updateSearchClearVisibility() {
@@ -94,151 +112,185 @@ function renderSearchChips() {
   if (!searchChips) {
     return;
   }
-  searchChips.innerHTML = searchTagFilters
-    .map((label, index) => {
-      const safe = viewerCardHtml.escapeHtml(label);
-      return `<span class="search-tag-chip"><span class="search-tag-chip-label">${safe}</span><button type="button" class="search-tag-chip-remove" data-search-tag-index="${index}" aria-label="Remove tag ${safe}">&times;</button></span>`;
+  searchChips.innerHTML = searchFilterChips
+    .map((chip, index) => {
+      const field = viewerSearchFields.getFieldByKey(chip.type);
+      const safe = viewerCardHtml.escapeHtml(chip.label);
+      const ariaPrefix = field?.chipAriaPrefix || chip.type;
+      return `<span class="search-field-chip search-field-chip--${chip.type}"><span class="search-field-chip-label">${safe}</span><button type="button" class="search-field-chip-remove" data-search-chip-index="${index}" aria-label="Remove ${ariaPrefix} ${safe}">&times;</button></span>`;
     })
     .join("");
 }
 
-function hideTagSuggest() {
+function hideSuggest() {
   searchSuggestIndex = -1;
-  searchTagSuggest.hidden = true;
-  searchTagSuggest.innerHTML = "";
+  searchFieldSuggest.hidden = true;
+  searchFieldSuggest.innerHTML = "";
   searchInput.setAttribute("aria-expanded", "false");
-  setTagSuggestScrollLock(false);
+  setSuggestScrollLock(false);
 }
 
-function getTagSuggestItems() {
-  const draft = viewerFilters.parseTagDraftInput(searchInput.value);
+function getSuggestItems() {
+  const field = getActiveSuggestField();
+  if (!field) {
+    return [];
+  }
+  const draft = viewerSearchFields.parseFieldDraftInput(
+    searchInput.value,
+    field,
+  );
   if (!draft) {
     return [];
   }
-  return viewerFilters.filterTagSuggestions(draft.partial, getKnownSearchTags(), {
-    exclude: searchTagFilters,
-  });
+  const exclude = searchFilterChips
+    .filter((chip) => chip.type === field.key)
+    .map((chip) => chip.label);
+  return viewerSearchFields.filterFieldSuggestions(
+    draft.partial,
+    field,
+    getKnownFieldValues(field.key),
+    { exclude },
+  );
 }
 
-function renderTagSuggest() {
-  const items = getTagSuggestItems();
-  if (!items.length) {
-    hideTagSuggest();
+function renderSuggest() {
+  const field = getActiveSuggestField();
+  const items = getSuggestItems();
+  if (!field || !items.length) {
+    hideSuggest();
     return;
   }
 
-  searchTagSuggest.innerHTML = items
+  searchFieldSuggest.innerHTML = items
     .map((label, index) => {
       const safe = viewerCardHtml.escapeHtml(label);
       const activeClass = index === searchSuggestIndex ? " active" : "";
-      return `<li class="search-tag-suggest-item${activeClass}" role="option" data-suggest-index="${index}" aria-selected="${index === searchSuggestIndex}">${safe}</li>`;
+      return `<li class="search-field-suggest-item search-field-suggest-item--${field.key}${activeClass}" role="option" data-suggest-index="${index}" aria-selected="${index === searchSuggestIndex}">${safe}</li>`;
     })
     .join("");
-  searchTagSuggest.hidden = false;
+  searchFieldSuggest.hidden = false;
   searchInput.setAttribute("aria-expanded", "true");
-  setTagSuggestScrollLock(true);
+  setSuggestScrollLock(true);
 }
 
-function updateTagSuggest() {
-  const draft = viewerFilters.parseTagDraftInput(searchInput.value);
-  if (!draft) {
-    hideTagSuggest();
+function updateSuggest() {
+  if (!getActiveSuggestField()) {
+    hideSuggest();
     return;
   }
-  if (searchSuggestIndex >= getTagSuggestItems().length) {
+  if (searchSuggestIndex >= getSuggestItems().length) {
     searchSuggestIndex = -1;
   }
-  renderTagSuggest();
+  renderSuggest();
 }
 
-function addSearchTag(label, options = {}) {
-  const known = getKnownSearchTags();
-  const canonical =
-    viewerFilters.resolveTagFilterLabel(label, known) ||
-    viewerTags.formatTagLabel(label);
+function addSearchChip(fieldKey, label, options = {}) {
+  const field = viewerSearchFields.getFieldByKey(fieldKey);
+  if (!field) {
+    return false;
+  }
+  const known = getKnownFieldValues(fieldKey);
+  const canonical = field.formatLabel(label, known);
   if (!canonical) {
     return false;
   }
   if (
-    searchTagFilters.some(
-      (entry) => viewerTags.tagKey(entry) === viewerTags.tagKey(canonical),
+    searchFilterChips.some(
+      (chip) =>
+        chip.type === fieldKey &&
+        field.labelKey(chip.label) === field.labelKey(canonical),
     )
   ) {
     return false;
   }
-  searchTagFilters.push(canonical);
+  searchFilterChips.push({ type: fieldKey, label: canonical });
   renderSearchChips();
   if (!options.silent) {
     updateSearchClearVisibility();
-    updateTagSuggest();
+    updateSuggest();
     debouncedRender();
   }
   return true;
 }
 
-function removeSearchTagAt(index) {
-  if (index < 0 || index >= searchTagFilters.length) {
+function removeSearchChipAt(index) {
+  if (index < 0 || index >= searchFilterChips.length) {
     return;
   }
-  searchTagFilters.splice(index, 1);
+  searchFilterChips.splice(index, 1);
   renderSearchChips();
   updateSearchClearVisibility();
-  updateTagSuggest();
+  updateSuggest();
   renderNow();
 }
 
 function absorbSearchInputTokens() {
   const trimmed = searchInput.value.trim();
-  const draftAbsorbed = viewerFilters.absorbTagDraftInput(
-    trimmed,
-    getKnownSearchTags(),
-  );
-  if (draftAbsorbed) {
-    if (draftAbsorbed.chipLabel) {
-      addSearchTag(draftAbsorbed.chipLabel, { silent: true });
-    }
-    searchInput.value = draftAbsorbed.remainder;
-    return;
-  }
+  const activeField = viewerSearchFields.getActiveDraftField(trimmed);
 
-  const parsed = viewerFilters.parseCompoundSearchQuery(searchInput.value);
-  const known = getKnownSearchTags();
-  const unknownTagParts = [];
-
-  for (const term of parsed.tagTerms) {
-    const label = viewerFilters.resolveTagFilterLabel(term, known);
-    if (label) {
-      addSearchTag(label, { silent: true });
-    } else {
-      unknownTagParts.push(viewerFilters.formatTagSearchQuery(term));
+  if (activeField) {
+    const draftAbsorbed = viewerSearchFields.absorbFieldDraftInput(
+      trimmed,
+      activeField,
+      getKnownFieldValues(activeField.key),
+    );
+    if (draftAbsorbed) {
+      if (draftAbsorbed.chipLabel) {
+        addSearchChip(activeField.key, draftAbsorbed.chipLabel, { silent: true });
+      }
+      searchInput.value = draftAbsorbed.remainder;
+      return;
     }
   }
 
-  searchInput.value = [...unknownTagParts, ...parsed.textTerms]
+  const parsed = viewerSearchFields.parseCompoundSearchQuery(searchInput.value);
+  const unknownParts = [];
+
+  for (const field of viewerSearchFields.SEARCH_FIELD_TYPES) {
+    const known = getKnownFieldValues(field.key);
+    for (const term of parsed.fieldTerms[field.key] || []) {
+      const label = viewerSearchFields.resolveKnownFieldLabel(
+        term,
+        field,
+        known,
+      );
+      if (label) {
+        addSearchChip(field.key, label, { silent: true });
+      } else {
+        unknownParts.push(field.formatQuery(term));
+      }
+    }
+  }
+
+  searchInput.value = [...unknownParts, ...parsed.textTerms]
     .join(" ")
     .trim();
 }
 
-function pickTagSuggestion(index) {
-  const items = getTagSuggestItems();
+function pickSuggestion(index) {
+  const field = getActiveSuggestField();
+  const items = getSuggestItems();
   const label = items[index];
-  if (!label) {
+  if (!field || !label) {
     return;
   }
-  const draft = viewerFilters.parseTagDraftInput(searchInput.value);
+  const draft = viewerSearchFields.parseFieldDraftInput(
+    searchInput.value,
+    field,
+  );
   const prefix = draft?.prefix?.trim() || "";
-  addSearchTag(label, { silent: true });
+  addSearchChip(field.key, label, { silent: true });
   searchInput.value = prefix;
-  hideTagSuggest();
+  hideSuggest();
   updateSearchClearVisibility();
   renderNow();
 }
 
 function clearSearchState() {
-  searchTagFilters.length = 0;
+  searchFilterChips.length = 0;
   searchInput.value = "";
   renderSearchChips();
-  hideTagSuggest();
+  hideSuggest();
   updateSearchClearVisibility();
 }
 
@@ -247,58 +299,85 @@ function clearSearchAll() {
   renderNow();
 }
 
+function applyFieldSearch(fieldKey, rawValue) {
+  const field = viewerSearchFields.getFieldByKey(fieldKey);
+  if (!field) {
+    return;
+  }
+  const label = field.formatLabel(rawValue, getKnownFieldValues(fieldKey));
+  if (!label) {
+    return;
+  }
+
+  searchFilterChips.length = 0;
+  searchInput.value = "";
+  renderSearchChips();
+  hideSuggest();
+  addSearchChip(fieldKey, label, { silent: true });
+  updateSearchClearVisibility();
+  closeBookDetail({ programmatic: true });
+  renderNow();
+  searchInput.focus();
+  grid.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
 function onSearchInput() {
   updateSearchClearVisibility();
-  updateTagSuggest();
+  updateSuggest();
   debouncedRender();
 }
 
 function onSearchCommit() {
   absorbSearchInputTokens();
-  hideTagSuggest();
+  hideSuggest();
   updateSearchClearVisibility();
   renderNow();
 }
 
 searchChips.addEventListener("click", (event) => {
-  const button = event.target.closest("[data-search-tag-index]");
+  const button = event.target.closest("[data-search-chip-index]");
   if (!button) {
     return;
   }
-  removeSearchTagAt(Number(button.dataset.searchTagIndex));
+  removeSearchChipAt(Number(button.dataset.searchChipIndex));
 });
 
-searchTagSuggest.addEventListener("mousedown", (event) => {
+searchFieldSuggest.addEventListener("mousedown", (event) => {
   const item = event.target.closest("[data-suggest-index]");
   if (!item) {
     return;
   }
   event.preventDefault();
-  pickTagSuggestion(Number(item.dataset.suggestIndex));
+  pickSuggestion(Number(item.dataset.suggestIndex));
 });
 
 searchInput.addEventListener("keydown", (event) => {
-  const items = getTagSuggestItems();
-  const suggestOpen = items.length > 0 && !searchTagSuggest.hidden;
+  const items = getSuggestItems();
+  const suggestOpen = items.length > 0 && !searchFieldSuggest.hidden;
+  const activeField = getActiveSuggestField();
 
-  if (event.key === "Backspace" && !searchInput.value && searchTagFilters.length) {
-    removeSearchTagAt(searchTagFilters.length - 1);
+  if (event.key === "Backspace" && !searchInput.value && searchFilterChips.length) {
+    removeSearchChipAt(searchFilterChips.length - 1);
     return;
   }
 
-  if (event.key === " " && !suggestOpen) {
-    const draft = viewerFilters.parseTagDraftInput(searchInput.value.trim());
+  if (event.key === " " && !suggestOpen && activeField) {
+    const draft = viewerSearchFields.parseFieldDraftInput(
+      searchInput.value.trim(),
+      activeField,
+    );
     if (draft?.partial) {
-      const label = viewerFilters.resolveTagFilterLabel(
+      const label = viewerSearchFields.resolveKnownFieldLabel(
         draft.partial,
-        getKnownSearchTags(),
+        activeField,
+        getKnownFieldValues(activeField.key),
       );
       if (label) {
         event.preventDefault();
-        addSearchTag(label, { silent: true });
+        addSearchChip(activeField.key, label, { silent: true });
         searchInput.value = draft.prefix?.trim() || "";
         updateSearchClearVisibility();
-        updateTagSuggest();
+        updateSuggest();
         renderNow();
       }
     }
@@ -307,7 +386,7 @@ searchInput.addEventListener("keydown", (event) => {
 
   if (!suggestOpen) {
     if (event.key === "Escape") {
-      hideTagSuggest();
+      hideSuggest();
     }
     return;
   }
@@ -315,7 +394,7 @@ searchInput.addEventListener("keydown", (event) => {
   if (event.key === "ArrowDown") {
     event.preventDefault();
     searchSuggestIndex = (searchSuggestIndex + 1) % items.length;
-    renderTagSuggest();
+    renderSuggest();
     return;
   }
 
@@ -323,14 +402,14 @@ searchInput.addEventListener("keydown", (event) => {
     event.preventDefault();
     searchSuggestIndex =
       searchSuggestIndex <= 0 ? items.length - 1 : searchSuggestIndex - 1;
-    renderTagSuggest();
+    renderSuggest();
     return;
   }
 
   if (event.key === "Enter") {
     event.preventDefault();
     if (searchSuggestIndex >= 0) {
-      pickTagSuggestion(searchSuggestIndex);
+      pickSuggestion(searchSuggestIndex);
     } else {
       onSearchCommit();
     }
@@ -339,14 +418,14 @@ searchInput.addEventListener("keydown", (event) => {
 
   if (event.key === "Escape") {
     event.preventDefault();
-    hideTagSuggest();
+    hideSuggest();
   }
 });
 
 searchInput.addEventListener("blur", () => {
   window.setTimeout(() => {
     absorbSearchInputTokens();
-    hideTagSuggest();
+    hideSuggest();
     updateSearchClearVisibility();
     renderNow();
   }, 120);
@@ -363,9 +442,9 @@ searchInput.addEventListener("change", onSearchCommit);
 
 document.addEventListener("click", (event) => {
   if (
-    !searchTagSuggest.hidden &&
+    !searchFieldSuggest.hidden &&
     !event.target.closest(".search-wrap")
   ) {
-    hideTagSuggest();
+    hideSuggest();
   }
 });

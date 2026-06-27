@@ -149,7 +149,7 @@
               <div
                 class="search-chips"
                 id="search-chips"
-                aria-label="Search tags"
+                aria-label="Search filters"
               ></div>
               <input
                 id="search"
@@ -157,13 +157,13 @@
                 placeholder="Search title, author, cover artist, date…"
                 aria-label="Search books"
                 aria-autocomplete="list"
-                aria-controls="search-tag-suggest"
+                aria-controls="search-field-suggest"
                 aria-expanded="false"
               />
             </div>
             <ul
-              id="search-tag-suggest"
-              class="search-tag-suggest"
+              id="search-field-suggest"
+              class="search-field-suggest"
               role="listbox"
               hidden
             ></ul>
@@ -177,81 +177,9 @@
               &times;
             </button>
           </div>
-          <button
-            type="button"
-            id="view-mode-toggle"
-            class="view-mode-toggle"
-            aria-pressed="false"
-            aria-label="Switch to list view"
-          >
-            <svg
-              class="icon-list"
-              viewBox="0 0 20 20"
-              fill="none"
-              aria-hidden="true"
-            >
-              <rect
-                x="3"
-                y="4"
-                width="5"
-                height="7"
-                rx="0.75"
-                stroke="currentColor"
-                stroke-width="1.5"
-              />
-              <path
-                d="M10 5.5h7M10 10h7M10 14.5h7"
-                stroke="currentColor"
-                stroke-width="1.5"
-                stroke-linecap="round"
-              />
-            </svg>
-            <svg
-              class="icon-grid"
-              viewBox="0 0 20 20"
-              fill="none"
-              aria-hidden="true"
-            >
-              <rect
-                x="3"
-                y="3"
-                width="6"
-                height="6"
-                rx="1"
-                stroke="currentColor"
-                stroke-width="1.5"
-              />
-              <rect
-                x="11"
-                y="3"
-                width="6"
-                height="6"
-                rx="1"
-                stroke="currentColor"
-                stroke-width="1.5"
-              />
-              <rect
-                x="3"
-                y="11"
-                width="6"
-                height="6"
-                rx="1"
-                stroke="currentColor"
-                stroke-width="1.5"
-              />
-              <rect
-                x="11"
-                y="11"
-                width="6"
-                height="6"
-                rx="1"
-                stroke="currentColor"
-                stroke-width="1.5"
-              />
-            </svg>
-          </button>
         </div>
         <div class="controls-secondary">
+          <div class="sort-bar">
           <div class="sort-control" id="sort-control-wrap">
             <label class="sort-label" for="sort">Sort</label>
             <div class="sort-value-slot">
@@ -320,6 +248,80 @@
                 </span>
               </button>
             </div>
+          </div>
+            <button
+              type="button"
+              id="view-mode-toggle"
+              class="view-mode-toggle"
+              aria-pressed="false"
+              aria-label="Switch to list view"
+            >
+              <svg
+                class="icon-list"
+                viewBox="0 0 20 20"
+                fill="none"
+                aria-hidden="true"
+              >
+                <rect
+                  x="3"
+                  y="4"
+                  width="5"
+                  height="7"
+                  rx="0.75"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                />
+                <path
+                  d="M10 5.5h7M10 10h7M10 14.5h7"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                />
+              </svg>
+              <svg
+                class="icon-grid"
+                viewBox="0 0 20 20"
+                fill="none"
+                aria-hidden="true"
+              >
+                <rect
+                  x="3"
+                  y="3"
+                  width="6"
+                  height="6"
+                  rx="1"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                />
+                <rect
+                  x="11"
+                  y="3"
+                  width="6"
+                  height="6"
+                  rx="1"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                />
+                <rect
+                  x="3"
+                  y="11"
+                  width="6"
+                  height="6"
+                  rx="1"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                />
+                <rect
+                  x="11"
+                  y="11"
+                  width="6"
+                  height="6"
+                  rx="1"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                />
+              </svg>
+            </button>
           </div>
           <label class="show-hidden-toggle" id="show-hidden-wrap" hidden>
             <input id="show-hidden" type="checkbox" />

@@ -170,7 +170,7 @@ function openBookDetail(bookId, options = {}) {
     collectionControl,
   );
 
-  const metaHtml = viewerCardHtml.renderBookMetaHtml(book);
+  const metaHtml = viewerCardHtml.renderBookDetailMetaHtml(book);
   const tagsHtml = renderBookTagsHtml(book);
   const description = getBookDescription(book);
   const descriptionHtml = description?.trim()

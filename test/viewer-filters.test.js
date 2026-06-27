@@ -1,6 +1,8 @@
 const { test } = require("node:test");
 const assert = require("node:assert/strict");
 
+require("./viewer-lib-bootstrap");
+
 const {
   collectTagsFromBooks,
 } = require("../scripts/lib/tag-normalize");
@@ -81,12 +83,16 @@ test("parseCompoundSearchQuery splits multiple tags and text terms", () => {
   assert.deepEqual(
     parseCompoundSearchQuery('tag:"cthulhu mythos" tag:fantasy 1950s'),
     {
-      tagTerms: ["cthulhu mythos", "fantasy"],
+      fieldTerms: {
+        tag: ["cthulhu mythos", "fantasy"],
+        author: [],
+        cover: [],
+      },
       textTerms: ["1950s"],
     },
   );
   assert.deepEqual(parseCompoundSearchQuery("derleth 1950s"), {
-    tagTerms: [],
+    fieldTerms: { tag: [], author: [], cover: [] },
     textTerms: ["derleth", "1950s"],
   });
 });
@@ -160,9 +166,16 @@ test("tag suggestions can be scoped to books matching selected tag chips", () =>
 
 test("buildSearchFilter merges chip tags with draft query", () => {
   assert.deepEqual(
-    buildSearchFilter(["FANTASY"], 'tag:"cthulhu mythos" 1950s'),
+    buildSearchFilter(
+      [{ type: "tag", label: "FANTASY" }],
+      'tag:"cthulhu mythos" 1950s',
+    ),
     {
-      tagTerms: ["fantasy", "cthulhu mythos"],
+      fieldTerms: {
+        tag: ["fantasy", "cthulhu mythos"],
+        author: [],
+        cover: [],
+      },
       textTerms: ["1950s"],
     },
   );
@@ -189,19 +202,22 @@ test("isTagDraftPending suppresses search while typing tag or tag:", () => {
 
 test("buildSearchFilter ignores pending tag draft but keeps chips", () => {
   assert.deepEqual(buildSearchFilter([], "ta"), {
-    tagTerms: [],
+    fieldTerms: { tag: [], author: [], cover: [] },
     textTerms: [],
   });
-  assert.deepEqual(buildSearchFilter(["FANTASY"], "tag:"), {
-    tagTerms: ["fantasy"],
-    textTerms: [],
-  });
+  assert.deepEqual(
+    buildSearchFilter([{ type: "tag", label: "FANTASY" }], "tag:"),
+    {
+      fieldTerms: { tag: ["fantasy"], author: [], cover: [] },
+      textTerms: [],
+    },
+  );
   assert.deepEqual(buildSearchFilter([], "th"), {
-    tagTerms: [],
+    fieldTerms: { tag: [], author: [], cover: [] },
     textTerms: ["th"],
   });
   assert.deepEqual(buildSearchFilter([], "80s tag:hor"), {
-    tagTerms: [],
+    fieldTerms: { tag: [], author: [], cover: [] },
     textTerms: ["80s"],
   });
 });

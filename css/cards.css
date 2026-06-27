@@ -8,6 +8,12 @@ main {
   gap: 1rem;
 }
 
+@media (min-width: 1001px) {
+  body:not(.view-mode-list) .grid {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+}
+
 .card {
   background: var(--panel);
   border: 1px solid var(--border);

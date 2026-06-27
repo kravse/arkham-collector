@@ -223,7 +223,7 @@ function getViewBooksWithoutSearch() {
     collectedIds: activeCollectionIds(),
     orderedIds,
     wantIds,
-    searchFilter: { tagTerms: [], textTerms: [] },
+    searchFilter: viewerFilters.emptySearchFilter(),
   });
 }
 

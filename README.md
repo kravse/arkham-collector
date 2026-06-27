@@ -10,7 +10,7 @@ A visual catalog for collectors and readers of [Arkham House](https://en.wikiped
 
 | | |
 |---|---|
-| **Search & sort** | Search the grid (title, author, cover artist, date); add tag filters with `tag:horror` or `tag:"cthulhu mythos"` (autocomplete after `tag:`; known tags show as removable chips); combine multiple tags and text, e.g. `tag:fantasy tag:horror 1950s`; **list/grid toggle** beside search (saved in browser); **Sort** (oldest/newest/title) everywhere. Same-year tiebreaks from `book-order.js`; maintainers set those with **Reorder** on `npm run serve` only |
+| **Search & sort** | Search the grid (title, author, cover artist, date); bind field filters with `tag:horror`, `author:"H. P. Lovecraft"`, or `cover:Utpatel` (autocomplete after `tag`, `author`, or `cover`; known values show as removable chips in distinct colors); combine chips and free text, e.g. `tag:fantasy author:Derleth 1950s`. Tags require `tag:` for tag-only filtering; author and cover artist names are parsed from Wikipedia strings (parentheticals like “inspired by …” stripped; cover credits before “design by” only) so `author:` / `cover:` and plain text search match one person at a time. Book detail shows one clickable chip per author or cover artist; the grid shows plain parsed names. **List/grid toggle** beside sort (saved in browser); **Sort** (oldest/newest/title) everywhere. Same-year tiebreaks from `book-order.js`; maintainers set those with **Reorder** on `npm run serve` only |
 | **Filters** | Collection, want list, Mycroft & Moran imprint, decade |
 | **Book detail** | Cover, description, cover artist, tags, **W** / **G** links, **Collect** (Ordered → Collection), and want toggles. In the detail overlay, tap the cover (mobile) or hover and click the magnifier (desktop) for a full-screen view |
 | **Your data** | Stored in the browser (`arkham-user-state` v2; older keys migrate automatically). Default is **This device only**; optional **Sync with GitHub Gist** saves full state to a private GitHub Gist using a throwaway bot account PAT (`arkham-gist-sync`) |
@@ -77,7 +77,17 @@ npm run build && open build/index.html   # read-only static site (matches deploy
 
 At load time, [`js/book-edits.js`](js/book-edits.js) merges scraped rows with edits; only differing fields are stored in `edits.json` so re-crawls can refresh untouched fields. [`js/book-layers.js`](js/book-layers.js) attaches tags from [`data/tags.js`](data/tags.js) (static in production; editable only on localhost). The grid is sorted by publication year; [`data/book-order.js`](data/book-order.js) breaks ties within each year. Magazine seasons (e.g. “Summer, 1967”) sort as that year—use **Reorder** to set issue order. Visitors on the built site cannot change order or tags.
 
-**Tags (maintainers):** With `npm run serve`, open a book’s edit dialog. Add a custom tag or pick from existing tags in the pool; remove tags with × on each chip. Tags save immediately to `data/tags.json` and regenerate `tags.js`. Run `npm run build` to ship tags to the live site. Tags appear in book detail; click a tag to search by that tag only (replaces the current search). Type `tag` or `tag:` in search for autocomplete; plain words still match title, author, and date only—not tags.
+**Tags (maintainers):** With `npm run serve`, open a book’s edit dialog. Add a custom tag or pick from existing tags in the pool; remove tags with × on each chip. Tags save immediately to `data/tags.json` and regenerate `tags.js`. Run `npm run build` to ship tags to the live site. Tags appear in book detail; click a tag to search by that tag only (replaces the current search). Type `tag`, `author`, or `cover` in search for field autocomplete (`tag:`, `author:`, `cover:` syntax); plain words match title, parsed author/cover names, and date—tags still require `tag:` for tag-only chips.
+
+**Author/cover overrides (maintainers):** When Wikipedia author or cover strings are too messy to parse (multi-volume bibliography lines, `(original)` / `(revised)` pairs, etc.), add hand-edited string arrays in `data/edits.json` (no edit-dialog UI yet). Non-empty `authors` or `coverArtists` arrays replace the parser for that book:
+
+```json
+"2752": {
+  "authors": ["August Derleth"]
+}
+```
+
+Candidate ids for manual overrides include multi-volume author lines and ambiguous `(original)` / `(revised)` cover credits—see fixtures in [`test/viewer-person-names.test.js`](test/viewer-person-names.test.js).
 
 **Reorder books (maintainers):** With `npm run serve`, use **Reorder** in the header. The list shows all non-deleted titles (respecting **Show hidden**). Move titles within the same calendar year only. Save writes `data/book-order.json` and regenerates `book-order.js`; run `npm run build` to ship the order to the live site.
 

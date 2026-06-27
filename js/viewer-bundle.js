@@ -12,7 +12,7 @@ const stats = document.getElementById("stats");
 const searchInput = document.getElementById("search");
 const searchCombobox = document.getElementById("search-combobox");
 const searchChips = document.getElementById("search-chips");
-const searchTagSuggest = document.getElementById("search-tag-suggest");
+const searchFieldSuggest = document.getElementById("search-field-suggest");
 const searchClearBtn = document.getElementById("search-clear");
 const viewModeToggle = document.getElementById("view-mode-toggle");
 const sortSelect = document.getElementById("sort");
@@ -311,25 +311,181 @@ function updateImportCollectionStatus(message, isError) {
 }
 
 
-/* Generated from scripts/lib/viewer-card-html.js — run npm run bundle-viewer */
+/* Generated from scripts/lib/viewer-person-names.js — run npm run bundle-viewer */
 
-const viewerCardHtml = (function () {
-  function escapeHtml(value) {
+const viewerPersonNames = (function () {
+  function normalizeForMatch(value) {
     return String(value || "")
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;");
+      .toLowerCase()
+      .normalize("NFKD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[''""]/g, "")
+      .replace(/[^a-z0-9]+/g, " ")
+      .trim();
   }
   
-  function getDisplayAuthor(book) {
-    if (book.author) {
-      return book.author;
+  const QUALIFYING_PAREN_RE =
+    /inspired by|notes by|fragments by|edited by|\bEd\.?\b|\bvol\.\s*\d/i;
+  
+  const COVER_ROLE_SUFFIX_RE =
+    /,\s*(?:lettering and )?design by\b.*$|,\s*photograph by\b.*$/i;
+  
+  const COVER_ROLE_PREFIX_RE =
+    /^(?:photograph|lettering and design|design)\s+by\s+(.+)$/i;
+  
+  const COLLECTIVE_AUTHOR_CREDIT_RE =
+    /\s*(?:&|\band\b)\s*(divers\s+hands|others)\s*$/i;
+  
+  const COLLECTIVE_AUTHOR_KEYS = new Set(["divers hands", "others"]);
+  
+  const GENERATIONAL_SUFFIX_RE = /^(?:jr\.?|sr\.?|ii|iii|iv)$/i;
+  
+  const PERSON_LIST_SPLIT_RE =
+    /\s*,\s*(?!\s*(?:Jr|Sr|II|III|IV)\.?)|\s+and\s+/i;
+  
+  function stripCollectiveAuthorCredit(text) {
+    return String(text || "")
+      .replace(COLLECTIVE_AUTHOR_CREDIT_RE, " ")
+      .replace(/\s{2,}/g, " ")
+      .trim();
+  }
+  
+  function parseAuthorCollectiveSuffix(raw) {
+    const text = parseEditedByPrefix(stripQualifyingParentheticals(raw));
+    const match = text.match(COLLECTIVE_AUTHOR_CREDIT_RE);
+    if (!match) {
+      return null;
+    }
+    const key = normalizePersonKey(match[1]);
+    if (key === "divers hands") {
+      return "and divers hands";
+    }
+    if (key === "others") {
+      return "and others";
+    }
+    return null;
+  }
+  
+  function normalizePersonKey(name) {
+    return normalizeForMatch(name);
+  }
+  
+  function stripQualifyingParentheticals(text) {
+    let result = String(text || "").trim();
+    if (!result) {
+      return "";
     }
   
-    const line = (book.listAuthor || "").trim();
+    result = result.replace(/\s*\(([^)]*)\)/g, (match, inner) => {
+      if (QUALIFYING_PAREN_RE.test(inner)) {
+        return "";
+      }
+      return match;
+    });
+  
+    return result.replace(/\s{2,}/g, " ").trim();
+  }
+  
+  function mergeGenerationalSuffixParts(parts) {
+    const merged = [];
+    for (const part of parts || []) {
+      const trimmed = String(part || "").trim();
+      if (!trimmed) {
+        continue;
+      }
+      if (merged.length && GENERATIONAL_SUFFIX_RE.test(trimmed)) {
+        merged[merged.length - 1] = `${merged[merged.length - 1]}, ${trimmed}`;
+        continue;
+      }
+      merged.push(trimmed);
+    }
+    return merged;
+  }
+  
+  function splitPersonList(text) {
+    const raw = String(text || "").trim();
+    if (!raw) {
+      return [];
+    }
+  
+    return mergeGenerationalSuffixParts(
+      raw
+        .split(PERSON_LIST_SPLIT_RE)
+        .map((part) => part.trim())
+        .filter(Boolean),
+    );
+  }
+  
+  function dedupePersonNames(names) {
+    const seen = new Set();
+    const result = [];
+    for (const name of names || []) {
+      const trimmed = String(name || "").trim();
+      if (!trimmed) {
+        continue;
+      }
+      const key = normalizePersonKey(trimmed);
+      if (!key || seen.has(key)) {
+        continue;
+      }
+      seen.add(key);
+      result.push(trimmed);
+    }
+    return result;
+  }
+  
+  function parseEditedByPrefix(text) {
+    const trimmed = String(text || "").trim();
+    const editedMatch = trimmed.match(/^edited by\s+(.+)$/i);
+    if (editedMatch) {
+      return editedMatch[1].trim();
+    }
+    return trimmed;
+  }
+  
+  function parseAuthorNames(raw) {
+    const text = stripCollectiveAuthorCredit(
+      parseEditedByPrefix(stripQualifyingParentheticals(raw)),
+    );
+    if (!text) {
+      return [];
+    }
+    return dedupePersonNames(
+      splitPersonList(text).filter(
+        (name) => !COLLECTIVE_AUTHOR_KEYS.has(normalizePersonKey(name)),
+      ),
+    );
+  }
+  
+  function stripCoverRoleSuffix(text) {
+    return String(text || "")
+      .trim()
+      .replace(COVER_ROLE_SUFFIX_RE, "")
+      .trim();
+  }
+  
+  function parseCoverArtistNames(raw) {
+    let text = stripCoverRoleSuffix(String(raw || "").trim());
+    if (!text) {
+      return [];
+    }
+  
+    const roleMatch = text.match(COVER_ROLE_PREFIX_RE);
+    if (roleMatch) {
+      text = roleMatch[1].trim();
+    }
+  
+    return dedupePersonNames(splitPersonList(text));
+  }
+  
+  function getDisplayAuthorRaw(book) {
+    if (book?.author) {
+      return String(book.author).trim();
+    }
+  
+    const line = String(book?.listAuthor || "").trim();
     if (!line) {
-      return null;
+      return "";
     }
   
     const withoutYear = line.replace(/\s*\(\d{4}\)\s*$/, "").trim();
@@ -340,9 +496,97 @@ const viewerCardHtml = (function () {
   
     const byMatch = withoutYear.match(/(?:^|,\s*)by\s+(.+)$/i);
     if (byMatch) {
-      return byMatch[1].split(/\s+vol\.\s+/i)[0].trim() || null;
+      return byMatch[1].split(/\s+vol\.\s+/i)[0].trim() || "";
     }
   
+    return "";
+  }
+  
+  function resolveOverrideNames(value) {
+    if (!Array.isArray(value)) {
+      return null;
+    }
+    const names = value
+      .map((entry) => String(entry || "").trim())
+      .filter(Boolean);
+    return names.length ? dedupePersonNames(names) : null;
+  }
+  
+  function resolveBookAuthors(book) {
+    const override = resolveOverrideNames(book?.authors);
+    if (override) {
+      return override;
+    }
+    const raw = getDisplayAuthorRaw(book);
+    return parseAuthorNames(raw);
+  }
+  
+  function resolveBookAuthorCollectiveSuffix(book) {
+    if (resolveOverrideNames(book?.authors)) {
+      return null;
+    }
+    return parseAuthorCollectiveSuffix(getDisplayAuthorRaw(book));
+  }
+  
+  function resolveBookCoverArtists(book) {
+    const override = resolveOverrideNames(book?.coverArtists);
+    if (override) {
+      return override;
+    }
+    return parseCoverArtistNames(book?.coverArtist);
+  }
+  
+  function formatPersonList(names) {
+    return (names || []).join(", ");
+  }
+  
+  function formatAuthorDisplay(names, collectiveSuffix) {
+    const base = formatPersonList(names);
+    if (!base) {
+      return collectiveSuffix || "";
+    }
+    return collectiveSuffix ? `${base} ${collectiveSuffix}` : base;
+  }
+  return {
+    normalizePersonKey,
+    stripQualifyingParentheticals,
+    splitPersonList,
+    parseAuthorNames,
+    parseAuthorCollectiveSuffix,
+    parseCoverArtistNames,
+    getDisplayAuthorRaw,
+    resolveBookAuthors,
+    resolveBookAuthorCollectiveSuffix,
+    resolveBookCoverArtists,
+    formatPersonList,
+    formatAuthorDisplay,
+  };
+})();
+
+
+/* Generated from scripts/lib/viewer-card-html.js — run npm run bundle-viewer */
+
+const viewerCardHtml = (function () {
+  function getPersonNames() {
+    if (typeof viewerPersonNames !== "undefined") {
+      return viewerPersonNames;
+    }
+    throw new Error("viewerPersonNames is not available");
+  }
+  
+  function escapeHtml(value) {
+    return String(value || "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+  
+  function getDisplayAuthor(book) {
+    const authors = getPersonNames().resolveBookAuthors(book);
+    if (authors.length) {
+      return authors[0];
+    }
     return null;
   }
   
@@ -415,16 +659,63 @@ const viewerCardHtml = (function () {
   `;
   }
   
+  function renderDetailFieldChip(fieldKey, label) {
+    const safe = escapeHtml(label);
+    return `<button type="button" class="search-field-chip search-field-chip--${fieldKey} book-detail-field-chip" data-search-field="${fieldKey}">${safe}</button>`;
+  }
+  
   function renderBookMetaHtml(book) {
-    const author = getDisplayAuthor(book);
+    const personNames = getPersonNames();
+    const authors = personNames.resolveBookAuthors(book);
+    const authorSuffix = personNames.resolveBookAuthorCollectiveSuffix(book);
+    const coverArtists = personNames.resolveBookCoverArtists(book);
     const lines = [];
   
-    if (author) {
-      lines.push(`<p class="meta"><strong>Author:</strong> ${author}</p>`);
+    if (authors.length || authorSuffix) {
+      lines.push(
+        `<p class="meta"><strong>Author:</strong> ${escapeHtml(personNames.formatAuthorDisplay(authors, authorSuffix))}</p>`,
+      );
     }
   
-    if (book.coverArtist) {
-      lines.push(`<p class="meta"><strong>Cover:</strong> ${book.coverArtist}</p>`);
+    if (coverArtists.length) {
+      lines.push(
+        `<p class="meta"><strong>Cover:</strong> ${escapeHtml(personNames.formatPersonList(coverArtists))}</p>`,
+      );
+    }
+  
+    if (book.imprint === "mycroft_moran") {
+      lines.push(`<p class="meta"><strong>Imprint:</strong> Mycroft &amp; Moran</p>`);
+    }
+  
+    return lines.join("");
+  }
+  
+  function renderBookDetailMetaHtml(book) {
+    const personNames = getPersonNames();
+    const authors = personNames.resolveBookAuthors(book);
+    const authorSuffix = personNames.resolveBookAuthorCollectiveSuffix(book);
+    const coverArtists = personNames.resolveBookCoverArtists(book);
+    const lines = [];
+  
+    if (authors.length || authorSuffix) {
+      const chips = authors
+        .map((name) => renderDetailFieldChip("author", name))
+        .join("");
+      const suffixHtml = authorSuffix
+        ? `<span class="book-detail-author-suffix">${escapeHtml(` ${authorSuffix}`)}</span>`
+        : "";
+      lines.push(
+        `<p class="meta book-detail-meta-line"><strong>Author:</strong> ${chips}${suffixHtml}</p>`,
+      );
+    }
+  
+    if (coverArtists.length) {
+      const chips = coverArtists
+        .map((name) => renderDetailFieldChip("cover", name))
+        .join("");
+      lines.push(
+        `<p class="meta book-detail-meta-line"><strong>Cover:</strong> ${chips}</p>`,
+      );
     }
   
     if (book.imprint === "mycroft_moran") {
@@ -450,6 +741,7 @@ const viewerCardHtml = (function () {
     renderWikiButton,
     renderGoodreadsButton,
     renderBookMetaHtml,
+    renderBookDetailMetaHtml,
     renderImprintBadge,
   };
 })();
@@ -1564,14 +1856,10 @@ const viewerMode = (function () {
 })();
 
 
-/* Generated from scripts/lib/viewer-filters.js — run npm run bundle-viewer */
+/* Generated from scripts/lib/tag-normalize.js — run npm run bundle-viewer */
 
-const viewerFilters = (function () {
-  const TAG_LITERAL = "tag";
-  const SAMPLER_ISSUE_TITLE_RE = /^The Arkham Sampler \(Vol\. [IV]+, No\. \d+\)$/;
-  const COLLECTOR_ISSUE_TITLE_RE = /^The Arkham Collector \(No\. \d+\)$/;
-  const TAG_SEARCH_PREFIX_RE = /^tag:\s*(?:"([^"]*)"|(.+))$/i;
-  const TAG_TOKEN_RE = /tag:\s*(?:"([^"]*)"|(\S+))/gi;
+const viewerTags = (function () {
+  const MAX_TAG_LENGTH = 48;
   
   function tagKey(tag) {
     return String(tag || "")
@@ -1579,147 +1867,141 @@ const viewerFilters = (function () {
       .toLowerCase();
   }
   
-  function prepareBookSearchIndex(book) {
-    book._searchHaystack = [
-      book.title,
-      book.author,
-      book.coverArtist,
-      book.publicationDate,
-      book.decade,
-      book.listAuthor,
-    ]
-      .filter(Boolean)
-      .join(" ")
+  function normalizeTag(value) {
+    const text = String(value || "")
+      .trim()
+      .replace(/\s+/g, " ");
+    if (!text || text.length > MAX_TAG_LENGTH) {
+      return null;
+    }
+    return text.toUpperCase();
+  }
+  
+  function formatTagLabel(tag) {
+    return normalizeTag(tag) || String(tag || "").trim().toUpperCase();
+  }
+  
+  function collectTagsFromBooks(books) {
+    const seen = new Set();
+    const tags = [];
+    for (const book of books || []) {
+      if (!Array.isArray(book?.tags)) {
+        continue;
+      }
+      for (const tag of book.tags) {
+        const label = formatTagLabel(tag);
+        if (!label) {
+          continue;
+        }
+        const key = tagKey(label);
+        if (seen.has(key)) {
+          continue;
+        }
+        seen.add(key);
+        tags.push(label);
+      }
+    }
+    return tags.sort((a, b) => tagKey(a).localeCompare(tagKey(b)));
+  }
+  
+  function collectAllKnownTags(tagsByBookId) {
+    const books = Object.values(tagsByBookId || {}).map((bookTags) => ({
+      tags: bookTags,
+    }));
+    return collectTagsFromBooks(books);
+  }
+  return {
+    tagKey,
+    normalizeTag,
+    formatTagLabel,
+    collectAllKnownTags,
+    collectTagsFromBooks,
+  };
+})();
+
+
+/* Generated from scripts/lib/viewer-search-fields.js — run npm run bundle-viewer */
+
+const viewerSearchFields = (function () {
+  function getPersonNames() {
+    if (typeof viewerPersonNames !== "undefined") {
+      return viewerPersonNames;
+    }
+    if (typeof global !== "undefined" && global.__viewerPersonNames) {
+      return global.__viewerPersonNames;
+    }
+    throw new Error("viewerPersonNames is not available");
+  }
+  
+  function getTagHelpers() {
+    if (typeof viewerTags !== "undefined") {
+      return viewerTags;
+    }
+    if (typeof global !== "undefined" && global.__viewerTagsForSearchFields) {
+      return global.__viewerTagsForSearchFields;
+    }
+    throw new Error("viewerTags is not available");
+  }
+  
+  function normalizeLabelKey(label) {
+    return String(label || "")
+      .trim()
       .toLowerCase();
   }
   
-  function parseSearchQuery(query) {
-    const text = String(query || "").trim();
-    if (!text) {
-      return { mode: "text", term: "" };
-    }
-  
-    const tagMatch = text.match(TAG_SEARCH_PREFIX_RE);
-    if (tagMatch) {
-      return {
-        mode: "tag",
-        term: String(tagMatch[1] ?? tagMatch[2] ?? "")
-          .trim()
-          .toLowerCase(),
-      };
-    }
-  
-    return { mode: "text", term: text.toLowerCase() };
+  function emptyFieldTerms() {
+    return { tag: [], author: [], cover: [] };
   }
   
-  function formatTagSearchQuery(tag) {
-    const text = String(tag || "").trim();
+  function emptySearchFilter() {
+    return { fieldTerms: emptyFieldTerms(), textTerms: [] };
+  }
+  
+  function formatFieldSearchQuery(prefix, label) {
+    const text = String(label || "").trim();
     if (!text) {
       return "";
     }
     if (/\s/.test(text)) {
-      return `tag:"${text.replace(/"/g, "")}"`;
+      return `${prefix}:"${text.replace(/"/g, "")}"`;
     }
-    return `tag:${text}`;
+    return `${prefix}:${text}`;
   }
   
-  function parseCompoundSearchQuery(query) {
-    const raw = String(query || "");
-    const tagTerms = [];
-    const remainder = raw.replace(TAG_TOKEN_RE, (_, quoted, unquoted) => {
-      const term = String(quoted ?? unquoted ?? "")
-        .trim()
-        .toLowerCase();
-      if (term) {
-        tagTerms.push(term);
-      }
-      return " ";
-    });
-    const textTerms = remainder
-      .trim()
-      .split(/\s+/)
-      .filter(Boolean)
-      .map((term) => term.toLowerCase());
-  
-    return { tagTerms, textTerms };
+  function buildFieldTokenRegex(prefix) {
+    return new RegExp(`${prefix}:\\s*(?:"([^"]*)"|(\\S+))`, "gi");
   }
   
-  function serializeCompoundSearchQuery({ tagTerms = [], textTerms = [] }) {
-    const parts = [
-      ...tagTerms.map((term) => formatTagSearchQuery(term)),
-      ...textTerms,
-    ].filter(Boolean);
-    return parts.join(" ").trim();
-  }
-  
-  function isTagDraftPending(draftQuery) {
-    const text = String(draftQuery || "").trim();
-    if (!text) {
-      return false;
-    }
-    const lower = text.toLowerCase();
-    if (
-      lower.length <= TAG_LITERAL.length &&
-      TAG_LITERAL.startsWith(lower)
-    ) {
-      return true;
-    }
-    return parseTagDraftInput(text) !== null;
-  }
-  
-  function buildSearchFilter(chipTags, draftQuery) {
-    const trimmed = String(draftQuery || "").trim();
-    const draft = parseTagDraftInput(trimmed);
-    let parsed;
-    if (draft) {
-      parsed = draft.prefix
-        ? parseCompoundSearchQuery(draft.prefix)
-        : { tagTerms: [], textTerms: [] };
-    } else if (isTagDraftPending(trimmed)) {
-      parsed = { tagTerms: [], textTerms: [] };
-    } else {
-      parsed = parseCompoundSearchQuery(trimmed);
-    }
-    const tagTerms = [];
-    const seen = new Set();
-  
-    for (const label of chipTags || []) {
-      const term = String(label || "").trim().toLowerCase();
-      if (!term || seen.has(term)) {
-        continue;
-      }
-      seen.add(term);
-      tagTerms.push(term);
-    }
-  
-    for (const term of parsed.tagTerms) {
-      if (!seen.has(term)) {
-        seen.add(term);
-        tagTerms.push(term);
-      }
-    }
-  
-    return { tagTerms, textTerms: parsed.textTerms };
-  }
-  
-  function parseTagDraftInput(input) {
+  function parseFieldDraftInput(input, field) {
     const text = String(input || "").trim();
     if (!text) {
       return null;
     }
   
-    const colonMatch = text.match(/(?:^|\s)tag:\s*(?:"([^"]*)"?|(\S*))$/i);
+    const prefix = field.prefix;
+    const prefixEsc = prefix.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  
+    const colonMatch = text.match(
+      new RegExp(`(?:^|\\s)${prefixEsc}:\\s*(?:"([^"]*)"?|(\\S*))$`, "i"),
+    );
     if (colonMatch) {
       return {
+        fieldKey: field.key,
         partial: String(colonMatch[1] ?? colonMatch[2] ?? "").trim(),
         quoted: /"/.test(colonMatch[0]),
         prefix: text.slice(0, colonMatch.index).trim(),
       };
     }
   
-    const shorthandMatch = text.match(/(?:^|\s)tag(?:\s+(?:"([^"]*)"?|(\S*)))?$/i);
+    const shorthandMatch = text.match(
+      new RegExp(
+        `(?:^|\\s)${prefixEsc}(?:\\s+(?:"([^"]*)"?|(\\S*)))?$`,
+        "i",
+      ),
+    );
     if (shorthandMatch) {
       return {
+        fieldKey: field.key,
         partial: String(shorthandMatch[1] ?? shorthandMatch[2] ?? "").trim(),
         quoted: /"/.test(shorthandMatch[0]),
         prefix: text.slice(0, shorthandMatch.index).trim(),
@@ -1729,65 +2011,375 @@ const viewerFilters = (function () {
     return null;
   }
   
-  function absorbTagDraftInput(input, knownTags) {
-    const draft = parseTagDraftInput(input);
-    if (!draft) {
+  function getFieldByKey(key) {
+    return SEARCH_FIELD_TYPES.find((field) => field.key === key) || null;
+  }
+  
+  function getFieldByPrefix(prefix) {
+    const lower = String(prefix || "").toLowerCase();
+    return (
+      SEARCH_FIELD_TYPES.find((field) => field.prefix.toLowerCase() === lower) ||
+      null
+    );
+  }
+  
+  const TAG_FIELD = {
+    key: "tag",
+    prefix: "tag",
+    suppressTextOnLiteralPrefix: true,
+    chipAriaPrefix: "tag",
+    labelKey(label) {
+      return getTagHelpers().tagKey(label);
+    },
+    formatQuery(label) {
+      return formatFieldSearchQuery("tag", label);
+    },
+    formatLabel(raw, knownValues) {
+      const { tagKey, formatTagLabel } = getTagHelpers();
+      const needle = tagKey(raw);
+      if (!needle) {
+        return null;
+      }
+      for (const label of knownValues || []) {
+        if (tagKey(label) === needle) {
+          return String(label).trim().toUpperCase();
+        }
+      }
+      return formatTagLabel(raw);
+    },
+    matchBook(book, term) {
+      if (!term) {
+        return true;
+      }
+      const tags = Array.isArray(book.tags) ? book.tags : [];
+      return tags.some((tag) => String(tag).toLowerCase().includes(term));
+    },
+    collectValues(books) {
+      return getTagHelpers().collectTagsFromBooks(books);
+    },
+  };
+  
+  const AUTHOR_FIELD = {
+    key: "author",
+    prefix: "author",
+    suppressTextOnLiteralPrefix: false,
+    chipAriaPrefix: "author",
+    labelKey(label) {
+      return getPersonNames().normalizePersonKey(label);
+    },
+    formatQuery(label) {
+      return formatFieldSearchQuery("author", label);
+    },
+    formatLabel(raw, knownValues) {
+      const needle = this.labelKey(raw);
+      if (!needle) {
+        return null;
+      }
+      for (const label of knownValues || []) {
+        if (this.labelKey(label) === needle) {
+          return String(label).trim();
+        }
+      }
+      return String(raw || "").trim() || null;
+    },
+    matchBook(book, term) {
+      if (!term) {
+        return true;
+      }
+      const needle = String(term || "").trim().toLowerCase();
+      return getPersonNames()
+        .resolveBookAuthors(book)
+        .some((name) => this.labelKey(name).includes(needle));
+    },
+    collectValues(books) {
+      const seen = new Set();
+      const values = [];
+      for (const book of books || []) {
+        for (const label of getPersonNames().resolveBookAuthors(book)) {
+          const key = this.labelKey(label);
+          if (!key || seen.has(key)) {
+            continue;
+          }
+          seen.add(key);
+          values.push(label);
+        }
+      }
+      return values.sort((a, b) => this.labelKey(a).localeCompare(this.labelKey(b)));
+    },
+  };
+  
+  const COVER_FIELD = {
+    key: "cover",
+    prefix: "cover",
+    suppressTextOnLiteralPrefix: false,
+    chipAriaPrefix: "cover artist",
+    labelKey(label) {
+      return getPersonNames().normalizePersonKey(label);
+    },
+    formatQuery(label) {
+      return formatFieldSearchQuery("cover", label);
+    },
+    formatLabel(raw, knownValues) {
+      const needle = this.labelKey(raw);
+      if (!needle) {
+        return null;
+      }
+      for (const label of knownValues || []) {
+        if (this.labelKey(label) === needle) {
+          return String(label).trim();
+        }
+      }
+      return String(raw || "").trim() || null;
+    },
+    matchBook(book, term) {
+      if (!term) {
+        return true;
+      }
+      const needle = String(term || "").trim().toLowerCase();
+      return getPersonNames()
+        .resolveBookCoverArtists(book)
+        .some((name) => this.labelKey(name).includes(needle));
+    },
+    collectValues(books) {
+      const seen = new Set();
+      const values = [];
+      for (const book of books || []) {
+        for (const label of getPersonNames().resolveBookCoverArtists(book)) {
+          const key = this.labelKey(label);
+          if (!key || seen.has(key)) {
+            continue;
+          }
+          seen.add(key);
+          values.push(label);
+        }
+      }
+      return values.sort((a, b) => this.labelKey(a).localeCompare(this.labelKey(b)));
+    },
+  };
+  
+  const SEARCH_FIELD_TYPES = [TAG_FIELD, AUTHOR_FIELD, COVER_FIELD];
+  
+  function getActiveDraftField(draftQuery) {
+    const text = String(draftQuery || "").trim();
+    if (!text) {
       return null;
     }
-    const prefix = draft.prefix || "";
-    if (!draft.partial) {
-      return { chipLabel: null, remainder: prefix };
+  
+    let active = null;
+    for (const field of SEARCH_FIELD_TYPES) {
+      const draft = parseFieldDraftInput(text, field);
+      if (draft) {
+        active = field;
+      }
     }
-    const chipLabel = resolveTagFilterLabel(draft.partial, knownTags);
-    if (chipLabel) {
-      return { chipLabel, remainder: prefix };
+    return active;
+  }
+  
+  function isFieldLiteralPrefixPending(draftQuery, field) {
+    if (!field.suppressTextOnLiteralPrefix) {
+      return false;
     }
-    const formatted = formatTagSearchQuery(draft.partial);
+    const text = String(draftQuery || "").trim();
+    if (!text) {
+      return false;
+    }
+    const lower = text.toLowerCase();
+    const literal = field.prefix.toLowerCase();
+    if (lower.length <= literal.length && literal.startsWith(lower)) {
+      return true;
+    }
+    return false;
+  }
+  
+  function isSearchDraftBlockingText(draftQuery) {
+    for (const field of SEARCH_FIELD_TYPES) {
+      if (isFieldLiteralPrefixPending(draftQuery, field)) {
+        return true;
+      }
+    }
+    return false;
+  }
+  
+  function parseCompoundSearchQuery(query) {
+    let remainder = String(query || "");
+    const fieldTerms = emptyFieldTerms();
+  
+    for (const field of SEARCH_FIELD_TYPES) {
+      const tokenRe = buildFieldTokenRegex(field.prefix);
+      remainder = remainder.replace(tokenRe, (_, quoted, unquoted) => {
+        const term = String(quoted ?? unquoted ?? "")
+          .trim()
+          .toLowerCase();
+        if (term) {
+          fieldTerms[field.key].push(term);
+        }
+        return " ";
+      });
+    }
+  
+    const textTerms = remainder
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean)
+      .map((term) => term.toLowerCase());
+  
+    return { fieldTerms, textTerms };
+  }
+  
+  function mergeFieldTermsFromChips(chips, parsedFieldTerms) {
+    const fieldTerms = emptyFieldTerms();
+    const seen = {
+      tag: new Set(),
+      author: new Set(),
+      cover: new Set(),
+    };
+  
+    for (const chip of chips || []) {
+      const field = getFieldByKey(chip?.type);
+      if (!field) {
+        continue;
+      }
+      const label = field.formatLabel(chip.label, [chip.label]);
+      const term = field.labelKey(label);
+      if (!term || seen[field.key].has(term)) {
+        continue;
+      }
+      seen[field.key].add(term);
+      fieldTerms[field.key].push(term);
+    }
+  
+    for (const field of SEARCH_FIELD_TYPES) {
+      for (const term of parsedFieldTerms[field.key] || []) {
+        if (!seen[field.key].has(term)) {
+          seen[field.key].add(term);
+          fieldTerms[field.key].push(term);
+        }
+      }
+    }
+  
+    return fieldTerms;
+  }
+  
+  function buildSearchFilter(chips, draftQuery) {
+    const trimmed = String(draftQuery || "").trim();
+    const activeDraftField = getActiveDraftField(trimmed);
+    let parsed;
+  
+    if (activeDraftField) {
+      const draft = parseFieldDraftInput(trimmed, activeDraftField);
+      parsed = draft?.prefix
+        ? parseCompoundSearchQuery(draft.prefix)
+        : emptySearchFilter();
+    } else if (isSearchDraftBlockingText(trimmed)) {
+      parsed = emptySearchFilter();
+    } else {
+      parsed = parseCompoundSearchQuery(trimmed);
+    }
+  
     return {
-      chipLabel: null,
-      remainder: prefix ? `${prefix} ${formatted}` : formatted,
+      fieldTerms: mergeFieldTermsFromChips(chips, parsed.fieldTerms),
+      textTerms: parsed.textTerms,
     };
   }
   
-  function resolveTagFilterLabel(term, knownTags) {
-    const needle = tagKey(term);
+  function resolveKnownFieldLabel(term, field, knownValues) {
+    const needle = field.labelKey(term);
     if (!needle) {
       return null;
     }
-    for (const label of knownTags || []) {
-      if (tagKey(label) === needle) {
-        return String(label).trim().toUpperCase();
+    for (const label of knownValues || []) {
+      if (field.labelKey(label) === needle) {
+        return field.key === "tag"
+          ? String(label).trim().toUpperCase()
+          : String(label).trim();
+      }
+    }
+    if (field.key !== "tag") {
+      const matches = (knownValues || []).filter((label) =>
+        field.labelKey(label).includes(needle),
+      );
+      if (matches.length === 1) {
+        return String(matches[0]).trim();
       }
     }
     return null;
   }
   
-  function filterTagSuggestions(partial, knownTags, options = {}) {
+  function absorbFieldDraftInput(input, field, knownValues) {
+    const draft = parseFieldDraftInput(input, field);
+    if (!draft) {
+      return null;
+    }
+    const prefix = draft.prefix || "";
+    if (!draft.partial) {
+      return { fieldKey: field.key, chipLabel: null, remainder: prefix };
+    }
+    const chipLabel = resolveKnownFieldLabel(draft.partial, field, knownValues);
+    if (chipLabel) {
+      return { fieldKey: field.key, chipLabel, remainder: prefix };
+    }
+    return {
+      fieldKey: field.key,
+      chipLabel: null,
+      remainder: prefix
+        ? `${prefix} ${field.formatQuery(draft.partial)}`
+        : field.formatQuery(draft.partial),
+    };
+  }
+  
+  function resolveFieldFilterLabel(term, field, knownValues) {
+    return resolveKnownFieldLabel(term, field, knownValues);
+  }
+  
+  function filterFieldSuggestions(partial, field, knownValues, options = {}) {
     const { exclude = [], limit } = options;
     const needle = String(partial || "").trim().toLowerCase();
-    const excluded = new Set((exclude || []).map((label) => tagKey(label)));
+    const excluded = new Set((exclude || []).map((label) => field.labelKey(label)));
   
-    const matches = (knownTags || [])
-      .filter((label) => !excluded.has(tagKey(label)))
-      .filter((label) => !needle || tagKey(label).includes(needle));
+    const matches = (knownValues || [])
+      .filter((label) => !excluded.has(field.labelKey(label)))
+      .filter(
+        (label) => !needle || field.labelKey(label).includes(needle),
+      );
   
     return typeof limit === "number" ? matches.slice(0, limit) : matches;
   }
   
-  function matchesTagSearch(book, term) {
-    if (!term) {
-      return true;
+  function normalizeSearchFilter(filter) {
+    if (!filter) {
+      return emptySearchFilter();
     }
-    const tags = Array.isArray(book.tags) ? book.tags : [];
-    return tags.some((tag) => String(tag).toLowerCase().includes(term));
+    if (filter.fieldTerms) {
+      return {
+        fieldTerms: {
+          tag: [...(filter.fieldTerms.tag || [])],
+          author: [...(filter.fieldTerms.author || [])],
+          cover: [...(filter.fieldTerms.cover || [])],
+        },
+        textTerms: [...(filter.textTerms || [])],
+      };
+    }
+    return {
+      fieldTerms: {
+        tag: [...(filter.tagTerms || [])],
+        author: [...(filter.authorTerms || [])],
+        cover: [...(filter.coverTerms || [])],
+      },
+      textTerms: [...(filter.textTerms || [])],
+    };
   }
   
-  function matchesCompoundSearch(book, { tagTerms = [], textTerms = [] }) {
-    for (const term of tagTerms) {
-      if (!matchesTagSearch(book, term)) {
-        return false;
+  function matchesCompoundSearch(book, filter) {
+    const { fieldTerms, textTerms } = normalizeSearchFilter(filter);
+  
+    for (const field of SEARCH_FIELD_TYPES) {
+      for (const term of fieldTerms[field.key] || []) {
+        if (!field.matchBook(book, term)) {
+          return false;
+        }
       }
     }
+  
     const haystack = book._searchHaystack || "";
     for (const term of textTerms) {
       if (!haystack.includes(term)) {
@@ -1797,20 +2389,222 @@ const viewerFilters = (function () {
     return true;
   }
   
-  function filterBooksMatchingTagTerms(books, tagTerms) {
-    const terms = (tagTerms || [])
-      .map((term) => String(term || "").trim().toLowerCase())
-      .filter(Boolean);
-    if (!terms.length) {
-      return books || [];
-    }
+  function filterBooksMatchingFieldTerms(books, fieldTermsPartial) {
+    const partial = normalizeSearchFilter({
+      fieldTerms: fieldTermsPartial,
+      textTerms: [],
+    });
     return (books || []).filter((book) =>
-      matchesCompoundSearch(book, { tagTerms: terms, textTerms: [] }),
+      matchesCompoundSearch(book, partial),
     );
   }
   
+  function chipsToFieldTermsPartial(chips, excludeFieldKey) {
+    const partial = emptyFieldTerms();
+    for (const chip of chips || []) {
+      if (chip.type === excludeFieldKey) {
+        continue;
+      }
+      const field = getFieldByKey(chip.type);
+      if (!field) {
+        continue;
+      }
+      const label = field.formatLabel(chip.label, [chip.label]);
+      const term = field.labelKey(label);
+      if (term) {
+        partial[chip.type].push(term);
+      }
+    }
+    return partial;
+  }
+  
+  function serializeCompoundSearchQuery({ fieldTerms = emptyFieldTerms(), textTerms = [] }) {
+    const parts = [];
+    for (const field of SEARCH_FIELD_TYPES) {
+      for (const term of fieldTerms[field.key] || []) {
+        parts.push(field.formatQuery(term));
+      }
+    }
+    parts.push(...textTerms);
+    return parts.filter(Boolean).join(" ").trim();
+  }
+  
+  function parseSearchQuery(query) {
+    const text = String(query || "").trim();
+    if (!text) {
+      return { mode: "text", term: "" };
+    }
+  
+    for (const field of SEARCH_FIELD_TYPES) {
+      const tokenRe = new RegExp(
+        `^${field.prefix}:\\s*(?:"([^"]*)"|(.+))$`,
+        "i",
+      );
+      const match = text.match(tokenRe);
+      if (match) {
+        return {
+          mode: field.key,
+          term: String(match[1] ?? match[2] ?? "")
+            .trim()
+            .toLowerCase(),
+        };
+      }
+    }
+  
+    return { mode: "text", term: text.toLowerCase() };
+  }
+  return {
+    SEARCH_FIELD_TYPES,
+    normalizeLabelKey,
+    emptyFieldTerms,
+    emptySearchFilter,
+    getFieldByKey,
+    getFieldByPrefix,
+    parseFieldDraftInput,
+    getActiveDraftField,
+    isFieldLiteralPrefixPending,
+    isSearchDraftBlockingText,
+    parseCompoundSearchQuery,
+    buildSearchFilter,
+    absorbFieldDraftInput,
+    resolveKnownFieldLabel,
+    resolveFieldFilterLabel,
+    filterFieldSuggestions,
+    normalizeSearchFilter,
+    matchesCompoundSearch,
+    filterBooksMatchingFieldTerms,
+    chipsToFieldTermsPartial,
+    serializeCompoundSearchQuery,
+    parseSearchQuery,
+    formatFieldSearchQuery,
+  };
+})();
+
+
+/* Generated from scripts/lib/viewer-filters.js — run npm run bundle-viewer */
+
+const viewerFilters = (function () {
+  function getSearchFields() {
+    if (typeof viewerSearchFields !== "undefined") {
+      return viewerSearchFields;
+    }
+    throw new Error("viewerSearchFields is not available");
+  }
+  
+  function getTagHelpers() {
+    if (typeof viewerTags !== "undefined") {
+      return viewerTags;
+    }
+    throw new Error("viewerTags is not available");
+  }
+  
+  const SAMPLER_ISSUE_TITLE_RE = /^The Arkham Sampler \(Vol\. [IV]+, No\. \d+\)$/;
+  const COLLECTOR_ISSUE_TITLE_RE = /^The Arkham Collector \(No\. \d+\)$/;
+  
+  function getPersonNames() {
+    if (typeof viewerPersonNames !== "undefined") {
+      return viewerPersonNames;
+    }
+    if (typeof global !== "undefined" && global.__viewerPersonNames) {
+      return global.__viewerPersonNames;
+    }
+    throw new Error("viewerPersonNames is not available");
+  }
+  
+  function tagField() {
+    return getSearchFields().getFieldByKey("tag");
+  }
+  
+  function prepareBookSearchIndex(book) {
+    const personNames = getPersonNames();
+    book._searchHaystack = [
+      book.title,
+      book.author,
+      book.coverArtist,
+      book.publicationDate,
+      book.decade,
+      book.listAuthor,
+      ...personNames.resolveBookAuthors(book),
+      ...personNames.resolveBookCoverArtists(book),
+    ]
+      .filter(Boolean)
+      .join(" ")
+      .toLowerCase();
+  }
+  
+  function formatTagSearchQuery(tag) {
+    return tagField().formatQuery(tag);
+  }
+  
+  function parseTagDraftInput(input) {
+    const draft = getSearchFields().parseFieldDraftInput(input, tagField());
+    if (!draft) {
+      return null;
+    }
+    return {
+      partial: draft.partial,
+      quoted: draft.quoted,
+      prefix: draft.prefix,
+    };
+  }
+  
+  function isTagDraftPending(draftQuery) {
+    const text = String(draftQuery || "").trim();
+    if (!text) {
+      return false;
+    }
+    if (getSearchFields().isFieldLiteralPrefixPending(text, tagField())) {
+      return true;
+    }
+    return parseTagDraftInput(text) !== null;
+  }
+  
+  function absorbTagDraftInput(input, knownTags) {
+    const absorbed = getSearchFields().absorbFieldDraftInput(
+      input,
+      tagField(),
+      knownTags,
+    );
+    if (!absorbed) {
+      return null;
+    }
+    return {
+      chipLabel: absorbed.chipLabel,
+      remainder: absorbed.remainder,
+    };
+  }
+  
+  function resolveTagFilterLabel(term, knownTags) {
+    return getSearchFields().resolveKnownFieldLabel(term, tagField(), knownTags);
+  }
+  
+  function filterTagSuggestions(partial, knownTags, options = {}) {
+    return getSearchFields().filterFieldSuggestions(
+      partial,
+      tagField(),
+      knownTags,
+      options,
+    );
+  }
+  
+  function matchesTagSearch(book, term) {
+    return tagField().matchBook(book, term);
+  }
+  
+  function filterBooksMatchingTagTerms(books, tagTerms) {
+    return getSearchFields().filterBooksMatchingFieldTerms(books, {
+      tag: tagTerms,
+      author: [],
+      cover: [],
+    });
+  }
+  
   function matchesSearch(book, query) {
-    return matchesCompoundSearch(book, parseCompoundSearchQuery(query));
+    const searchFields = getSearchFields();
+    return searchFields.matchesCompoundSearch(
+      book,
+      searchFields.parseCompoundSearchQuery(query),
+    );
   }
   
   function isMagazineIssue(book) {
@@ -1907,7 +2701,10 @@ const viewerFilters = (function () {
     } = options;
   
     const resolvedSearchFilter =
-      searchFilter || parseCompoundSearchQuery(searchQuery);
+      searchFilter ||
+      (searchQuery
+        ? getSearchFields().parseCompoundSearchQuery(searchQuery)
+        : getSearchFields().emptySearchFilter());
   
     return books.filter(
       (book) =>
@@ -1920,7 +2717,7 @@ const viewerFilters = (function () {
           orderedIds,
         ) &&
         passesWantFilter(book, wantFilterMode, wantIds) &&
-        matchesCompoundSearch(book, resolvedSearchFilter),
+        getSearchFields().matchesCompoundSearch(book, resolvedSearchFilter),
     );
   }
   
@@ -1961,6 +2758,74 @@ const viewerFilters = (function () {
     }
     return books[Math.floor(Math.random() * books.length)];
   }
+  
+  function parseSearchQuery(...args) {
+    return getSearchFields().parseSearchQuery(...args);
+  }
+  
+  function parseCompoundSearchQuery(...args) {
+    return getSearchFields().parseCompoundSearchQuery(...args);
+  }
+  
+  function serializeCompoundSearchQuery(...args) {
+    return getSearchFields().serializeCompoundSearchQuery(...args);
+  }
+  
+  function buildSearchFilter(...args) {
+    return getSearchFields().buildSearchFilter(...args);
+  }
+  
+  function isSearchDraftBlockingText(...args) {
+    return getSearchFields().isSearchDraftBlockingText(...args);
+  }
+  
+  function parseFieldDraftInput(...args) {
+    return getSearchFields().parseFieldDraftInput(...args);
+  }
+  
+  function getActiveDraftField(...args) {
+    return getSearchFields().getActiveDraftField(...args);
+  }
+  
+  function absorbFieldDraftInput(...args) {
+    return getSearchFields().absorbFieldDraftInput(...args);
+  }
+  
+  function resolveFieldFilterLabel(...args) {
+    return getSearchFields().resolveFieldFilterLabel(...args);
+  }
+  
+  function resolveKnownFieldLabel(...args) {
+    return getSearchFields().resolveKnownFieldLabel(...args);
+  }
+  
+  function filterFieldSuggestions(...args) {
+    return getSearchFields().filterFieldSuggestions(...args);
+  }
+  
+  function formatFieldSearchQuery(...args) {
+    return getSearchFields().formatFieldSearchQuery(...args);
+  }
+  
+  function matchesCompoundSearch(...args) {
+    return getSearchFields().matchesCompoundSearch(...args);
+  }
+  
+  function filterBooksMatchingFieldTerms(...args) {
+    return getSearchFields().filterBooksMatchingFieldTerms(...args);
+  }
+  
+  function chipsToFieldTermsPartial(...args) {
+    return getSearchFields().chipsToFieldTermsPartial(...args);
+  }
+  
+  function emptySearchFilter(...args) {
+    return getSearchFields().emptySearchFilter(...args);
+  }
+  
+  function tagKey(...args) {
+    return getTagHelpers().tagKey(...args);
+  }
   return {
     prepareBookSearchIndex,
     parseSearchQuery,
@@ -1968,14 +2833,25 @@ const viewerFilters = (function () {
     serializeCompoundSearchQuery,
     buildSearchFilter,
     isTagDraftPending,
+    isSearchDraftBlockingText,
     parseTagDraftInput,
+    parseFieldDraftInput,
+    getActiveDraftField,
     absorbTagDraftInput,
+    absorbFieldDraftInput,
     resolveTagFilterLabel,
+    resolveFieldFilterLabel,
+    resolveKnownFieldLabel,
     filterTagSuggestions,
+    filterFieldSuggestions,
     formatTagSearchQuery,
+    formatFieldSearchQuery,
     matchesTagSearch,
     matchesCompoundSearch,
     filterBooksMatchingTagTerms,
+    filterBooksMatchingFieldTerms,
+    chipsToFieldTermsPartial,
+    emptySearchFilter,
     matchesSearch,
     isMagazineIssue,
     passesHiddenVisibility,
@@ -2090,70 +2966,6 @@ const viewerFilterUrl = (function () {
     buildFilterPath,
     buildFilterUrl,
     currentFilterSnapshot,
-  };
-})();
-
-
-/* Generated from scripts/lib/tag-normalize.js — run npm run bundle-viewer */
-
-const viewerTags = (function () {
-  const MAX_TAG_LENGTH = 48;
-  
-  function tagKey(tag) {
-    return String(tag || "")
-      .trim()
-      .toLowerCase();
-  }
-  
-  function normalizeTag(value) {
-    const text = String(value || "")
-      .trim()
-      .replace(/\s+/g, " ");
-    if (!text || text.length > MAX_TAG_LENGTH) {
-      return null;
-    }
-    return text.toUpperCase();
-  }
-  
-  function formatTagLabel(tag) {
-    return normalizeTag(tag) || String(tag || "").trim().toUpperCase();
-  }
-  
-  function collectTagsFromBooks(books) {
-    const seen = new Set();
-    const tags = [];
-    for (const book of books || []) {
-      if (!Array.isArray(book?.tags)) {
-        continue;
-      }
-      for (const tag of book.tags) {
-        const label = formatTagLabel(tag);
-        if (!label) {
-          continue;
-        }
-        const key = tagKey(label);
-        if (seen.has(key)) {
-          continue;
-        }
-        seen.add(key);
-        tags.push(label);
-      }
-    }
-    return tags.sort((a, b) => tagKey(a).localeCompare(tagKey(b)));
-  }
-  
-  function collectAllKnownTags(tagsByBookId) {
-    const books = Object.values(tagsByBookId || {}).map((bookTags) => ({
-      tags: bookTags,
-    }));
-    return collectTagsFromBooks(books);
-  }
-  return {
-    tagKey,
-    normalizeTag,
-    formatTagLabel,
-    collectAllKnownTags,
-    collectTagsFromBooks,
   };
 })();
 
@@ -3520,74 +4332,92 @@ const viewerWantView = (function () {
 })();
 
 
-/* Search chips, tag autocomplete, and compound query state */
+/* Search chips, field autocomplete, and compound query state */
 
-const searchTagFilters = [];
+/** @type {{ type: string, label: string }[]} */
+const searchFilterChips = [];
 let searchSuggestIndex = -1;
 let searchRenderTimer = null;
-let tagSuggestScrollY = 0;
+let suggestScrollY = 0;
 
-function isTagSuggestTouchAllowed(target) {
-  return Boolean(target?.closest?.(".search-tag-suggest"));
+function isSuggestTouchAllowed(target) {
+  return Boolean(target?.closest?.(".search-field-suggest"));
 }
 
-function preventTagSuggestTouchMove(event) {
-  if (isTagSuggestTouchAllowed(event.target)) {
+function preventSuggestTouchMove(event) {
+  if (isSuggestTouchAllowed(event.target)) {
     return;
   }
   event.preventDefault();
 }
 
-function setTagSuggestScrollLock(locked) {
+function setSuggestScrollLock(locked) {
   const root = document.documentElement;
-  const isLocked = document.body.classList.contains("search-tag-suggest-open");
+  const isLocked = document.body.classList.contains("search-field-suggest-open");
   if (locked === isLocked) {
     return;
   }
 
   if (locked) {
-    tagSuggestScrollY = window.scrollY;
+    suggestScrollY = window.scrollY;
     window.scrollTo(0, 0);
-    root.classList.add("search-tag-suggest-open");
-    document.body.classList.add("search-tag-suggest-open");
+    root.classList.add("search-field-suggest-open");
+    document.body.classList.add("search-field-suggest-open");
     document.body.style.top = "0";
-    document.addEventListener("touchmove", preventTagSuggestTouchMove, {
+    document.addEventListener("touchmove", preventSuggestTouchMove, {
       passive: false,
     });
     return;
   }
 
-  root.classList.remove("search-tag-suggest-open");
-  document.body.classList.remove("search-tag-suggest-open");
+  root.classList.remove("search-field-suggest-open");
+  document.body.classList.remove("search-field-suggest-open");
   document.body.style.top = "";
-  document.removeEventListener("touchmove", preventTagSuggestTouchMove);
-  window.scrollTo(0, tagSuggestScrollY);
+  document.removeEventListener("touchmove", preventSuggestTouchMove);
+  window.scrollTo(0, suggestScrollY);
 }
 
-function getKnownSearchTags() {
-  const tagTerms = searchTagFilters.map((label) =>
-    String(label || "").trim().toLowerCase(),
-  );
-  const matchingBooks = viewerFilters.filterBooksMatchingTagTerms(
+function getActiveSuggestField() {
+  return viewerSearchFields.getActiveDraftField(searchInput.value);
+}
+
+function getKnownFieldValues(fieldKey) {
+  const field = viewerSearchFields.getFieldByKey(fieldKey);
+  if (!field) {
+    return [];
+  }
+  const scopedBooks = viewerFilters.filterBooksMatchingFieldTerms(
     getViewBooksWithoutSearch(),
-    tagTerms,
+    viewerSearchFields.chipsToFieldTermsPartial(
+      searchFilterChips,
+      fieldKey,
+    ),
   );
-  return viewerTags.collectTagsFromBooks(matchingBooks);
+  return field.collectValues(scopedBooks);
 }
 
 function getSearchFilter() {
   return viewerFilters.buildSearchFilter(
-    searchTagFilters,
+    searchFilterChips,
     searchInput.value,
   );
 }
 
 function hasActiveSearch() {
-  if (searchTagFilters.length > 0) {
+  if (searchFilterChips.length > 0) {
     return true;
   }
   const draft = searchInput.value.trim();
-  return Boolean(draft) && !viewerFilters.isTagDraftPending(draft);
+  if (!draft || viewerFilters.isSearchDraftBlockingText(draft)) {
+    return false;
+  }
+  const filter = viewerFilters.buildSearchFilter([], draft);
+  return (
+    filter.textTerms.length > 0 ||
+    viewerSearchFields.SEARCH_FIELD_TYPES.some(
+      (field) => (filter.fieldTerms[field.key] || []).length > 0,
+    )
+  );
 }
 
 function updateSearchClearVisibility() {
@@ -3616,151 +4446,185 @@ function renderSearchChips() {
   if (!searchChips) {
     return;
   }
-  searchChips.innerHTML = searchTagFilters
-    .map((label, index) => {
-      const safe = viewerCardHtml.escapeHtml(label);
-      return `<span class="search-tag-chip"><span class="search-tag-chip-label">${safe}</span><button type="button" class="search-tag-chip-remove" data-search-tag-index="${index}" aria-label="Remove tag ${safe}">&times;</button></span>`;
+  searchChips.innerHTML = searchFilterChips
+    .map((chip, index) => {
+      const field = viewerSearchFields.getFieldByKey(chip.type);
+      const safe = viewerCardHtml.escapeHtml(chip.label);
+      const ariaPrefix = field?.chipAriaPrefix || chip.type;
+      return `<span class="search-field-chip search-field-chip--${chip.type}"><span class="search-field-chip-label">${safe}</span><button type="button" class="search-field-chip-remove" data-search-chip-index="${index}" aria-label="Remove ${ariaPrefix} ${safe}">&times;</button></span>`;
     })
     .join("");
 }
 
-function hideTagSuggest() {
+function hideSuggest() {
   searchSuggestIndex = -1;
-  searchTagSuggest.hidden = true;
-  searchTagSuggest.innerHTML = "";
+  searchFieldSuggest.hidden = true;
+  searchFieldSuggest.innerHTML = "";
   searchInput.setAttribute("aria-expanded", "false");
-  setTagSuggestScrollLock(false);
+  setSuggestScrollLock(false);
 }
 
-function getTagSuggestItems() {
-  const draft = viewerFilters.parseTagDraftInput(searchInput.value);
+function getSuggestItems() {
+  const field = getActiveSuggestField();
+  if (!field) {
+    return [];
+  }
+  const draft = viewerSearchFields.parseFieldDraftInput(
+    searchInput.value,
+    field,
+  );
   if (!draft) {
     return [];
   }
-  return viewerFilters.filterTagSuggestions(draft.partial, getKnownSearchTags(), {
-    exclude: searchTagFilters,
-  });
+  const exclude = searchFilterChips
+    .filter((chip) => chip.type === field.key)
+    .map((chip) => chip.label);
+  return viewerSearchFields.filterFieldSuggestions(
+    draft.partial,
+    field,
+    getKnownFieldValues(field.key),
+    { exclude },
+  );
 }
 
-function renderTagSuggest() {
-  const items = getTagSuggestItems();
-  if (!items.length) {
-    hideTagSuggest();
+function renderSuggest() {
+  const field = getActiveSuggestField();
+  const items = getSuggestItems();
+  if (!field || !items.length) {
+    hideSuggest();
     return;
   }
 
-  searchTagSuggest.innerHTML = items
+  searchFieldSuggest.innerHTML = items
     .map((label, index) => {
       const safe = viewerCardHtml.escapeHtml(label);
       const activeClass = index === searchSuggestIndex ? " active" : "";
-      return `<li class="search-tag-suggest-item${activeClass}" role="option" data-suggest-index="${index}" aria-selected="${index === searchSuggestIndex}">${safe}</li>`;
+      return `<li class="search-field-suggest-item search-field-suggest-item--${field.key}${activeClass}" role="option" data-suggest-index="${index}" aria-selected="${index === searchSuggestIndex}">${safe}</li>`;
     })
     .join("");
-  searchTagSuggest.hidden = false;
+  searchFieldSuggest.hidden = false;
   searchInput.setAttribute("aria-expanded", "true");
-  setTagSuggestScrollLock(true);
+  setSuggestScrollLock(true);
 }
 
-function updateTagSuggest() {
-  const draft = viewerFilters.parseTagDraftInput(searchInput.value);
-  if (!draft) {
-    hideTagSuggest();
+function updateSuggest() {
+  if (!getActiveSuggestField()) {
+    hideSuggest();
     return;
   }
-  if (searchSuggestIndex >= getTagSuggestItems().length) {
+  if (searchSuggestIndex >= getSuggestItems().length) {
     searchSuggestIndex = -1;
   }
-  renderTagSuggest();
+  renderSuggest();
 }
 
-function addSearchTag(label, options = {}) {
-  const known = getKnownSearchTags();
-  const canonical =
-    viewerFilters.resolveTagFilterLabel(label, known) ||
-    viewerTags.formatTagLabel(label);
+function addSearchChip(fieldKey, label, options = {}) {
+  const field = viewerSearchFields.getFieldByKey(fieldKey);
+  if (!field) {
+    return false;
+  }
+  const known = getKnownFieldValues(fieldKey);
+  const canonical = field.formatLabel(label, known);
   if (!canonical) {
     return false;
   }
   if (
-    searchTagFilters.some(
-      (entry) => viewerTags.tagKey(entry) === viewerTags.tagKey(canonical),
+    searchFilterChips.some(
+      (chip) =>
+        chip.type === fieldKey &&
+        field.labelKey(chip.label) === field.labelKey(canonical),
     )
   ) {
     return false;
   }
-  searchTagFilters.push(canonical);
+  searchFilterChips.push({ type: fieldKey, label: canonical });
   renderSearchChips();
   if (!options.silent) {
     updateSearchClearVisibility();
-    updateTagSuggest();
+    updateSuggest();
     debouncedRender();
   }
   return true;
 }
 
-function removeSearchTagAt(index) {
-  if (index < 0 || index >= searchTagFilters.length) {
+function removeSearchChipAt(index) {
+  if (index < 0 || index >= searchFilterChips.length) {
     return;
   }
-  searchTagFilters.splice(index, 1);
+  searchFilterChips.splice(index, 1);
   renderSearchChips();
   updateSearchClearVisibility();
-  updateTagSuggest();
+  updateSuggest();
   renderNow();
 }
 
 function absorbSearchInputTokens() {
   const trimmed = searchInput.value.trim();
-  const draftAbsorbed = viewerFilters.absorbTagDraftInput(
-    trimmed,
-    getKnownSearchTags(),
-  );
-  if (draftAbsorbed) {
-    if (draftAbsorbed.chipLabel) {
-      addSearchTag(draftAbsorbed.chipLabel, { silent: true });
-    }
-    searchInput.value = draftAbsorbed.remainder;
-    return;
-  }
+  const activeField = viewerSearchFields.getActiveDraftField(trimmed);
 
-  const parsed = viewerFilters.parseCompoundSearchQuery(searchInput.value);
-  const known = getKnownSearchTags();
-  const unknownTagParts = [];
-
-  for (const term of parsed.tagTerms) {
-    const label = viewerFilters.resolveTagFilterLabel(term, known);
-    if (label) {
-      addSearchTag(label, { silent: true });
-    } else {
-      unknownTagParts.push(viewerFilters.formatTagSearchQuery(term));
+  if (activeField) {
+    const draftAbsorbed = viewerSearchFields.absorbFieldDraftInput(
+      trimmed,
+      activeField,
+      getKnownFieldValues(activeField.key),
+    );
+    if (draftAbsorbed) {
+      if (draftAbsorbed.chipLabel) {
+        addSearchChip(activeField.key, draftAbsorbed.chipLabel, { silent: true });
+      }
+      searchInput.value = draftAbsorbed.remainder;
+      return;
     }
   }
 
-  searchInput.value = [...unknownTagParts, ...parsed.textTerms]
+  const parsed = viewerSearchFields.parseCompoundSearchQuery(searchInput.value);
+  const unknownParts = [];
+
+  for (const field of viewerSearchFields.SEARCH_FIELD_TYPES) {
+    const known = getKnownFieldValues(field.key);
+    for (const term of parsed.fieldTerms[field.key] || []) {
+      const label = viewerSearchFields.resolveKnownFieldLabel(
+        term,
+        field,
+        known,
+      );
+      if (label) {
+        addSearchChip(field.key, label, { silent: true });
+      } else {
+        unknownParts.push(field.formatQuery(term));
+      }
+    }
+  }
+
+  searchInput.value = [...unknownParts, ...parsed.textTerms]
     .join(" ")
     .trim();
 }
 
-function pickTagSuggestion(index) {
-  const items = getTagSuggestItems();
+function pickSuggestion(index) {
+  const field = getActiveSuggestField();
+  const items = getSuggestItems();
   const label = items[index];
-  if (!label) {
+  if (!field || !label) {
     return;
   }
-  const draft = viewerFilters.parseTagDraftInput(searchInput.value);
+  const draft = viewerSearchFields.parseFieldDraftInput(
+    searchInput.value,
+    field,
+  );
   const prefix = draft?.prefix?.trim() || "";
-  addSearchTag(label, { silent: true });
+  addSearchChip(field.key, label, { silent: true });
   searchInput.value = prefix;
-  hideTagSuggest();
+  hideSuggest();
   updateSearchClearVisibility();
   renderNow();
 }
 
 function clearSearchState() {
-  searchTagFilters.length = 0;
+  searchFilterChips.length = 0;
   searchInput.value = "";
   renderSearchChips();
-  hideTagSuggest();
+  hideSuggest();
   updateSearchClearVisibility();
 }
 
@@ -3769,58 +4633,85 @@ function clearSearchAll() {
   renderNow();
 }
 
+function applyFieldSearch(fieldKey, rawValue) {
+  const field = viewerSearchFields.getFieldByKey(fieldKey);
+  if (!field) {
+    return;
+  }
+  const label = field.formatLabel(rawValue, getKnownFieldValues(fieldKey));
+  if (!label) {
+    return;
+  }
+
+  searchFilterChips.length = 0;
+  searchInput.value = "";
+  renderSearchChips();
+  hideSuggest();
+  addSearchChip(fieldKey, label, { silent: true });
+  updateSearchClearVisibility();
+  closeBookDetail({ programmatic: true });
+  renderNow();
+  searchInput.focus();
+  grid.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
 function onSearchInput() {
   updateSearchClearVisibility();
-  updateTagSuggest();
+  updateSuggest();
   debouncedRender();
 }
 
 function onSearchCommit() {
   absorbSearchInputTokens();
-  hideTagSuggest();
+  hideSuggest();
   updateSearchClearVisibility();
   renderNow();
 }
 
 searchChips.addEventListener("click", (event) => {
-  const button = event.target.closest("[data-search-tag-index]");
+  const button = event.target.closest("[data-search-chip-index]");
   if (!button) {
     return;
   }
-  removeSearchTagAt(Number(button.dataset.searchTagIndex));
+  removeSearchChipAt(Number(button.dataset.searchChipIndex));
 });
 
-searchTagSuggest.addEventListener("mousedown", (event) => {
+searchFieldSuggest.addEventListener("mousedown", (event) => {
   const item = event.target.closest("[data-suggest-index]");
   if (!item) {
     return;
   }
   event.preventDefault();
-  pickTagSuggestion(Number(item.dataset.suggestIndex));
+  pickSuggestion(Number(item.dataset.suggestIndex));
 });
 
 searchInput.addEventListener("keydown", (event) => {
-  const items = getTagSuggestItems();
-  const suggestOpen = items.length > 0 && !searchTagSuggest.hidden;
+  const items = getSuggestItems();
+  const suggestOpen = items.length > 0 && !searchFieldSuggest.hidden;
+  const activeField = getActiveSuggestField();
 
-  if (event.key === "Backspace" && !searchInput.value && searchTagFilters.length) {
-    removeSearchTagAt(searchTagFilters.length - 1);
+  if (event.key === "Backspace" && !searchInput.value && searchFilterChips.length) {
+    removeSearchChipAt(searchFilterChips.length - 1);
     return;
   }
 
-  if (event.key === " " && !suggestOpen) {
-    const draft = viewerFilters.parseTagDraftInput(searchInput.value.trim());
+  if (event.key === " " && !suggestOpen && activeField) {
+    const draft = viewerSearchFields.parseFieldDraftInput(
+      searchInput.value.trim(),
+      activeField,
+    );
     if (draft?.partial) {
-      const label = viewerFilters.resolveTagFilterLabel(
+      const label = viewerSearchFields.resolveKnownFieldLabel(
         draft.partial,
-        getKnownSearchTags(),
+        activeField,
+        getKnownFieldValues(activeField.key),
       );
       if (label) {
         event.preventDefault();
-        addSearchTag(label, { silent: true });
+        addSearchChip(activeField.key, label, { silent: true });
         searchInput.value = draft.prefix?.trim() || "";
         updateSearchClearVisibility();
-        updateTagSuggest();
+        updateSuggest();
         renderNow();
       }
     }
@@ -3829,7 +4720,7 @@ searchInput.addEventListener("keydown", (event) => {
 
   if (!suggestOpen) {
     if (event.key === "Escape") {
-      hideTagSuggest();
+      hideSuggest();
     }
     return;
   }
@@ -3837,7 +4728,7 @@ searchInput.addEventListener("keydown", (event) => {
   if (event.key === "ArrowDown") {
     event.preventDefault();
     searchSuggestIndex = (searchSuggestIndex + 1) % items.length;
-    renderTagSuggest();
+    renderSuggest();
     return;
   }
 
@@ -3845,14 +4736,14 @@ searchInput.addEventListener("keydown", (event) => {
     event.preventDefault();
     searchSuggestIndex =
       searchSuggestIndex <= 0 ? items.length - 1 : searchSuggestIndex - 1;
-    renderTagSuggest();
+    renderSuggest();
     return;
   }
 
   if (event.key === "Enter") {
     event.preventDefault();
     if (searchSuggestIndex >= 0) {
-      pickTagSuggestion(searchSuggestIndex);
+      pickSuggestion(searchSuggestIndex);
     } else {
       onSearchCommit();
     }
@@ -3861,14 +4752,14 @@ searchInput.addEventListener("keydown", (event) => {
 
   if (event.key === "Escape") {
     event.preventDefault();
-    hideTagSuggest();
+    hideSuggest();
   }
 });
 
 searchInput.addEventListener("blur", () => {
   window.setTimeout(() => {
     absorbSearchInputTokens();
-    hideTagSuggest();
+    hideSuggest();
     updateSearchClearVisibility();
     renderNow();
   }, 120);
@@ -3885,10 +4776,10 @@ searchInput.addEventListener("change", onSearchCommit);
 
 document.addEventListener("click", (event) => {
   if (
-    !searchTagSuggest.hidden &&
+    !searchFieldSuggest.hidden &&
     !event.target.closest(".search-wrap")
   ) {
-    hideTagSuggest();
+    hideSuggest();
   }
 });
 
@@ -4118,7 +5009,7 @@ function getViewBooksWithoutSearch() {
     collectedIds: activeCollectionIds(),
     orderedIds,
     wantIds,
-    searchFilter: { tagTerms: [], textTerms: [] },
+    searchFilter: viewerFilters.emptySearchFilter(),
   });
 }
 
@@ -4931,7 +5822,7 @@ function openBookDetail(bookId, options = {}) {
     collectionControl,
   );
 
-  const metaHtml = viewerCardHtml.renderBookMetaHtml(book);
+  const metaHtml = viewerCardHtml.renderBookDetailMetaHtml(book);
   const tagsHtml = renderBookTagsHtml(book);
   const description = getBookDescription(book);
   const descriptionHtml = description?.trim()
@@ -5973,24 +6864,6 @@ function renderBookTagsHtml(book) {
   return `<div class="book-detail-tags${editableClass}" aria-label="Tags">${chips}</div>`;
 }
 
-function applyTagSearch(rawTag) {
-  const tag = viewerTags.formatTagLabel(rawTag);
-  if (!tag) {
-    return;
-  }
-
-  searchTagFilters.length = 0;
-  searchInput.value = "";
-  renderSearchChips();
-  hideTagSuggest();
-  addSearchTag(tag, { silent: true });
-  updateSearchClearVisibility();
-  closeBookDetail({ programmatic: true });
-  renderNow();
-  searchInput.focus();
-  grid.scrollIntoView({ behavior: "smooth", block: "start" });
-}
-
 
 /* Admin book order dialog */
 
@@ -6792,11 +7665,19 @@ bookDetailDialog.addEventListener("click", (event) => {
     return;
   }
 
+  const fieldChip = event.target.closest(".book-detail-field-chip");
+  if (fieldChip) {
+    event.preventDefault();
+    event.stopPropagation();
+    applyFieldSearch(fieldChip.dataset.searchField, fieldChip.textContent);
+    return;
+  }
+
   const tagButton = event.target.closest(".book-detail-tag");
   if (tagButton) {
     event.preventDefault();
     event.stopPropagation();
-    applyTagSearch(tagButton.textContent);
+    applyFieldSearch("tag", tagButton.textContent);
     return;
   }
 

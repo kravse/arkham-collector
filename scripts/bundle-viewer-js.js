@@ -15,6 +15,11 @@ const PARTS = [
     title: "Configuration, DOM references, and mutable state",
   },
   {
+    file: "00-viewer-person-names.js",
+    title:
+      "Person name parsing (generated from scripts/lib/viewer-person-names.js)",
+  },
+  {
     file: "00-viewer-card-html.js",
     title:
       "Card HTML helpers (generated from scripts/lib/viewer-card-html.js)",
@@ -54,6 +59,16 @@ const PARTS = [
       "Shared read-only vs serve visibility (generated from scripts/lib/viewer-mode.js)",
   },
   {
+    file: "00-viewer-tags.js",
+    title:
+      "Tag helpers (generated from scripts/lib/tag-normalize.js)",
+  },
+  {
+    file: "00-viewer-search-fields.js",
+    title:
+      "Search field registry (generated from scripts/lib/viewer-search-fields.js)",
+  },
+  {
     file: "00-viewer-filters.js",
     title: "Shared filter helpers (generated from scripts/lib/viewer-filters.js)",
   },
@@ -61,11 +76,6 @@ const PARTS = [
     file: "00-viewer-filter-url.js",
     title:
       "Filter URL paths (generated from scripts/lib/viewer-filter-url.js)",
-  },
-  {
-    file: "00-viewer-tags.js",
-    title:
-      "Tag helpers (generated from scripts/lib/tag-normalize.js)",
   },
   {
     file: "02-books-parse.js",

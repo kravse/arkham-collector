@@ -302,6 +302,43 @@
   margin-bottom: 0;
 }
 
+.book-detail-meta-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.book-detail-meta-line strong {
+  color: #c5ccd8;
+  font-weight: 600;
+}
+
+.book-detail-field-chip {
+  margin: 0;
+  padding: 0.08rem 0.34rem;
+  max-width: none;
+  white-space: normal;
+  text-align: left;
+  cursor: pointer;
+  transition: filter 0.15s ease;
+}
+
+.book-detail-field-chip:hover,
+.book-detail-field-chip:focus-visible {
+  filter: brightness(1.12);
+  outline: none;
+}
+
+.book-detail-field-chip:focus-visible {
+  outline: 2px solid var(--search-field-border, var(--border));
+  outline-offset: 2px;
+}
+
+.book-detail-author-suffix {
+  color: #c5ccd8;
+}
+
 .book-detail-tags {
   display: flex;
   flex-wrap: wrap;

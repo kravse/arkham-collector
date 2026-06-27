@@ -1,6 +1,13 @@
 /* Generated from scripts/lib/viewer-card-html.js — run npm run bundle-viewer */
 
 const viewerCardHtml = (function () {
+  function getPersonNames() {
+    if (typeof viewerPersonNames !== "undefined") {
+      return viewerPersonNames;
+    }
+    throw new Error("viewerPersonNames is not available");
+  }
+  
   function escapeHtml(value) {
     return String(value || "")
       .replace(/&/g, "&amp;")
@@ -10,26 +17,10 @@ const viewerCardHtml = (function () {
   }
   
   function getDisplayAuthor(book) {
-    if (book.author) {
-      return book.author;
+    const authors = getPersonNames().resolveBookAuthors(book);
+    if (authors.length) {
+      return authors[0];
     }
-  
-    const line = (book.listAuthor || "").trim();
-    if (!line) {
-      return null;
-    }
-  
-    const withoutYear = line.replace(/\s*\(\d{4}\)\s*$/, "").trim();
-    const editedMatch = withoutYear.match(/edited by\s+(.+)$/i);
-    if (editedMatch) {
-      return editedMatch[1].trim();
-    }
-  
-    const byMatch = withoutYear.match(/(?:^|,\s*)by\s+(.+)$/i);
-    if (byMatch) {
-      return byMatch[1].split(/\s+vol\.\s+/i)[0].trim() || null;
-    }
-  
     return null;
   }
   
@@ -102,16 +93,63 @@ const viewerCardHtml = (function () {
   `;
   }
   
+  function renderDetailFieldChip(fieldKey, label) {
+    const safe = escapeHtml(label);
+    return `<button type="button" class="search-field-chip search-field-chip--${fieldKey} book-detail-field-chip" data-search-field="${fieldKey}">${safe}</button>`;
+  }
+  
   function renderBookMetaHtml(book) {
-    const author = getDisplayAuthor(book);
+    const personNames = getPersonNames();
+    const authors = personNames.resolveBookAuthors(book);
+    const authorSuffix = personNames.resolveBookAuthorCollectiveSuffix(book);
+    const coverArtists = personNames.resolveBookCoverArtists(book);
     const lines = [];
   
-    if (author) {
-      lines.push(`<p class="meta"><strong>Author:</strong> ${author}</p>`);
+    if (authors.length || authorSuffix) {
+      lines.push(
+        `<p class="meta"><strong>Author:</strong> ${escapeHtml(personNames.formatAuthorDisplay(authors, authorSuffix))}</p>`,
+      );
     }
   
-    if (book.coverArtist) {
-      lines.push(`<p class="meta"><strong>Cover:</strong> ${book.coverArtist}</p>`);
+    if (coverArtists.length) {
+      lines.push(
+        `<p class="meta"><strong>Cover:</strong> ${escapeHtml(personNames.formatPersonList(coverArtists))}</p>`,
+      );
+    }
+  
+    if (book.imprint === "mycroft_moran") {
+      lines.push(`<p class="meta"><strong>Imprint:</strong> Mycroft &amp; Moran</p>`);
+    }
+  
+    return lines.join("");
+  }
+  
+  function renderBookDetailMetaHtml(book) {
+    const personNames = getPersonNames();
+    const authors = personNames.resolveBookAuthors(book);
+    const authorSuffix = personNames.resolveBookAuthorCollectiveSuffix(book);
+    const coverArtists = personNames.resolveBookCoverArtists(book);
+    const lines = [];
+  
+    if (authors.length || authorSuffix) {
+      const chips = authors
+        .map((name) => renderDetailFieldChip("author", name))
+        .join("");
+      const suffixHtml = authorSuffix
+        ? `<span class="book-detail-author-suffix">${escapeHtml(` ${authorSuffix}`)}</span>`
+        : "";
+      lines.push(
+        `<p class="meta book-detail-meta-line"><strong>Author:</strong> ${chips}${suffixHtml}</p>`,
+      );
+    }
+  
+    if (coverArtists.length) {
+      const chips = coverArtists
+        .map((name) => renderDetailFieldChip("cover", name))
+        .join("");
+      lines.push(
+        `<p class="meta book-detail-meta-line"><strong>Cover:</strong> ${chips}</p>`,
+      );
     }
   
     if (book.imprint === "mycroft_moran") {
@@ -137,6 +175,7 @@ const viewerCardHtml = (function () {
     renderWikiButton,
     renderGoodreadsButton,
     renderBookMetaHtml,
+    renderBookDetailMetaHtml,
     renderImprintBadge,
   };
 })();

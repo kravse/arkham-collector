@@ -223,7 +223,8 @@ window.BOOK_EDITS = {
     "coverImageFile": "covers/cthulhu-mythos-anthology-265.jpg",
     "description": "Arkham House released a revised edition of Tales of the Cthulhu Mythos in November 1990, edited by Jim Turner with a substantially different selection of stories, reflecting the editor's disdain for \"Mythos pastiches in which eccentric New England recluses utter the right incantations in the wrong books and are promptly eaten by a giant frog named Cthulhu.\" It was released in an edition of 7,015 copies.\n\nTurner eliminates some authors from the earlier edition (totalling four stories, those by Wade, Shea and two by Lumley) --while still suggesting that \"a few of the earliest pieces in this volume.now seem like pop-cultural kitsch.\"\n\nThe added seven stories, he writes, are from \"the relative handful of successful works that have been influenced by the Cthulhu Mythos.exemplifying the darkly enduring power of H. P. Lovecraft over a disparate group of writers who have made their own inimitable contributions to the Mythos.\"",
     "listCoverFocusX": 0.47058823529411764,
-    "listCoverFocusY": 0.8174437847388626
+    "listCoverFocusY": 0.8174437847388626,
+    "author": "H. P. Lovecraft and divers hands"
   },
   "266": {
     "coverImageFile": "covers/crystal-express-266.webp",
@@ -231,7 +232,7 @@ window.BOOK_EDITS = {
     "listCoverFocusY": 0.8490352161368827
   },
   "267": {
-    "coverImageFile": "covers/the-horror-in-the-museum-and-other-revisions-267.jpg"
+    "coverArtist": "Gahan Wilson"
   },
   "268": {
     "coverImageFile": "covers/memories-of-the-space-age-268.jpg"
@@ -681,7 +682,8 @@ window.BOOK_EDITS = {
     "listCoverFocusY": 0.10868988548017906
   },
   "372": {
-    "goodreadsUrl": "https://www.goodreads.com/book/show/10049265-the-shuttered-room-and-other-pieces"
+    "goodreadsUrl": "https://www.goodreads.com/book/show/10049265-the-shuttered-room-and-other-pieces",
+    "author": "H. P. Lovecraft and divers hands (edited by August Derleth)"
   },
   "373": {
     "goodreadsUrl": "https://www.goodreads.com/book/show/5743580-some-notes-on-h-p-lovecraft",
