@@ -105,6 +105,7 @@ const showHiddenWrap = document.getElementById("show-hidden-wrap");
 const showHiddenInput = document.getElementById("show-hidden");
 const pageSubtitle = document.getElementById("page-subtitle");
 const pageTitle = document.getElementById("page-title");
+const headerLogoBtn = document.getElementById("header-logo-btn");
 const headerLogo = document.getElementById("header-logo");
 const headerFiltersToggle = document.getElementById("header-filters-toggle");
 const readOnly = window.READ_ONLY === true;

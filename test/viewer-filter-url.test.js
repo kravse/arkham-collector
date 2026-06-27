@@ -26,7 +26,7 @@ test("parseFilterPath maps known segments", () => {
   assert.deepEqual(parseFilterPath("/want").wantFilterMode, "want");
   assert.deepEqual(parseFilterPath("/mycroft-moran").mycroftFilterMode, "only");
   assert.deepEqual(parseFilterPath("/mycroft-hidden").mycroftFilterMode, "hidden");
-  assert.equal(parseFilterPath("/hidden").hiddenOnly, true);
+  assert.equal(parseFilterPath("/hidden").hiddenOnly, false);
   assert.deepEqual(parseFilterPath("/unknown"), {
     collectionFilterMode: null,
     wantFilterMode: null,

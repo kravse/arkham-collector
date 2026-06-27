@@ -1,9 +1,5 @@
 /* Grid and header filter event listeners */
 
-const RANDOM_CARD_LOGO_TAP_MS = 1200;
-const RANDOM_CARD_LOGO_TAP_COUNT = 3;
-let randomCardLogoTapTimes = [];
-
 grid.addEventListener("click", (event) => {
   if (event.target.closest(".want-rank-drag-handle")) {
     return;
@@ -53,7 +49,7 @@ stats.addEventListener("click", (event) => {
   }
   if (event.target.closest("#hidden-filter-toggle")) {
     hiddenOnly = !hiddenOnly;
-    notifyFilterChange({ replace: false });
+    render();
     return;
   }
   if (event.target.closest("#mycroft-filter-toggle")) {
@@ -71,16 +67,37 @@ stats.addEventListener("click", (event) => {
   }
 });
 
-if (headerLogo) {
-  headerLogo.addEventListener("click", () => {
+const HOME_LOGO_MULTI_TAP_MS = 1200;
+const HOME_LOGO_RANDOM_TAP_COUNT = 3;
+let homeLogoTapTimes = [];
+let homeLogoSingleTapTimer = null;
+
+if (headerLogoBtn) {
+  headerLogoBtn.addEventListener("click", (event) => {
+    event.preventDefault();
     const now = Date.now();
-    randomCardLogoTapTimes = randomCardLogoTapTimes.filter(
-      (time) => now - time < RANDOM_CARD_LOGO_TAP_MS,
+    homeLogoTapTimes = homeLogoTapTimes.filter(
+      (time) => now - time < HOME_LOGO_MULTI_TAP_MS,
     );
-    randomCardLogoTapTimes.push(now);
-    if (randomCardLogoTapTimes.length >= RANDOM_CARD_LOGO_TAP_COUNT) {
-      randomCardLogoTapTimes = [];
+    homeLogoTapTimes.push(now);
+
+    if (homeLogoTapTimes.length >= HOME_LOGO_RANDOM_TAP_COUNT) {
+      homeLogoTapTimes = [];
+      if (homeLogoSingleTapTimer) {
+        clearTimeout(homeLogoSingleTapTimer);
+        homeLogoSingleTapTimer = null;
+      }
       openRandomVisibleBook();
+      return;
     }
+
+    if (homeLogoSingleTapTimer) {
+      clearTimeout(homeLogoSingleTapTimer);
+    }
+    homeLogoSingleTapTimer = setTimeout(() => {
+      homeLogoTapTimes = [];
+      homeLogoSingleTapTimer = null;
+      goHome();
+    }, 350);
   });
 }

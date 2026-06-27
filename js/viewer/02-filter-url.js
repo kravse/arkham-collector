@@ -33,6 +33,37 @@ function syncFilterUrlFromState(options = {}) {
   return true;
 }
 
+function goHome() {
+  collectionFilterMode = null;
+  wantFilterMode = null;
+  mycroftFilterMode = null;
+  hiddenOnly = false;
+
+  if (typeof clearSearchState === "function") {
+    clearSearchState();
+  }
+
+  if (
+    typeof coverLightbox !== "undefined" &&
+    coverLightbox &&
+    !coverLightbox.hidden &&
+    typeof closeCoverLightbox === "function"
+  ) {
+    closeCoverLightbox();
+  }
+
+  if (
+    bookDetailDialog &&
+    !bookDetailDialog.hidden &&
+    typeof closeBookDetail === "function"
+  ) {
+    closeBookDetail({ programmatic: true });
+  }
+
+  syncFilterUrlFromState({ replace: false });
+  render();
+}
+
 function notifyFilterChange(options = {}) {
   syncFilterUrlFromState(options);
   render();

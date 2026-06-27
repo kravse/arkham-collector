@@ -21,9 +21,6 @@ const FILTER_BY_SEGMENT = {
   "mycroft-hidden": {
     mycroftFilterMode: "hidden",
   },
-  hidden: {
-    hiddenOnly: true,
-  },
 };
 
 const FILTER_PATH_SEGMENTS = Object.keys(FILTER_BY_SEGMENT);
@@ -53,9 +50,6 @@ function parseFilterPath(pathname) {
 }
 
 function buildFilterPath(filters) {
-  if (filters?.hiddenOnly) {
-    return "/hidden";
-  }
   if (filters?.wantFilterMode === "want") {
     return "/want";
   }
