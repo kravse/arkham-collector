@@ -368,7 +368,9 @@ window.BOOK_EDITS = {
     "listCoverFocusY": 0.5123930762050878
   },
   "302": {
-    "coverImageFile": "covers/dwellers-in-darkness-302.jpg"
+    "coverImageFile": "covers/dwellers-in-darkness-302.jpg",
+    "listCoverFocusX": 0.4380252100840336,
+    "listCoverFocusY": 0.4475453527974788
   },
   "303": {
     "coverImageFile": "covers/selected-letters-of-h-p-lovecraft-v-1934-1937-303.jpg",
