@@ -4652,7 +4652,9 @@ function applyFieldSearch(fieldKey, rawValue) {
   closeBookDetail({ programmatic: true });
   renderNow();
   searchInput.blur();
-  grid.scrollIntoView({ behavior: "smooth", block: "start" });
+  requestAnimationFrame(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+  });
 }
 
 function onSearchInput() {
