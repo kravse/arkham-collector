@@ -95,7 +95,6 @@ async function checkServeSupport() {
   if (readOnly) {
     serveEnabled = false;
     hiddenOnly = false;
-    showHiddenWrap.hidden = true;
     updateSortControlVisibility();
     return;
   }
@@ -121,7 +120,6 @@ async function checkServeSupport() {
     hiddenOnly = false;
   }
 
-  showHiddenWrap.hidden = !viewerMode.shouldShowShowHiddenToggle(serveEnabled);
   syncEditTagsVisibility();
   updateSortControlVisibility();
   refreshDetailToolbarIfOpen();

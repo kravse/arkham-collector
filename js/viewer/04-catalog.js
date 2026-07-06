@@ -207,15 +207,14 @@ function renderStats(visible, all) {
     .join("");
 
   stats.innerHTML = `
-    <span class="stat-showing">Showing ${showingCount} of ${total}</span>
     <div class="stats-filters${hasMycroft ? "" : " stats-filters--two"}">${filters}</div>
+    <p class="stat-showing">Showing ${showingCount} of ${total}</p>
   `;
 }
 
 function getViewBooksWithoutSearch() {
   return viewerFilters.filterVisibleBooks(getSortedActiveBooks(), {
     hiddenOnly,
-    showHidden: showHiddenInput.checked,
     showMagazines,
     mycroftFilterMode,
     collectionFilterMode,
@@ -230,7 +229,6 @@ function getViewBooksWithoutSearch() {
 function getVisibleBooks() {
   return viewerFilters.filterVisibleBooks(getSortedActiveBooks(), {
     hiddenOnly,
-    showHidden: showHiddenInput.checked,
     showMagazines,
     mycroftFilterMode,
     collectionFilterMode,

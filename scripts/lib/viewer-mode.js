@@ -1,6 +1,5 @@
 const SERVE_ONLY_UI_KEYS = [
   "bookOrderButton",
-  "showHiddenToggle",
   "hiddenStatFilter",
   "cardEditButton",
   "detailEditButton",
@@ -14,10 +13,6 @@ function resolveServeEnabled({ readOnly, healthCheckOk = false }) {
 }
 
 function shouldShowBookOrderButton(serveEnabled) {
-  return serveEnabled === true;
-}
-
-function shouldShowShowHiddenToggle(serveEnabled) {
   return serveEnabled === true;
 }
 
@@ -47,7 +42,6 @@ function serveOnlyUiVisibility(options = {}) {
 
   return {
     bookOrderButton: shouldShowBookOrderButton(effectiveServeEnabled),
-    showHiddenToggle: shouldShowShowHiddenToggle(effectiveServeEnabled),
     hiddenStatFilter: shouldShowHiddenStatFilter(
       effectiveServeEnabled,
       hiddenCount,
@@ -77,7 +71,6 @@ module.exports = {
   SERVE_ONLY_UI_KEYS,
   resolveServeEnabled,
   shouldShowBookOrderButton,
-  shouldShowShowHiddenToggle,
   shouldShowHiddenStatFilter,
   shouldRenderCardEditButton,
   shouldRenderDetailEditButton,

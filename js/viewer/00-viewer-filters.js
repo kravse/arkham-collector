@@ -137,12 +137,12 @@ const viewerFilters = (function () {
     return false;
   }
   
-  function passesHiddenVisibility(book, { hiddenOnly, showHidden }) {
-    return hiddenOnly ? book.hidden : showHidden || !book.hidden;
+  function passesHiddenVisibility(book, { hiddenOnly }) {
+    return hiddenOnly ? book.hidden : !book.hidden;
   }
   
-  function passesBookVisibility(book, { hiddenOnly, showHidden, showMagazines }) {
-    if (!passesHiddenVisibility(book, { hiddenOnly, showHidden })) {
+  function passesBookVisibility(book, { hiddenOnly, showMagazines }) {
+    if (!passesHiddenVisibility(book, { hiddenOnly })) {
       return false;
     }
     if (isMagazineIssue(book) && !showMagazines) {
@@ -205,7 +205,6 @@ const viewerFilters = (function () {
   function filterVisibleBooks(books, options) {
     const {
       hiddenOnly,
-      showHidden,
       showMagazines,
       mycroftFilterMode,
       collectionFilterMode,
@@ -225,7 +224,7 @@ const viewerFilters = (function () {
   
     return books.filter(
       (book) =>
-        passesBookVisibility(book, { hiddenOnly, showHidden, showMagazines }) &&
+        passesBookVisibility(book, { hiddenOnly, showMagazines }) &&
         passesMycroftImprintFilter(book, mycroftFilterMode) &&
         passesCollectionFilter(
           book,

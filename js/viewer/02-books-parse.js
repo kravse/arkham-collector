@@ -49,10 +49,7 @@ function isMagazineIssue(book) {
 }
 
 function passesHiddenVisibility(book) {
-  return viewerFilters.passesHiddenVisibility(book, {
-    hiddenOnly,
-    showHidden: showHiddenInput.checked,
-  });
+  return viewerFilters.passesHiddenVisibility(book, { hiddenOnly });
 }
 
 function hasVisibleMagazineIssues() {
@@ -84,7 +81,6 @@ function hasAnyOrderedBooks() {
     orderedIds,
     {
       hiddenOnly,
-      showHidden: showHiddenInput.checked,
       showMagazines,
     },
   );
@@ -121,7 +117,6 @@ function cycleWantFilter() {
 function hasAnyWants() {
   return viewerFilters.hasAnyWants(getActiveBooks(), wantIds, {
     hiddenOnly,
-    showHidden: showHiddenInput.checked,
     showMagazines,
   });
 }
@@ -136,7 +131,6 @@ function cycleCollectionFilter() {
 function passesBookVisibility(book) {
   return viewerFilters.passesBookVisibility(book, {
     hiddenOnly,
-    showHidden: showHiddenInput.checked,
     showMagazines,
   });
 }

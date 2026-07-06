@@ -56,10 +56,9 @@ function canMoveBookInOrder(order, index, delta) {
 }
 
 function getOrderDialogIds() {
-  const showHidden = showHiddenInput.checked;
   return workingBookOrder.filter((id) => {
     const book = getBookById(id);
-    return book && (showHidden || !book.hidden);
+    return book && !book.hidden;
   });
 }
 

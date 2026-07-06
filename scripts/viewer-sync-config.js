@@ -225,7 +225,6 @@ const VIEWER_SYNC_ENTRIES = [
     exports: [
       "resolveServeEnabled",
       "shouldShowBookOrderButton",
-      "shouldShowShowHiddenToggle",
       "shouldShowHiddenStatFilter",
       "shouldRenderCardEditButton",
       "shouldRenderDetailEditButton",

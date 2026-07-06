@@ -3,7 +3,6 @@
 const viewerMode = (function () {
   const SERVE_ONLY_UI_KEYS = [
     "bookOrderButton",
-    "showHiddenToggle",
     "hiddenStatFilter",
     "cardEditButton",
     "detailEditButton",
@@ -17,10 +16,6 @@ const viewerMode = (function () {
   }
   
   function shouldShowBookOrderButton(serveEnabled) {
-    return serveEnabled === true;
-  }
-  
-  function shouldShowShowHiddenToggle(serveEnabled) {
     return serveEnabled === true;
   }
   
@@ -50,7 +45,6 @@ const viewerMode = (function () {
   
     return {
       bookOrderButton: shouldShowBookOrderButton(effectiveServeEnabled),
-      showHiddenToggle: shouldShowShowHiddenToggle(effectiveServeEnabled),
       hiddenStatFilter: shouldShowHiddenStatFilter(
         effectiveServeEnabled,
         hiddenCount,
@@ -78,7 +72,6 @@ const viewerMode = (function () {
   return {
     resolveServeEnabled,
     shouldShowBookOrderButton,
-    shouldShowShowHiddenToggle,
     shouldShowHiddenStatFilter,
     shouldRenderCardEditButton,
     shouldRenderDetailEditButton,

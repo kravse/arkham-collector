@@ -75,7 +75,6 @@ test("serve-only hidden stat filter stays off without hidden books", () => {
   const visibility = serveUiVisibility({ hiddenCount: 0, protocol: "http:" });
 
   assert.equal(visibility.bookOrderButton, true);
-  assert.equal(visibility.showHiddenToggle, true);
   assert.equal(visibility.hiddenStatFilter, false);
   assert.equal(visibility.cardEditButton, true);
   assert.equal(visibility.detailEditButton, true);
@@ -106,7 +105,6 @@ test("built HTML still contains serve-only markup but read-only runtime hides it
   const built = applyBuildHtmlTransforms(html);
 
   assert.match(built, /id="book-order-btn"/);
-  assert.match(built, /id="show-hidden-wrap"/);
   assert.match(built, /id="edit-dialog"/);
 
   const buildVisibility = buildUiVisibility({ hiddenCount: 99 });

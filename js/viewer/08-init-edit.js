@@ -301,10 +301,6 @@ document.addEventListener("keydown", (event) => {
 });
 
 sortSelect.addEventListener("change", onSortChange);
-showHiddenInput.addEventListener("change", () => {
-  refreshBookOrderDialogIfOpen();
-  render();
-});
 
 syncSettingsStorageMode();
 updateSortControlVisibility();

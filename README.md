@@ -89,7 +89,7 @@ At load time, [`js/book-edits.js`](js/book-edits.js) merges scraped rows with ed
 
 Candidate ids for manual overrides include multi-volume author lines and ambiguous `(original)` / `(revised)` cover credits—see fixtures in [`test/viewer-person-names.test.js`](test/viewer-person-names.test.js).
 
-**Reorder books (maintainers):** With `npm run serve`, use **Reorder** in the header. The list shows all non-deleted titles (respecting **Show hidden**). Move titles within the same calendar year only. Save writes `data/book-order.json` and regenerates `book-order.js`; run `npm run build` to ship the order to the live site.
+**Reorder books (maintainers):** With `npm run serve`, use **Reorder** in the header. The list shows all non-deleted, non-hidden titles. Move titles within the same calendar year only. Save writes `data/book-order.json` and regenerates `book-order.js`; run `npm run build` to ship the order to the live site.
 
 **Dev API:** `GET /api/tags` returns all known tags; `PATCH /api/books/:id/tags` with `{ "tags": [ … ] }` saves a book’s tag list (400 on invalid input). `GET /api/book-order` returns the normalized id list; `PUT /api/book-order` with `{ "order": [ … ] }` saves it (400 if order breaks year sequence or omits books).
 
@@ -158,7 +158,7 @@ Entry point: `node scripts/index.js`. Common flags: `--yes`, `--local`, `--limit
 | `export-arkham-catalog:stdout` | Same export to stdout (`--output -`) |
 | `import-tags-from-csv` | Import tags from a tagged catalog CSV into `data/tags.json` (pass `-- --csv path/to/file.csv`) |
 
-**Curation tips:** Prefer `serve` for one-off fixes. Use targeted syncs instead of full `crawl` when possible. **Hide** (`hidden` in edits) shows on localhost with “Show hidden”; **delete** removes from the UI but keeps the scraped row.
+**Curation tips:** Prefer `serve` for one-off fixes. Use targeted syncs instead of full `crawl` when possible. **Hide** (`hidden` in edits) removes a title from normal browsing; on localhost, tap **HIDDEN** in the filter bar to view hidden titles only. **Delete** removes from the UI everywhere but keeps the scraped row.
 
 ## Project layout
 

@@ -101,8 +101,6 @@ const showMagazinesOption = document.getElementById("show-magazines-option");
 const attributionBtn = document.getElementById("attribution-btn");
 const attributionDialog = document.getElementById("attribution-dialog");
 const attributionCloseBtn = document.getElementById("attribution-close");
-const showHiddenWrap = document.getElementById("show-hidden-wrap");
-const showHiddenInput = document.getElementById("show-hidden");
 const pageSubtitle = document.getElementById("page-subtitle");
 const pageTitle = document.getElementById("page-title");
 const headerLogoBtn = document.getElementById("header-logo-btn");
@@ -1770,7 +1768,6 @@ const viewerListCrop = (function () {
 const viewerMode = (function () {
   const SERVE_ONLY_UI_KEYS = [
     "bookOrderButton",
-    "showHiddenToggle",
     "hiddenStatFilter",
     "cardEditButton",
     "detailEditButton",
@@ -1784,10 +1781,6 @@ const viewerMode = (function () {
   }
   
   function shouldShowBookOrderButton(serveEnabled) {
-    return serveEnabled === true;
-  }
-  
-  function shouldShowShowHiddenToggle(serveEnabled) {
     return serveEnabled === true;
   }
   
@@ -1817,7 +1810,6 @@ const viewerMode = (function () {
   
     return {
       bookOrderButton: shouldShowBookOrderButton(effectiveServeEnabled),
-      showHiddenToggle: shouldShowShowHiddenToggle(effectiveServeEnabled),
       hiddenStatFilter: shouldShowHiddenStatFilter(
         effectiveServeEnabled,
         hiddenCount,
@@ -1845,7 +1837,6 @@ const viewerMode = (function () {
   return {
     resolveServeEnabled,
     shouldShowBookOrderButton,
-    shouldShowShowHiddenToggle,
     shouldShowHiddenStatFilter,
     shouldRenderCardEditButton,
     shouldRenderDetailEditButton,
@@ -2620,12 +2611,12 @@ const viewerFilters = (function () {
     return false;
   }
   
-  function passesHiddenVisibility(book, { hiddenOnly, showHidden }) {
-    return hiddenOnly ? book.hidden : showHidden || !book.hidden;
+  function passesHiddenVisibility(book, { hiddenOnly }) {
+    return hiddenOnly ? book.hidden : !book.hidden;
   }
   
-  function passesBookVisibility(book, { hiddenOnly, showHidden, showMagazines }) {
-    if (!passesHiddenVisibility(book, { hiddenOnly, showHidden })) {
+  function passesBookVisibility(book, { hiddenOnly, showMagazines }) {
+    if (!passesHiddenVisibility(book, { hiddenOnly })) {
       return false;
     }
     if (isMagazineIssue(book) && !showMagazines) {
@@ -2688,7 +2679,6 @@ const viewerFilters = (function () {
   function filterVisibleBooks(books, options) {
     const {
       hiddenOnly,
-      showHidden,
       showMagazines,
       mycroftFilterMode,
       collectionFilterMode,
@@ -2708,7 +2698,7 @@ const viewerFilters = (function () {
   
     return books.filter(
       (book) =>
-        passesBookVisibility(book, { hiddenOnly, showHidden, showMagazines }) &&
+        passesBookVisibility(book, { hiddenOnly, showMagazines }) &&
         passesMycroftImprintFilter(book, mycroftFilterMode) &&
         passesCollectionFilter(
           book,
@@ -3021,10 +3011,7 @@ function isMagazineIssue(book) {
 }
 
 function passesHiddenVisibility(book) {
-  return viewerFilters.passesHiddenVisibility(book, {
-    hiddenOnly,
-    showHidden: showHiddenInput.checked,
-  });
+  return viewerFilters.passesHiddenVisibility(book, { hiddenOnly });
 }
 
 function hasVisibleMagazineIssues() {
@@ -3056,7 +3043,6 @@ function hasAnyOrderedBooks() {
     orderedIds,
     {
       hiddenOnly,
-      showHidden: showHiddenInput.checked,
       showMagazines,
     },
   );
@@ -3093,7 +3079,6 @@ function cycleWantFilter() {
 function hasAnyWants() {
   return viewerFilters.hasAnyWants(getActiveBooks(), wantIds, {
     hiddenOnly,
-    showHidden: showHiddenInput.checked,
     showMagazines,
   });
 }
@@ -3108,7 +3093,6 @@ function cycleCollectionFilter() {
 function passesBookVisibility(book) {
   return viewerFilters.passesBookVisibility(book, {
     hiddenOnly,
-    showHidden: showHiddenInput.checked,
     showMagazines,
   });
 }
@@ -4995,15 +4979,14 @@ function renderStats(visible, all) {
     .join("");
 
   stats.innerHTML = `
-    <span class="stat-showing">Showing ${showingCount} of ${total}</span>
     <div class="stats-filters${hasMycroft ? "" : " stats-filters--two"}">${filters}</div>
+    <p class="stat-showing">Showing ${showingCount} of ${total}</p>
   `;
 }
 
 function getViewBooksWithoutSearch() {
   return viewerFilters.filterVisibleBooks(getSortedActiveBooks(), {
     hiddenOnly,
-    showHidden: showHiddenInput.checked,
     showMagazines,
     mycroftFilterMode,
     collectionFilterMode,
@@ -5018,7 +5001,6 @@ function getViewBooksWithoutSearch() {
 function getVisibleBooks() {
   return viewerFilters.filterVisibleBooks(getSortedActiveBooks(), {
     hiddenOnly,
-    showHidden: showHiddenInput.checked,
     showMagazines,
     mycroftFilterMode,
     collectionFilterMode,
@@ -5749,7 +5731,6 @@ async function checkServeSupport() {
   if (readOnly) {
     serveEnabled = false;
     hiddenOnly = false;
-    showHiddenWrap.hidden = true;
     updateSortControlVisibility();
     return;
   }
@@ -5775,7 +5756,6 @@ async function checkServeSupport() {
     hiddenOnly = false;
   }
 
-  showHiddenWrap.hidden = !viewerMode.shouldShowShowHiddenToggle(serveEnabled);
   syncEditTagsVisibility();
   updateSortControlVisibility();
   refreshDetailToolbarIfOpen();
@@ -6925,10 +6905,9 @@ function canMoveBookInOrder(order, index, delta) {
 }
 
 function getOrderDialogIds() {
-  const showHidden = showHiddenInput.checked;
   return workingBookOrder.filter((id) => {
     const book = getBookById(id);
-    return book && (showHidden || !book.hidden);
+    return book && !book.hidden;
   });
 }
 
@@ -8076,10 +8055,6 @@ document.addEventListener("keydown", (event) => {
 });
 
 sortSelect.addEventListener("change", onSortChange);
-showHiddenInput.addEventListener("change", () => {
-  refreshBookOrderDialogIfOpen();
-  render();
-});
 
 syncSettingsStorageMode();
 updateSortControlVisibility();

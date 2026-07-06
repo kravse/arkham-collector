@@ -51,7 +51,6 @@ function book(id, overrides = {}) {
 function defaultVisibility(overrides = {}) {
   return {
     hiddenOnly: false,
-    showHidden: false,
     showMagazines: false,
     ...overrides,
   };
@@ -343,28 +342,24 @@ test("matchesTagSearch matches tag substrings only", () => {
   assert.equal(matchesTagSearch(entry, "call"), false);
 });
 
-test("passesHiddenVisibility respects hidden-only and show-hidden modes", () => {
+test("passesHiddenVisibility shows visible books unless hidden-only filter", () => {
   const visible = book(1);
   const hidden = book(2, { hidden: true });
 
   assert.equal(
-    passesHiddenVisibility(visible, { hiddenOnly: false, showHidden: false }),
+    passesHiddenVisibility(visible, { hiddenOnly: false }),
     true,
   );
   assert.equal(
-    passesHiddenVisibility(hidden, { hiddenOnly: false, showHidden: false }),
+    passesHiddenVisibility(hidden, { hiddenOnly: false }),
     false,
   );
   assert.equal(
-    passesHiddenVisibility(hidden, { hiddenOnly: false, showHidden: true }),
-    true,
-  );
-  assert.equal(
-    passesHiddenVisibility(visible, { hiddenOnly: true, showHidden: false }),
+    passesHiddenVisibility(visible, { hiddenOnly: true }),
     false,
   );
   assert.equal(
-    passesHiddenVisibility(hidden, { hiddenOnly: true, showHidden: false }),
+    passesHiddenVisibility(hidden, { hiddenOnly: true }),
     true,
   );
 });
@@ -529,7 +524,7 @@ test("cycleCollectionFilter toggles when no ordered books exist", () => {
   assert.equal(cycleCollectionFilter(null, false), "collection");
 });
 
-test("hasAnyOrderedBooks ignores hidden books unless show-hidden is on", () => {
+test("hasAnyOrderedBooks ignores hidden books", () => {
   const books = [
     book(1),
     book(2, { hidden: true }),
@@ -539,15 +534,6 @@ test("hasAnyOrderedBooks ignores hidden books unless show-hidden is on", () => {
 
   assert.equal(
     hasAnyOrderedBooks(books, collectedIds, orderedIds, defaultVisibility()),
-    true,
-  );
-  assert.equal(
-    hasAnyOrderedBooks(
-      books,
-      collectedIds,
-      orderedIds,
-      defaultVisibility({ showHidden: true }),
-    ),
     true,
   );
   assert.equal(
