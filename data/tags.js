@@ -161,7 +161,8 @@ window.BOOK_TAGS = {
   ],
   "239": [
     "ANTHOLOGY",
-    "HORROR"
+    "HORROR",
+    "SHORT STORIES"
   ],
   "240": [
     "COLLECTION",
@@ -199,7 +200,8 @@ window.BOOK_TAGS = {
     "ESSAYS",
     "HISTORY",
     "HORROR",
-    "NONFICTION"
+    "NONFICTION",
+    "SHORT STORIES"
   ],
   "247": [
     "COLLECTION",
@@ -250,6 +252,7 @@ window.BOOK_TAGS = {
     "ANTHOLOGY",
     "CTHULHU MYTHOS",
     "HORROR",
+    "SHORT STORIES",
     "WEIRD FICTION"
   ],
   "256": [
@@ -461,6 +464,7 @@ window.BOOK_TAGS = {
     "ANTHOLOGY",
     "CTHULHU MYTHOS",
     "HORROR",
+    "SHORT STORIES",
     "WEIRD FICTION"
   ],
   "290": [
@@ -570,6 +574,7 @@ window.BOOK_TAGS = {
     "ANTHOLOGY",
     "CTHULHU MYTHOS",
     "HORROR",
+    "SHORT STORIES",
     "WEIRD FICTION"
   ],
   "308": [
@@ -652,8 +657,11 @@ window.BOOK_TAGS = {
   "320": [
     "ANTHOLOGY",
     "BIBLIOGRAPHY",
+    "ESSAYS",
     "HORROR",
     "MAGAZINE",
+    "POETRY",
+    "SHORT STORIES",
     "WEIRD FICTION"
   ],
   "321": [
@@ -682,6 +690,7 @@ window.BOOK_TAGS = {
   "325": [
     "ANTHOLOGY",
     "HORROR",
+    "SHORT STORIES",
     "WEIRD FICTION"
   ],
   "326": [
@@ -775,6 +784,7 @@ window.BOOK_TAGS = {
   "340": [
     "ANTHOLOGY",
     "HORROR",
+    "SHORT STORIES",
     "WEIRD FICTION"
   ],
   "341": [
@@ -856,6 +866,7 @@ window.BOOK_TAGS = {
   "353": [
     "ANTHOLOGY",
     "HORROR",
+    "SHORT STORIES",
     "WEIRD FICTION"
   ],
   "354": [
@@ -923,6 +934,7 @@ window.BOOK_TAGS = {
   "364": [
     "ANTHOLOGY",
     "HORROR",
+    "SHORT STORIES",
     "SUPERNATURAL FICTION"
   ],
   "365": [
@@ -1036,6 +1048,7 @@ window.BOOK_TAGS = {
     "ANTHOLOGY",
     "GHOST STORIES",
     "HORROR",
+    "SHORT STORIES",
     "SUPERNATURAL FICTION"
   ],
   "383": [
