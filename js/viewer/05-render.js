@@ -451,11 +451,7 @@ function renderCard(book) {
   </article>`;
 
   if (listHandle) {
-    const rowContent =
-      wantRankDragSide === "right"
-        ? `${cardMarkup}${listHandle}`
-        : `${listHandle}${cardMarkup}`;
-    return `<div class="want-rank-row">${rowContent}</div>`;
+    return `<div class="want-rank-row">${cardMarkup}${listHandle}</div>`;
   }
 
   if (cardChip) {

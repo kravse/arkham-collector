@@ -123,6 +123,40 @@ function buildGistUpdatePayload(stateJson) {
   };
 }
 
+function resolveGistConnectState({
+  gistId,
+  remoteState,
+  localPersisted,
+  adoptRemoteGistState,
+  buildNewGistConnectState,
+}) {
+  if (gistId) {
+    if (!remoteState) {
+      return {
+        ok: false,
+        error:
+          "Found an existing Arkham Gist but could not read state.json. Your Gist was not changed.",
+      };
+    }
+    const nextState = adoptRemoteGistState(remoteState, localPersisted);
+    if (!nextState) {
+      return {
+        ok: false,
+        error:
+          "Found an existing Arkham Gist but the sync file is invalid. Your Gist was not changed.",
+      };
+    }
+    return { ok: true, action: "adopt", gistId, nextState };
+  }
+
+  return {
+    ok: true,
+    action: "create",
+    gistId: "",
+    nextState: buildNewGistConnectState(localPersisted),
+  };
+}
+
 module.exports = {
   GIST_SYNC_KEY,
   GIST_STATE_FILENAME,
@@ -136,4 +170,5 @@ module.exports = {
   findArkhamGistId,
   buildGistCreatePayload,
   buildGistUpdatePayload,
+  resolveGistConnectState,
 };

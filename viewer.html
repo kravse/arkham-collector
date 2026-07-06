@@ -465,6 +465,54 @@
               Search narrows the grid; filters combine with search. Your lists
               stay in the browser, or sync via an optional private GitHub Gist.
             </p>
+            <h3 class="settings-about-heading">Collection backup</h3>
+            <p>
+              Import or export your collected titles as CSV for the active
+              storage option (this device or GitHub Gist).
+            </p>
+            <div class="settings-control-group" role="group" aria-label="Collection CSV">
+              <div class="settings-collection-csv-row">
+                <span class="settings-control-copy">
+                  <span class="settings-control-label">Import collection CSV</span>
+                  <span class="settings-control-hint"
+                    >Replace collected titles from a CSV file.</span
+                  >
+                </span>
+                <button
+                  type="button"
+                  id="import-collection-btn"
+                  class="settings-collection-csv-btn settings-collection-csv-btn--import"
+                >
+                  Import
+                </button>
+              </div>
+              <div class="settings-collection-csv-row">
+                <span class="settings-control-copy">
+                  <span class="settings-control-label">Export collection CSV</span>
+                  <span class="settings-control-hint"
+                    >Download your collected titles as a CSV file.</span
+                  >
+                </span>
+                <button
+                  type="button"
+                  id="export-collection-btn"
+                  class="settings-collection-csv-btn settings-collection-csv-btn--export"
+                >
+                  Export
+                </button>
+              </div>
+            </div>
+            <input
+              type="file"
+              id="import-collection-input"
+              accept=".csv,text/csv"
+              hidden
+            />
+            <p
+              id="import-collection-status"
+              class="settings-collection-hint"
+              hidden
+            ></p>
           </div>
         </div>
         <div
@@ -550,8 +598,9 @@
                   </li>
                   <li>
                     To move a local collection to GitHub Gist: stay on
-                    <strong>This device only</strong>, export CSV, switch to
-                    GitHub Gist sync, connect, then import CSV.
+                    <strong>This device only</strong>, export CSV from
+                    <strong>About</strong>, switch to GitHub Gist sync, connect,
+                    then import CSV.
                   </li>
                   <li>
                     On another browser or device, connect with the same token to
@@ -612,49 +661,6 @@
               </div>
               <p id="gist-sync-status" class="settings-collection-hint"></p>
             </div>
-            <div class="settings-control-group" role="group" aria-label="Collection CSV">
-              <div class="settings-collection-csv-row">
-                <span class="settings-control-copy">
-                  <span class="settings-control-label">Import collection CSV</span>
-                  <span class="settings-control-hint"
-                    >Replace collected titles from a CSV file.</span
-                  >
-                </span>
-                <button
-                  type="button"
-                  id="import-collection-btn"
-                  class="settings-collection-csv-btn settings-collection-csv-btn--import"
-                >
-                  Import
-                </button>
-              </div>
-              <div class="settings-collection-csv-row">
-                <span class="settings-control-copy">
-                  <span class="settings-control-label">Export collection CSV</span>
-                  <span class="settings-control-hint"
-                    >Download your collected titles as a CSV file.</span
-                  >
-                </span>
-                <button
-                  type="button"
-                  id="export-collection-btn"
-                  class="settings-collection-csv-btn settings-collection-csv-btn--export"
-                >
-                  Export
-                </button>
-              </div>
-            </div>
-            <input
-              type="file"
-              id="import-collection-input"
-              accept=".csv,text/csv"
-              hidden
-            />
-            <p
-              id="import-collection-status"
-              class="settings-collection-hint"
-              hidden
-            ></p>
           </section>
           <hr class="settings-divider" aria-hidden="true" />
           <section class="settings-section">
@@ -675,47 +681,6 @@
                   checked
                 />
               </label>
-              <fieldset
-                id="want-rank-drag-side-option"
-                class="settings-control-group settings-control-group--nested"
-              >
-                <legend class="visually-hidden">Want rank drag handle side</legend>
-                <p class="settings-control-group-label">Want rank drag handle</p>
-                <p class="settings-control-group-intro settings-control-hint">
-                  In list view, drag rank tabs to set priority.
-                </p>
-                <label class="settings-control-row">
-                  <input
-                    type="radio"
-                    name="want-rank-drag-side"
-                    id="want-rank-drag-side-left"
-                    value="left"
-                  />
-                  <span class="settings-control-copy">
-                    <span class="settings-control-label">Left side</span>
-                    <span class="settings-control-hint"
-                      >Show the rank tab on the left of each row.</span
-                    >
-                  </span>
-                  <span class="settings-choice-mark" aria-hidden="true"></span>
-                </label>
-                <label class="settings-control-row">
-                  <input
-                    type="radio"
-                    name="want-rank-drag-side"
-                    id="want-rank-drag-side-right"
-                    value="right"
-                    checked
-                  />
-                  <span class="settings-control-copy">
-                    <span class="settings-control-label">Right side</span>
-                    <span class="settings-control-hint"
-                      >Show the rank tab on the right of each row.</span
-                    >
-                  </span>
-                  <span class="settings-choice-mark" aria-hidden="true"></span>
-                </label>
-              </fieldset>
               <label class="settings-control-row">
                 <span class="settings-control-copy">
                   <span class="settings-control-label">Highlight collection</span>

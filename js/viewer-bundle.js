@@ -92,9 +92,6 @@ const importCollectionBtn = document.getElementById("import-collection-btn");
 const importCollectionInput = document.getElementById("import-collection-input");
 const importCollectionStatus = document.getElementById("import-collection-status");
 const highlightWantsInput = document.getElementById("highlight-wants");
-const wantRankDragSideLeftInput = document.getElementById("want-rank-drag-side-left");
-const wantRankDragSideRightInput = document.getElementById("want-rank-drag-side-right");
-const wantRankDragSideOption = document.getElementById("want-rank-drag-side-option");
 const highlightCollectionInput = document.getElementById("highlight-collection");
 const showMagazinesInput = document.getElementById("show-magazines");
 const showMagazinesOption = document.getElementById("show-magazines-option");
@@ -133,7 +130,6 @@ let gridViewMode = "cards";
 let highlightWants = true;
 let highlightCollection = true;
 let showMagazines = false;
-let wantRankDragSide = "right";
 let wantOrderLocked = false;
 let detailBookId = null;
 let bookOrderIds = Array.isArray(window.BOOK_ORDER)
@@ -203,12 +199,6 @@ function activeCollectionIds() {
 function syncSettingsHighlightCheckboxes() {
   if (highlightWantsInput) {
     highlightWantsInput.checked = highlightWants;
-  }
-  if (wantRankDragSideLeftInput) {
-    wantRankDragSideLeftInput.checked = wantRankDragSide === "left";
-  }
-  if (wantRankDragSideRightInput) {
-    wantRankDragSideRightInput.checked = wantRankDragSide === "right";
   }
   if (highlightCollectionInput) {
     highlightCollectionInput.checked = highlightCollection;
@@ -862,19 +852,9 @@ const viewerUserState = (function () {
         highlightWants: true,
         highlightCollection: true,
         showMagazines: false,
-        wantRankDragSide: "right",
         wantOrderLocked: false,
       },
     };
-  }
-  
-  const WANT_RANK_DRAG_SIDES = new Set(["left", "right"]);
-  
-  function normalizeWantRankDragSide(raw, fallback = "right") {
-    if (raw && WANT_RANK_DRAG_SIDES.has(raw)) {
-      return raw;
-    }
-    return fallback;
   }
   
   function emptyCollectionSlot() {
@@ -935,22 +915,45 @@ const viewerUserState = (function () {
     });
   }
   
-  function buildEmptyGistConnectState(localPersisted) {
+  function buildNewGistConnectState(localPersisted) {
     const base = defaultUserState();
     const localSlot = localCollectionSlotFromPersisted(localPersisted);
+    const mode = normalizeStorageMode(localPersisted?.storageMode);
+    const collections = normalizeCollections(
+      localPersisted?.collections,
+      localPersisted?.collectionIds,
+      localPersisted?.orderedIds,
+    );
+    const activeSlot = collections[mode] || collections.local;
+    const wantIds = normalizeIdArray(localPersisted?.wantIds);
     return {
       ...base,
       updatedAt: new Date().toISOString(),
       storageMode: "gist",
-      collectionIds: [],
-      orderedIds: [],
-      wantIds: [],
-      wantOrderIds: [],
+      collectionIds: activeSlot.collectionIds,
+      orderedIds: activeSlot.orderedIds,
+      wantIds,
+      wantOrderIds: viewerWantOrderNormalize.normalizeWantOrderIds(
+        localPersisted?.wantOrderIds,
+        wantIds,
+      ),
+      preferences: {
+        ...base.preferences,
+        ...(localPersisted?.preferences || {}),
+      },
       collections: {
         local: localSlot,
-        gist: emptyCollectionSlot(),
+        gist: {
+          collectionIds: activeSlot.collectionIds,
+          orderedIds: activeSlot.orderedIds,
+        },
       },
     };
+  }
+  
+  /** @deprecated Use buildNewGistConnectState */
+  function buildEmptyGistConnectState(localPersisted) {
+    return buildNewGistConnectState(localPersisted);
   }
   
   function adoptRemoteGistState(remoteState, localPersisted) {
@@ -1063,10 +1066,6 @@ const viewerUserState = (function () {
         typeof raw?.showMagazines === "boolean"
           ? raw.showMagazines
           : base.preferences.showMagazines,
-      wantRankDragSide: normalizeWantRankDragSide(
-        raw?.wantRankDragSide,
-        base.preferences.wantRankDragSide,
-      ),
       wantOrderLocked: normalizeWantOrderLocked(
         raw?.wantOrderLocked,
         base.preferences.wantOrderLocked,
@@ -1254,7 +1253,6 @@ const viewerUserState = (function () {
         highlightWants: Boolean(snapshot.highlightWants),
         highlightCollection: Boolean(snapshot.highlightCollection),
         showMagazines: Boolean(snapshot.showMagazines),
-        wantRankDragSide: normalizeWantRankDragSide(snapshot.wantRankDragSide),
         wantOrderLocked: normalizeWantOrderLocked(snapshot.wantOrderLocked),
       },
     };
@@ -1275,7 +1273,6 @@ const viewerUserState = (function () {
       highlightWants: parsed.preferences.highlightWants,
       highlightCollection: parsed.preferences.highlightCollection,
       showMagazines: parsed.preferences.showMagazines,
-      wantRankDragSide: parsed.preferences.wantRankDragSide,
       wantOrderLocked: parsed.preferences.wantOrderLocked,
     };
   }
@@ -1294,6 +1291,7 @@ const viewerUserState = (function () {
     activeCollectionSlot,
     localCollectionSlotFromPersisted,
     buildEmptyGistConnectState,
+    buildNewGistConnectState,
     adoptRemoteGistState,
     normalizeIdArray,
     normalizeStorageMode,
@@ -1434,6 +1432,40 @@ const viewerGistSync = (function () {
       },
     };
   }
+  
+  function resolveGistConnectState({
+    gistId,
+    remoteState,
+    localPersisted,
+    adoptRemoteGistState,
+    buildNewGistConnectState,
+  }) {
+    if (gistId) {
+      if (!remoteState) {
+        return {
+          ok: false,
+          error:
+            "Found an existing Arkham Gist but could not read state.json. Your Gist was not changed.",
+        };
+      }
+      const nextState = adoptRemoteGistState(remoteState, localPersisted);
+      if (!nextState) {
+        return {
+          ok: false,
+          error:
+            "Found an existing Arkham Gist but the sync file is invalid. Your Gist was not changed.",
+        };
+      }
+      return { ok: true, action: "adopt", gistId, nextState };
+    }
+  
+    return {
+      ok: true,
+      action: "create",
+      gistId: "",
+      nextState: buildNewGistConnectState(localPersisted),
+    };
+  }
   return {
     GIST_SYNC_KEY,
     GIST_STATE_FILENAME,
@@ -1447,6 +1479,7 @@ const viewerGistSync = (function () {
     findArkhamGistId,
     buildGistCreatePayload,
     buildGistUpdatePayload,
+    resolveGistConnectState,
   };
 })();
 
@@ -3392,6 +3425,24 @@ function goHome() {
     closeBookDetail({ programmatic: true });
   }
 
+  if (
+    typeof settingsDialog !== "undefined" &&
+    settingsDialog &&
+    !settingsDialog.hidden &&
+    typeof closeSettingsDialog === "function"
+  ) {
+    closeSettingsDialog({ programmatic: true });
+  }
+
+  if (
+    typeof attributionDialog !== "undefined" &&
+    attributionDialog &&
+    !attributionDialog.hidden &&
+    typeof closeAttributionDialog === "function"
+  ) {
+    closeAttributionDialog({ programmatic: true });
+  }
+
   syncFilterUrlFromState({ replace: false });
   render();
 }
@@ -3403,7 +3454,9 @@ function notifyFilterChange(options = {}) {
 
 window.addEventListener("popstate", () => {
   applyFiltersFromUrl();
-  if (typeof handleDetailPopState === "function") {
+  if (typeof handleNavigationPopState === "function") {
+    handleNavigationPopState();
+  } else if (typeof handleDetailPopState === "function") {
     handleDetailPopState();
   }
   render();
@@ -3532,7 +3585,6 @@ function collectRuntimeSnapshot() {
     highlightWants,
     highlightCollection,
     showMagazines,
-    wantRankDragSide,
     wantOrderLocked,
   };
 }
@@ -3551,7 +3603,6 @@ function applyRuntimeSnapshot(runtime) {
   highlightWants = runtime.highlightWants;
   highlightCollection = runtime.highlightCollection;
   showMagazines = runtime.showMagazines;
-  wantRankDragSide = runtime.wantRankDragSide;
   wantOrderLocked = runtime.wantOrderLocked === true;
   if (sortSelect && runtime.sort) {
     sortSelect.value = runtime.sort;
@@ -3650,10 +3701,9 @@ async function connectGistSync(token) {
   }
 
   const localPersisted = readPersistedUserState();
-  let nextState = null;
+  let remoteState = null;
 
   if (gistId) {
-    let remoteState = null;
     try {
       remoteState = await fetchGistState({ token: trimmed, gistId });
     } catch (error) {
@@ -3663,24 +3713,25 @@ async function connectGistSync(token) {
         throw error;
       }
     }
-    if (gistId && remoteState) {
-      nextState = viewerUserState.adoptRemoteGistState(
-        remoteState,
-        localPersisted,
-      );
-    }
   }
 
-  if (!nextState) {
-    nextState = viewerUserState.buildEmptyGistConnectState(localPersisted);
-    if (!gistId) {
-      gistId = await createGistWithState(
-        { token: trimmed, gistId: "" },
-        nextState,
-      );
-    } else {
-      await pushGistState({ token: trimmed, gistId }, nextState);
-    }
+  const resolved = viewerGistSync.resolveGistConnectState({
+    gistId,
+    remoteState,
+    localPersisted,
+    adoptRemoteGistState: viewerUserState.adoptRemoteGistState,
+    buildNewGistConnectState: viewerUserState.buildNewGistConnectState,
+  });
+  if (!resolved.ok) {
+    throw new Error(resolved.error);
+  }
+
+  let nextState = resolved.nextState;
+  if (resolved.action === "create") {
+    gistId = await createGistWithState(
+      { token: trimmed, gistId: "" },
+      nextState,
+    );
   }
 
   writeGistSyncConfig({ token: trimmed, gistId });
@@ -5679,11 +5730,7 @@ function renderCard(book) {
   </article>`;
 
   if (listHandle) {
-    const rowContent =
-      wantRankDragSide === "right"
-        ? `${cardMarkup}${listHandle}`
-        : `${listHandle}${cardMarkup}`;
-    return `<div class="want-rank-row">${rowContent}</div>`;
+    return `<div class="want-rank-row">${cardMarkup}${listHandle}</div>`;
   }
 
   if (cardChip) {
@@ -5893,15 +5940,51 @@ function openBookDetailFromLocation() {
   }
 }
 
-function handleDetailPopState() {
+function currentHistoryUrl() {
+  return `${window.location.pathname}${window.location.search}${window.location.hash}`;
+}
+
+function isOverlayHistoryView(view) {
+  return history.state?.view === view;
+}
+
+function pushOverlayHistory(view, extra = {}) {
+  history.pushState({ view, ...extra }, "", currentHistoryUrl());
+}
+
+function replaceOverlayHistory(view, extra = {}) {
+  history.replaceState({ view, ...extra }, "", currentHistoryUrl());
+}
+
+function handleNavigationPopState() {
   const state = history.state;
+
   if (state?.view === "detail") {
     openBookDetail(state.bookId, { historyMode: "none" });
-    return;
-  }
-  if (!bookDetailDialog.hidden) {
+  } else if (!bookDetailDialog.hidden) {
     closeBookDetail({ fromPopState: true });
   }
+
+  if (state?.view === "settings") {
+    if (settingsDialog.hidden) {
+      openSettingsDialog({ historyMode: "none" });
+    }
+  } else if (!settingsDialog.hidden) {
+    closeSettingsDialog({ fromPopState: true });
+  }
+
+  if (state?.view === "attribution") {
+    if (attributionDialog.hidden) {
+      openAttributionDialog({ historyMode: "none" });
+    }
+  } else if (!attributionDialog.hidden) {
+    closeAttributionDialog({ fromPopState: true });
+  }
+}
+
+/** @deprecated Use handleNavigationPopState */
+function handleDetailPopState() {
+  handleNavigationPopState();
 }
 function getDetailNavigation() {
   const visible = getVisibleBooks();
@@ -6254,16 +6337,26 @@ function selectSettingsTab(tab) {
   settingsPanelSettings.hidden = aboutActive;
 }
 
-function openSettingsDialog() {
+function openSettingsDialog(options = {}) {
+  let { historyMode = "push" } = options;
   pendingGistSetup = false;
   syncSettingsStorageMode();
   selectSettingsTab("about");
   settingsDialog.hidden = false;
   settingsBtn.setAttribute("aria-expanded", "true");
   settingsCloseBtn.focus();
+
+  if (historyMode === "push" && isOverlayHistoryView("settings")) {
+    historyMode = "replace";
+  }
+  if (historyMode === "push") {
+    pushOverlayHistory("settings");
+  } else if (historyMode === "replace") {
+    replaceOverlayHistory("settings");
+  }
 }
 
-function closeSettingsDialog() {
+function closeSettingsDialogUI() {
   if (!viewerGistSync.isConnectedGistConfig(readGistSyncConfig())) {
     activateLocalStorageMode({ render: false });
   } else {
@@ -6272,6 +6365,27 @@ function closeSettingsDialog() {
   }
   settingsDialog.hidden = true;
   settingsBtn.setAttribute("aria-expanded", "false");
+}
+
+function closeSettingsDialog(options = {}) {
+  const { fromPopState = false, programmatic = false } = options;
+
+  if (fromPopState) {
+    closeSettingsDialogUI();
+    return;
+  }
+
+  if (programmatic) {
+    closeSettingsDialogUI();
+    return;
+  }
+
+  if (isOverlayHistoryView("settings")) {
+    history.back();
+    return;
+  }
+
+  closeSettingsDialogUI();
 }
 
 async function onStorageModeChange(next) {
@@ -6397,15 +6511,46 @@ async function onImportCollectionFileSelected(input) {
   }
 }
 
-function openAttributionDialog() {
+function openAttributionDialog(options = {}) {
+  let { historyMode = "push" } = options;
   attributionDialog.hidden = false;
   attributionBtn.setAttribute("aria-expanded", "true");
   attributionCloseBtn.focus();
+
+  if (historyMode === "push" && isOverlayHistoryView("attribution")) {
+    historyMode = "replace";
+  }
+  if (historyMode === "push") {
+    pushOverlayHistory("attribution");
+  } else if (historyMode === "replace") {
+    replaceOverlayHistory("attribution");
+  }
 }
 
-function closeAttributionDialog() {
+function closeAttributionDialogUI() {
   attributionDialog.hidden = true;
   attributionBtn.setAttribute("aria-expanded", "false");
+}
+
+function closeAttributionDialog(options = {}) {
+  const { fromPopState = false, programmatic = false } = options;
+
+  if (fromPopState) {
+    closeAttributionDialogUI();
+    return;
+  }
+
+  if (programmatic) {
+    closeAttributionDialogUI();
+    return;
+  }
+
+  if (isOverlayHistoryView("attribution")) {
+    history.back();
+    return;
+  }
+
+  closeAttributionDialogUI();
 }
 
 
@@ -8151,28 +8296,6 @@ if (importCollectionBtn && importCollectionInput) {
 if (highlightWantsInput) {
   highlightWantsInput.addEventListener("change", () => {
     highlightWants = highlightWantsInput.checked;
-    saveUserState();
-    render();
-  });
-}
-
-if (wantRankDragSideLeftInput) {
-  wantRankDragSideLeftInput.addEventListener("change", () => {
-    if (!wantRankDragSideLeftInput.checked) {
-      return;
-    }
-    wantRankDragSide = "left";
-    saveUserState();
-    render();
-  });
-}
-
-if (wantRankDragSideRightInput) {
-  wantRankDragSideRightInput.addEventListener("change", () => {
-    if (!wantRankDragSideRightInput.checked) {
-      return;
-    }
-    wantRankDragSide = "right";
     saveUserState();
     render();
   });

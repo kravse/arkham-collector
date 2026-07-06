@@ -35,14 +35,14 @@ A visual catalog for collectors and readers of [Arkham House](https://en.wikiped
 1. Open a card → **Collect** to mark a copy you own (tap again to remove).
 2. Toggle **want** on titles you are hunting.
 3. Filter with **COLLECTION** or **WANT** in the header. If you have on-order titles, **COLLECTION** cycles: all books → your collection → on-order only → all books. If you have wants, **WANT** toggles: all books ↔ your want list (priority order; drag rank tabs in list view or rank chips on cards in grid view). Active filters update the URL (`/collection`, `/ordered`, `/want`, `/mycroft-moran`, `/mycroft-hidden`) so a refresh or shared link restores the same view.
-4. **Gear** (bottom bar): under **Collection storage**, choose **This device only** (default) or **Sync with GitHub Gist**. Under **Card display**, toggle want highlighting, set want rank drag handle side, and collection highlighting. GitHub Gist sync only activates after a successful **Connect**; until then you stay on this device. Connecting loads existing Gist data if present, or creates an empty Gist. While connected, the viewer pulls from GitHub on each page load and when you return to the tab. **Clear** or closing settings without a working token returns you to this device only. To move local data to GitHub Gist, export CSV locally then import after connecting.
-5. **Import collection CSV** / **Export collection CSV** (gear → Settings): import replaces collected titles for the **active storage option only** (this device and GitHub Gist keep separate collections), clears on-order titles for that option, and leaves your want list alone. Works on this device or with GitHub Gist sync (Gist upload happens immediately when connected).
+4. **Gear** (bottom bar): under **Collection storage**, choose **This device only** (default) or **Sync with GitHub Gist**. Under **Card display**, toggle want highlighting and collection highlighting. GitHub Gist sync only activates after a successful **Connect**; until then you stay on this device. **Connect** looks for an existing private Gist with `state.json` on that GitHub account; if found, the site loads that data and does not overwrite the Gist. If none exists, it creates a new Gist seeded from your current collection on this device. While connected, the viewer pulls from GitHub on each page load and when you return to the tab. **Clear** or closing settings without a working token returns you to this device only.
+5. **Import collection CSV** / **Export collection CSV** (gear → About): import replaces collected titles for the **active storage option only** (this device and GitHub Gist keep separate collections), clears on-order titles for that option, and leaves your want list alone. Works on this device or with GitHub Gist sync (Gist upload happens immediately when connected).
 
 ### Browser storage keys
 
 | Key | Contents |
 |-----|----------|
-| `arkham-user-state` | Unified v2 state: collection ids, want list (`wantIds`), want priority order (`wantOrderIds`), ordered titles, display preferences (including `wantRankDragSide`, `wantOrderLocked`), and `storageMode` (`local` or `gist`). Older per-key entries migrate on first load. |
+| `arkham-user-state` | Unified v2 state: collection ids, want list (`wantIds`), want priority order (`wantOrderIds`), ordered titles, display preferences (including `wantOrderLocked`), and `storageMode` (`local` or `gist`). Older per-key entries migrate on first load. |
 | `arkham-gist-sync` | GitHub Gist credentials only (`token`, `gistId`) when GitHub Gist sync is connected—not included in the synced Gist file. |
 
 **Gist sync security:** The PAT is stored in your browser’s `localStorage`. Use a throwaway GitHub account and a fine-grained PAT limited to gist read/write. This device only never sends data to GitHub.
@@ -93,7 +93,7 @@ Candidate ids for manual overrides include multi-volume author lines and ambiguo
 
 **Dev API:** `GET /api/tags` returns all known tags; `PATCH /api/books/:id/tags` with `{ "tags": [ … ] }` saves a book’s tag list (400 on invalid input). `GET /api/book-order` returns the normalized id list; `PUT /api/book-order` with `{ "order": [ … ] }` saves it (400 if order breaks year sequence or omits books).
 
-**Maintainer backup CSV:** [`my_collection/my_collection.csv`](my_collection/my_collection.csv) is a personal backup of collected titles (same shape as export/import). It is not loaded by the viewer; use Settings import/export or Gist sync for live collection data.
+**Maintainer backup CSV:** [`my_collection/my_collection.csv`](my_collection/my_collection.csv) is a personal backup of collected titles (same shape as export/import). It is not loaded by the viewer; use About import/export or Gist sync for live collection data.
 
 **First-time scrape** (optional, overwrites scraped data):
 

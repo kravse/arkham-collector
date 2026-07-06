@@ -263,6 +263,7 @@ const VIEWER_SYNC_ENTRIES = [
       "activeCollectionSlot",
       "localCollectionSlotFromPersisted",
       "buildEmptyGistConnectState",
+      "buildNewGistConnectState",
       "adoptRemoteGistState",
       "normalizeIdArray",
       "normalizeStorageMode",
@@ -293,6 +294,7 @@ const VIEWER_SYNC_ENTRIES = [
       "findArkhamGistId",
       "buildGistCreatePayload",
       "buildGistUpdatePayload",
+      "resolveGistConnectState",
     ],
   },
   {

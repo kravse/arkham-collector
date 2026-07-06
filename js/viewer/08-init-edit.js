@@ -189,28 +189,6 @@ if (highlightWantsInput) {
   });
 }
 
-if (wantRankDragSideLeftInput) {
-  wantRankDragSideLeftInput.addEventListener("change", () => {
-    if (!wantRankDragSideLeftInput.checked) {
-      return;
-    }
-    wantRankDragSide = "left";
-    saveUserState();
-    render();
-  });
-}
-
-if (wantRankDragSideRightInput) {
-  wantRankDragSideRightInput.addEventListener("change", () => {
-    if (!wantRankDragSideRightInput.checked) {
-      return;
-    }
-    wantRankDragSide = "right";
-    saveUserState();
-    render();
-  });
-}
-
 if (highlightCollectionInput) {
   highlightCollectionInput.addEventListener("change", () => {
     highlightCollection = highlightCollectionInput.checked;

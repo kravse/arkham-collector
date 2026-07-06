@@ -44,15 +44,51 @@ function openBookDetailFromLocation() {
   }
 }
 
-function handleDetailPopState() {
+function currentHistoryUrl() {
+  return `${window.location.pathname}${window.location.search}${window.location.hash}`;
+}
+
+function isOverlayHistoryView(view) {
+  return history.state?.view === view;
+}
+
+function pushOverlayHistory(view, extra = {}) {
+  history.pushState({ view, ...extra }, "", currentHistoryUrl());
+}
+
+function replaceOverlayHistory(view, extra = {}) {
+  history.replaceState({ view, ...extra }, "", currentHistoryUrl());
+}
+
+function handleNavigationPopState() {
   const state = history.state;
+
   if (state?.view === "detail") {
     openBookDetail(state.bookId, { historyMode: "none" });
-    return;
-  }
-  if (!bookDetailDialog.hidden) {
+  } else if (!bookDetailDialog.hidden) {
     closeBookDetail({ fromPopState: true });
   }
+
+  if (state?.view === "settings") {
+    if (settingsDialog.hidden) {
+      openSettingsDialog({ historyMode: "none" });
+    }
+  } else if (!settingsDialog.hidden) {
+    closeSettingsDialog({ fromPopState: true });
+  }
+
+  if (state?.view === "attribution") {
+    if (attributionDialog.hidden) {
+      openAttributionDialog({ historyMode: "none" });
+    }
+  } else if (!attributionDialog.hidden) {
+    closeAttributionDialog({ fromPopState: true });
+  }
+}
+
+/** @deprecated Use handleNavigationPopState */
+function handleDetailPopState() {
+  handleNavigationPopState();
 }
 function getDetailNavigation() {
   const visible = getVisibleBooks();
@@ -405,16 +441,26 @@ function selectSettingsTab(tab) {
   settingsPanelSettings.hidden = aboutActive;
 }
 
-function openSettingsDialog() {
+function openSettingsDialog(options = {}) {
+  let { historyMode = "push" } = options;
   pendingGistSetup = false;
   syncSettingsStorageMode();
   selectSettingsTab("about");
   settingsDialog.hidden = false;
   settingsBtn.setAttribute("aria-expanded", "true");
   settingsCloseBtn.focus();
+
+  if (historyMode === "push" && isOverlayHistoryView("settings")) {
+    historyMode = "replace";
+  }
+  if (historyMode === "push") {
+    pushOverlayHistory("settings");
+  } else if (historyMode === "replace") {
+    replaceOverlayHistory("settings");
+  }
 }
 
-function closeSettingsDialog() {
+function closeSettingsDialogUI() {
   if (!viewerGistSync.isConnectedGistConfig(readGistSyncConfig())) {
     activateLocalStorageMode({ render: false });
   } else {
@@ -423,6 +469,27 @@ function closeSettingsDialog() {
   }
   settingsDialog.hidden = true;
   settingsBtn.setAttribute("aria-expanded", "false");
+}
+
+function closeSettingsDialog(options = {}) {
+  const { fromPopState = false, programmatic = false } = options;
+
+  if (fromPopState) {
+    closeSettingsDialogUI();
+    return;
+  }
+
+  if (programmatic) {
+    closeSettingsDialogUI();
+    return;
+  }
+
+  if (isOverlayHistoryView("settings")) {
+    history.back();
+    return;
+  }
+
+  closeSettingsDialogUI();
 }
 
 async function onStorageModeChange(next) {
@@ -548,13 +615,44 @@ async function onImportCollectionFileSelected(input) {
   }
 }
 
-function openAttributionDialog() {
+function openAttributionDialog(options = {}) {
+  let { historyMode = "push" } = options;
   attributionDialog.hidden = false;
   attributionBtn.setAttribute("aria-expanded", "true");
   attributionCloseBtn.focus();
+
+  if (historyMode === "push" && isOverlayHistoryView("attribution")) {
+    historyMode = "replace";
+  }
+  if (historyMode === "push") {
+    pushOverlayHistory("attribution");
+  } else if (historyMode === "replace") {
+    replaceOverlayHistory("attribution");
+  }
 }
 
-function closeAttributionDialog() {
+function closeAttributionDialogUI() {
   attributionDialog.hidden = true;
   attributionBtn.setAttribute("aria-expanded", "false");
+}
+
+function closeAttributionDialog(options = {}) {
+  const { fromPopState = false, programmatic = false } = options;
+
+  if (fromPopState) {
+    closeAttributionDialogUI();
+    return;
+  }
+
+  if (programmatic) {
+    closeAttributionDialogUI();
+    return;
+  }
+
+  if (isOverlayHistoryView("attribution")) {
+    history.back();
+    return;
+  }
+
+  closeAttributionDialogUI();
 }

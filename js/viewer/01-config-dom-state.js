@@ -92,9 +92,6 @@ const importCollectionBtn = document.getElementById("import-collection-btn");
 const importCollectionInput = document.getElementById("import-collection-input");
 const importCollectionStatus = document.getElementById("import-collection-status");
 const highlightWantsInput = document.getElementById("highlight-wants");
-const wantRankDragSideLeftInput = document.getElementById("want-rank-drag-side-left");
-const wantRankDragSideRightInput = document.getElementById("want-rank-drag-side-right");
-const wantRankDragSideOption = document.getElementById("want-rank-drag-side-option");
 const highlightCollectionInput = document.getElementById("highlight-collection");
 const showMagazinesInput = document.getElementById("show-magazines");
 const showMagazinesOption = document.getElementById("show-magazines-option");
@@ -133,7 +130,6 @@ let gridViewMode = "cards";
 let highlightWants = true;
 let highlightCollection = true;
 let showMagazines = false;
-let wantRankDragSide = "right";
 let wantOrderLocked = false;
 let detailBookId = null;
 let bookOrderIds = Array.isArray(window.BOOK_ORDER)
@@ -203,12 +199,6 @@ function activeCollectionIds() {
 function syncSettingsHighlightCheckboxes() {
   if (highlightWantsInput) {
     highlightWantsInput.checked = highlightWants;
-  }
-  if (wantRankDragSideLeftInput) {
-    wantRankDragSideLeftInput.checked = wantRankDragSide === "left";
-  }
-  if (wantRankDragSideRightInput) {
-    wantRankDragSideRightInput.checked = wantRankDragSide === "right";
   }
   if (highlightCollectionInput) {
     highlightCollectionInput.checked = highlightCollection;

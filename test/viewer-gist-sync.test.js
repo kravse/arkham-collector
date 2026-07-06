@@ -11,11 +11,15 @@ const {
   buildGistUpdatePayload,
   parseGistSyncConfig,
   isConnectedGistConfig,
+  resolveGistConnectState,
 } = require("../scripts/lib/viewer-gist-sync");
 const {
   normalizeCollections,
   normalizeCollectionSlot,
   emptyCollectionSlot,
+  defaultUserState,
+  adoptRemoteGistState,
+  buildNewGistConnectState,
 } = require("../scripts/lib/viewer-user-state");
 
 const localState = {
@@ -115,4 +119,77 @@ test("parseGistSyncConfig requires token", () => {
   });
   assert.equal(isConnectedGistConfig({ token: "abc", gistId: "" }), false);
   assert.equal(isConnectedGistConfig({ token: "abc", gistId: "123" }), true);
+});
+
+const connectHelpers = {
+  adoptRemoteGistState,
+  buildNewGistConnectState,
+};
+
+test("resolveGistConnectState adopts existing gist without creating empty state", () => {
+  const remote = {
+    version: 2,
+    updatedAt: "2026-06-02T00:00:00.000Z",
+    storageMode: "gist",
+    collectionIds: [5, 6],
+    orderedIds: [7],
+    wantIds: [8],
+    preferences: defaultUserState().preferences,
+    collections: {
+      local: { collectionIds: [], orderedIds: [] },
+      gist: { collectionIds: [5, 6], orderedIds: [7] },
+    },
+  };
+  const resolved = resolveGistConnectState({
+    gistId: "abc123",
+    remoteState: remote,
+    localPersisted: {
+      collections: {
+        local: { collectionIds: [1], orderedIds: [] },
+      },
+    },
+    ...connectHelpers,
+  });
+  assert.equal(resolved.ok, true);
+  assert.equal(resolved.action, "adopt");
+  assert.deepEqual(resolved.nextState.collections.gist.collectionIds, [5, 6]);
+});
+
+test("resolveGistConnectState refuses to overwrite when existing gist is unreadable", () => {
+  const missing = resolveGistConnectState({
+    gistId: "abc123",
+    remoteState: null,
+    localPersisted: {},
+    ...connectHelpers,
+  });
+  assert.equal(missing.ok, false);
+  assert.match(missing.error, /not changed/i);
+
+  const invalid = resolveGistConnectState({
+    gistId: "abc123",
+    remoteState: { version: 999 },
+    localPersisted: {},
+    ...connectHelpers,
+  });
+  assert.equal(invalid.ok, false);
+  assert.match(invalid.error, /invalid/i);
+});
+
+test("resolveGistConnectState creates new gist state from local collection", () => {
+  const resolved = resolveGistConnectState({
+    gistId: "",
+    remoteState: null,
+    localPersisted: {
+      storageMode: "local",
+      collectionIds: [2, 3],
+      orderedIds: [],
+      collections: {
+        local: { collectionIds: [2, 3], orderedIds: [] },
+      },
+    },
+    ...connectHelpers,
+  });
+  assert.equal(resolved.ok, true);
+  assert.equal(resolved.action, "create");
+  assert.deepEqual(resolved.nextState.collections.gist.collectionIds, [2, 3]);
 });

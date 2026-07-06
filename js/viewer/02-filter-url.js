@@ -60,6 +60,24 @@ function goHome() {
     closeBookDetail({ programmatic: true });
   }
 
+  if (
+    typeof settingsDialog !== "undefined" &&
+    settingsDialog &&
+    !settingsDialog.hidden &&
+    typeof closeSettingsDialog === "function"
+  ) {
+    closeSettingsDialog({ programmatic: true });
+  }
+
+  if (
+    typeof attributionDialog !== "undefined" &&
+    attributionDialog &&
+    !attributionDialog.hidden &&
+    typeof closeAttributionDialog === "function"
+  ) {
+    closeAttributionDialog({ programmatic: true });
+  }
+
   syncFilterUrlFromState({ replace: false });
   render();
 }
@@ -71,7 +89,9 @@ function notifyFilterChange(options = {}) {
 
 window.addEventListener("popstate", () => {
   applyFiltersFromUrl();
-  if (typeof handleDetailPopState === "function") {
+  if (typeof handleNavigationPopState === "function") {
+    handleNavigationPopState();
+  } else if (typeof handleDetailPopState === "function") {
     handleDetailPopState();
   }
   render();

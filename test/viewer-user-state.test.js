@@ -14,6 +14,7 @@ const {
   serializeUserState,
   adoptRemoteGistState,
   buildEmptyGistConnectState,
+  buildNewGistConnectState,
 } = require("../scripts/lib/viewer-user-state");
 
 test("migrateFromLegacy maps own collection and drops sample ids", () => {
@@ -103,12 +104,10 @@ test("buildUserStateFromRuntime roundtrips wantOrderIds through parseUserState",
     highlightWants: true,
     highlightCollection: false,
     showMagazines: true,
-    wantRankDragSide: "left",
   });
   const parsed = parseUserState(serializeUserState(built));
   assert.deepEqual(parsed.wantIds, [1, 2]);
   assert.deepEqual(parsed.wantOrderIds, [2, 1]);
-  assert.equal(parsed.preferences.wantRankDragSide, "left");
   assert.equal(parsed.preferences.wantOrderLocked, false);
 });
 
@@ -229,7 +228,30 @@ test("adoptRemoteGistState replaces gist data but keeps local collection slot", 
   assert.equal(adopted.preferences.sort, "title-desc");
 });
 
-test("buildEmptyGistConnectState starts empty gist data and keeps local slot", () => {
+test("buildNewGistConnectState seeds gist from local collection and wants", () => {
+  const seeded = buildNewGistConnectState({
+    storageMode: "local",
+    collectionIds: [3, 4],
+    orderedIds: [5],
+    wantIds: [8],
+    wantOrderIds: [8],
+    preferences: {
+      sort: "title-desc",
+    },
+    collections: {
+      local: { collectionIds: [3, 4], orderedIds: [5] },
+      gist: { collectionIds: [], orderedIds: [] },
+    },
+  });
+  assert.deepEqual(seeded.collections.local.collectionIds, [3, 4]);
+  assert.deepEqual(seeded.collections.gist.collectionIds, [3, 4]);
+  assert.deepEqual(seeded.collections.gist.orderedIds, [5]);
+  assert.deepEqual(seeded.collectionIds, [3, 4]);
+  assert.deepEqual(seeded.wantIds, [8]);
+  assert.equal(seeded.preferences.sort, "title-desc");
+});
+
+test("buildEmptyGistConnectState alias seeds gist from local data", () => {
   const empty = buildEmptyGistConnectState({
     collections: {
       local: { collectionIds: [3], orderedIds: [] },
@@ -237,8 +259,7 @@ test("buildEmptyGistConnectState starts empty gist data and keeps local slot", (
     },
   });
   assert.deepEqual(empty.collections.local.collectionIds, [3]);
-  assert.deepEqual(empty.collections.gist.collectionIds, []);
-  assert.deepEqual(empty.wantIds, []);
+  assert.deepEqual(empty.collections.gist.collectionIds, [3]);
 });
 
 test("defaultUserState matches first-visit defaults", () => {
@@ -246,7 +267,6 @@ test("defaultUserState matches first-visit defaults", () => {
   assert.equal(state.storageMode, "local");
   assert.deepEqual(state.collectionIds, []);
   assert.equal(state.preferences.highlightWants, true);
-  assert.equal(state.preferences.wantRankDragSide, "right");
   assert.equal(state.preferences.wantOrderLocked, false);
 });
 

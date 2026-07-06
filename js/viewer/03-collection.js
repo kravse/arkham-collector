@@ -120,7 +120,6 @@ function collectRuntimeSnapshot() {
     highlightWants,
     highlightCollection,
     showMagazines,
-    wantRankDragSide,
     wantOrderLocked,
   };
 }
@@ -139,7 +138,6 @@ function applyRuntimeSnapshot(runtime) {
   highlightWants = runtime.highlightWants;
   highlightCollection = runtime.highlightCollection;
   showMagazines = runtime.showMagazines;
-  wantRankDragSide = runtime.wantRankDragSide;
   wantOrderLocked = runtime.wantOrderLocked === true;
   if (sortSelect && runtime.sort) {
     sortSelect.value = runtime.sort;
@@ -238,10 +236,9 @@ async function connectGistSync(token) {
   }
 
   const localPersisted = readPersistedUserState();
-  let nextState = null;
+  let remoteState = null;
 
   if (gistId) {
-    let remoteState = null;
     try {
       remoteState = await fetchGistState({ token: trimmed, gistId });
     } catch (error) {
@@ -251,24 +248,25 @@ async function connectGistSync(token) {
         throw error;
       }
     }
-    if (gistId && remoteState) {
-      nextState = viewerUserState.adoptRemoteGistState(
-        remoteState,
-        localPersisted,
-      );
-    }
   }
 
-  if (!nextState) {
-    nextState = viewerUserState.buildEmptyGistConnectState(localPersisted);
-    if (!gistId) {
-      gistId = await createGistWithState(
-        { token: trimmed, gistId: "" },
-        nextState,
-      );
-    } else {
-      await pushGistState({ token: trimmed, gistId }, nextState);
-    }
+  const resolved = viewerGistSync.resolveGistConnectState({
+    gistId,
+    remoteState,
+    localPersisted,
+    adoptRemoteGistState: viewerUserState.adoptRemoteGistState,
+    buildNewGistConnectState: viewerUserState.buildNewGistConnectState,
+  });
+  if (!resolved.ok) {
+    throw new Error(resolved.error);
+  }
+
+  let nextState = resolved.nextState;
+  if (resolved.action === "create") {
+    gistId = await createGistWithState(
+      { token: trimmed, gistId: "" },
+      nextState,
+    );
   }
 
   writeGistSyncConfig({ token: trimmed, gistId });

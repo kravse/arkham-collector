@@ -44,19 +44,9 @@ const viewerUserState = (function () {
         highlightWants: true,
         highlightCollection: true,
         showMagazines: false,
-        wantRankDragSide: "right",
         wantOrderLocked: false,
       },
     };
-  }
-  
-  const WANT_RANK_DRAG_SIDES = new Set(["left", "right"]);
-  
-  function normalizeWantRankDragSide(raw, fallback = "right") {
-    if (raw && WANT_RANK_DRAG_SIDES.has(raw)) {
-      return raw;
-    }
-    return fallback;
   }
   
   function emptyCollectionSlot() {
@@ -117,22 +107,45 @@ const viewerUserState = (function () {
     });
   }
   
-  function buildEmptyGistConnectState(localPersisted) {
+  function buildNewGistConnectState(localPersisted) {
     const base = defaultUserState();
     const localSlot = localCollectionSlotFromPersisted(localPersisted);
+    const mode = normalizeStorageMode(localPersisted?.storageMode);
+    const collections = normalizeCollections(
+      localPersisted?.collections,
+      localPersisted?.collectionIds,
+      localPersisted?.orderedIds,
+    );
+    const activeSlot = collections[mode] || collections.local;
+    const wantIds = normalizeIdArray(localPersisted?.wantIds);
     return {
       ...base,
       updatedAt: new Date().toISOString(),
       storageMode: "gist",
-      collectionIds: [],
-      orderedIds: [],
-      wantIds: [],
-      wantOrderIds: [],
+      collectionIds: activeSlot.collectionIds,
+      orderedIds: activeSlot.orderedIds,
+      wantIds,
+      wantOrderIds: viewerWantOrderNormalize.normalizeWantOrderIds(
+        localPersisted?.wantOrderIds,
+        wantIds,
+      ),
+      preferences: {
+        ...base.preferences,
+        ...(localPersisted?.preferences || {}),
+      },
       collections: {
         local: localSlot,
-        gist: emptyCollectionSlot(),
+        gist: {
+          collectionIds: activeSlot.collectionIds,
+          orderedIds: activeSlot.orderedIds,
+        },
       },
     };
+  }
+  
+  /** @deprecated Use buildNewGistConnectState */
+  function buildEmptyGistConnectState(localPersisted) {
+    return buildNewGistConnectState(localPersisted);
   }
   
   function adoptRemoteGistState(remoteState, localPersisted) {
@@ -245,10 +258,6 @@ const viewerUserState = (function () {
         typeof raw?.showMagazines === "boolean"
           ? raw.showMagazines
           : base.preferences.showMagazines,
-      wantRankDragSide: normalizeWantRankDragSide(
-        raw?.wantRankDragSide,
-        base.preferences.wantRankDragSide,
-      ),
       wantOrderLocked: normalizeWantOrderLocked(
         raw?.wantOrderLocked,
         base.preferences.wantOrderLocked,
@@ -436,7 +445,6 @@ const viewerUserState = (function () {
         highlightWants: Boolean(snapshot.highlightWants),
         highlightCollection: Boolean(snapshot.highlightCollection),
         showMagazines: Boolean(snapshot.showMagazines),
-        wantRankDragSide: normalizeWantRankDragSide(snapshot.wantRankDragSide),
         wantOrderLocked: normalizeWantOrderLocked(snapshot.wantOrderLocked),
       },
     };
@@ -457,7 +465,6 @@ const viewerUserState = (function () {
       highlightWants: parsed.preferences.highlightWants,
       highlightCollection: parsed.preferences.highlightCollection,
       showMagazines: parsed.preferences.showMagazines,
-      wantRankDragSide: parsed.preferences.wantRankDragSide,
       wantOrderLocked: parsed.preferences.wantOrderLocked,
     };
   }
@@ -476,6 +483,7 @@ const viewerUserState = (function () {
     activeCollectionSlot,
     localCollectionSlotFromPersisted,
     buildEmptyGistConnectState,
+    buildNewGistConnectState,
     adoptRemoteGistState,
     normalizeIdArray,
     normalizeStorageMode,
