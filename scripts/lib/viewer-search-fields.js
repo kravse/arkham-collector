@@ -25,7 +25,7 @@ function normalizeLabelKey(label) {
 }
 
 function emptyFieldTerms() {
-  return { tag: [], author: [], cover: [] };
+  return { tag: [], author: [], cover: [], decade: [] };
 }
 
 function emptySearchFilter() {
@@ -47,7 +47,106 @@ function buildFieldTokenRegex(prefix) {
   return new RegExp(`${prefix}:\\s*(?:"([^"]*)"|(\\S+))`, "gi");
 }
 
+function parseDecadeTrailingToken(input) {
+  const text = String(input || "").trim();
+  const digitMatch = text.match(/(?:^|\s)(\d{1,4}s?)$/i);
+  if (!digitMatch) {
+    return null;
+  }
+  return {
+    partial: digitMatch[1],
+    prefix: text.slice(0, digitMatch.index).trim(),
+  };
+}
+
+function isDecadeFilterDraftPartial(partial) {
+  const token = String(partial || "").trim();
+  if (!token) {
+    return false;
+  }
+  if (/^\d{4}$/.test(token)) {
+    return false;
+  }
+  if (/^\d{4}s$/i.test(token)) {
+    return false;
+  }
+  return /^\d{1,3}s?$/i.test(token);
+}
+
+function parseDecadeDraftInput(input) {
+  const text = String(input || "").trim();
+  if (!text) {
+    return null;
+  }
+
+  const prefixEsc = "decade".replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const colonMatch = text.match(
+    new RegExp(`(?:^|\\s)${prefixEsc}:\\s*(?:"([^"]*)"?|(\\S*))$`, "i"),
+  );
+  if (colonMatch) {
+    const partial = String(colonMatch[1] ?? colonMatch[2] ?? "").trim();
+    if (!isDecadeFilterDraftPartial(partial)) {
+      return null;
+    }
+    return {
+      fieldKey: "decade",
+      partial,
+      quoted: /"/.test(colonMatch[0]),
+      prefix: text.slice(0, colonMatch.index).trim(),
+    };
+  }
+
+  const token = parseDecadeTrailingToken(text);
+  if (!token || !isDecadeFilterDraftPartial(token.partial)) {
+    return null;
+  }
+
+  return {
+    fieldKey: "decade",
+    partial: token.partial,
+    quoted: false,
+    prefix: token.prefix,
+  };
+}
+
+function getDecadeSuggestDraft(input) {
+  const filterDraft = parseDecadeDraftInput(input);
+  if (filterDraft) {
+    return filterDraft;
+  }
+
+  const text = String(input || "").trim();
+  const prefixEsc = "decade".replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const colonMatch = text.match(
+    new RegExp(`(?:^|\\s)${prefixEsc}:\\s*(?:"([^"]*)"?|(\\S*))$`, "i"),
+  );
+  if (colonMatch) {
+    return {
+      fieldKey: "decade",
+      partial: String(colonMatch[1] ?? colonMatch[2] ?? "").trim(),
+      quoted: /"/.test(colonMatch[0]),
+      prefix: text.slice(0, colonMatch.index).trim(),
+    };
+  }
+
+  const token = parseDecadeTrailingToken(text);
+  if (!token) {
+    return null;
+  }
+
+  return {
+    fieldKey: "decade",
+    partial: token.partial,
+    quoted: false,
+    prefix: token.prefix,
+  };
+}
+
 function parseFieldDraftInput(input, field) {
+  if (field.key === "decade") {
+    return parseDecadeDraftInput(input);
+  }
+
   const text = String(input || "").trim();
   if (!text) {
     return null;
@@ -232,7 +331,69 @@ const COVER_FIELD = {
   },
 };
 
-const SEARCH_FIELD_TYPES = [TAG_FIELD, AUTHOR_FIELD, COVER_FIELD];
+function decadeSortKey(label) {
+  const match = String(label || "").trim().match(/^(\d{4})/);
+  return match ? parseInt(match[1], 10) : 0;
+}
+
+const DECADE_FIELD = {
+  key: "decade",
+  prefix: "decade",
+  suppressTextOnLiteralPrefix: false,
+  chipAriaPrefix: "decade",
+  labelKey(label) {
+    return String(label || "")
+      .trim()
+      .toLowerCase();
+  },
+  formatQuery(label) {
+    return formatFieldSearchQuery("decade", label);
+  },
+  formatLabel(raw, knownValues) {
+    const needle = this.labelKey(raw);
+    if (!needle) {
+      return null;
+    }
+    for (const label of knownValues || []) {
+      if (this.labelKey(label) === needle) {
+        return String(label).trim();
+      }
+    }
+    return null;
+  },
+  matchesSuggestion(partial, label) {
+    const needle = this.labelKey(partial);
+    if (!needle) {
+      return true;
+    }
+    return this.labelKey(label).startsWith(needle);
+  },
+  matchBook(book, term) {
+    if (!term) {
+      return true;
+    }
+    return this.labelKey(book.decade) === term;
+  },
+  collectValues(books) {
+    const seen = new Set();
+    const values = [];
+    for (const book of books || []) {
+      const label = String(book.decade || "").trim();
+      if (!label) {
+        continue;
+      }
+      const key = this.labelKey(label);
+      if (seen.has(key)) {
+        continue;
+      }
+      seen.add(key);
+      values.push(label);
+    }
+    return values.sort((a, b) => decadeSortKey(a) - decadeSortKey(b));
+  },
+};
+
+const SEARCH_FIELD_TYPES = [TAG_FIELD, AUTHOR_FIELD, COVER_FIELD, DECADE_FIELD];
 
 function getActiveDraftField(draftQuery) {
   const text = String(draftQuery || "").trim();
@@ -307,6 +468,7 @@ function mergeFieldTermsFromChips(chips, parsedFieldTerms) {
     tag: new Set(),
     author: new Set(),
     cover: new Set(),
+    decade: new Set(),
   };
 
   for (const chip of chips || []) {
@@ -369,10 +531,13 @@ function resolveKnownFieldLabel(term, field, knownValues) {
         : String(label).trim();
     }
   }
-  if (field.key !== "tag") {
-    const matches = (knownValues || []).filter((label) =>
-      field.labelKey(label).includes(needle),
-    );
+  if (field.key === "decade" || field.key === "author" || field.key === "cover") {
+    const matches = (knownValues || []).filter((label) => {
+      if (field.matchesSuggestion) {
+        return field.matchesSuggestion.call(field, needle, label);
+      }
+      return field.labelKey(label).includes(needle);
+    });
     if (matches.length === 1) {
       return String(matches[0]).trim();
     }
@@ -381,6 +546,10 @@ function resolveKnownFieldLabel(term, field, knownValues) {
 }
 
 function absorbFieldDraftInput(input, field, knownValues) {
+  if (field.key === "decade") {
+    return null;
+  }
+
   const draft = parseFieldDraftInput(input, field);
   if (!draft) {
     return null;
@@ -413,9 +582,15 @@ function filterFieldSuggestions(partial, field, knownValues, options = {}) {
 
   const matches = (knownValues || [])
     .filter((label) => !excluded.has(field.labelKey(label)))
-    .filter(
-      (label) => !needle || field.labelKey(label).includes(needle),
-    );
+    .filter((label) => {
+      if (!needle) {
+        return true;
+      }
+      if (field.matchesSuggestion) {
+        return field.matchesSuggestion.call(field, needle, label);
+      }
+      return field.labelKey(label).includes(needle);
+    });
 
   return typeof limit === "number" ? matches.slice(0, limit) : matches;
 }
@@ -430,6 +605,7 @@ function normalizeSearchFilter(filter) {
         tag: [...(filter.fieldTerms.tag || [])],
         author: [...(filter.fieldTerms.author || [])],
         cover: [...(filter.fieldTerms.cover || [])],
+        decade: [...(filter.fieldTerms.decade || [])],
       },
       textTerms: [...(filter.textTerms || [])],
     };
@@ -439,6 +615,7 @@ function normalizeSearchFilter(filter) {
       tag: [...(filter.tagTerms || [])],
       author: [...(filter.authorTerms || [])],
       cover: [...(filter.coverTerms || [])],
+      decade: [...(filter.decadeTerms || [])],
     },
     textTerms: [...(filter.textTerms || [])],
   };
@@ -536,6 +713,9 @@ module.exports = {
   emptySearchFilter,
   getFieldByKey,
   getFieldByPrefix,
+  parseDecadeTrailingToken,
+  parseDecadeDraftInput,
+  getDecadeSuggestDraft,
   parseFieldDraftInput,
   getActiveDraftField,
   isFieldLiteralPrefixPending,

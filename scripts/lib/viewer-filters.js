@@ -29,8 +29,30 @@ function tagField() {
   return getSearchFields().getFieldByKey("tag");
 }
 
+function normalizeDecadeLabel(value) {
+  const text = String(value || "").trim();
+  if (!text) {
+    return null;
+  }
+  const match = text.match(/^(\d{4})s?$/i);
+  if (match) {
+    const year = parseInt(match[1], 10);
+    if (!year) {
+      return null;
+    }
+    return `${Math.floor(year / 10) * 10}s`;
+  }
+  return text;
+}
+
 function prepareBookSearchIndex(book) {
   const personNames = getPersonNames();
+  if (book.decade) {
+    const normalizedDecade = normalizeDecadeLabel(book.decade);
+    if (normalizedDecade) {
+      book.decade = normalizedDecade;
+    }
+  }
   book._searchHaystack = [
     book.title,
     book.author,

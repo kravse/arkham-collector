@@ -24,15 +24,24 @@ function decadeFromYear(year) {
   if (!value) {
     return null;
   }
-  if (value < 1940) {
-    return String(value);
-  }
   return `${Math.floor(value / 10) * 10}s`;
+}
+
+function normalizeDecadeLabel(value) {
+  const text = String(value || "").trim();
+  if (!text) {
+    return null;
+  }
+  const match = text.match(/^(\d{4})s?$/i);
+  if (match) {
+    return decadeFromYear(match[1]);
+  }
+  return text;
 }
 
 function entryDecade(entry) {
   if (entry.decade) {
-    return entry.decade;
+    return normalizeDecadeLabel(entry.decade);
   }
   return decadeFromYear(entry.listYear);
 }
@@ -109,6 +118,7 @@ module.exports = {
   headingText,
   isSectionStop,
   decadeFromYear,
+  normalizeDecadeLabel,
   entryDecade,
   collectListItems,
   extractBibliography,

@@ -38,9 +38,6 @@ function decadeFromYear(year) {
   if (!value) {
     return null;
   }
-  if (value < 1940) {
-    return String(value);
-  }
   return `${Math.floor(value / 10) * 10}s`;
 }
 

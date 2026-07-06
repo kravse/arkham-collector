@@ -36,6 +36,9 @@
   --search-field-cover-bg: rgba(56, 168, 138, 0.14);
   --search-field-cover-border: rgba(96, 196, 168, 0.34);
   --search-field-cover-text: rgba(176, 228, 210, 0.88);
+  --search-field-decade-bg: rgba(140, 100, 200, 0.14);
+  --search-field-decade-border: rgba(180, 140, 230, 0.34);
+  --search-field-decade-text: rgba(210, 190, 240, 0.88);
   --tag-font:
     ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
     Roboto, "Helvetica Neue", Arial, sans-serif;

@@ -649,7 +649,9 @@
       "listCoverFocusY": 0.6464593571877703
     },
     "364": {
-      "coverImageFile": "covers/dark-mind-dark-heart-364.png"
+      "coverImageFile": "covers/dark-mind-dark-heart-364.png",
+      "listCoverFocusX": 0.5735294117647058,
+      "listCoverFocusY": 0.5378604733662113
     },
     "365": {
       "coverImageFile": "covers/lonesome-places-365.jpg",
@@ -705,7 +707,9 @@
       "listCoverFocusY": 0.6596689141431115
     },
     "377": {
-      "coverImageFile": "covers/spells-and-philtres-377.png"
+      "coverImageFile": "covers/spells-and-philtres-377.jpg",
+      "listCoverFocusX": 0.5735294117647058,
+      "listCoverFocusY": 0.10105199939072329
     },
     "378": {
       "listCoverFocusX": 0.6144957983193278,
@@ -735,8 +739,9 @@
       "listCoverFocusY": 0.4789715889635434
     },
     "384": {
-      "listCoverFocusX": 0.45483193277310924,
-      "listCoverFocusY": 0.5589583502875434
+      "coverImageFile": "covers/the-dark-chateau-384.jpg",
+      "listCoverFocusX": 0.707983193277311,
+      "listCoverFocusY": 0.5316199971616954
     },
     "385": {
       "listCoverFocusX": 0.4380252100840336,

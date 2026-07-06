@@ -15,6 +15,7 @@ const {
   getActiveDraftField,
   getFieldByKey,
   resolveKnownFieldLabel,
+  getDecadeSuggestDraft,
 } = require("../scripts/lib/viewer-search-fields");
 const { prepareBookSearchIndex } = require("../scripts/lib/viewer-filters");
 
@@ -24,26 +25,28 @@ function book(overrides = {}) {
   return entry;
 }
 
-test("parseCompoundSearchQuery splits tags, author, cover, and text", () => {
+test("parseCompoundSearchQuery splits tags, author, cover, decade, and text", () => {
   assert.deepEqual(
     parseCompoundSearchQuery(
-      'tag:fantasy author:"H. P. Lovecraft" cover:Jones 1950s',
+      'tag:fantasy author:"H. P. Lovecraft" cover:Jones decade:1950s horror',
     ),
     {
       fieldTerms: {
         tag: ["fantasy"],
         author: ["h. p. lovecraft"],
         cover: ["jones"],
+        decade: ["1950s"],
       },
-      textTerms: ["1950s"],
+      textTerms: ["horror"],
     },
   );
 });
 
-test("parseFieldDraftInput supports tag, author, and cover prefixes", () => {
+test("parseFieldDraftInput supports tag, author, cover, and decade prefixes", () => {
   const tagField = getFieldByKey("tag");
   const authorField = getFieldByKey("author");
   const coverField = getFieldByKey("cover");
+  const decadeField = getFieldByKey("decade");
 
   assert.deepEqual(parseFieldDraftInput("author", authorField), {
     fieldKey: "author",
@@ -71,6 +74,27 @@ test("parseFieldDraftInput supports tag, author, and cover prefixes", () => {
     quoted: false,
     prefix: "",
   });
+  assert.deepEqual(parseFieldDraftInput("19", decadeField), {
+    fieldKey: "decade",
+    partial: "19",
+    quoted: false,
+    prefix: "",
+  });
+  assert.equal(parseFieldDraftInput("1945", decadeField), null);
+  assert.equal(parseFieldDraftInput("1950s", decadeField), null);
+  assert.deepEqual(parseFieldDraftInput("horror 1950s", decadeField), null);
+  assert.deepEqual(parseFieldDraftInput("horror 19", decadeField), {
+    fieldKey: "decade",
+    partial: "19",
+    quoted: false,
+    prefix: "horror",
+  });
+  assert.deepEqual(parseFieldDraftInput("decade:195", decadeField), {
+    fieldKey: "decade",
+    partial: "195",
+    quoted: false,
+    prefix: "",
+  });
 });
 
 test("isSearchDraftBlockingText only blocks partial tag literals", () => {
@@ -79,68 +103,97 @@ test("isSearchDraftBlockingText only blocks partial tag literals", () => {
   assert.equal(isSearchDraftBlockingText("author"), false);
   assert.equal(isSearchDraftBlockingText("80s author"), false);
   assert.equal(isSearchDraftBlockingText("cover"), false);
+  assert.equal(isSearchDraftBlockingText("19"), false);
 });
 
 test("buildSearchFilter keeps prefix text for author draft but not tag literal pending", () => {
   assert.deepEqual(buildSearchFilter([], "ta"), {
-    fieldTerms: { tag: [], author: [], cover: [] },
+    fieldTerms: { tag: [], author: [], cover: [], decade: [] },
     textTerms: [],
   });
   assert.deepEqual(buildSearchFilter([], "80s author"), {
-    fieldTerms: { tag: [], author: [], cover: [] },
+    fieldTerms: { tag: [], author: [], cover: [], decade: [] },
     textTerms: ["80s"],
   });
+  assert.deepEqual(buildSearchFilter([], "19"), {
+    fieldTerms: { tag: [], author: [], cover: [], decade: [] },
+    textTerms: [],
+  });
+  assert.deepEqual(buildSearchFilter([], "1945"), {
+    fieldTerms: { tag: [], author: [], cover: [], decade: [] },
+    textTerms: ["1945"],
+  });
+  assert.deepEqual(buildSearchFilter([], "1950s"), {
+    fieldTerms: { tag: [], author: [], cover: [], decade: [] },
+    textTerms: ["1950s"],
+  });
   assert.deepEqual(
-    buildSearchFilter([{ type: "tag", label: "FANTASY" }], 'tag:"cthulhu mythos" 1950s'),
+    buildSearchFilter([{ type: "tag", label: "FANTASY" }], 'tag:"cthulhu mythos" horror'),
     {
       fieldTerms: {
         tag: ["fantasy", "cthulhu mythos"],
         author: [],
         cover: [],
+        decade: [],
       },
-      textTerms: ["1950s"],
+      textTerms: ["horror"],
     },
   );
 });
 
-test("author and cover field filters match only their book fields", () => {
+test("author, cover, and decade field filters match only their book fields", () => {
   const entry = book({
     author: "H. P. Lovecraft",
     coverArtist: "Frank Utpatel",
     tags: ["HORROR"],
+    decade: "1950s",
   });
 
   assert.equal(
     matchesCompoundSearch(entry, {
-      fieldTerms: { tag: [], author: ["lovecraft"], cover: [] },
+      fieldTerms: { tag: [], author: ["lovecraft"], cover: [], decade: [] },
       textTerms: [],
     }),
     true,
   );
   assert.equal(
     matchesCompoundSearch(entry, {
-      fieldTerms: { tag: [], author: [], cover: ["utpatel"] },
+      fieldTerms: { tag: [], author: [], cover: ["utpatel"], decade: [] },
       textTerms: [],
     }),
     true,
   );
   assert.equal(
     matchesCompoundSearch(entry, {
-      fieldTerms: { tag: [], author: ["utpatel"], cover: [] },
+      fieldTerms: { tag: [], author: [], cover: [], decade: ["1950s"] },
+      textTerms: [],
+    }),
+    true,
+  );
+  assert.equal(
+    matchesCompoundSearch(entry, {
+      fieldTerms: { tag: [], author: [], cover: [], decade: ["1940s"] },
       textTerms: [],
     }),
     false,
   );
   assert.equal(
     matchesCompoundSearch(entry, {
-      fieldTerms: { tag: [], author: [], cover: [] },
+      fieldTerms: { tag: [], author: ["utpatel"], cover: [], decade: [] },
+      textTerms: [],
+    }),
+    false,
+  );
+  assert.equal(
+    matchesCompoundSearch(entry, {
+      fieldTerms: { tag: [], author: [], cover: [], decade: [] },
       textTerms: ["lovecraft"],
     }),
     true,
   );
   assert.equal(
     matchesCompoundSearch(entry, {
-      fieldTerms: { tag: [], author: [], cover: [] },
+      fieldTerms: { tag: [], author: [], cover: [], decade: [] },
       textTerms: ["horror"],
     }),
     false,
@@ -153,14 +206,14 @@ test("author and cover filters match parsed person names", () => {
   });
   assert.equal(
     matchesCompoundSearch(derleth, {
-      fieldTerms: { tag: [], author: ["derleth"], cover: [] },
+      fieldTerms: { tag: [], author: ["derleth"], cover: [], decade: [] },
       textTerms: [],
     }),
     true,
   );
   assert.equal(
     matchesCompoundSearch(derleth, {
-      fieldTerms: { tag: [], author: ["lovecraft"], cover: [] },
+      fieldTerms: { tag: [], author: ["lovecraft"], cover: [], decade: [] },
       textTerms: [],
     }),
     false,
@@ -171,25 +224,27 @@ test("author and cover filters match parsed person names", () => {
   });
   assert.equal(
     matchesCompoundSearch(cover, {
-      fieldTerms: { tag: [], author: [], cover: ["dietrich"] },
+      fieldTerms: { tag: [], author: [], cover: ["dietrich"], decade: [] },
       textTerms: [],
     }),
     true,
   );
   assert.equal(
     matchesCompoundSearch(cover, {
-      fieldTerms: { tag: [], author: [], cover: ["gore"] },
+      fieldTerms: { tag: [], author: [], cover: ["gore"], decade: [] },
       textTerms: [],
     }),
     false,
   );
 });
 
-test("absorbFieldDraftInput resolves known author and cover labels", () => {
+test("absorbFieldDraftInput resolves known author, cover, and decade labels", () => {
   const authorField = getFieldByKey("author");
   const coverField = getFieldByKey("cover");
+  const decadeField = getFieldByKey("decade");
   const authors = ["H. P. Lovecraft", "August Derleth"];
   const covers = ["Frank Utpatel"];
+  const decades = ["1940s", "1950s", "1930s"];
 
   assert.deepEqual(absorbFieldDraftInput("author lovecraft", authorField, authors), {
     fieldKey: "author",
@@ -201,17 +256,22 @@ test("absorbFieldDraftInput resolves known author and cover labels", () => {
     chipLabel: null,
     remainder: "cover:unknown",
   });
+  assert.equal(absorbFieldDraftInput("1950s", decadeField, decades), null);
+  assert.equal(absorbFieldDraftInput("horror 195", decadeField, decades), null);
 });
 
 test("getActiveDraftField returns the active trailing field draft", () => {
   assert.equal(getActiveDraftField("80s author").key, "author");
   assert.equal(getActiveDraftField("tag horror").key, "tag");
+  assert.equal(getActiveDraftField("19").key, "decade");
   assert.equal(getActiveDraftField("derleth"), null);
 });
 
 test("filterFieldSuggestions excludes selected chips and filters partials", () => {
   const authorField = getFieldByKey("author");
+  const decadeField = getFieldByKey("decade");
   const known = ["August Derleth", "H. P. Lovecraft"];
+  const decades = ["1930s", "1940s", "1950s", "1960s", "1970s", "1980s", "1990s"];
   assert.deepEqual(
     filterFieldSuggestions("love", authorField, known, {
       exclude: ["H. P. Lovecraft"],
@@ -221,11 +281,25 @@ test("filterFieldSuggestions excludes selected chips and filters partials", () =
   assert.deepEqual(filterFieldSuggestions("love", authorField, known), [
     "H. P. Lovecraft",
   ]);
+  assert.deepEqual(filterFieldSuggestions("19", decadeField, decades), [
+    "1930s",
+    "1940s",
+    "1950s",
+    "1960s",
+    "1970s",
+    "1980s",
+    "1990s",
+  ]);
+  assert.deepEqual(filterFieldSuggestions("20", decadeField, ["2000s", "2010s"]), [
+    "2000s",
+    "2010s",
+  ]);
 });
 
 test("resolveKnownFieldLabel preserves author casing and uppercases tags", () => {
   const tagField = getFieldByKey("tag");
   const authorField = getFieldByKey("author");
+  const decadeField = getFieldByKey("decade");
   assert.equal(
     resolveKnownFieldLabel("fantasy", tagField, ["FANTASY", "HORROR"]),
     "FANTASY",
@@ -234,11 +308,25 @@ test("resolveKnownFieldLabel preserves author casing and uppercases tags", () =>
     resolveKnownFieldLabel("lovecraft", authorField, ["H. P. Lovecraft"]),
     "H. P. Lovecraft",
   );
+  assert.equal(
+    resolveKnownFieldLabel("195", decadeField, ["1940s", "1950s"]),
+    "1950s",
+  );
 });
 
-test("SEARCH_FIELD_TYPES includes tag, author, and cover", () => {
+test("getDecadeSuggestDraft still offers decades for typed years", () => {
+  assert.deepEqual(getDecadeSuggestDraft("1945"), {
+    fieldKey: "decade",
+    partial: "1945",
+    quoted: false,
+    prefix: "",
+  });
+  assert.equal(getActiveDraftField("1945"), null);
+});
+
+test("SEARCH_FIELD_TYPES includes tag, author, cover, and decade", () => {
   assert.deepEqual(
     SEARCH_FIELD_TYPES.map((field) => field.key),
-    ["tag", "author", "cover"],
+    ["tag", "author", "cover", "decade"],
   );
 });

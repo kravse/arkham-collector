@@ -1941,7 +1941,7 @@ const viewerSearchFields = (function () {
   }
   
   function emptyFieldTerms() {
-    return { tag: [], author: [], cover: [] };
+    return { tag: [], author: [], cover: [], decade: [] };
   }
   
   function emptySearchFilter() {
@@ -1963,7 +1963,106 @@ const viewerSearchFields = (function () {
     return new RegExp(`${prefix}:\\s*(?:"([^"]*)"|(\\S+))`, "gi");
   }
   
+  function parseDecadeTrailingToken(input) {
+    const text = String(input || "").trim();
+    const digitMatch = text.match(/(?:^|\s)(\d{1,4}s?)$/i);
+    if (!digitMatch) {
+      return null;
+    }
+    return {
+      partial: digitMatch[1],
+      prefix: text.slice(0, digitMatch.index).trim(),
+    };
+  }
+  
+  function isDecadeFilterDraftPartial(partial) {
+    const token = String(partial || "").trim();
+    if (!token) {
+      return false;
+    }
+    if (/^\d{4}$/.test(token)) {
+      return false;
+    }
+    if (/^\d{4}s$/i.test(token)) {
+      return false;
+    }
+    return /^\d{1,3}s?$/i.test(token);
+  }
+  
+  function parseDecadeDraftInput(input) {
+    const text = String(input || "").trim();
+    if (!text) {
+      return null;
+    }
+  
+    const prefixEsc = "decade".replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const colonMatch = text.match(
+      new RegExp(`(?:^|\\s)${prefixEsc}:\\s*(?:"([^"]*)"?|(\\S*))$`, "i"),
+    );
+    if (colonMatch) {
+      const partial = String(colonMatch[1] ?? colonMatch[2] ?? "").trim();
+      if (!isDecadeFilterDraftPartial(partial)) {
+        return null;
+      }
+      return {
+        fieldKey: "decade",
+        partial,
+        quoted: /"/.test(colonMatch[0]),
+        prefix: text.slice(0, colonMatch.index).trim(),
+      };
+    }
+  
+    const token = parseDecadeTrailingToken(text);
+    if (!token || !isDecadeFilterDraftPartial(token.partial)) {
+      return null;
+    }
+  
+    return {
+      fieldKey: "decade",
+      partial: token.partial,
+      quoted: false,
+      prefix: token.prefix,
+    };
+  }
+  
+  function getDecadeSuggestDraft(input) {
+    const filterDraft = parseDecadeDraftInput(input);
+    if (filterDraft) {
+      return filterDraft;
+    }
+  
+    const text = String(input || "").trim();
+    const prefixEsc = "decade".replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const colonMatch = text.match(
+      new RegExp(`(?:^|\\s)${prefixEsc}:\\s*(?:"([^"]*)"?|(\\S*))$`, "i"),
+    );
+    if (colonMatch) {
+      return {
+        fieldKey: "decade",
+        partial: String(colonMatch[1] ?? colonMatch[2] ?? "").trim(),
+        quoted: /"/.test(colonMatch[0]),
+        prefix: text.slice(0, colonMatch.index).trim(),
+      };
+    }
+  
+    const token = parseDecadeTrailingToken(text);
+    if (!token) {
+      return null;
+    }
+  
+    return {
+      fieldKey: "decade",
+      partial: token.partial,
+      quoted: false,
+      prefix: token.prefix,
+    };
+  }
+  
   function parseFieldDraftInput(input, field) {
+    if (field.key === "decade") {
+      return parseDecadeDraftInput(input);
+    }
+  
     const text = String(input || "").trim();
     if (!text) {
       return null;
@@ -2148,7 +2247,69 @@ const viewerSearchFields = (function () {
     },
   };
   
-  const SEARCH_FIELD_TYPES = [TAG_FIELD, AUTHOR_FIELD, COVER_FIELD];
+  function decadeSortKey(label) {
+    const match = String(label || "").trim().match(/^(\d{4})/);
+    return match ? parseInt(match[1], 10) : 0;
+  }
+  
+  const DECADE_FIELD = {
+    key: "decade",
+    prefix: "decade",
+    suppressTextOnLiteralPrefix: false,
+    chipAriaPrefix: "decade",
+    labelKey(label) {
+      return String(label || "")
+        .trim()
+        .toLowerCase();
+    },
+    formatQuery(label) {
+      return formatFieldSearchQuery("decade", label);
+    },
+    formatLabel(raw, knownValues) {
+      const needle = this.labelKey(raw);
+      if (!needle) {
+        return null;
+      }
+      for (const label of knownValues || []) {
+        if (this.labelKey(label) === needle) {
+          return String(label).trim();
+        }
+      }
+      return null;
+    },
+    matchesSuggestion(partial, label) {
+      const needle = this.labelKey(partial);
+      if (!needle) {
+        return true;
+      }
+      return this.labelKey(label).startsWith(needle);
+    },
+    matchBook(book, term) {
+      if (!term) {
+        return true;
+      }
+      return this.labelKey(book.decade) === term;
+    },
+    collectValues(books) {
+      const seen = new Set();
+      const values = [];
+      for (const book of books || []) {
+        const label = String(book.decade || "").trim();
+        if (!label) {
+          continue;
+        }
+        const key = this.labelKey(label);
+        if (seen.has(key)) {
+          continue;
+        }
+        seen.add(key);
+        values.push(label);
+      }
+      return values.sort((a, b) => decadeSortKey(a) - decadeSortKey(b));
+    },
+  };
+  
+  const SEARCH_FIELD_TYPES = [TAG_FIELD, AUTHOR_FIELD, COVER_FIELD, DECADE_FIELD];
   
   function getActiveDraftField(draftQuery) {
     const text = String(draftQuery || "").trim();
@@ -2223,6 +2384,7 @@ const viewerSearchFields = (function () {
       tag: new Set(),
       author: new Set(),
       cover: new Set(),
+      decade: new Set(),
     };
   
     for (const chip of chips || []) {
@@ -2285,10 +2447,13 @@ const viewerSearchFields = (function () {
           : String(label).trim();
       }
     }
-    if (field.key !== "tag") {
-      const matches = (knownValues || []).filter((label) =>
-        field.labelKey(label).includes(needle),
-      );
+    if (field.key === "decade" || field.key === "author" || field.key === "cover") {
+      const matches = (knownValues || []).filter((label) => {
+        if (field.matchesSuggestion) {
+          return field.matchesSuggestion.call(field, needle, label);
+        }
+        return field.labelKey(label).includes(needle);
+      });
       if (matches.length === 1) {
         return String(matches[0]).trim();
       }
@@ -2297,6 +2462,10 @@ const viewerSearchFields = (function () {
   }
   
   function absorbFieldDraftInput(input, field, knownValues) {
+    if (field.key === "decade") {
+      return null;
+    }
+  
     const draft = parseFieldDraftInput(input, field);
     if (!draft) {
       return null;
@@ -2329,9 +2498,15 @@ const viewerSearchFields = (function () {
   
     const matches = (knownValues || [])
       .filter((label) => !excluded.has(field.labelKey(label)))
-      .filter(
-        (label) => !needle || field.labelKey(label).includes(needle),
-      );
+      .filter((label) => {
+        if (!needle) {
+          return true;
+        }
+        if (field.matchesSuggestion) {
+          return field.matchesSuggestion.call(field, needle, label);
+        }
+        return field.labelKey(label).includes(needle);
+      });
   
     return typeof limit === "number" ? matches.slice(0, limit) : matches;
   }
@@ -2346,6 +2521,7 @@ const viewerSearchFields = (function () {
           tag: [...(filter.fieldTerms.tag || [])],
           author: [...(filter.fieldTerms.author || [])],
           cover: [...(filter.fieldTerms.cover || [])],
+          decade: [...(filter.fieldTerms.decade || [])],
         },
         textTerms: [...(filter.textTerms || [])],
       };
@@ -2355,6 +2531,7 @@ const viewerSearchFields = (function () {
         tag: [...(filter.tagTerms || [])],
         author: [...(filter.authorTerms || [])],
         cover: [...(filter.coverTerms || [])],
+        decade: [...(filter.decadeTerms || [])],
       },
       textTerms: [...(filter.textTerms || [])],
     };
@@ -2451,6 +2628,8 @@ const viewerSearchFields = (function () {
     emptySearchFilter,
     getFieldByKey,
     getFieldByPrefix,
+    parseDecadeDraftInput,
+    getDecadeSuggestDraft,
     parseFieldDraftInput,
     getActiveDraftField,
     isFieldLiteralPrefixPending,
@@ -2506,8 +2685,30 @@ const viewerFilters = (function () {
     return getSearchFields().getFieldByKey("tag");
   }
   
+  function normalizeDecadeLabel(value) {
+    const text = String(value || "").trim();
+    if (!text) {
+      return null;
+    }
+    const match = text.match(/^(\d{4})s?$/i);
+    if (match) {
+      const year = parseInt(match[1], 10);
+      if (!year) {
+        return null;
+      }
+      return `${Math.floor(year / 10) * 10}s`;
+    }
+    return text;
+  }
+  
   function prepareBookSearchIndex(book) {
     const personNames = getPersonNames();
+    if (book.decade) {
+      const normalizedDecade = normalizeDecadeLabel(book.decade);
+      if (normalizedDecade) {
+        book.decade = normalizedDecade;
+      }
+    }
     book._searchHaystack = [
       book.title,
       book.author,
@@ -2999,9 +3200,6 @@ function decadeFromYear(year) {
   const value = parseInt(year, 10);
   if (!value) {
     return null;
-  }
-  if (value < 1940) {
-    return String(value);
   }
   return `${Math.floor(value / 10) * 10}s`;
 }
@@ -4361,8 +4559,26 @@ function setSuggestScrollLock(locked) {
   window.scrollTo(0, suggestScrollY);
 }
 
+function hasDecadeSearchChip() {
+  return searchFilterChips.some((chip) => chip.type === "decade");
+}
+
 function getActiveSuggestField() {
+  if (hasDecadeSearchChip()) {
+    const field = viewerSearchFields.getActiveDraftField(searchInput.value);
+    return field?.key === "decade" ? null : field;
+  }
+  if (viewerSearchFields.getDecadeSuggestDraft(searchInput.value)) {
+    return viewerSearchFields.getFieldByKey("decade");
+  }
   return viewerSearchFields.getActiveDraftField(searchInput.value);
+}
+
+function getFieldDraftForSuggest(field) {
+  if (field?.key === "decade") {
+    return viewerSearchFields.getDecadeSuggestDraft(searchInput.value);
+  }
+  return viewerSearchFields.parseFieldDraftInput(searchInput.value, field);
 }
 
 function getKnownFieldValues(fieldKey) {
@@ -4453,10 +4669,7 @@ function getSuggestItems() {
   if (!field) {
     return [];
   }
-  const draft = viewerSearchFields.parseFieldDraftInput(
-    searchInput.value,
-    field,
-  );
+  const draft = getFieldDraftForSuggest(field);
   if (!draft) {
     return [];
   }
@@ -4546,7 +4759,7 @@ function absorbSearchInputTokens() {
   const trimmed = searchInput.value.trim();
   const activeField = viewerSearchFields.getActiveDraftField(trimmed);
 
-  if (activeField) {
+  if (activeField && activeField.key !== "decade") {
     const draftAbsorbed = viewerSearchFields.absorbFieldDraftInput(
       trimmed,
       activeField,
@@ -4565,6 +4778,9 @@ function absorbSearchInputTokens() {
   const unknownParts = [];
 
   for (const field of viewerSearchFields.SEARCH_FIELD_TYPES) {
+    if (field.key === "decade") {
+      continue;
+    }
     const known = getKnownFieldValues(field.key);
     for (const term of parsed.fieldTerms[field.key] || []) {
       const label = viewerSearchFields.resolveKnownFieldLabel(
@@ -4592,10 +4808,7 @@ function pickSuggestion(index) {
   if (!field || !label) {
     return;
   }
-  const draft = viewerSearchFields.parseFieldDraftInput(
-    searchInput.value,
-    field,
-  );
+  const draft = getFieldDraftForSuggest(field);
   const prefix = draft?.prefix?.trim() || "";
   addSearchChip(field.key, label, { silent: true });
   searchInput.value = prefix;
@@ -4681,7 +4894,7 @@ searchInput.addEventListener("keydown", (event) => {
     return;
   }
 
-  if (event.key === " " && !suggestOpen && activeField) {
+  if (event.key === " " && !suggestOpen && activeField && activeField.key !== "decade") {
     const draft = viewerSearchFields.parseFieldDraftInput(
       searchInput.value.trim(),
       activeField,

@@ -235,6 +235,14 @@ select {
   letter-spacing: 0.01em;
 }
 
+.search-field-chip--decade {
+  --search-field-bg: var(--search-field-decade-bg);
+  --search-field-border: var(--search-field-decade-border);
+  --search-field-text: var(--search-field-decade-text);
+  text-transform: none;
+  letter-spacing: 0.01em;
+}
+
 .search-field-chip-label {
   max-width: 12rem;
   overflow: hidden;
@@ -315,7 +323,8 @@ body.search-field-suggest-open {
 }
 
 .search-field-suggest-item--author,
-.search-field-suggest-item--cover {
+.search-field-suggest-item--cover,
+.search-field-suggest-item--decade {
   text-transform: none;
   letter-spacing: 0.01em;
 }
@@ -330,6 +339,10 @@ body.search-field-suggest-open {
 
 .search-field-suggest-item--cover {
   --search-field-text: var(--search-field-cover-text);
+}
+
+.search-field-suggest-item--decade {
+  --search-field-text: var(--search-field-decade-text);
 }
 
 .search-field-suggest-item:hover,
@@ -351,6 +364,11 @@ body.search-field-suggest-open {
 .search-field-suggest-item--cover:hover,
 .search-field-suggest-item--cover.active {
   --search-field-bg: var(--search-field-cover-bg);
+}
+
+.search-field-suggest-item--decade:hover,
+.search-field-suggest-item--decade.active {
+  --search-field-bg: var(--search-field-decade-bg);
 }
 
 .search-wrap input[type="search"] {

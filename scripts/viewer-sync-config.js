@@ -147,6 +147,8 @@ const VIEWER_SYNC_ENTRIES = [
       "emptySearchFilter",
       "getFieldByKey",
       "getFieldByPrefix",
+      "parseDecadeDraftInput",
+      "getDecadeSuggestDraft",
       "parseFieldDraftInput",
       "getActiveDraftField",
       "isFieldLiteralPrefixPending",

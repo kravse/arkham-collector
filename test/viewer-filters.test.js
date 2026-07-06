@@ -86,12 +86,13 @@ test("parseCompoundSearchQuery splits multiple tags and text terms", () => {
         tag: ["cthulhu mythos", "fantasy"],
         author: [],
         cover: [],
+        decade: [],
       },
       textTerms: ["1950s"],
     },
   );
   assert.deepEqual(parseCompoundSearchQuery("derleth 1950s"), {
-    fieldTerms: { tag: [], author: [], cover: [] },
+    fieldTerms: { tag: [], author: [], cover: [], decade: [] },
     textTerms: ["derleth", "1950s"],
   });
 });
@@ -174,6 +175,25 @@ test("buildSearchFilter merges chip tags with draft query", () => {
         tag: ["fantasy", "cthulhu mythos"],
         author: [],
         cover: [],
+        decade: [],
+      },
+      textTerms: ["1950s"],
+    },
+  );
+});
+
+test("buildSearchFilter keeps typed decade suffixes as text search", () => {
+  assert.deepEqual(
+    buildSearchFilter(
+      [{ type: "tag", label: "FANTASY" }],
+      'tag:"cthulhu mythos" 1950s',
+    ),
+    {
+      fieldTerms: {
+        tag: ["fantasy", "cthulhu mythos"],
+        author: [],
+        cover: [],
+        decade: [],
       },
       textTerms: ["1950s"],
     },
@@ -201,22 +221,22 @@ test("isTagDraftPending suppresses search while typing tag or tag:", () => {
 
 test("buildSearchFilter ignores pending tag draft but keeps chips", () => {
   assert.deepEqual(buildSearchFilter([], "ta"), {
-    fieldTerms: { tag: [], author: [], cover: [] },
+    fieldTerms: { tag: [], author: [], cover: [], decade: [] },
     textTerms: [],
   });
   assert.deepEqual(
     buildSearchFilter([{ type: "tag", label: "FANTASY" }], "tag:"),
     {
-      fieldTerms: { tag: ["fantasy"], author: [], cover: [] },
+      fieldTerms: { tag: ["fantasy"], author: [], cover: [], decade: [] },
       textTerms: [],
     },
   );
   assert.deepEqual(buildSearchFilter([], "th"), {
-    fieldTerms: { tag: [], author: [], cover: [] },
+    fieldTerms: { tag: [], author: [], cover: [], decade: [] },
     textTerms: ["th"],
   });
   assert.deepEqual(buildSearchFilter([], "80s tag:hor"), {
-    fieldTerms: { tag: [], author: [], cover: [] },
+    fieldTerms: { tag: [], author: [], cover: [], decade: [] },
     textTerms: ["80s"],
   });
 });

@@ -43,8 +43,26 @@ function setSuggestScrollLock(locked) {
   window.scrollTo(0, suggestScrollY);
 }
 
+function hasDecadeSearchChip() {
+  return searchFilterChips.some((chip) => chip.type === "decade");
+}
+
 function getActiveSuggestField() {
+  if (hasDecadeSearchChip()) {
+    const field = viewerSearchFields.getActiveDraftField(searchInput.value);
+    return field?.key === "decade" ? null : field;
+  }
+  if (viewerSearchFields.getDecadeSuggestDraft(searchInput.value)) {
+    return viewerSearchFields.getFieldByKey("decade");
+  }
   return viewerSearchFields.getActiveDraftField(searchInput.value);
+}
+
+function getFieldDraftForSuggest(field) {
+  if (field?.key === "decade") {
+    return viewerSearchFields.getDecadeSuggestDraft(searchInput.value);
+  }
+  return viewerSearchFields.parseFieldDraftInput(searchInput.value, field);
 }
 
 function getKnownFieldValues(fieldKey) {
@@ -135,10 +153,7 @@ function getSuggestItems() {
   if (!field) {
     return [];
   }
-  const draft = viewerSearchFields.parseFieldDraftInput(
-    searchInput.value,
-    field,
-  );
+  const draft = getFieldDraftForSuggest(field);
   if (!draft) {
     return [];
   }
@@ -228,7 +243,7 @@ function absorbSearchInputTokens() {
   const trimmed = searchInput.value.trim();
   const activeField = viewerSearchFields.getActiveDraftField(trimmed);
 
-  if (activeField) {
+  if (activeField && activeField.key !== "decade") {
     const draftAbsorbed = viewerSearchFields.absorbFieldDraftInput(
       trimmed,
       activeField,
@@ -247,6 +262,9 @@ function absorbSearchInputTokens() {
   const unknownParts = [];
 
   for (const field of viewerSearchFields.SEARCH_FIELD_TYPES) {
+    if (field.key === "decade") {
+      continue;
+    }
     const known = getKnownFieldValues(field.key);
     for (const term of parsed.fieldTerms[field.key] || []) {
       const label = viewerSearchFields.resolveKnownFieldLabel(
@@ -274,10 +292,7 @@ function pickSuggestion(index) {
   if (!field || !label) {
     return;
   }
-  const draft = viewerSearchFields.parseFieldDraftInput(
-    searchInput.value,
-    field,
-  );
+  const draft = getFieldDraftForSuggest(field);
   const prefix = draft?.prefix?.trim() || "";
   addSearchChip(field.key, label, { silent: true });
   searchInput.value = prefix;
@@ -363,7 +378,7 @@ searchInput.addEventListener("keydown", (event) => {
     return;
   }
 
-  if (event.key === " " && !suggestOpen && activeField) {
+  if (event.key === " " && !suggestOpen && activeField && activeField.key !== "decade") {
     const draft = viewerSearchFields.parseFieldDraftInput(
       searchInput.value.trim(),
       activeField,
