@@ -330,3 +330,192 @@ test("SEARCH_FIELD_TYPES includes tag, author, cover, and decade", () => {
     ["tag", "author", "cover", "decade"],
   );
 });
+
+function decadeYearFilter(overrides = {}) {
+  return {
+    fieldTerms: {
+      tag: [],
+      author: [],
+      cover: [],
+      decade: [],
+      ...(overrides.fieldTerms || {}),
+    },
+    textTerms: overrides.textTerms || [],
+  };
+}
+
+test("decade and year filters combine with OR within the date dimension", () => {
+  const seventies = book({ decade: "1970s", publicationDate: "1972" });
+  const seventiesOther = book({ id: 2, decade: "1970s", publicationDate: "1978" });
+  const eighties = book({ id: 3, decade: "1980s", publicationDate: "1985" });
+  const year1976 = book({ id: 4, decade: "1970s", publicationDate: "1976" });
+  const year1986 = book({ id: 5, decade: "1980s", publicationDate: "1986" });
+  const nineties = book({ id: 6, decade: "1990s", publicationDate: "1992" });
+
+  assert.equal(
+    matchesCompoundSearch(
+      seventies,
+      decadeYearFilter({ fieldTerms: { decade: ["1970s", "1980s"] } }),
+    ),
+    true,
+  );
+  assert.equal(
+    matchesCompoundSearch(
+      eighties,
+      decadeYearFilter({ fieldTerms: { decade: ["1970s", "1980s"] } }),
+    ),
+    true,
+  );
+  assert.equal(
+    matchesCompoundSearch(
+      nineties,
+      decadeYearFilter({ fieldTerms: { decade: ["1970s", "1980s"] } }),
+    ),
+    false,
+  );
+
+  assert.equal(
+    matchesCompoundSearch(
+      seventiesOther,
+      decadeYearFilter({
+        fieldTerms: { decade: ["1970s"] },
+        textTerms: ["1976"],
+      }),
+    ),
+    true,
+  );
+  assert.equal(
+    matchesCompoundSearch(
+      year1976,
+      decadeYearFilter({
+        fieldTerms: { decade: ["1970s"] },
+        textTerms: ["1976"],
+      }),
+    ),
+    true,
+  );
+
+  assert.equal(
+    matchesCompoundSearch(
+      eighties,
+      decadeYearFilter({
+        fieldTerms: { decade: ["1980s"] },
+        textTerms: ["1976"],
+      }),
+    ),
+    true,
+  );
+  assert.equal(
+    matchesCompoundSearch(
+      year1976,
+      decadeYearFilter({
+        fieldTerms: { decade: ["1980s"] },
+        textTerms: ["1976"],
+      }),
+    ),
+    true,
+  );
+  assert.equal(
+    matchesCompoundSearch(
+      seventies,
+      decadeYearFilter({
+        fieldTerms: { decade: ["1980s"] },
+        textTerms: ["1976"],
+      }),
+    ),
+    false,
+  );
+
+  assert.equal(
+    matchesCompoundSearch(year1976, decadeYearFilter({ textTerms: ["1976"] })),
+    true,
+  );
+  assert.equal(
+    matchesCompoundSearch(
+      seventiesOther,
+      decadeYearFilter({ textTerms: ["1976"] }),
+    ),
+    false,
+  );
+
+  assert.equal(
+    matchesCompoundSearch(
+      year1976,
+      decadeYearFilter({ textTerms: ["1976", "1986"] }),
+    ),
+    true,
+  );
+  assert.equal(
+    matchesCompoundSearch(
+      year1986,
+      decadeYearFilter({ textTerms: ["1976", "1986"] }),
+    ),
+    true,
+  );
+  assert.equal(
+    matchesCompoundSearch(
+      seventies,
+      decadeYearFilter({ textTerms: ["1976", "1986"] }),
+    ),
+    false,
+  );
+});
+
+test("decade/year OR still ANDs with tag and other text filters", () => {
+  const horror1970s = book({
+    decade: "1970s",
+    publicationDate: "1974",
+    tags: ["HORROR"],
+  });
+  const fantasy1970s = book({
+    id: 2,
+    decade: "1970s",
+    publicationDate: "1974",
+    tags: ["FANTASY"],
+  });
+
+  assert.equal(
+    matchesCompoundSearch(
+      horror1970s,
+      decadeYearFilter({
+        fieldTerms: { tag: ["horror"], decade: ["1970s", "1980s"] },
+      }),
+    ),
+    true,
+  );
+  assert.equal(
+    matchesCompoundSearch(
+      fantasy1970s,
+      decadeYearFilter({
+        fieldTerms: { tag: ["horror"], decade: ["1970s", "1980s"] },
+      }),
+    ),
+    false,
+  );
+});
+
+test("typed decade text combines with decade chips using OR", () => {
+  const fifties = book({ decade: "1950s", publicationDate: "1955" });
+  const seventies = book({ id: 2, decade: "1970s", publicationDate: "1974" });
+
+  assert.equal(
+    matchesCompoundSearch(
+      fifties,
+      decadeYearFilter({
+        fieldTerms: { decade: ["1970s"] },
+        textTerms: ["1950s"],
+      }),
+    ),
+    true,
+  );
+  assert.equal(
+    matchesCompoundSearch(
+      seventies,
+      decadeYearFilter({
+        fieldTerms: { decade: ["1970s"] },
+        textTerms: ["1950s"],
+      }),
+    ),
+    true,
+  );
+});

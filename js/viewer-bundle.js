@@ -2342,6 +2342,99 @@ const viewerSearchFields = (function () {
     },
   };
   
+  function decadeStartYear(label) {
+    const match = String(label || "")
+      .trim()
+      .match(/^(\d{4})s$/i);
+    return match ? parseInt(match[1], 10) : null;
+  }
+  
+  function yearInDecade(year, decadeLabel) {
+    const start = decadeStartYear(decadeLabel);
+    if (start == null || !Number.isFinite(year)) {
+      return false;
+    }
+    return year >= start && year <= start + 9;
+  }
+  
+  function bookPublicationYear(book) {
+    if (!book) {
+      return null;
+    }
+    const match = String(book.publicationDate || "").match(/\d{4}/);
+    return match ? parseInt(match[0], 10) : null;
+  }
+  
+  function bookMatchesDecadeTerm(book, term) {
+    const normalizedTerm = normalizeLabelKey(term);
+    if (!normalizedTerm) {
+      return true;
+    }
+    if (DECADE_FIELD.labelKey(book.decade) === normalizedTerm) {
+      return true;
+    }
+    const year = bookPublicationYear(book);
+    return year != null && yearInDecade(year, term);
+  }
+  
+  function splitYearDecadeTextTerms(textTerms) {
+    const decadeTermsFromText = [];
+    const yearTerms = [];
+    const otherTextTerms = [];
+    for (const term of textTerms || []) {
+      if (/^\d{4}s$/i.test(term)) {
+        decadeTermsFromText.push(normalizeLabelKey(term));
+      } else if (/^\d{4}$/.test(term)) {
+        yearTerms.push(parseInt(term, 10));
+      } else {
+        otherTextTerms.push(term);
+      }
+    }
+    return { decadeTermsFromText, yearTerms, otherTextTerms };
+  }
+  
+  function dedupeLowerTerms(terms) {
+    const seen = new Set();
+    const out = [];
+    for (const term of terms) {
+      const key = normalizeLabelKey(term);
+      if (!key || seen.has(key)) {
+        continue;
+      }
+      seen.add(key);
+      out.push(key);
+    }
+    return out;
+  }
+  
+  function buildYearDecadeCriteria(decadeFieldTerms, textTerms) {
+    const { decadeTermsFromText, yearTerms, otherTextTerms } =
+      splitYearDecadeTextTerms(textTerms);
+    const decades = dedupeLowerTerms([
+      ...(decadeFieldTerms || []),
+      ...decadeTermsFromText,
+    ]);
+    const years = yearTerms.filter(
+      (year) => !decades.some((decade) => yearInDecade(year, decade)),
+    );
+    return { decades, years, otherTextTerms };
+  }
+  
+  function bookMatchesYearDecadeCriteria(book, criteria) {
+    const { decades, years } = criteria;
+    if (decades.length === 0 && years.length === 0) {
+      return true;
+    }
+    if (decades.some((term) => bookMatchesDecadeTerm(book, term))) {
+      return true;
+    }
+    const bookYear = bookPublicationYear(book);
+    if (bookYear != null && years.some((year) => bookYear === year)) {
+      return true;
+    }
+    return false;
+  }
+  
   const SEARCH_FIELD_TYPES = [TAG_FIELD, AUTHOR_FIELD, COVER_FIELD, DECADE_FIELD];
   
   function getActiveDraftField(draftQuery) {
@@ -2572,8 +2665,15 @@ const viewerSearchFields = (function () {
   
   function matchesCompoundSearch(book, filter) {
     const { fieldTerms, textTerms } = normalizeSearchFilter(filter);
+    const yearDecadeCriteria = buildYearDecadeCriteria(
+      fieldTerms.decade,
+      textTerms,
+    );
   
     for (const field of SEARCH_FIELD_TYPES) {
+      if (field.key === "decade") {
+        continue;
+      }
       for (const term of fieldTerms[field.key] || []) {
         if (!field.matchBook(book, term)) {
           return false;
@@ -2581,8 +2681,17 @@ const viewerSearchFields = (function () {
       }
     }
   
+    if (
+      yearDecadeCriteria.decades.length > 0 ||
+      yearDecadeCriteria.years.length > 0
+    ) {
+      if (!bookMatchesYearDecadeCriteria(book, yearDecadeCriteria)) {
+        return false;
+      }
+    }
+  
     const haystack = book._searchHaystack || "";
-    for (const term of textTerms) {
+    for (const term of yearDecadeCriteria.otherTextTerms) {
       if (!haystack.includes(term)) {
         return false;
       }
@@ -2674,6 +2783,13 @@ const viewerSearchFields = (function () {
     resolveFieldFilterLabel,
     filterFieldSuggestions,
     normalizeSearchFilter,
+    decadeStartYear,
+    yearInDecade,
+    bookPublicationYear,
+    bookMatchesDecadeTerm,
+    splitYearDecadeTextTerms,
+    buildYearDecadeCriteria,
+    bookMatchesYearDecadeCriteria,
     matchesCompoundSearch,
     filterBooksMatchingFieldTerms,
     chipsToFieldTermsPartial,
@@ -4610,15 +4726,7 @@ function setSuggestScrollLock(locked) {
   window.scrollTo(0, suggestScrollY);
 }
 
-function hasDecadeSearchChip() {
-  return searchFilterChips.some((chip) => chip.type === "decade");
-}
-
 function getActiveSuggestField() {
-  if (hasDecadeSearchChip()) {
-    const field = viewerSearchFields.getActiveDraftField(searchInput.value);
-    return field?.key === "decade" ? null : field;
-  }
   if (viewerSearchFields.getDecadeSuggestDraft(searchInput.value)) {
     return viewerSearchFields.getFieldByKey("decade");
   }

@@ -43,15 +43,7 @@ function setSuggestScrollLock(locked) {
   window.scrollTo(0, suggestScrollY);
 }
 
-function hasDecadeSearchChip() {
-  return searchFilterChips.some((chip) => chip.type === "decade");
-}
-
 function getActiveSuggestField() {
-  if (hasDecadeSearchChip()) {
-    const field = viewerSearchFields.getActiveDraftField(searchInput.value);
-    return field?.key === "decade" ? null : field;
-  }
   if (viewerSearchFields.getDecadeSuggestDraft(searchInput.value)) {
     return viewerSearchFields.getFieldByKey("decade");
   }
