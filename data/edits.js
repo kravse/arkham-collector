@@ -614,7 +614,7 @@ window.BOOK_EDITS = {
   "356": {
     "coverImageFile": "covers/the-dark-man-and-others-356.jpg",
     "listCoverFocusX": 0.49789915966386555,
-    "listCoverFocusY": 0.3576585293949415
+    "listCoverFocusY": 0.36702629417335375
   },
   "357": {
     "coverImageFile": "covers/mr-george-and-other-odd-persons-357.jpg",
