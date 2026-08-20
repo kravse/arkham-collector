@@ -22,6 +22,61 @@ function needsSpaceBetween(prevChar, nextChar) {
   return /[\w$]/.test(prevChar) && /[\w$]/.test(nextChar);
 }
 
+function canStartRegexLiteral(prevChar) {
+  if (!prevChar) {
+    return true;
+  }
+  return /[\s;({},=:![&|?+\-*%^~<>]/.test(prevChar);
+}
+
+function consumeRegexLiteral(input, startIndex, appendChar) {
+  let i = startIndex;
+  appendChar(input[i]);
+  i += 1;
+  while (i < input.length) {
+    const current = input[i];
+    if (current === "\\") {
+      appendChar(current);
+      i += 1;
+      if (i < input.length) {
+        appendChar(input[i]);
+        i += 1;
+      }
+      continue;
+    }
+    if (current === "[") {
+      appendChar(current);
+      i += 1;
+      while (i < input.length) {
+        const cls = input[i];
+        appendChar(cls);
+        i += 1;
+        if (cls === "\\" && i < input.length) {
+          appendChar(input[i]);
+          i += 1;
+          continue;
+        }
+        if (cls === "]") {
+          break;
+        }
+      }
+      continue;
+    }
+    if (current === "/") {
+      appendChar(current);
+      i += 1;
+      while (i < input.length && /[gimsuy]/.test(input[i])) {
+        appendChar(input[i]);
+        i += 1;
+      }
+      return i;
+    }
+    appendChar(current);
+    i += 1;
+  }
+  return i;
+}
+
 function compactJs(source) {
   const input = String(source);
   let out = "";
@@ -61,6 +116,11 @@ function compactJs(source) {
         i += 1;
       }
       i += 2;
+      continue;
+    }
+
+    if (ch === "/" && canStartRegexLiteral(prevOutChar)) {
+      i = consumeRegexLiteral(input, i, appendChar);
       continue;
     }
 
@@ -140,4 +200,5 @@ function compactJs(source) {
 
 module.exports = {
   compactJs,
+  canStartRegexLiteral,
 };

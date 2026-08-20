@@ -1,5 +1,8 @@
 const { test } = require("node:test");
 const assert = require("node:assert/strict");
+const fs = require("node:fs");
+const path = require("node:path");
+const { execFileSync } = require("node:child_process");
 
 const { compactJs } = require("../scripts/lib/compact-js");
 
@@ -38,4 +41,26 @@ test("compactJs shrinks readable bundle output", () => {
   const compact = compactJs(source);
   assert.ok(compact.length < source.length);
   assert.match(compact, /function example\(value\)\{return value\+1;\}/);
+});
+
+test("compactJs preserves regex literals with quotes and https URLs in strings", () => {
+  const source = `
+    function escapeHtml(value) {
+      return String(value || "")
+        .replace(/"/g, "&quot;");
+    }
+    const GITHUB_API = "https://api.github.com";
+  `;
+  const compact = compactJs(source);
+  assert.ok(compact.includes('replace(/"/g,"&quot;")'));
+  assert.ok(compact.includes('GITHUB_API="https://api.github.com"'));
+  execFileSync(process.execPath, ["--check", "-"], { input: compact });
+});
+
+test("compactJs output for viewer bundle passes syntax check", () => {
+  const bundlePath = path.join(__dirname, "..", "js", "viewer-bundle.js");
+  const source = fs.readFileSync(bundlePath, "utf8");
+  const compact = compactJs(source);
+  assert.ok(compact.length < source.length);
+  execFileSync(process.execPath, ["--check", "-"], { input: compact });
 });
