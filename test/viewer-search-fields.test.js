@@ -16,6 +16,7 @@ const {
   getFieldByKey,
   resolveKnownFieldLabel,
   getDecadeSuggestDraft,
+  prepareCompoundSearchMatcher,
 } = require("../scripts/lib/viewer-search-fields");
 const { prepareBookSearchIndex } = require("../scripts/lib/viewer-filters");
 
@@ -344,6 +345,20 @@ function decadeYearFilter(overrides = {}) {
   };
 }
 
+test("prepareCompoundSearchMatcher matches matchesCompoundSearch behavior", () => {
+  const entry = book({
+    author: "H. P. Lovecraft",
+    tags: ["HORROR"],
+    decade: "1950s",
+  });
+  const filter = {
+    fieldTerms: { tag: ["horror"], author: [], cover: [], decade: ["1950s"] },
+    textTerms: ["lovecraft"],
+  };
+  const match = prepareCompoundSearchMatcher(filter);
+  assert.equal(match(entry), matchesCompoundSearch(entry, filter));
+});
+
 test("decade and year filters combine with OR within the date dimension", () => {
   const seventies = book({ decade: "1970s", publicationDate: "1972" });
   const seventiesOther = book({ id: 2, decade: "1970s", publicationDate: "1978" });
@@ -518,4 +533,46 @@ test("typed decade text combines with decade chips using OR", () => {
     ),
     true,
   );
+});
+
+test("searchFilterIsEmpty detects empty and non-empty filters", () => {
+  const {
+    emptySearchFilter,
+    searchFilterIsEmpty,
+    buildSearchFilter,
+  } = require("../scripts/lib/viewer-search-fields");
+
+  assert.equal(searchFilterIsEmpty(emptySearchFilter()), true);
+  assert.equal(
+    searchFilterIsEmpty(buildSearchFilter([{ type: "tag", label: "Horror" }], "")),
+    false,
+  );
+});
+
+test("filterBooksBySearch returns same array reference when filter is empty", () => {
+  const {
+    emptySearchFilter,
+    filterBooksBySearch,
+  } = require("../scripts/lib/viewer-search-fields");
+
+  const books = [book({ title: "The Outsider" })];
+  assert.equal(filterBooksBySearch(books, emptySearchFilter()), books);
+});
+
+test("filterBooksBySearch narrows books by text terms", () => {
+  const {
+    parseCompoundSearchQuery,
+    filterBooksBySearch,
+  } = require("../scripts/lib/viewer-search-fields");
+
+  const books = [
+    book({ id: 1, title: "The Outsider" }),
+    book({ id: 2, title: "At the Mountains of Madness" }),
+  ];
+  const filtered = filterBooksBySearch(
+    books,
+    parseCompoundSearchQuery("outsider"),
+  );
+  assert.equal(filtered.length, 1);
+  assert.equal(filtered[0].id, 1);
 });

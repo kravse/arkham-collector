@@ -4,6 +4,12 @@ const assert = require("node:assert/strict");
 const {
   buildBookOrderIndex,
   sortBooks,
+  normalizeSort,
+  getSortField,
+  isSortDescending,
+  toggleSortDirection,
+  sortModeForField,
+  sortDirectionLabel,
 } = require("../scripts/lib/viewer-sort");
 
 function book(id, year, title) {
@@ -109,4 +115,21 @@ test("fixture order matches date-asc within every multi-book year", () => {
       `date-asc should follow custom order for year ${year}`,
     );
   }
+});
+
+test("sort field helpers map modes to fields and directions", () => {
+  assert.equal(normalizeSort("title-desc"), "title-desc");
+  assert.equal(normalizeSort("invalid"), "date-asc");
+  assert.equal(getSortField("date-desc"), "date");
+  assert.equal(getSortField("title-asc"), "title");
+  assert.equal(isSortDescending("date-desc"), true);
+  assert.equal(isSortDescending("title-asc"), false);
+  assert.equal(toggleSortDirection("date-asc"), "date-desc");
+  assert.equal(toggleSortDirection("title-desc"), "title-asc");
+  assert.equal(sortModeForField("title", "date-desc"), "title-asc");
+  assert.equal(sortModeForField("date", "title-desc"), "date-asc");
+  assert.equal(sortDirectionLabel("date", false), "Oldest first");
+  assert.equal(sortDirectionLabel("date", true), "Newest first");
+  assert.equal(sortDirectionLabel("title", false), "A to Z");
+  assert.equal(sortDirectionLabel("title", true), "Z to A");
 });

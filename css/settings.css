@@ -685,6 +685,68 @@
   color: #f0a8a8;
 }
 
+.gist-backup-section {
+  margin-top: 1rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid rgba(232, 234, 237, 0.08);
+}
+
+.gist-backup-section[hidden] {
+  display: none;
+}
+
+.gist-backup-heading {
+  margin: 0 0 0.45rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.gist-backup-note {
+  margin: 0 0 0.65rem;
+}
+
+.gist-backup-note code {
+  font-size: 0.72rem;
+}
+
+.gist-backup-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.4rem;
+}
+
+.gist-backup-item {
+  margin: 0;
+}
+
+.gist-backup-restore-btn {
+  width: 100%;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid rgba(232, 234, 237, 0.12);
+  border-radius: 8px;
+  background: rgba(15, 17, 21, 0.55);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.78rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.gist-backup-restore-btn:hover {
+  border-color: rgba(232, 234, 237, 0.22);
+  background: rgba(23, 26, 33, 0.85);
+}
+
+.gist-backup-empty {
+  margin: 0;
+  font-size: 0.76rem;
+  line-height: 1.45;
+  color: rgba(232, 234, 237, 0.55);
+}
+
 .visually-hidden {
   position: absolute;
   width: 1px;

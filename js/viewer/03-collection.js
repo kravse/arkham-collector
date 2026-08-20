@@ -114,7 +114,7 @@ function collectRuntimeSnapshot() {
     orderedIds: [...orderedIds],
     wantIds: [...wantIds],
     wantOrderIds: [...wantOrderIds],
-    sort: sortSelect.value,
+    sort: getCatalogSortMode(),
     viewMode: gridViewMode,
     headerFiltersExpanded,
     highlightWants,
@@ -139,8 +139,8 @@ function applyRuntimeSnapshot(runtime) {
   highlightCollection = runtime.highlightCollection;
   showMagazines = runtime.showMagazines;
   wantOrderLocked = runtime.wantOrderLocked === true;
-  if (sortSelect && runtime.sort) {
-    sortSelect.value = runtime.sort;
+  if (runtime.sort) {
+    syncSortControlFromMode(runtime.sort);
   }
   updateViewModeState();
   updateHeaderFiltersState();
@@ -152,6 +152,17 @@ function githubHeaders(token) {
     Authorization: `Bearer ${token}`,
     "X-GitHub-Api-Version": "2022-11-28",
   };
+}
+
+async function listUserGists(token) {
+  const response = await fetch(`${viewerGistSync.GITHUB_API}/gists?per_page=100`, {
+    headers: githubHeaders(token),
+    cache: "no-store",
+  });
+  if (!response.ok) {
+    return [];
+  }
+  return response.json();
 }
 
 async function fetchGistState(config) {
@@ -169,27 +180,32 @@ async function fetchGistState(config) {
     throw new Error(`Gist fetch failed (${response.status})`);
   }
   const body = await response.json();
-  const content = viewerGistSync.extractStateJsonFromGistResponse(body);
+  const stateFilename = viewerGistSync.resolveGistStateFilename(
+    body,
+    config.stateFilename,
+  );
+  if (stateFilename !== config.stateFilename) {
+    writeGistSyncConfig({ ...config, stateFilename });
+  }
+  const content = viewerGistSync.extractStateJsonFromGistResponse(
+    body,
+    stateFilename,
+  );
   if (!content) {
     return null;
   }
   return viewerUserState.parseUserState(content);
 }
 
-async function findExistingArkhamGistId(token) {
-  const response = await fetch(`${viewerGistSync.GITHUB_API}/gists?per_page=100`, {
-    headers: githubHeaders(token),
-    cache: "no-store",
-  });
-  if (!response.ok) {
-    return null;
-  }
-  const gists = await response.json();
-  return viewerGistSync.findArkhamGistId(gists);
+async function findExistingArkhamGist(token) {
+  const gists = await listUserGists(token);
+  return viewerGistSync.findArkhamGistEntry(gists);
 }
 
 async function pushGistState(config, state) {
   const stateJson = viewerUserState.serializeUserState(state);
+  const stateFilename =
+    config.stateFilename || viewerGistSync.GIST_STATE_FILENAME;
   const response = await fetch(
     `${viewerGistSync.GITHUB_API}/gists/${config.gistId}`,
     {
@@ -198,7 +214,9 @@ async function pushGistState(config, state) {
         ...githubHeaders(config.token),
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(viewerGistSync.buildGistUpdatePayload(stateJson)),
+      body: JSON.stringify(
+        viewerGistSync.buildGistUpdatePayload(stateJson, stateFilename),
+      ),
     },
   );
   if (!response.ok) {
@@ -231,8 +249,11 @@ async function connectGistSync(token) {
 
   const existingConfig = readGistSyncConfig();
   let gistId = existingConfig?.gistId || "";
+  let stateFilename = existingConfig?.stateFilename || "";
   if (!gistId) {
-    gistId = (await findExistingArkhamGistId(trimmed)) || "";
+    const entry = await findExistingArkhamGist(trimmed);
+    gistId = entry?.gistId || "";
+    stateFilename = entry?.stateFilename || "";
   }
 
   const localPersisted = readPersistedUserState();
@@ -240,10 +261,15 @@ async function connectGistSync(token) {
 
   if (gistId) {
     try {
-      remoteState = await fetchGistState({ token: trimmed, gistId });
+      remoteState = await fetchGistState({
+        token: trimmed,
+        gistId,
+        stateFilename,
+      });
     } catch (error) {
       if (String(error.message || "").includes("404")) {
         gistId = "";
+        stateFilename = "";
       } else {
         throw error;
       }
@@ -267,9 +293,21 @@ async function connectGistSync(token) {
       { token: trimmed, gistId: "" },
       nextState,
     );
+    stateFilename = viewerGistSync.GIST_STATE_FILENAME;
   }
 
-  writeGistSyncConfig({ token: trimmed, gistId });
+  const gists = await listUserGists(trimmed);
+  const backupGistId =
+    existingConfig?.backupGistId ||
+    viewerGistBackup.findBackupGistId(gists, gistId) ||
+    "";
+
+  writeGistSyncConfig({
+    token: trimmed,
+    gistId,
+    backupGistId,
+    stateFilename,
+  });
   persistUserState(nextState);
   applyRuntimeSnapshot(viewerUserState.applyUserStateToRuntime(nextState));
   pendingGistSetup = false;
@@ -295,6 +333,11 @@ function scheduleGistPush() {
       gistPushInFlight = pushGistState(config, buildStateForPersistence());
       await gistPushInFlight;
       updateGistSyncStatus("Synced to GitHub Gist.");
+      try {
+        await maybeCreateGistSnapshot();
+      } catch (_) {
+        /* Backup failures must not block live sync. */
+      }
     } catch (error) {
       updateGistSyncStatus(error.message || "Gist sync failed.", true);
     } finally {
@@ -436,6 +479,11 @@ function loadUserState() {
 async function loadUserStateAsync() {
   loadUserState();
   await pullGistStateIfConfigured({ reRender: false });
+  try {
+    await maybeCreateGistSnapshot();
+  } catch (_) {
+    /* Backup failures must not block startup. */
+  }
 }
 
 function saveUserState() {
@@ -569,4 +617,235 @@ function getCollectionCount() {
   return getActiveBooks().filter(
     (book) => passesBookVisibility(book) && isInCollection(book),
   ).length;
+}
+
+let backupSnapshotChain = Promise.resolve();
+
+function isGistSyncConnected() {
+  return (
+    storageMode === "gist" &&
+    viewerGistSync.isConnectedGistConfig(readGistSyncConfig())
+  );
+}
+
+function backupUserStateLocally(state) {
+  try {
+    localStorage.setItem(
+      viewerUserState.USER_STATE_BACKUP_KEY,
+      viewerUserState.serializeUserState(state),
+    );
+  } catch (_) {
+    // localStorage unavailable
+  }
+}
+
+function clearStoredBackupGistId() {
+  const config = readGistSyncConfig();
+  if (!config?.backupGistId) {
+    return;
+  }
+  writeGistSyncConfig({ ...config, backupGistId: "" });
+}
+
+async function gistApiRequest(path, options = {}) {
+  const { method = "GET", token, body } = options;
+  const response = await fetch(`${viewerGistSync.GITHUB_API}${path}`, {
+    method,
+    headers: {
+      ...githubHeaders(token),
+      ...(body ? { "Content-Type": "application/json" } : {}),
+    },
+    body: body ? JSON.stringify(body) : undefined,
+    cache: "no-store",
+  });
+  if (!response.ok) {
+    const error = new Error(`GitHub API failed (${response.status})`);
+    error.status = response.status;
+    throw error;
+  }
+  if (response.status === 204) {
+    return null;
+  }
+  return response.json();
+}
+
+async function resolveBackupGistId() {
+  const config = readGistSyncConfig();
+  if (!config?.token) {
+    return null;
+  }
+  if (config.backupGistId) {
+    return config.backupGistId;
+  }
+  const gists = await listUserGists(config.token);
+  const backupGistId = viewerGistBackup.findBackupGistId(gists, config.gistId);
+  if (backupGistId) {
+    writeGistSyncConfig({ ...config, backupGistId });
+  }
+  return backupGistId || null;
+}
+
+async function fetchBackupGistBody(backupGistId) {
+  const config = readGistSyncConfig();
+  try {
+    return await gistApiRequest(`/gists/${backupGistId}`, {
+      token: config.token,
+    });
+  } catch (error) {
+    if (error?.status === 404) {
+      clearStoredBackupGistId();
+      return null;
+    }
+    throw error;
+  }
+}
+
+async function readBackupPayload(backupGistId) {
+  const body = await fetchBackupGistBody(backupGistId);
+  if (!body) {
+    return viewerGistBackup.emptyBackupPayload();
+  }
+  const content = viewerGistBackup.extractBackupContent(body);
+  return content
+    ? viewerGistBackup.parseBackupPayload(content)
+    : viewerGistBackup.emptyBackupPayload();
+}
+
+async function writeBackupPayload(backupGistId, payload) {
+  const config = readGistSyncConfig();
+  const contentJson = viewerGistBackup.serializeBackupPayload(payload);
+  try {
+    await gistApiRequest(`/gists/${backupGistId}`, {
+      method: "PATCH",
+      token: config.token,
+      body: viewerGistBackup.buildBackupGistUpdatePayload(contentJson),
+    });
+  } catch (error) {
+    if (error?.status === 404) {
+      clearStoredBackupGistId();
+      await createBackupGist(payload);
+      return;
+    }
+    throw error;
+  }
+}
+
+async function createBackupGist(payload) {
+  const config = readGistSyncConfig();
+  const contentJson = viewerGistBackup.serializeBackupPayload(payload);
+  const created = await gistApiRequest("/gists", {
+    method: "POST",
+    token: config.token,
+    body: viewerGistBackup.buildBackupGistCreatePayload(contentJson),
+  });
+  const backupGistId = created?.id || "";
+  if (!backupGistId) {
+    throw new Error("GitHub did not return a backup Gist id.");
+  }
+  writeGistSyncConfig({ ...config, backupGistId });
+  return backupGistId;
+}
+
+async function createGistSnapshotNow() {
+  const now = Date.now();
+  const atIso = new Date(now).toISOString();
+  const stateObject = viewerUserState.parseUserState(
+    viewerUserState.serializeUserState(buildStateForPersistence()),
+  );
+  if (!stateObject) {
+    return { ok: false, reason: "state" };
+  }
+
+  let backupGistId = await resolveBackupGistId();
+  let payload = viewerGistBackup.emptyBackupPayload();
+
+  if (backupGistId) {
+    const body = await fetchBackupGistBody(backupGistId);
+    if (!body) {
+      backupGistId = null;
+    } else {
+      payload = viewerGistBackup.parseBackupPayload(
+        viewerGistBackup.extractBackupContent(body) || "",
+      );
+      if (!viewerGistBackup.shouldCreateSnapshot(payload.snapshots, now)) {
+        return { ok: true, skipped: true };
+      }
+    }
+  }
+
+  if (!backupGistId && !viewerGistBackup.shouldCreateSnapshot([], now)) {
+    return { ok: true, skipped: true };
+  }
+
+  const nextPayload = viewerGistBackup.appendSnapshot(
+    payload,
+    stateObject,
+    atIso,
+  );
+
+  if (!backupGistId) {
+    await createBackupGist(nextPayload);
+    return { ok: true, created: true };
+  }
+
+  await writeBackupPayload(backupGistId, nextPayload);
+  return { ok: true, created: true };
+}
+
+async function maybeCreateGistSnapshot() {
+  if (!isGistSyncConnected()) {
+    return { ok: false, reason: "disabled" };
+  }
+  backupSnapshotChain = backupSnapshotChain.then(() => createGistSnapshotNow());
+  return backupSnapshotChain;
+}
+
+async function listGistSnapshots() {
+  if (!isGistSyncConnected()) {
+    return [];
+  }
+  const backupGistId = await resolveBackupGistId();
+  if (!backupGistId) {
+    return [];
+  }
+  const payload = await readBackupPayload(backupGistId);
+  return viewerGistBackup.snapshotListEntries(payload);
+}
+
+async function restoreGistSnapshot(at) {
+  if (!isGistSyncConnected()) {
+    return { ok: false, error: "Gist sync is not connected." };
+  }
+  if (!Date.parse(String(at || ""))) {
+    return { ok: false, error: "That snapshot is not valid." };
+  }
+
+  const backupGistId = await resolveBackupGistId();
+  if (!backupGistId) {
+    return { ok: false, error: "No backup Gist found." };
+  }
+
+  const payload = await readBackupPayload(backupGistId);
+  const entry = viewerGistBackup.findSnapshotByAt(payload, at);
+  if (!entry) {
+    return { ok: false, error: "Could not find that snapshot." };
+  }
+  const parsed = viewerUserState.parseUserState(entry.state);
+  if (!parsed) {
+    return { ok: false, error: "Could not read that snapshot." };
+  }
+
+  backupUserStateLocally(buildStateForPersistence());
+  persistUserState(parsed);
+  applyRuntimeSnapshot(viewerUserState.applyUserStateToRuntime(parsed));
+  storageMode = "gist";
+  pendingGistSetup = false;
+  syncSettingsStorageMode();
+  invalidateSortedCache();
+
+  const config = readGistSyncConfig();
+  await pushGistState(config, parsed);
+  updateGistSyncStatus("Synced to GitHub Gist.");
+
+  return { ok: true };
 }

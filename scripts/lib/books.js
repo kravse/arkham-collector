@@ -48,7 +48,7 @@ function writeDevBooksPayload(payload, paths = {}) {
   const booksJson = paths.booksJson || BOOKS_JSON;
   const booksJs = paths.booksJs || BOOKS_JS;
   writeJsonFile(booksJson, payload);
-  writeJsGlobal(booksJs, "BOOKS", payload.books || []);
+  writeJsGlobal(booksJs, "BOOKS", payload.books || [], { compact: true });
 }
 
 function getScrapedBookFromPayload(payload, bookId) {
@@ -253,8 +253,10 @@ function writeViewerBookScripts(books, dataDir) {
   const { slim, descriptions } = splitBooksAndDescriptions(books);
   const booksPath = path.join(dataDir, "books.js");
   const descriptionsPath = path.join(dataDir, "descriptions.js");
-  writeJsGlobal(booksPath, "BOOKS", slim);
-  writeJsGlobal(descriptionsPath, "BOOK_DESCRIPTIONS", descriptions);
+  writeJsGlobal(booksPath, "BOOKS", slim, { compact: true });
+  writeJsGlobal(descriptionsPath, "BOOK_DESCRIPTIONS", descriptions, {
+    compact: true,
+  });
   return { booksPath, descriptionsPath };
 }
 

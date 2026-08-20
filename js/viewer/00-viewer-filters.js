@@ -224,6 +224,36 @@ const viewerFilters = (function () {
     );
   }
   
+  function filterBooksByCatalogFilters(books, options) {
+    const {
+      hiddenOnly,
+      showMagazines,
+      mycroftFilterMode,
+      collectionFilterMode,
+      wantFilterMode,
+      collectedIds,
+      orderedIds,
+      wantIds,
+    } = options;
+  
+    return books.filter(
+      (book) =>
+        passesBookVisibility(book, { hiddenOnly, showMagazines }) &&
+        passesMycroftImprintFilter(book, mycroftFilterMode) &&
+        passesCollectionFilter(
+          book,
+          collectionFilterMode,
+          collectedIds,
+          orderedIds,
+        ) &&
+        passesWantFilter(book, wantFilterMode, wantIds),
+    );
+  }
+  
+  function filterBooksBySearch(books, searchFilter) {
+    return getSearchFields().filterBooksBySearch(books, searchFilter);
+  }
+  
   function filterVisibleBooks(books, options) {
     const {
       hiddenOnly,
@@ -244,18 +274,18 @@ const viewerFilters = (function () {
         ? getSearchFields().parseCompoundSearchQuery(searchQuery)
         : getSearchFields().emptySearchFilter());
   
-    return books.filter(
-      (book) =>
-        passesBookVisibility(book, { hiddenOnly, showMagazines }) &&
-        passesMycroftImprintFilter(book, mycroftFilterMode) &&
-        passesCollectionFilter(
-          book,
-          collectionFilterMode,
-          collectedIds,
-          orderedIds,
-        ) &&
-        passesWantFilter(book, wantFilterMode, wantIds) &&
-        getSearchFields().matchesCompoundSearch(book, resolvedSearchFilter),
+    return filterBooksBySearch(
+      filterBooksByCatalogFilters(books, {
+        hiddenOnly,
+        showMagazines,
+        mycroftFilterMode,
+        collectionFilterMode,
+        wantFilterMode,
+        collectedIds,
+        orderedIds,
+        wantIds,
+      }),
+      resolvedSearchFilter,
     );
   }
   
@@ -349,6 +379,10 @@ const viewerFilters = (function () {
     return getSearchFields().matchesCompoundSearch(...args);
   }
   
+  function prepareCompoundSearchMatcher(...args) {
+    return getSearchFields().prepareCompoundSearchMatcher(...args);
+  }
+  
   function filterBooksMatchingFieldTerms(...args) {
     return getSearchFields().filterBooksMatchingFieldTerms(...args);
   }
@@ -359,6 +393,14 @@ const viewerFilters = (function () {
   
   function emptySearchFilter(...args) {
     return getSearchFields().emptySearchFilter(...args);
+  }
+  
+  function searchFilterIsEmpty(...args) {
+    return getSearchFields().searchFilterIsEmpty(...args);
+  }
+  
+  function filterBooksBySearch(...args) {
+    return getSearchFields().filterBooksBySearch(...args);
   }
   
   function tagKey(...args) {
@@ -385,11 +427,14 @@ const viewerFilters = (function () {
     formatTagSearchQuery,
     formatFieldSearchQuery,
     matchesTagSearch,
+    prepareCompoundSearchMatcher,
     matchesCompoundSearch,
     filterBooksMatchingTagTerms,
     filterBooksMatchingFieldTerms,
     chipsToFieldTermsPartial,
     emptySearchFilter,
+    searchFilterIsEmpty,
+    filterBooksBySearch,
     matchesSearch,
     isMagazineIssue,
     passesHiddenVisibility,
@@ -400,6 +445,7 @@ const viewerFilters = (function () {
     isInCollection,
     passesCollectionFilter,
     passesWantFilter,
+    filterBooksByCatalogFilters,
     filterVisibleBooks,
     cycleMycroftFilter,
     cycleCollectionFilter,

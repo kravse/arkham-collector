@@ -15,6 +15,7 @@ const {
 const { buildListFocalByMaster } = require("./scripts/lib/cover-list-crop");
 const { bundleViewerJs } = require("./scripts/bundle-viewer-js");
 const { VIEWER_CSS_FILES } = require("./scripts/css-manifest");
+const { compactJs } = require("./scripts/lib/compact-js");
 
 const ROOT = __dirname;
 const BUILD_DIR = path.join(ROOT, "build");
@@ -90,8 +91,8 @@ function applyBuildHtmlTransforms(html, options = {}) {
 
   const injectParts = ["<script>window.READ_ONLY = true;</script>"];
   next = next.replace(
-    '<script src="data/books.js"></script>',
-    `${injectParts.join("\n  ")}\n    <script src="data/books.js"></script>`,
+    '<script defer src="data/books.js"></script>',
+    `${injectParts.join("\n  ")}\n    <script defer src="data/books.js"></script>`,
   );
 
   const shareImage = `${DEPLOY_ORIGIN}/images/share.png`;
@@ -119,6 +120,32 @@ Disallow: /
 
 /** Canonical deploy origin for absolute Open Graph / Twitter image URLs. */
 const DEPLOY_ORIGIN = "https://arkhamcollector.org";
+
+function minifyDeployJs(relativePath) {
+  const filePath = path.join(BUILD_DIR, relativePath);
+  if (!fs.existsSync(filePath)) {
+    return;
+  }
+  const source = fs.readFileSync(filePath, "utf8");
+  fs.writeFileSync(filePath, compactJs(source));
+}
+
+function minifyDeployJsTree(relativeDir) {
+  const dirPath = path.join(BUILD_DIR, relativeDir);
+  if (!fs.existsSync(dirPath)) {
+    return;
+  }
+  for (const entry of fs.readdirSync(dirPath, { withFileTypes: true })) {
+    const relativePath = path.join(relativeDir, entry.name);
+    if (entry.isDirectory()) {
+      minifyDeployJsTree(relativePath);
+      continue;
+    }
+    if (entry.name.endsWith(".js")) {
+      minifyDeployJs(relativePath);
+    }
+  }
+}
 
 function buildStaticSite() {
   return buildStaticSiteAsync();
@@ -229,6 +256,8 @@ async function buildStaticSiteAsync() {
   copiedAssets += 1;
   copiedAssets += copyDirectory("js");
   copiedAssets += copyDirectory("images");
+  minifyDeployJsTree("js");
+  minifyDeployJsTree("data");
   if (fs.existsSync(SITE_WEBMANIFEST)) {
     copyFile(SITE_WEBMANIFEST, path.join(BUILD_DIR, "site.webmanifest"));
     copiedAssets += 1;

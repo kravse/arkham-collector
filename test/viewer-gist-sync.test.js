@@ -81,7 +81,7 @@ test("mergeGistUserState preserves local collection when remote wins", () => {
   assert.deepEqual(merged.collections.gist.collectionIds, [2]);
 });
 
-test("findArkhamGistId picks gist with state.json", () => {
+test("findArkhamGistId picks arkham sync filename and legacy state.json", () => {
   assert.equal(
     findArkhamGistId([
       { id: "a", files: { "notes.txt": {} } },
@@ -89,10 +89,17 @@ test("findArkhamGistId picks gist with state.json", () => {
     ]),
     "b",
   );
+  assert.equal(
+    findArkhamGistId([
+      { id: "legacy", files: { "state.json": { content: "{}" } } },
+      { id: "current", files: { [GIST_STATE_FILENAME]: { content: "{}" } } },
+    ]),
+    "current",
+  );
   assert.equal(findArkhamGistId([]), null);
 });
 
-test("extractStateJsonFromGistResponse reads state.json content", () => {
+test("extractStateJsonFromGistResponse reads arkham sync file content", () => {
   const json = extractStateJsonFromGistResponse({
     files: {
       [GIST_STATE_FILENAME]: { content: '{"version":2}' },
@@ -101,22 +108,45 @@ test("extractStateJsonFromGistResponse reads state.json content", () => {
   assert.equal(json, '{"version":2}');
 });
 
-test("gist payload builders wrap state.json", () => {
+test("extractStateJsonFromGistResponse falls back to legacy state.json", () => {
+  const json = extractStateJsonFromGistResponse({
+    files: {
+      "state.json": { content: '{"version":2}' },
+    },
+  });
+  assert.equal(json, '{"version":2}');
+});
+
+test("gist payload builders wrap arkham sync filename", () => {
   const content = '{"version":2}';
   assert.deepEqual(buildGistCreatePayload(content).files[GIST_STATE_FILENAME], {
     content,
   });
-  assert.deepEqual(buildGistUpdatePayload(content).files[GIST_STATE_FILENAME], {
-    content,
-  });
+  assert.deepEqual(
+    buildGistUpdatePayload(content, "state.json").files["state.json"],
+    { content },
+  );
 });
 
-test("parseGistSyncConfig requires token", () => {
+test("parseGistSyncConfig requires token and stores backup gist id", () => {
   assert.equal(parseGistSyncConfig(null), null);
   assert.deepEqual(parseGistSyncConfig('{"token":"abc","gistId":"123"}'), {
     token: "abc",
     gistId: "123",
+    backupGistId: "",
+    stateFilename: "",
   });
+  assert.deepEqual(
+    parseGistSyncConfig(
+      '{"token":"abc","gistId":"123","backupGistId":"backup","stateFilename":"state.json"}',
+    ),
+    {
+      token: "abc",
+      gistId: "123",
+      backupGistId: "backup",
+      stateFilename: "state.json",
+    },
+  );
   assert.equal(isConnectedGistConfig({ token: "abc", gistId: "" }), false);
   assert.equal(isConnectedGistConfig({ token: "abc", gistId: "123" }), true);
 });

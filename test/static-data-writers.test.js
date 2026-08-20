@@ -25,7 +25,7 @@ test("saveEdits writes json wrapper and BOOK_EDITS js global", () => {
   });
   assert.equal(
     fs.readFileSync(editsJs, "utf8"),
-    'window.BOOK_EDITS = {\n  "3": {\n    "title": "Override"\n  }\n};\n',
+    'window.BOOK_EDITS = {"3":{"title":"Override"}};\n',
   );
 });
 
@@ -39,7 +39,7 @@ test("saveTags writes byBookId json and BOOK_TAGS js global", () => {
   });
   assert.equal(
     fs.readFileSync(tagsJs, "utf8"),
-    'window.BOOK_TAGS = {\n  "7": [\n    "RARE"\n  ]\n};\n',
+    'window.BOOK_TAGS = {"7":["RARE"]};\n',
   );
 });
 
@@ -53,6 +53,6 @@ test("saveBookOrder writes order json and BOOK_ORDER js global", () => {
   });
   assert.equal(
     fs.readFileSync(jsPath, "utf8"),
-    "window.BOOK_ORDER = [\n  1,\n  2,\n  3\n];\n",
+    "window.BOOK_ORDER = [1,2,3];\n",
   );
 });

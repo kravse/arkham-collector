@@ -50,6 +50,6 @@ test("saveTags writes json and js payloads", () => {
   assert.deepEqual(JSON.parse(fs.readFileSync(tagsJson, "utf8")), {
     byBookId: { 7: ["RARE"] },
   });
-  assert.match(fs.readFileSync(tagsJs, "utf8"), /"7": \[\s*"RARE"/);
+  assert.match(fs.readFileSync(tagsJs, "utf8"), /"7":\s*\[\s*"RARE"/);
   fs.rmSync(tmpDir, { recursive: true, force: true });
 });

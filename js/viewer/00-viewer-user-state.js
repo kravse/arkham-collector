@@ -2,6 +2,7 @@
 
 const viewerUserState = (function () {
   const USER_STATE_KEY = "arkham-user-state";
+  const USER_STATE_BACKUP_KEY = "arkham-user-state-backup";
   const USER_STATE_VERSION = 2;
   const USER_STATE_VERSION_V1 = 1;
   
@@ -474,6 +475,7 @@ const viewerUserState = (function () {
   }
   return {
     USER_STATE_KEY,
+    USER_STATE_BACKUP_KEY,
     USER_STATE_VERSION,
     LEGACY_KEYS,
     defaultUserState,

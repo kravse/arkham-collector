@@ -118,7 +118,7 @@
   .sort-bar {
     display: flex;
     align-items: stretch;
-    gap: 0.45rem;
+    gap: 0.65rem;
     width: 100%;
     min-width: 0;
   }
@@ -131,9 +131,15 @@
   }
 
   .sort-bar .sort-control {
-    display: block;
+    display: flex;
+    align-items: stretch;
+    gap: 0.65rem;
     flex: 1;
     min-width: 0;
+  }
+
+  .sort-bar .sort-reverse-btn {
+    align-self: stretch;
   }
 
   .sort-value-slot {

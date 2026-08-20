@@ -4,7 +4,43 @@
 const searchFilterChips = [];
 let searchSuggestIndex = -1;
 let searchRenderTimer = null;
+let suggestUpdateTimer = null;
 let suggestScrollY = 0;
+let cachedSearchFilter = null;
+let cachedSearchFilterKey = null;
+const knownFieldValuesCache = new Map();
+/** @type {string[]} */
+let lastSuggestItems = [];
+
+function searchStateKey() {
+  return JSON.stringify({
+    chips: searchFilterChips,
+    draft: searchInput.value,
+  });
+}
+
+function invalidateSearchFilterCache() {
+  cachedSearchFilterKey = null;
+  cachedSearchFilter = null;
+}
+
+function invalidateKnownFieldValuesCache() {
+  knownFieldValuesCache.clear();
+}
+
+function invalidateSearchViewCache() {
+  invalidateSearchFilterCache();
+  invalidateKnownFieldValuesCache();
+}
+
+function searchFilterHasTerms(filter) {
+  return (
+    (filter.textTerms || []).length > 0 ||
+    viewerSearchFields.SEARCH_FIELD_TYPES.some(
+      (field) => (filter.fieldTerms[field.key] || []).length > 0,
+    )
+  );
+}
 
 function isSuggestTouchAllowed(target) {
   return Boolean(target?.closest?.(".search-field-suggest"));
@@ -62,6 +98,21 @@ function getKnownFieldValues(fieldKey) {
   if (!field) {
     return [];
   }
+  const scopeKey = [
+    fieldKey,
+    typeof getViewWithoutSearchCacheKey === "function"
+      ? getViewWithoutSearchCacheKey()
+      : "",
+    JSON.stringify(
+      viewerSearchFields.chipsToFieldTermsPartial(
+        searchFilterChips,
+        fieldKey,
+      ),
+    ),
+  ].join("|");
+  if (knownFieldValuesCache.has(scopeKey)) {
+    return knownFieldValuesCache.get(scopeKey);
+  }
   const scopedBooks = viewerFilters.filterBooksMatchingFieldTerms(
     getViewBooksWithoutSearch(),
     viewerSearchFields.chipsToFieldTermsPartial(
@@ -69,14 +120,21 @@ function getKnownFieldValues(fieldKey) {
       fieldKey,
     ),
   );
-  return field.collectValues(scopedBooks);
+  const values = field.collectValues(scopedBooks);
+  knownFieldValuesCache.set(scopeKey, values);
+  return values;
 }
 
 function getSearchFilter() {
-  return viewerFilters.buildSearchFilter(
-    searchFilterChips,
-    searchInput.value,
-  );
+  const key = searchStateKey();
+  if (key !== cachedSearchFilterKey) {
+    cachedSearchFilterKey = key;
+    cachedSearchFilter = viewerFilters.buildSearchFilter(
+      searchFilterChips,
+      searchInput.value,
+    );
+  }
+  return cachedSearchFilter;
 }
 
 function hasActiveSearch() {
@@ -87,13 +145,7 @@ function hasActiveSearch() {
   if (!draft || viewerFilters.isSearchDraftBlockingText(draft)) {
     return false;
   }
-  const filter = viewerFilters.buildSearchFilter([], draft);
-  return (
-    filter.textTerms.length > 0 ||
-    viewerSearchFields.SEARCH_FIELD_TYPES.some(
-      (field) => (filter.fieldTerms[field.key] || []).length > 0,
-    )
-  );
+  return searchFilterHasTerms(getSearchFilter());
 }
 
 function updateSearchClearVisibility() {
@@ -134,13 +186,18 @@ function renderSearchChips() {
 
 function hideSuggest() {
   searchSuggestIndex = -1;
+  lastSuggestItems = [];
   searchFieldSuggest.hidden = true;
   searchFieldSuggest.innerHTML = "";
   searchInput.setAttribute("aria-expanded", "false");
   setSuggestScrollLock(false);
 }
 
-function getSuggestItems() {
+function updateSuggest() {
+  updateSuggestNow();
+}
+
+function computeSuggestItems() {
   const field = getActiveSuggestField();
   if (!field) {
     return [];
@@ -160,9 +217,11 @@ function getSuggestItems() {
   );
 }
 
-function renderSuggest() {
-  const field = getActiveSuggestField();
-  const items = getSuggestItems();
+function getSuggestItems() {
+  return computeSuggestItems();
+}
+
+function renderSuggest(field, items) {
   if (!field || !items.length) {
     hideSuggest();
     return;
@@ -180,15 +239,28 @@ function renderSuggest() {
   setSuggestScrollLock(true);
 }
 
-function updateSuggest() {
-  if (!getActiveSuggestField()) {
+function updateSuggestNow() {
+  const field = getActiveSuggestField();
+  if (!field) {
+    lastSuggestItems = [];
     hideSuggest();
     return;
   }
-  if (searchSuggestIndex >= getSuggestItems().length) {
+  lastSuggestItems = computeSuggestItems();
+  if (searchSuggestIndex >= lastSuggestItems.length) {
     searchSuggestIndex = -1;
   }
-  renderSuggest();
+  renderSuggest(field, lastSuggestItems);
+}
+
+function debouncedUpdateSuggest() {
+  if (suggestUpdateTimer) {
+    clearTimeout(suggestUpdateTimer);
+  }
+  suggestUpdateTimer = setTimeout(() => {
+    suggestUpdateTimer = null;
+    updateSuggestNow();
+  }, 120);
 }
 
 function addSearchChip(fieldKey, label, options = {}) {
@@ -211,6 +283,7 @@ function addSearchChip(fieldKey, label, options = {}) {
     return false;
   }
   searchFilterChips.push({ type: fieldKey, label: canonical });
+  invalidateSearchViewCache();
   renderSearchChips();
   if (!options.silent) {
     updateSearchClearVisibility();
@@ -225,6 +298,7 @@ function removeSearchChipAt(index) {
     return;
   }
   searchFilterChips.splice(index, 1);
+  invalidateSearchViewCache();
   renderSearchChips();
   updateSearchClearVisibility();
   updateSuggest();
@@ -279,7 +353,7 @@ function absorbSearchInputTokens() {
 
 function pickSuggestion(index) {
   const field = getActiveSuggestField();
-  const items = getSuggestItems();
+  const items = lastSuggestItems.length ? lastSuggestItems : computeSuggestItems();
   const label = items[index];
   if (!field || !label) {
     return;
@@ -296,6 +370,7 @@ function pickSuggestion(index) {
 function clearSearchState() {
   searchFilterChips.length = 0;
   searchInput.value = "";
+  invalidateSearchViewCache();
   renderSearchChips();
   hideSuggest();
   updateSearchClearVisibility();
@@ -331,13 +406,15 @@ function applyFieldSearch(fieldKey, rawValue) {
 }
 
 function onSearchInput() {
+  invalidateSearchFilterCache();
   updateSearchClearVisibility();
-  updateSuggest();
+  debouncedUpdateSuggest();
   debouncedRender();
 }
 
 function onSearchCommit() {
   absorbSearchInputTokens();
+  invalidateSearchFilterCache();
   hideSuggest();
   updateSearchClearVisibility();
   renderNow();
@@ -361,8 +438,9 @@ searchFieldSuggest.addEventListener("mousedown", (event) => {
 });
 
 searchInput.addEventListener("keydown", (event) => {
-  const items = getSuggestItems();
-  const suggestOpen = items.length > 0 && !searchFieldSuggest.hidden;
+  const suggestOpen =
+    lastSuggestItems.length > 0 && !searchFieldSuggest.hidden;
+  const items = suggestOpen ? lastSuggestItems : [];
   const activeField = getActiveSuggestField();
 
   if (event.key === "Backspace" && !searchInput.value && searchFilterChips.length) {
@@ -403,7 +481,7 @@ searchInput.addEventListener("keydown", (event) => {
   if (event.key === "ArrowDown") {
     event.preventDefault();
     searchSuggestIndex = (searchSuggestIndex + 1) % items.length;
-    renderSuggest();
+    renderSuggest(getActiveSuggestField(), items);
     return;
   }
 
@@ -411,7 +489,7 @@ searchInput.addEventListener("keydown", (event) => {
     event.preventDefault();
     searchSuggestIndex =
       searchSuggestIndex <= 0 ? items.length - 1 : searchSuggestIndex - 1;
-    renderSuggest();
+    renderSuggest(getActiveSuggestField(), items);
     return;
   }
 

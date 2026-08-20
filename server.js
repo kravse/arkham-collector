@@ -35,6 +35,14 @@ const { FILTER_PATH_SEGMENTS } = require("./scripts/lib/viewer-filter-url");
 const ROOT = __dirname;
 const DATA_DIR = path.join(ROOT, "data");
 const COVERS_DIR = path.join(ROOT, "covers");
+const BOOKS_JSON_PATH = path.join(DATA_DIR, "books.json");
+const EDITS_JSON_PATH = path.join(DATA_DIR, "edits.json");
+const TAGS_JSON_PATH = path.join(DATA_DIR, "tags.json");
+
+let booksPayloadCache = { mtimeMs: null, payload: null };
+let editsPayloadCache = { mtimeMs: null, payload: null };
+let tagsPayloadCache = { mtimeMs: null, payload: null };
+let mergedBooksCache = { key: null, books: null };
 const {
   readBooksPayload,
   writeDevBooksPayload,
@@ -54,12 +62,64 @@ function wikiTitleFromHref(href) {
 }
 
 function readPayload() {
-  return readBooksPayload();
+  const stat = fs.statSync(BOOKS_JSON_PATH);
+  if (
+    booksPayloadCache.payload &&
+    booksPayloadCache.mtimeMs === stat.mtimeMs
+  ) {
+    return booksPayloadCache.payload;
+  }
+  const payload = readBooksPayload();
+  booksPayloadCache = { mtimeMs: stat.mtimeMs, payload };
+  return payload;
 }
 
 function writePayload(payload) {
   fs.mkdirSync(DATA_DIR, { recursive: true });
   writeDevBooksPayload(payload);
+  const stat = fs.statSync(BOOKS_JSON_PATH);
+  booksPayloadCache = { mtimeMs: stat.mtimeMs, payload };
+  mergedBooksCache.key = null;
+  mergedBooksCache.books = null;
+}
+
+function readEditsCached() {
+  if (!fs.existsSync(EDITS_JSON_PATH)) {
+    return { edits: {} };
+  }
+  const stat = fs.statSync(EDITS_JSON_PATH);
+  if (
+    editsPayloadCache.payload &&
+    editsPayloadCache.mtimeMs === stat.mtimeMs
+  ) {
+    return editsPayloadCache.payload;
+  }
+  const payload = loadEdits();
+  editsPayloadCache = { mtimeMs: stat.mtimeMs, payload };
+  mergedBooksCache.key = null;
+  mergedBooksCache.books = null;
+  return payload;
+}
+
+function readTagsCached() {
+  if (!fs.existsSync(TAGS_JSON_PATH)) {
+    return { byBookId: {} };
+  }
+  const stat = fs.statSync(TAGS_JSON_PATH);
+  if (tagsPayloadCache.payload && tagsPayloadCache.mtimeMs === stat.mtimeMs) {
+    return tagsPayloadCache.payload;
+  }
+  const payload = loadTags();
+  tagsPayloadCache = { mtimeMs: stat.mtimeMs, payload };
+  return payload;
+}
+
+function getMergedBooksCacheKey() {
+  const booksStat = fs.statSync(BOOKS_JSON_PATH);
+  const editsStat = fs.existsSync(EDITS_JSON_PATH)
+    ? fs.statSync(EDITS_JSON_PATH)
+    : { mtimeMs: 0 };
+  return `${booksStat.mtimeMs}:${editsStat.mtimeMs}`;
 }
 
 function getScrapedBook(payload, bookId) {
@@ -71,11 +131,11 @@ function getMergedBook(payload, bookId) {
   if (!scraped) {
     return null;
   }
-  return applyEditsToBook(scraped, loadEdits().edits);
+  return applyEditsToBook(scraped, readEditsCached().edits);
 }
 
 function bookEditResponse(payload, bookId, merged) {
-  const edit = getEditForBook(loadEdits().edits, bookId);
+  const edit = getEditForBook(readEditsCached().edits, bookId);
   return {
     ...merged,
     edit: edit ? { ...edit } : {},
@@ -119,7 +179,7 @@ app.post("/api/books/:id/cover", upload.single("cover"), (req, res) => {
 
 app.get("/api/tags", (_req, res) => {
   try {
-    const { byBookId } = loadTags();
+    const { byBookId } = readTagsCached();
     res.json({ tags: getAllTags(byBookId) });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -329,7 +389,13 @@ app.delete("/api/books/:id", (req, res) => {
 });
 
 function getMergedBooks(payload) {
-  return applyEditsToBooks(payload.books, loadEdits().edits);
+  const cacheKey = getMergedBooksCacheKey();
+  if (mergedBooksCache.key === cacheKey && mergedBooksCache.books) {
+    return mergedBooksCache.books;
+  }
+  const books = applyEditsToBooks(payload.books, readEditsCached().edits);
+  mergedBooksCache = { key: cacheKey, books };
+  return books;
 }
 
 app.get("/api/book-order", (_req, res) => {
@@ -365,6 +431,14 @@ app.put("/api/book-order", (req, res) => {
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
+});
+
+app.use((req, res, next) => {
+  if (req.path === "/data/books.json") {
+    res.status(404).end();
+    return;
+  }
+  next();
 });
 
 app.use(

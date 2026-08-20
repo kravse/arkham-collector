@@ -28,6 +28,8 @@ const {
   passesMycroftImprintFilter,
   passesCollectionFilter,
   passesWantFilter,
+  filterBooksByCatalogFilters,
+  filterBooksBySearch,
   filterVisibleBooks,
   cycleMycroftFilter,
   cycleCollectionFilter,
@@ -576,4 +578,30 @@ test("pickRandomBook returns one of the provided books", () => {
   const pool = [book(1), book(2), book(3)];
   const picked = pickRandomBook(pool);
   assert.ok(pool.some((entry) => entry.id === picked.id));
+});
+
+test("filterBooksByCatalogFilters applies visibility filters without search", () => {
+  const books = [
+    book(1, { hidden: true }),
+    book(2),
+    book(3, { imprint: "mycroft_moran" }),
+  ];
+  const collectedIds = new Set([2]);
+  const orderedIds = new Set();
+
+  const filtered = filterBooksByCatalogFilters(books, {
+    hiddenOnly: false,
+    showMagazines: false,
+    mycroftFilterMode: "hidden",
+    collectionFilterMode: "collection",
+    wantFilterMode: null,
+    collectedIds,
+    orderedIds,
+    wantIds: new Set(),
+  });
+
+  assert.deepEqual(
+    filtered.map((entry) => entry.id),
+    [2],
+  );
 });

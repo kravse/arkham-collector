@@ -166,6 +166,28 @@ if (gistClearBtn) {
   });
 }
 
+if (gistBackupList) {
+  gistBackupList.addEventListener("click", onGistBackupListClick);
+}
+
+if (backupRestoreOk) {
+  backupRestoreOk.addEventListener("click", () => {
+    onConfirmBackupRestore();
+  });
+}
+
+if (backupRestoreCancel) {
+  backupRestoreCancel.addEventListener("click", closeBackupRestoreConfirm);
+}
+
+if (backupRestoreDialog) {
+  backupRestoreDialog
+    .querySelectorAll("[data-close-backup-restore]")
+    .forEach((element) => {
+      element.addEventListener("click", closeBackupRestoreConfirm);
+    });
+}
+
 if (exportCollectionBtn) {
   exportCollectionBtn.addEventListener("click", () => {
     exportCollectionCsv();
@@ -279,6 +301,7 @@ document.addEventListener("keydown", (event) => {
 });
 
 sortSelect.addEventListener("change", onSortChange);
+sortReverseBtn?.addEventListener("click", toggleSortOrder);
 
 syncSettingsStorageMode();
 updateSortControlVisibility();

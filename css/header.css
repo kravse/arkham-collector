@@ -95,7 +95,7 @@ h1 {
 .sort-bar {
   display: flex;
   align-items: stretch;
-  gap: 0.5rem;
+  gap: 0.65rem;
   flex: 1 1 auto;
   min-width: 0;
 }
@@ -436,7 +436,7 @@ input[type="search"]::-webkit-search-cancel-button {
 .sort-control {
   display: flex;
   align-items: center;
-  gap: 0.55rem;
+  gap: 0.75rem;
   flex: 1;
   min-width: 0;
 }
@@ -659,7 +659,7 @@ input[type="search"]::-webkit-search-cancel-button {
   }
 
   .catalog-toolbar .sort-bar {
-    flex: 0 0 min(16rem, 22vw);
+    flex: 0 0 min(18rem, 24vw);
     order: 2;
   }
 
@@ -675,12 +675,23 @@ input[type="search"]::-webkit-search-cancel-button {
   }
 
   .sort-control {
-    gap: 0;
+    gap: 0.65rem;
   }
 
   #sort,
   .sort-want-badge {
     width: 100%;
+  }
+
+  .sort-reverse-btn {
+    width: 2.35rem;
+    min-width: 2.35rem;
+    height: 2.35rem;
+  }
+
+  .sort-reverse-btn svg {
+    width: 15px;
+    height: 15px;
   }
 }
 
@@ -695,6 +706,79 @@ input[type="search"]::-webkit-search-cancel-button {
   background-position: right 0.85rem center;
   background-size: 0.75rem;
   cursor: pointer;
+}
+
+.sort-reverse-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  min-width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel);
+  color: var(--muted);
+  cursor: pointer;
+  flex: none;
+}
+
+.sort-reverse-btn .sort-direction-icon--asc {
+  display: block;
+}
+
+.sort-reverse-btn .sort-direction-icon--desc {
+  display: none;
+}
+
+.sort-reverse-btn.is-descending .sort-direction-icon--asc {
+  display: none;
+}
+
+.sort-reverse-btn.is-descending .sort-direction-icon--desc {
+  display: block;
+}
+
+.sort-reverse-btn[hidden] {
+  display: none;
+}
+
+@media (hover: hover) {
+  .sort-reverse-btn:hover:not(:disabled) {
+    color: var(--text);
+    border-color: var(--border-strong, var(--border));
+    filter: brightness(1.06);
+  }
+}
+
+.sort-reverse-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.sort-reverse-btn.is-descending {
+  color: var(--muted);
+}
+
+.sort-reverse-btn.is-newest-first {
+  color: var(--accent);
+  border-color: rgba(201, 162, 39, 0.45);
+  background: rgba(201, 162, 39, 0.14);
+}
+
+@media (hover: hover) {
+  .sort-reverse-btn.is-newest-first:hover:not(:disabled) {
+    color: var(--accent);
+    border-color: rgba(201, 162, 39, 0.55);
+    background: rgba(201, 162, 39, 0.2);
+    filter: none;
+  }
+}
+
+.sort-reverse-btn.is-ascending {
+  color: var(--muted);
+  background: var(--panel);
 }
 
 .stats {

@@ -35,6 +35,11 @@ const PARTS = [
       "Unified user state persistence (generated from scripts/lib/viewer-user-state.js)",
   },
   {
+    file: "00-viewer-gist-backup.js",
+    title:
+      "GitHub Gist snapshot backups (generated from scripts/lib/viewer-gist-backup.js)",
+  },
+  {
     file: "00-viewer-gist-sync.js",
     title:
       "GitHub gist sync helpers (generated from scripts/lib/viewer-gist-sync.js)",

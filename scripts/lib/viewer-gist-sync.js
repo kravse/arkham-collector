@@ -1,6 +1,8 @@
 const GIST_SYNC_KEY = "arkham-gist-sync";
-const GIST_STATE_FILENAME = "state.json";
+const GIST_STATE_FILENAME = "arkham-collector-state.json";
+const LEGACY_GIST_STATE_FILENAMES = ["state.json"];
 const GITHUB_API = "https://api.github.com";
+const GIST_DESCRIPTION = "Arkham Collector sync";
 
 function parseGistSyncConfig(json) {
   if (json == null || json === "") {
@@ -10,10 +12,14 @@ function parseGistSyncConfig(json) {
     const parsed = typeof json === "string" ? JSON.parse(json) : json;
     const token = typeof parsed.token === "string" ? parsed.token.trim() : "";
     const gistId = typeof parsed.gistId === "string" ? parsed.gistId.trim() : "";
+    const backupGistId =
+      typeof parsed.backupGistId === "string" ? parsed.backupGistId.trim() : "";
+    const stateFilename =
+      typeof parsed.stateFilename === "string" ? parsed.stateFilename.trim() : "";
     if (!token) {
       return null;
     }
-    return { token, gistId };
+    return { token, gistId, backupGistId, stateFilename };
   } catch (_) {
     return null;
   }
@@ -23,6 +29,8 @@ function serializeGistSyncConfig(config) {
   return JSON.stringify({
     token: config.token,
     gistId: config.gistId || "",
+    backupGistId: config.backupGistId || "",
+    stateFilename: config.stateFilename || "",
   });
 }
 
@@ -80,30 +88,64 @@ function mergeGistUserState(localState, remoteState, helpers) {
   return merged;
 }
 
-function extractStateJsonFromGistResponse(body) {
+function resolveGistStateFilename(body, preferredFilename) {
+  if (preferredFilename && body?.files?.[preferredFilename]) {
+    return preferredFilename;
+  }
+  if (body?.files?.[GIST_STATE_FILENAME]) {
+    return GIST_STATE_FILENAME;
+  }
+  for (const legacy of LEGACY_GIST_STATE_FILENAMES) {
+    if (body?.files?.[legacy]) {
+      return legacy;
+    }
+  }
+  return GIST_STATE_FILENAME;
+}
+
+function extractStateJsonFromGistResponse(body, stateFilename) {
   if (!body || typeof body !== "object") {
     return null;
   }
-  const file = body.files?.[GIST_STATE_FILENAME];
+  const filename = resolveGistStateFilename(body, stateFilename);
+  const file = body.files?.[filename];
   if (!file || typeof file.content !== "string") {
     return null;
   }
   return file.content;
 }
 
-function findArkhamGistId(gists, stateFilename = GIST_STATE_FILENAME) {
+function findArkhamGistId(gists) {
   if (!Array.isArray(gists)) {
     return null;
   }
-  const match = gists.find(
-    (gist) => gist?.files && gist.files[stateFilename],
-  );
-  return match?.id || null;
+  const filenames = [GIST_STATE_FILENAME, ...LEGACY_GIST_STATE_FILENAMES];
+  for (const filename of filenames) {
+    const match = gists.find((gist) => gist?.files && gist.files[filename]);
+    if (match?.id) {
+      return match.id;
+    }
+  }
+  return null;
+}
+
+function findArkhamGistEntry(gists) {
+  if (!Array.isArray(gists)) {
+    return null;
+  }
+  const filenames = [GIST_STATE_FILENAME, ...LEGACY_GIST_STATE_FILENAMES];
+  for (const filename of filenames) {
+    const match = gists.find((gist) => gist?.files && gist.files[filename]);
+    if (match?.id) {
+      return { gistId: match.id, stateFilename: filename };
+    }
+  }
+  return null;
 }
 
 function buildGistCreatePayload(stateJson) {
   return {
-    description: "Arkham Collector sync",
+    description: GIST_DESCRIPTION,
     public: false,
     files: {
       [GIST_STATE_FILENAME]: {
@@ -113,10 +155,10 @@ function buildGistCreatePayload(stateJson) {
   };
 }
 
-function buildGistUpdatePayload(stateJson) {
+function buildGistUpdatePayload(stateJson, stateFilename = GIST_STATE_FILENAME) {
   return {
     files: {
-      [GIST_STATE_FILENAME]: {
+      [stateFilename]: {
         content: stateJson,
       },
     },
@@ -160,14 +202,18 @@ function resolveGistConnectState({
 module.exports = {
   GIST_SYNC_KEY,
   GIST_STATE_FILENAME,
+  LEGACY_GIST_STATE_FILENAMES,
+  GIST_DESCRIPTION,
   GITHUB_API,
   parseGistSyncConfig,
   serializeGistSyncConfig,
   isConnectedGistConfig,
   mergeUserStateByUpdatedAt,
   mergeGistUserState,
+  resolveGistStateFilename,
   extractStateJsonFromGistResponse,
   findArkhamGistId,
+  findArkhamGistEntry,
   buildGistCreatePayload,
   buildGistUpdatePayload,
   resolveGistConnectState,

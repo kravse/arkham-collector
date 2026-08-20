@@ -7,6 +7,11 @@ const books = applyBookTags(
   applyBookEdits(window.BOOKS || [], window.BOOK_EDITS || {}),
   window.BOOK_TAGS || {},
 );
+try {
+  delete window.BOOKS;
+} catch {
+  window.BOOKS = undefined;
+}
 const grid = document.getElementById("grid");
 const stats = document.getElementById("stats");
 const searchInput = document.getElementById("search");
@@ -16,6 +21,7 @@ const searchFieldSuggest = document.getElementById("search-field-suggest");
 const searchClearBtn = document.getElementById("search-clear");
 const viewModeToggle = document.getElementById("view-mode-toggle");
 const sortSelect = document.getElementById("sort");
+const sortReverseBtn = document.getElementById("sort-reverse");
 const sortWantBadge = document.getElementById("sort-want-badge");
 const sortControlWrap = document.getElementById("sort-control-wrap");
 const bookOrderBtn = document.getElementById("book-order-btn");
@@ -87,6 +93,13 @@ const gistTokenInput = document.getElementById("gist-token-input");
 const gistConnectBtn = document.getElementById("gist-connect-btn");
 const gistClearBtn = document.getElementById("gist-clear-btn");
 const gistSyncStatus = document.getElementById("gist-sync-status");
+const gistBackupSection = document.getElementById("gist-backup-section");
+const gistBackupList = document.getElementById("gist-backup-list");
+const gistBackupStatus = document.getElementById("gist-backup-status");
+const backupRestoreDialog = document.getElementById("backup-restore-dialog");
+const backupRestoreMessage = document.getElementById("backup-restore-message");
+const backupRestoreOk = document.getElementById("backup-restore-ok");
+const backupRestoreCancel = document.getElementById("backup-restore-cancel");
 const exportCollectionBtn = document.getElementById("export-collection-btn");
 const importCollectionBtn = document.getElementById("import-collection-btn");
 const importCollectionInput = document.getElementById("import-collection-input");
@@ -106,12 +119,6 @@ const headerFiltersToggle = document.getElementById("header-filters-toggle");
 const readOnly = window.READ_ONLY === true;
 const LOGO_ARKHAM = "images/arkham-house.jpg";
 const LOGO_MYCROFT = "images/Mycroft_moran.png";
-const SORT_MODES = new Set([
-  "date-desc",
-  "date-asc",
-  "title-asc",
-  "title-desc",
-]);
 let serveEnabled = false;
 let serveEditDeltas = false;
 let editingBookId = null;
@@ -130,6 +137,7 @@ let gridViewMode = "cards";
 let highlightWants = true;
 let highlightCollection = true;
 let showMagazines = false;
+let catalogSortMode = "date-asc";
 let wantOrderLocked = false;
 let detailBookId = null;
 let bookOrderIds = Array.isArray(window.BOOK_ORDER)
@@ -196,7 +204,24 @@ function activeCollectionIds() {
   return collectionIds;
 }
 
+let lastSettingsHighlightSignature = null;
+
+function buildSettingsHighlightSignature() {
+  return [
+    highlightWants ? 1 : 0,
+    highlightCollection ? 1 : 0,
+    showMagazines ? 1 : 0,
+    hasVisibleMagazineIssues() ? 1 : 0,
+  ].join(":");
+}
+
 function syncSettingsHighlightCheckboxes() {
+  const signature = buildSettingsHighlightSignature();
+  if (signature === lastSettingsHighlightSignature) {
+    return;
+  }
+  lastSettingsHighlightSignature = signature;
+
   if (highlightWantsInput) {
     highlightWantsInput.checked = highlightWants;
   }
@@ -810,6 +835,7 @@ const viewerWantOrderNormalize = (function () {
 
 const viewerUserState = (function () {
   const USER_STATE_KEY = "arkham-user-state";
+  const USER_STATE_BACKUP_KEY = "arkham-user-state-backup";
   const USER_STATE_VERSION = 2;
   const USER_STATE_VERSION_V1 = 1;
   
@@ -1282,6 +1308,7 @@ const viewerUserState = (function () {
   }
   return {
     USER_STATE_KEY,
+    USER_STATE_BACKUP_KEY,
     USER_STATE_VERSION,
     LEGACY_KEYS,
     defaultUserState,
@@ -1305,12 +1332,191 @@ const viewerUserState = (function () {
 })();
 
 
+/* Generated from scripts/lib/viewer-gist-backup.js — run npm run bundle-viewer */
+
+const viewerGistBackup = (function () {
+  /**
+   * Gist snapshot backups: one private gist, one JSON file, up to five immutable
+   * state entries appended over time.
+   */
+  
+  const BACKUP_GIST_DESCRIPTION = "Arkham Collector backups";
+  const BACKUP_FILENAME = "arkham-collector-backups.json";
+  const BACKUP_PAYLOAD_VERSION = 1;
+  const MAX_SNAPSHOTS = 5;
+  const SNAPSHOT_INTERVAL_MS = 24 * 60 * 60 * 1000;
+  
+  function emptyBackupPayload() {
+    return { version: BACKUP_PAYLOAD_VERSION, snapshots: [] };
+  }
+  
+  function normalizeAtStamp(value) {
+    const time = Date.parse(String(value || ""));
+    if (!Number.isFinite(time)) {
+      return null;
+    }
+    return new Date(time).toISOString();
+  }
+  
+  function normalizeSnapshotEntry(entry) {
+    if (!entry || typeof entry !== "object") {
+      return null;
+    }
+    const at = normalizeAtStamp(entry.at);
+    const state = entry.state;
+    if (!at || !state || typeof state !== "object") {
+      return null;
+    }
+    return { at, state };
+  }
+  
+  function parseBackupPayload(json) {
+    if (json == null || json === "") {
+      return emptyBackupPayload();
+    }
+    try {
+      const parsed = typeof json === "string" ? JSON.parse(json) : json;
+      if (!parsed || typeof parsed !== "object") {
+        return emptyBackupPayload();
+      }
+      const snapshots = Array.isArray(parsed.snapshots)
+        ? parsed.snapshots.map(normalizeSnapshotEntry).filter(Boolean)
+        : [];
+      snapshots.sort((a, b) => a.at.localeCompare(b.at));
+      return {
+        version: BACKUP_PAYLOAD_VERSION,
+        snapshots,
+      };
+    } catch (_) {
+      return emptyBackupPayload();
+    }
+  }
+  
+  function serializeBackupPayload(payload) {
+    const snapshots = Array.isArray(payload?.snapshots)
+      ? payload.snapshots.map(normalizeSnapshotEntry).filter(Boolean)
+      : [];
+    snapshots.sort((a, b) => a.at.localeCompare(b.at));
+    return JSON.stringify(
+      {
+        version: BACKUP_PAYLOAD_VERSION,
+        snapshots,
+      },
+      null,
+      2,
+    );
+  }
+  
+  function snapshotListEntries(payload) {
+    return (payload?.snapshots || []).map((entry) => ({ at: entry.at }));
+  }
+  
+  function shouldCreateSnapshot(snapshots, nowMs, intervalMs = SNAPSHOT_INTERVAL_MS) {
+    if (!snapshots?.length) {
+      return true;
+    }
+    const latestAt = Date.parse(snapshots[snapshots.length - 1]?.at || "");
+    if (!Number.isFinite(latestAt)) {
+      return true;
+    }
+    return nowMs - latestAt >= intervalMs;
+  }
+  
+  function appendSnapshot(payload, state, at, maxSnapshots = MAX_SNAPSHOTS) {
+    const atIso = normalizeAtStamp(at);
+    if (!atIso || !state || typeof state !== "object") {
+      return payload || emptyBackupPayload();
+    }
+    const previous = (payload?.snapshots || [])
+      .map(normalizeSnapshotEntry)
+      .filter(Boolean);
+    const next = [...previous, { at: atIso, state }];
+    const trimmed =
+      next.length > maxSnapshots ? next.slice(next.length - maxSnapshots) : next;
+    return {
+      version: BACKUP_PAYLOAD_VERSION,
+      snapshots: trimmed,
+    };
+  }
+  
+  function findSnapshotByAt(payload, at) {
+    const needle = normalizeAtStamp(at);
+    if (!needle) {
+      return null;
+    }
+    return (payload?.snapshots || []).find((entry) => entry.at === needle) || null;
+  }
+  
+  function findBackupGistId(gists, syncGistId) {
+    if (!Array.isArray(gists)) {
+      return null;
+    }
+    let byDescription = null;
+    for (const gist of gists) {
+      if (!gist?.id || gist.id === syncGistId) {
+        continue;
+      }
+      const files = gist.files || {};
+      if (files[BACKUP_FILENAME]) {
+        return gist.id;
+      }
+      if (gist.description === BACKUP_GIST_DESCRIPTION && !byDescription) {
+        byDescription = gist.id;
+      }
+    }
+    return byDescription;
+  }
+  
+  function buildBackupGistCreatePayload(contentJson) {
+    return {
+      description: BACKUP_GIST_DESCRIPTION,
+      public: false,
+      files: { [BACKUP_FILENAME]: { content: contentJson } },
+    };
+  }
+  
+  function buildBackupGistUpdatePayload(contentJson) {
+    return {
+      files: { [BACKUP_FILENAME]: { content: contentJson } },
+    };
+  }
+  
+  function extractBackupContent(body) {
+    if (!body?.files || typeof body.files !== "object") {
+      return null;
+    }
+    const content = body.files[BACKUP_FILENAME]?.content;
+    return typeof content === "string" ? content : null;
+  }
+  return {
+    BACKUP_GIST_DESCRIPTION,
+    BACKUP_FILENAME,
+    BACKUP_PAYLOAD_VERSION,
+    MAX_SNAPSHOTS,
+    SNAPSHOT_INTERVAL_MS,
+    emptyBackupPayload,
+    parseBackupPayload,
+    serializeBackupPayload,
+    snapshotListEntries,
+    shouldCreateSnapshot,
+    appendSnapshot,
+    findSnapshotByAt,
+    findBackupGistId,
+    buildBackupGistCreatePayload,
+    buildBackupGistUpdatePayload,
+    extractBackupContent,
+  };
+})();
+
+
 /* Generated from scripts/lib/viewer-gist-sync.js — run npm run bundle-viewer */
 
 const viewerGistSync = (function () {
   const GIST_SYNC_KEY = "arkham-gist-sync";
-  const GIST_STATE_FILENAME = "state.json";
+  const GIST_STATE_FILENAME = "arkham-collector-state.json";
+  const LEGACY_GIST_STATE_FILENAMES = ["state.json"];
   const GITHUB_API = "https://api.github.com";
+  const GIST_DESCRIPTION = "Arkham Collector sync";
   
   function parseGistSyncConfig(json) {
     if (json == null || json === "") {
@@ -1320,10 +1526,14 @@ const viewerGistSync = (function () {
       const parsed = typeof json === "string" ? JSON.parse(json) : json;
       const token = typeof parsed.token === "string" ? parsed.token.trim() : "";
       const gistId = typeof parsed.gistId === "string" ? parsed.gistId.trim() : "";
+      const backupGistId =
+        typeof parsed.backupGistId === "string" ? parsed.backupGistId.trim() : "";
+      const stateFilename =
+        typeof parsed.stateFilename === "string" ? parsed.stateFilename.trim() : "";
       if (!token) {
         return null;
       }
-      return { token, gistId };
+      return { token, gistId, backupGistId, stateFilename };
     } catch (_) {
       return null;
     }
@@ -1333,6 +1543,8 @@ const viewerGistSync = (function () {
     return JSON.stringify({
       token: config.token,
       gistId: config.gistId || "",
+      backupGistId: config.backupGistId || "",
+      stateFilename: config.stateFilename || "",
     });
   }
   
@@ -1390,30 +1602,64 @@ const viewerGistSync = (function () {
     return merged;
   }
   
-  function extractStateJsonFromGistResponse(body) {
+  function resolveGistStateFilename(body, preferredFilename) {
+    if (preferredFilename && body?.files?.[preferredFilename]) {
+      return preferredFilename;
+    }
+    if (body?.files?.[GIST_STATE_FILENAME]) {
+      return GIST_STATE_FILENAME;
+    }
+    for (const legacy of LEGACY_GIST_STATE_FILENAMES) {
+      if (body?.files?.[legacy]) {
+        return legacy;
+      }
+    }
+    return GIST_STATE_FILENAME;
+  }
+  
+  function extractStateJsonFromGistResponse(body, stateFilename) {
     if (!body || typeof body !== "object") {
       return null;
     }
-    const file = body.files?.[GIST_STATE_FILENAME];
+    const filename = resolveGistStateFilename(body, stateFilename);
+    const file = body.files?.[filename];
     if (!file || typeof file.content !== "string") {
       return null;
     }
     return file.content;
   }
   
-  function findArkhamGistId(gists, stateFilename = GIST_STATE_FILENAME) {
+  function findArkhamGistId(gists) {
     if (!Array.isArray(gists)) {
       return null;
     }
-    const match = gists.find(
-      (gist) => gist?.files && gist.files[stateFilename],
-    );
-    return match?.id || null;
+    const filenames = [GIST_STATE_FILENAME, ...LEGACY_GIST_STATE_FILENAMES];
+    for (const filename of filenames) {
+      const match = gists.find((gist) => gist?.files && gist.files[filename]);
+      if (match?.id) {
+        return match.id;
+      }
+    }
+    return null;
+  }
+  
+  function findArkhamGistEntry(gists) {
+    if (!Array.isArray(gists)) {
+      return null;
+    }
+    const filenames = [GIST_STATE_FILENAME, ...LEGACY_GIST_STATE_FILENAMES];
+    for (const filename of filenames) {
+      const match = gists.find((gist) => gist?.files && gist.files[filename]);
+      if (match?.id) {
+        return { gistId: match.id, stateFilename: filename };
+      }
+    }
+    return null;
   }
   
   function buildGistCreatePayload(stateJson) {
     return {
-      description: "Arkham Collector sync",
+      description: GIST_DESCRIPTION,
       public: false,
       files: {
         [GIST_STATE_FILENAME]: {
@@ -1423,10 +1669,10 @@ const viewerGistSync = (function () {
     };
   }
   
-  function buildGistUpdatePayload(stateJson) {
+  function buildGistUpdatePayload(stateJson, stateFilename = GIST_STATE_FILENAME) {
     return {
       files: {
-        [GIST_STATE_FILENAME]: {
+        [stateFilename]: {
           content: stateJson,
         },
       },
@@ -1469,14 +1715,18 @@ const viewerGistSync = (function () {
   return {
     GIST_SYNC_KEY,
     GIST_STATE_FILENAME,
+    LEGACY_GIST_STATE_FILENAMES,
+    GIST_DESCRIPTION,
     GITHUB_API,
     parseGistSyncConfig,
     serializeGistSyncConfig,
     isConnectedGistConfig,
     mergeUserStateByUpdatedAt,
     mergeGistUserState,
+    resolveGistStateFilename,
     extractStateJsonFromGistResponse,
     findArkhamGistId,
+    findArkhamGistEntry,
     buildGistCreatePayload,
     buildGistUpdatePayload,
     resolveGistConnectState,
@@ -1979,6 +2229,25 @@ const viewerSearchFields = (function () {
   
   function emptySearchFilter() {
     return { fieldTerms: emptyFieldTerms(), textTerms: [] };
+  }
+  
+  function searchFilterIsEmpty(filter) {
+    if (!filter) {
+      return true;
+    }
+    if ((filter.textTerms || []).length > 0) {
+      return false;
+    }
+    const terms = filter.fieldTerms || emptyFieldTerms();
+    return SEARCH_FIELD_TYPES.every((field) => !(terms[field.key] || []).length);
+  }
+  
+  function filterBooksBySearch(books, searchFilter) {
+    if (searchFilterIsEmpty(searchFilter)) {
+      return books;
+    }
+    const match = prepareCompoundSearchMatcher(searchFilter);
+    return (books || []).filter(match);
   }
   
   function formatFieldSearchQuery(prefix, label) {
@@ -2663,50 +2932,57 @@ const viewerSearchFields = (function () {
     };
   }
   
-  function matchesCompoundSearch(book, filter) {
+  function prepareCompoundSearchMatcher(filter) {
     const { fieldTerms, textTerms } = normalizeSearchFilter(filter);
     const yearDecadeCriteria = buildYearDecadeCriteria(
       fieldTerms.decade,
       textTerms,
     );
+    const otherFieldTerms = SEARCH_FIELD_TYPES.filter(
+      (field) => field.key !== "decade",
+    ).map((field) => ({
+      field,
+      terms: fieldTerms[field.key] || [],
+    }));
   
-    for (const field of SEARCH_FIELD_TYPES) {
-      if (field.key === "decade") {
-        continue;
+    return (book) => {
+      for (const { field, terms } of otherFieldTerms) {
+        for (const term of terms) {
+          if (!field.matchBook(book, term)) {
+            return false;
+          }
+        }
       }
-      for (const term of fieldTerms[field.key] || []) {
-        if (!field.matchBook(book, term)) {
+  
+      if (
+        yearDecadeCriteria.decades.length > 0 ||
+        yearDecadeCriteria.years.length > 0
+      ) {
+        if (!bookMatchesYearDecadeCriteria(book, yearDecadeCriteria)) {
           return false;
         }
       }
-    }
   
-    if (
-      yearDecadeCriteria.decades.length > 0 ||
-      yearDecadeCriteria.years.length > 0
-    ) {
-      if (!bookMatchesYearDecadeCriteria(book, yearDecadeCriteria)) {
-        return false;
+      const haystack = book._searchHaystack || "";
+      for (const term of yearDecadeCriteria.otherTextTerms) {
+        if (!haystack.includes(term)) {
+          return false;
+        }
       }
-    }
+      return true;
+    };
+  }
   
-    const haystack = book._searchHaystack || "";
-    for (const term of yearDecadeCriteria.otherTextTerms) {
-      if (!haystack.includes(term)) {
-        return false;
-      }
-    }
-    return true;
+  function matchesCompoundSearch(book, filter) {
+    return prepareCompoundSearchMatcher(filter)(book);
   }
   
   function filterBooksMatchingFieldTerms(books, fieldTermsPartial) {
-    const partial = normalizeSearchFilter({
+    const matchBook = prepareCompoundSearchMatcher({
       fieldTerms: fieldTermsPartial,
       textTerms: [],
     });
-    return (books || []).filter((book) =>
-      matchesCompoundSearch(book, partial),
-    );
+    return (books || []).filter(matchBook);
   }
   
   function chipsToFieldTermsPartial(chips, excludeFieldKey) {
@@ -2768,6 +3044,8 @@ const viewerSearchFields = (function () {
     normalizeLabelKey,
     emptyFieldTerms,
     emptySearchFilter,
+    searchFilterIsEmpty,
+    filterBooksBySearch,
     getFieldByKey,
     getFieldByPrefix,
     parseDecadeDraftInput,
@@ -2790,6 +3068,7 @@ const viewerSearchFields = (function () {
     splitYearDecadeTextTerms,
     buildYearDecadeCriteria,
     bookMatchesYearDecadeCriteria,
+    prepareCompoundSearchMatcher,
     matchesCompoundSearch,
     filterBooksMatchingFieldTerms,
     chipsToFieldTermsPartial,
@@ -3026,6 +3305,36 @@ const viewerFilters = (function () {
     );
   }
   
+  function filterBooksByCatalogFilters(books, options) {
+    const {
+      hiddenOnly,
+      showMagazines,
+      mycroftFilterMode,
+      collectionFilterMode,
+      wantFilterMode,
+      collectedIds,
+      orderedIds,
+      wantIds,
+    } = options;
+  
+    return books.filter(
+      (book) =>
+        passesBookVisibility(book, { hiddenOnly, showMagazines }) &&
+        passesMycroftImprintFilter(book, mycroftFilterMode) &&
+        passesCollectionFilter(
+          book,
+          collectionFilterMode,
+          collectedIds,
+          orderedIds,
+        ) &&
+        passesWantFilter(book, wantFilterMode, wantIds),
+    );
+  }
+  
+  function filterBooksBySearch(books, searchFilter) {
+    return getSearchFields().filterBooksBySearch(books, searchFilter);
+  }
+  
   function filterVisibleBooks(books, options) {
     const {
       hiddenOnly,
@@ -3046,18 +3355,18 @@ const viewerFilters = (function () {
         ? getSearchFields().parseCompoundSearchQuery(searchQuery)
         : getSearchFields().emptySearchFilter());
   
-    return books.filter(
-      (book) =>
-        passesBookVisibility(book, { hiddenOnly, showMagazines }) &&
-        passesMycroftImprintFilter(book, mycroftFilterMode) &&
-        passesCollectionFilter(
-          book,
-          collectionFilterMode,
-          collectedIds,
-          orderedIds,
-        ) &&
-        passesWantFilter(book, wantFilterMode, wantIds) &&
-        getSearchFields().matchesCompoundSearch(book, resolvedSearchFilter),
+    return filterBooksBySearch(
+      filterBooksByCatalogFilters(books, {
+        hiddenOnly,
+        showMagazines,
+        mycroftFilterMode,
+        collectionFilterMode,
+        wantFilterMode,
+        collectedIds,
+        orderedIds,
+        wantIds,
+      }),
+      resolvedSearchFilter,
     );
   }
   
@@ -3151,6 +3460,10 @@ const viewerFilters = (function () {
     return getSearchFields().matchesCompoundSearch(...args);
   }
   
+  function prepareCompoundSearchMatcher(...args) {
+    return getSearchFields().prepareCompoundSearchMatcher(...args);
+  }
+  
   function filterBooksMatchingFieldTerms(...args) {
     return getSearchFields().filterBooksMatchingFieldTerms(...args);
   }
@@ -3161,6 +3474,14 @@ const viewerFilters = (function () {
   
   function emptySearchFilter(...args) {
     return getSearchFields().emptySearchFilter(...args);
+  }
+  
+  function searchFilterIsEmpty(...args) {
+    return getSearchFields().searchFilterIsEmpty(...args);
+  }
+  
+  function filterBooksBySearch(...args) {
+    return getSearchFields().filterBooksBySearch(...args);
   }
   
   function tagKey(...args) {
@@ -3187,11 +3508,14 @@ const viewerFilters = (function () {
     formatTagSearchQuery,
     formatFieldSearchQuery,
     matchesTagSearch,
+    prepareCompoundSearchMatcher,
     matchesCompoundSearch,
     filterBooksMatchingTagTerms,
     filterBooksMatchingFieldTerms,
     chipsToFieldTermsPartial,
     emptySearchFilter,
+    searchFilterIsEmpty,
+    filterBooksBySearch,
     matchesSearch,
     isMagazineIssue,
     passesHiddenVisibility,
@@ -3202,6 +3526,7 @@ const viewerFilters = (function () {
     isInCollection,
     passesCollectionFilter,
     passesWantFilter,
+    filterBooksByCatalogFilters,
     filterVisibleBooks,
     cycleMycroftFilter,
     cycleCollectionFilter,
@@ -3695,7 +4020,7 @@ function collectRuntimeSnapshot() {
     orderedIds: [...orderedIds],
     wantIds: [...wantIds],
     wantOrderIds: [...wantOrderIds],
-    sort: sortSelect.value,
+    sort: getCatalogSortMode(),
     viewMode: gridViewMode,
     headerFiltersExpanded,
     highlightWants,
@@ -3720,8 +4045,8 @@ function applyRuntimeSnapshot(runtime) {
   highlightCollection = runtime.highlightCollection;
   showMagazines = runtime.showMagazines;
   wantOrderLocked = runtime.wantOrderLocked === true;
-  if (sortSelect && runtime.sort) {
-    sortSelect.value = runtime.sort;
+  if (runtime.sort) {
+    syncSortControlFromMode(runtime.sort);
   }
   updateViewModeState();
   updateHeaderFiltersState();
@@ -3733,6 +4058,17 @@ function githubHeaders(token) {
     Authorization: `Bearer ${token}`,
     "X-GitHub-Api-Version": "2022-11-28",
   };
+}
+
+async function listUserGists(token) {
+  const response = await fetch(`${viewerGistSync.GITHUB_API}/gists?per_page=100`, {
+    headers: githubHeaders(token),
+    cache: "no-store",
+  });
+  if (!response.ok) {
+    return [];
+  }
+  return response.json();
 }
 
 async function fetchGistState(config) {
@@ -3750,27 +4086,32 @@ async function fetchGistState(config) {
     throw new Error(`Gist fetch failed (${response.status})`);
   }
   const body = await response.json();
-  const content = viewerGistSync.extractStateJsonFromGistResponse(body);
+  const stateFilename = viewerGistSync.resolveGistStateFilename(
+    body,
+    config.stateFilename,
+  );
+  if (stateFilename !== config.stateFilename) {
+    writeGistSyncConfig({ ...config, stateFilename });
+  }
+  const content = viewerGistSync.extractStateJsonFromGistResponse(
+    body,
+    stateFilename,
+  );
   if (!content) {
     return null;
   }
   return viewerUserState.parseUserState(content);
 }
 
-async function findExistingArkhamGistId(token) {
-  const response = await fetch(`${viewerGistSync.GITHUB_API}/gists?per_page=100`, {
-    headers: githubHeaders(token),
-    cache: "no-store",
-  });
-  if (!response.ok) {
-    return null;
-  }
-  const gists = await response.json();
-  return viewerGistSync.findArkhamGistId(gists);
+async function findExistingArkhamGist(token) {
+  const gists = await listUserGists(token);
+  return viewerGistSync.findArkhamGistEntry(gists);
 }
 
 async function pushGistState(config, state) {
   const stateJson = viewerUserState.serializeUserState(state);
+  const stateFilename =
+    config.stateFilename || viewerGistSync.GIST_STATE_FILENAME;
   const response = await fetch(
     `${viewerGistSync.GITHUB_API}/gists/${config.gistId}`,
     {
@@ -3779,7 +4120,9 @@ async function pushGistState(config, state) {
         ...githubHeaders(config.token),
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(viewerGistSync.buildGistUpdatePayload(stateJson)),
+      body: JSON.stringify(
+        viewerGistSync.buildGistUpdatePayload(stateJson, stateFilename),
+      ),
     },
   );
   if (!response.ok) {
@@ -3812,8 +4155,11 @@ async function connectGistSync(token) {
 
   const existingConfig = readGistSyncConfig();
   let gistId = existingConfig?.gistId || "";
+  let stateFilename = existingConfig?.stateFilename || "";
   if (!gistId) {
-    gistId = (await findExistingArkhamGistId(trimmed)) || "";
+    const entry = await findExistingArkhamGist(trimmed);
+    gistId = entry?.gistId || "";
+    stateFilename = entry?.stateFilename || "";
   }
 
   const localPersisted = readPersistedUserState();
@@ -3821,10 +4167,15 @@ async function connectGistSync(token) {
 
   if (gistId) {
     try {
-      remoteState = await fetchGistState({ token: trimmed, gistId });
+      remoteState = await fetchGistState({
+        token: trimmed,
+        gistId,
+        stateFilename,
+      });
     } catch (error) {
       if (String(error.message || "").includes("404")) {
         gistId = "";
+        stateFilename = "";
       } else {
         throw error;
       }
@@ -3848,9 +4199,21 @@ async function connectGistSync(token) {
       { token: trimmed, gistId: "" },
       nextState,
     );
+    stateFilename = viewerGistSync.GIST_STATE_FILENAME;
   }
 
-  writeGistSyncConfig({ token: trimmed, gistId });
+  const gists = await listUserGists(trimmed);
+  const backupGistId =
+    existingConfig?.backupGistId ||
+    viewerGistBackup.findBackupGistId(gists, gistId) ||
+    "";
+
+  writeGistSyncConfig({
+    token: trimmed,
+    gistId,
+    backupGistId,
+    stateFilename,
+  });
   persistUserState(nextState);
   applyRuntimeSnapshot(viewerUserState.applyUserStateToRuntime(nextState));
   pendingGistSetup = false;
@@ -3876,6 +4239,11 @@ function scheduleGistPush() {
       gistPushInFlight = pushGistState(config, buildStateForPersistence());
       await gistPushInFlight;
       updateGistSyncStatus("Synced to GitHub Gist.");
+      try {
+        await maybeCreateGistSnapshot();
+      } catch (_) {
+        /* Backup failures must not block live sync. */
+      }
     } catch (error) {
       updateGistSyncStatus(error.message || "Gist sync failed.", true);
     } finally {
@@ -4017,6 +4385,11 @@ function loadUserState() {
 async function loadUserStateAsync() {
   loadUserState();
   await pullGistStateIfConfigured({ reRender: false });
+  try {
+    await maybeCreateGistSnapshot();
+  } catch (_) {
+    /* Backup failures must not block startup. */
+  }
 }
 
 function saveUserState() {
@@ -4152,6 +4525,237 @@ function getCollectionCount() {
   ).length;
 }
 
+let backupSnapshotChain = Promise.resolve();
+
+function isGistSyncConnected() {
+  return (
+    storageMode === "gist" &&
+    viewerGistSync.isConnectedGistConfig(readGistSyncConfig())
+  );
+}
+
+function backupUserStateLocally(state) {
+  try {
+    localStorage.setItem(
+      viewerUserState.USER_STATE_BACKUP_KEY,
+      viewerUserState.serializeUserState(state),
+    );
+  } catch (_) {
+    // localStorage unavailable
+  }
+}
+
+function clearStoredBackupGistId() {
+  const config = readGistSyncConfig();
+  if (!config?.backupGistId) {
+    return;
+  }
+  writeGistSyncConfig({ ...config, backupGistId: "" });
+}
+
+async function gistApiRequest(path, options = {}) {
+  const { method = "GET", token, body } = options;
+  const response = await fetch(`${viewerGistSync.GITHUB_API}${path}`, {
+    method,
+    headers: {
+      ...githubHeaders(token),
+      ...(body ? { "Content-Type": "application/json" } : {}),
+    },
+    body: body ? JSON.stringify(body) : undefined,
+    cache: "no-store",
+  });
+  if (!response.ok) {
+    const error = new Error(`GitHub API failed (${response.status})`);
+    error.status = response.status;
+    throw error;
+  }
+  if (response.status === 204) {
+    return null;
+  }
+  return response.json();
+}
+
+async function resolveBackupGistId() {
+  const config = readGistSyncConfig();
+  if (!config?.token) {
+    return null;
+  }
+  if (config.backupGistId) {
+    return config.backupGistId;
+  }
+  const gists = await listUserGists(config.token);
+  const backupGistId = viewerGistBackup.findBackupGistId(gists, config.gistId);
+  if (backupGistId) {
+    writeGistSyncConfig({ ...config, backupGistId });
+  }
+  return backupGistId || null;
+}
+
+async function fetchBackupGistBody(backupGistId) {
+  const config = readGistSyncConfig();
+  try {
+    return await gistApiRequest(`/gists/${backupGistId}`, {
+      token: config.token,
+    });
+  } catch (error) {
+    if (error?.status === 404) {
+      clearStoredBackupGistId();
+      return null;
+    }
+    throw error;
+  }
+}
+
+async function readBackupPayload(backupGistId) {
+  const body = await fetchBackupGistBody(backupGistId);
+  if (!body) {
+    return viewerGistBackup.emptyBackupPayload();
+  }
+  const content = viewerGistBackup.extractBackupContent(body);
+  return content
+    ? viewerGistBackup.parseBackupPayload(content)
+    : viewerGistBackup.emptyBackupPayload();
+}
+
+async function writeBackupPayload(backupGistId, payload) {
+  const config = readGistSyncConfig();
+  const contentJson = viewerGistBackup.serializeBackupPayload(payload);
+  try {
+    await gistApiRequest(`/gists/${backupGistId}`, {
+      method: "PATCH",
+      token: config.token,
+      body: viewerGistBackup.buildBackupGistUpdatePayload(contentJson),
+    });
+  } catch (error) {
+    if (error?.status === 404) {
+      clearStoredBackupGistId();
+      await createBackupGist(payload);
+      return;
+    }
+    throw error;
+  }
+}
+
+async function createBackupGist(payload) {
+  const config = readGistSyncConfig();
+  const contentJson = viewerGistBackup.serializeBackupPayload(payload);
+  const created = await gistApiRequest("/gists", {
+    method: "POST",
+    token: config.token,
+    body: viewerGistBackup.buildBackupGistCreatePayload(contentJson),
+  });
+  const backupGistId = created?.id || "";
+  if (!backupGistId) {
+    throw new Error("GitHub did not return a backup Gist id.");
+  }
+  writeGistSyncConfig({ ...config, backupGistId });
+  return backupGistId;
+}
+
+async function createGistSnapshotNow() {
+  const now = Date.now();
+  const atIso = new Date(now).toISOString();
+  const stateObject = viewerUserState.parseUserState(
+    viewerUserState.serializeUserState(buildStateForPersistence()),
+  );
+  if (!stateObject) {
+    return { ok: false, reason: "state" };
+  }
+
+  let backupGistId = await resolveBackupGistId();
+  let payload = viewerGistBackup.emptyBackupPayload();
+
+  if (backupGistId) {
+    const body = await fetchBackupGistBody(backupGistId);
+    if (!body) {
+      backupGistId = null;
+    } else {
+      payload = viewerGistBackup.parseBackupPayload(
+        viewerGistBackup.extractBackupContent(body) || "",
+      );
+      if (!viewerGistBackup.shouldCreateSnapshot(payload.snapshots, now)) {
+        return { ok: true, skipped: true };
+      }
+    }
+  }
+
+  if (!backupGistId && !viewerGistBackup.shouldCreateSnapshot([], now)) {
+    return { ok: true, skipped: true };
+  }
+
+  const nextPayload = viewerGistBackup.appendSnapshot(
+    payload,
+    stateObject,
+    atIso,
+  );
+
+  if (!backupGistId) {
+    await createBackupGist(nextPayload);
+    return { ok: true, created: true };
+  }
+
+  await writeBackupPayload(backupGistId, nextPayload);
+  return { ok: true, created: true };
+}
+
+async function maybeCreateGistSnapshot() {
+  if (!isGistSyncConnected()) {
+    return { ok: false, reason: "disabled" };
+  }
+  backupSnapshotChain = backupSnapshotChain.then(() => createGistSnapshotNow());
+  return backupSnapshotChain;
+}
+
+async function listGistSnapshots() {
+  if (!isGistSyncConnected()) {
+    return [];
+  }
+  const backupGistId = await resolveBackupGistId();
+  if (!backupGistId) {
+    return [];
+  }
+  const payload = await readBackupPayload(backupGistId);
+  return viewerGistBackup.snapshotListEntries(payload);
+}
+
+async function restoreGistSnapshot(at) {
+  if (!isGistSyncConnected()) {
+    return { ok: false, error: "Gist sync is not connected." };
+  }
+  if (!Date.parse(String(at || ""))) {
+    return { ok: false, error: "That snapshot is not valid." };
+  }
+
+  const backupGistId = await resolveBackupGistId();
+  if (!backupGistId) {
+    return { ok: false, error: "No backup Gist found." };
+  }
+
+  const payload = await readBackupPayload(backupGistId);
+  const entry = viewerGistBackup.findSnapshotByAt(payload, at);
+  if (!entry) {
+    return { ok: false, error: "Could not find that snapshot." };
+  }
+  const parsed = viewerUserState.parseUserState(entry.state);
+  if (!parsed) {
+    return { ok: false, error: "Could not read that snapshot." };
+  }
+
+  backupUserStateLocally(buildStateForPersistence());
+  persistUserState(parsed);
+  applyRuntimeSnapshot(viewerUserState.applyUserStateToRuntime(parsed));
+  storageMode = "gist";
+  pendingGistSetup = false;
+  syncSettingsStorageMode();
+  invalidateSortedCache();
+
+  const config = readGistSyncConfig();
+  await pushGistState(config, parsed);
+  updateGistSyncStatus("Synced to GitHub Gist.");
+
+  return { ok: true };
+}
+
 
 /* Generated from scripts/lib/viewer-sort.js — run npm run bundle-viewer */
 
@@ -4162,6 +4766,68 @@ const viewerSort = (function () {
     }
     const match = String(value).match(/\d{4}/);
     return match ? match[0] : null;
+  }
+  
+  const SORT_MODES = new Set([
+    "date-desc",
+    "date-asc",
+    "title-asc",
+    "title-desc",
+  ]);
+  
+  const SORT_FIELDS = new Set(["date", "title"]);
+  
+  const SORT_FIELD_DEFAULTS = {
+    date: "date-asc",
+    title: "title-asc",
+  };
+  
+  function normalizeSort(raw, fallback = "date-asc") {
+    if (raw && SORT_MODES.has(raw)) {
+      return raw;
+    }
+    return fallback;
+  }
+  
+  function getSortField(mode) {
+    const normalized = normalizeSort(mode);
+    if (normalized.startsWith("title-")) {
+      return "title";
+    }
+    return "date";
+  }
+  
+  function isSortDescending(mode) {
+    return normalizeSort(mode).endsWith("-desc");
+  }
+  
+  function toggleSortDirection(mode) {
+    const normalized = normalizeSort(mode);
+    if (normalized.endsWith("-asc")) {
+      return normalized.replace(/-asc$/, "-desc");
+    }
+    if (normalized.endsWith("-desc")) {
+      return normalized.replace(/-desc$/, "-asc");
+    }
+    return normalized;
+  }
+  
+  function sortModeForField(field, currentMode) {
+    if (!field || !SORT_FIELDS.has(field)) {
+      return SORT_FIELD_DEFAULTS.date;
+    }
+    const normalized = normalizeSort(currentMode);
+    if (getSortField(normalized) === field) {
+      return normalized;
+    }
+    return SORT_FIELD_DEFAULTS[field] || SORT_FIELD_DEFAULTS.date;
+  }
+  
+  function sortDirectionLabel(field, descending) {
+    if (field === "title") {
+      return descending ? "Z to A" : "A to Z";
+    }
+    return descending ? "Newest first" : "Oldest first";
   }
   
   function buildBookOrderIndex(orderIds) {
@@ -4229,6 +4895,15 @@ const viewerSort = (function () {
     return copy.sort((a, b) => compareCanonical(a, b, bookOrderIndex));
   }
   return {
+    SORT_MODES,
+    SORT_FIELDS,
+    SORT_FIELD_DEFAULTS,
+    normalizeSort,
+    getSortField,
+    isSortDescending,
+    toggleSortDirection,
+    sortModeForField,
+    sortDirectionLabel,
     compareOrderTiebreak,
     compareCanonical,
     sortBooks,
@@ -4687,7 +5362,43 @@ const viewerWantView = (function () {
 const searchFilterChips = [];
 let searchSuggestIndex = -1;
 let searchRenderTimer = null;
+let suggestUpdateTimer = null;
 let suggestScrollY = 0;
+let cachedSearchFilter = null;
+let cachedSearchFilterKey = null;
+const knownFieldValuesCache = new Map();
+/** @type {string[]} */
+let lastSuggestItems = [];
+
+function searchStateKey() {
+  return JSON.stringify({
+    chips: searchFilterChips,
+    draft: searchInput.value,
+  });
+}
+
+function invalidateSearchFilterCache() {
+  cachedSearchFilterKey = null;
+  cachedSearchFilter = null;
+}
+
+function invalidateKnownFieldValuesCache() {
+  knownFieldValuesCache.clear();
+}
+
+function invalidateSearchViewCache() {
+  invalidateSearchFilterCache();
+  invalidateKnownFieldValuesCache();
+}
+
+function searchFilterHasTerms(filter) {
+  return (
+    (filter.textTerms || []).length > 0 ||
+    viewerSearchFields.SEARCH_FIELD_TYPES.some(
+      (field) => (filter.fieldTerms[field.key] || []).length > 0,
+    )
+  );
+}
 
 function isSuggestTouchAllowed(target) {
   return Boolean(target?.closest?.(".search-field-suggest"));
@@ -4745,6 +5456,21 @@ function getKnownFieldValues(fieldKey) {
   if (!field) {
     return [];
   }
+  const scopeKey = [
+    fieldKey,
+    typeof getViewWithoutSearchCacheKey === "function"
+      ? getViewWithoutSearchCacheKey()
+      : "",
+    JSON.stringify(
+      viewerSearchFields.chipsToFieldTermsPartial(
+        searchFilterChips,
+        fieldKey,
+      ),
+    ),
+  ].join("|");
+  if (knownFieldValuesCache.has(scopeKey)) {
+    return knownFieldValuesCache.get(scopeKey);
+  }
   const scopedBooks = viewerFilters.filterBooksMatchingFieldTerms(
     getViewBooksWithoutSearch(),
     viewerSearchFields.chipsToFieldTermsPartial(
@@ -4752,14 +5478,21 @@ function getKnownFieldValues(fieldKey) {
       fieldKey,
     ),
   );
-  return field.collectValues(scopedBooks);
+  const values = field.collectValues(scopedBooks);
+  knownFieldValuesCache.set(scopeKey, values);
+  return values;
 }
 
 function getSearchFilter() {
-  return viewerFilters.buildSearchFilter(
-    searchFilterChips,
-    searchInput.value,
-  );
+  const key = searchStateKey();
+  if (key !== cachedSearchFilterKey) {
+    cachedSearchFilterKey = key;
+    cachedSearchFilter = viewerFilters.buildSearchFilter(
+      searchFilterChips,
+      searchInput.value,
+    );
+  }
+  return cachedSearchFilter;
 }
 
 function hasActiveSearch() {
@@ -4770,13 +5503,7 @@ function hasActiveSearch() {
   if (!draft || viewerFilters.isSearchDraftBlockingText(draft)) {
     return false;
   }
-  const filter = viewerFilters.buildSearchFilter([], draft);
-  return (
-    filter.textTerms.length > 0 ||
-    viewerSearchFields.SEARCH_FIELD_TYPES.some(
-      (field) => (filter.fieldTerms[field.key] || []).length > 0,
-    )
-  );
+  return searchFilterHasTerms(getSearchFilter());
 }
 
 function updateSearchClearVisibility() {
@@ -4817,13 +5544,18 @@ function renderSearchChips() {
 
 function hideSuggest() {
   searchSuggestIndex = -1;
+  lastSuggestItems = [];
   searchFieldSuggest.hidden = true;
   searchFieldSuggest.innerHTML = "";
   searchInput.setAttribute("aria-expanded", "false");
   setSuggestScrollLock(false);
 }
 
-function getSuggestItems() {
+function updateSuggest() {
+  updateSuggestNow();
+}
+
+function computeSuggestItems() {
   const field = getActiveSuggestField();
   if (!field) {
     return [];
@@ -4843,9 +5575,11 @@ function getSuggestItems() {
   );
 }
 
-function renderSuggest() {
-  const field = getActiveSuggestField();
-  const items = getSuggestItems();
+function getSuggestItems() {
+  return computeSuggestItems();
+}
+
+function renderSuggest(field, items) {
   if (!field || !items.length) {
     hideSuggest();
     return;
@@ -4863,15 +5597,28 @@ function renderSuggest() {
   setSuggestScrollLock(true);
 }
 
-function updateSuggest() {
-  if (!getActiveSuggestField()) {
+function updateSuggestNow() {
+  const field = getActiveSuggestField();
+  if (!field) {
+    lastSuggestItems = [];
     hideSuggest();
     return;
   }
-  if (searchSuggestIndex >= getSuggestItems().length) {
+  lastSuggestItems = computeSuggestItems();
+  if (searchSuggestIndex >= lastSuggestItems.length) {
     searchSuggestIndex = -1;
   }
-  renderSuggest();
+  renderSuggest(field, lastSuggestItems);
+}
+
+function debouncedUpdateSuggest() {
+  if (suggestUpdateTimer) {
+    clearTimeout(suggestUpdateTimer);
+  }
+  suggestUpdateTimer = setTimeout(() => {
+    suggestUpdateTimer = null;
+    updateSuggestNow();
+  }, 120);
 }
 
 function addSearchChip(fieldKey, label, options = {}) {
@@ -4894,6 +5641,7 @@ function addSearchChip(fieldKey, label, options = {}) {
     return false;
   }
   searchFilterChips.push({ type: fieldKey, label: canonical });
+  invalidateSearchViewCache();
   renderSearchChips();
   if (!options.silent) {
     updateSearchClearVisibility();
@@ -4908,6 +5656,7 @@ function removeSearchChipAt(index) {
     return;
   }
   searchFilterChips.splice(index, 1);
+  invalidateSearchViewCache();
   renderSearchChips();
   updateSearchClearVisibility();
   updateSuggest();
@@ -4962,7 +5711,7 @@ function absorbSearchInputTokens() {
 
 function pickSuggestion(index) {
   const field = getActiveSuggestField();
-  const items = getSuggestItems();
+  const items = lastSuggestItems.length ? lastSuggestItems : computeSuggestItems();
   const label = items[index];
   if (!field || !label) {
     return;
@@ -4979,6 +5728,7 @@ function pickSuggestion(index) {
 function clearSearchState() {
   searchFilterChips.length = 0;
   searchInput.value = "";
+  invalidateSearchViewCache();
   renderSearchChips();
   hideSuggest();
   updateSearchClearVisibility();
@@ -5014,13 +5764,15 @@ function applyFieldSearch(fieldKey, rawValue) {
 }
 
 function onSearchInput() {
+  invalidateSearchFilterCache();
   updateSearchClearVisibility();
-  updateSuggest();
+  debouncedUpdateSuggest();
   debouncedRender();
 }
 
 function onSearchCommit() {
   absorbSearchInputTokens();
+  invalidateSearchFilterCache();
   hideSuggest();
   updateSearchClearVisibility();
   renderNow();
@@ -5044,8 +5796,9 @@ searchFieldSuggest.addEventListener("mousedown", (event) => {
 });
 
 searchInput.addEventListener("keydown", (event) => {
-  const items = getSuggestItems();
-  const suggestOpen = items.length > 0 && !searchFieldSuggest.hidden;
+  const suggestOpen =
+    lastSuggestItems.length > 0 && !searchFieldSuggest.hidden;
+  const items = suggestOpen ? lastSuggestItems : [];
   const activeField = getActiveSuggestField();
 
   if (event.key === "Backspace" && !searchInput.value && searchFilterChips.length) {
@@ -5086,7 +5839,7 @@ searchInput.addEventListener("keydown", (event) => {
   if (event.key === "ArrowDown") {
     event.preventDefault();
     searchSuggestIndex = (searchSuggestIndex + 1) % items.length;
-    renderSuggest();
+    renderSuggest(getActiveSuggestField(), items);
     return;
   }
 
@@ -5094,7 +5847,7 @@ searchInput.addEventListener("keydown", (event) => {
     event.preventDefault();
     searchSuggestIndex =
       searchSuggestIndex <= 0 ? items.length - 1 : searchSuggestIndex - 1;
-    renderSuggest();
+    renderSuggest(getActiveSuggestField(), items);
     return;
   }
 
@@ -5144,11 +5897,31 @@ document.addEventListener("click", (event) => {
 
 /* Sort, search, filters, and visible book list */
 
+let prefilteredCache = { key: null, books: null };
 let sortedActiveCache = { key: null, books: null };
+let lastStatsRenderSignature = null;
+
+function getCatalogFilterCacheKey() {
+  return [
+    hiddenOnly,
+    showMagazines,
+    mycroftFilterMode,
+    collectionFilterMode,
+    wantFilterMode,
+    collectionIds.size,
+    orderedIds.size,
+    wantIds.size,
+  ].join(":");
+}
 
 function invalidateSortedCache() {
+  prefilteredCache.key = null;
+  prefilteredCache.books = null;
   sortedActiveCache.key = null;
   sortedActiveCache.books = null;
+  if (typeof invalidateSearchViewCache === "function") {
+    invalidateSearchViewCache();
+  }
 }
 
 function compareOrderTiebreak(a, b) {
@@ -5159,8 +5932,28 @@ function compareCanonical(a, b) {
   return viewerSort.compareCanonical(a, b, bookOrderIndex);
 }
 
+function getPrefilteredBooks() {
+  const cacheKey = getCatalogFilterCacheKey();
+  if (prefilteredCache.key === cacheKey && prefilteredCache.books) {
+    return prefilteredCache.books;
+  }
+  const books = viewerFilters.filterBooksByCatalogFilters(getActiveBooks(), {
+    hiddenOnly,
+    showMagazines,
+    mycroftFilterMode,
+    collectionFilterMode,
+    wantFilterMode,
+    collectedIds: activeCollectionIds(),
+    orderedIds,
+    wantIds,
+  });
+  prefilteredCache.key = cacheKey;
+  prefilteredCache.books = books;
+  return books;
+}
+
 function getSortedActiveBooksCacheKey() {
-  return `${sortSelect.value}:${wantFilterMode ?? "off"}`;
+  return `${getCatalogFilterCacheKey()}:${getCatalogSortMode()}`;
 }
 
 function getSortedActiveBooks() {
@@ -5168,29 +5961,87 @@ function getSortedActiveBooks() {
   if (sortedActiveCache.key === cacheKey && sortedActiveCache.books) {
     return sortedActiveCache.books;
   }
+  const source = getPrefilteredBooks();
   let sorted;
   if (viewerWantView.usesWantPrioritySort(wantFilterMode)) {
-    const wantBooks = getActiveBooks().filter((book) => wantIds.has(book.id));
     sorted = viewerWantOrder.sortBooksByWantOrder(
-      wantBooks,
+      source,
       wantOrderIds,
       bookOrderIndex,
     );
   } else {
-    sorted = sortBooks(getActiveBooks(), sortSelect.value);
+    sorted = sortBooks(source, getCatalogSortMode());
   }
   sortedActiveCache.key = cacheKey;
   sortedActiveCache.books = sorted;
   return sorted;
 }
 
-function onSortChange() {
-  if (sortSelect.disabled) {
+function getCatalogSortMode() {
+  return catalogSortMode;
+}
+
+function syncSortReverseButton(mode) {
+  if (!sortReverseBtn) {
     return;
   }
+  const descending = viewerSort.isSortDescending(mode);
+  const field = viewerSort.getSortField(mode);
+  sortReverseBtn.classList.toggle("is-descending", descending);
+  sortReverseBtn.classList.toggle("is-ascending", !descending);
+  sortReverseBtn.classList.toggle(
+    "is-newest-first",
+    field === "date" && descending,
+  );
+  const directionLabel = viewerSort.sortDirectionLabel(field, descending);
+  sortReverseBtn.title = `${directionLabel} · click to reverse`;
+  sortReverseBtn.setAttribute(
+    "aria-label",
+    `Sort order: ${directionLabel}. Reverse.`,
+  );
+}
+
+function syncSortControlFromMode(mode) {
+  const normalized = viewerSort.normalizeSort(mode);
+  catalogSortMode = normalized;
+  if (sortSelect) {
+    sortSelect.value = viewerSort.getSortField(normalized);
+  }
+  syncSortReverseButton(normalized);
+}
+
+function setCatalogSortMode(mode) {
+  const next = viewerSort.normalizeSort(mode);
+  if (next === catalogSortMode) {
+    syncSortReverseButton(next);
+    return;
+  }
+  catalogSortMode = next;
+  syncSortControlFromMode(next);
   invalidateSortedCache();
   saveUserState();
   render();
+}
+
+function onSortFieldChange() {
+  if (sortSelect.disabled) {
+    return;
+  }
+  setCatalogSortMode(
+    viewerSort.sortModeForField(sortSelect.value, catalogSortMode),
+  );
+}
+
+function toggleSortOrder() {
+  if (sortSelect.disabled) {
+    return;
+  }
+  setCatalogSortMode(viewerSort.toggleSortDirection(catalogSortMode));
+  sortReverseBtn?.blur();
+}
+
+function onSortChange() {
+  onSortFieldChange();
 }
 
 function sortBooks(list, mode) {
@@ -5235,6 +6086,14 @@ function updateSortControlState() {
     sortSelect.disabled = wantSort;
     sortSelect.classList.toggle("is-sort-slot-hidden", wantSort);
     sortSelect.setAttribute("aria-hidden", String(wantSort));
+  }
+  if (sortReverseBtn) {
+    sortReverseBtn.hidden = wantSort;
+    sortReverseBtn.disabled = wantSort;
+    sortReverseBtn.setAttribute("aria-hidden", String(wantSort));
+  }
+  if (!wantSort) {
+    syncSortControlFromMode(catalogSortMode);
   }
   if (sortWantBadge) {
     sortWantBadge.hidden = !wantSort;
@@ -5310,8 +6169,35 @@ function getStatTotal(activeBooks) {
     .length;
 }
 
+function buildStatsRenderSignature(visible, activeBooks) {
+  const hiddenCount = activeBooks.filter((book) => book.hidden).length;
+  const total = getStatTotal(activeBooks);
+  const hasMycroft = activeBooks.some(
+    (book) => book.imprint === "mycroft_moran",
+  );
+  return [
+    visible.length,
+    total,
+    hiddenCount,
+    hasMycroft ? 1 : 0,
+    isMycroftOnlyFilter() ? 1 : 0,
+    isMycroftHiddenFilter() ? 1 : 0,
+    isCollectionAllFilter() ? 1 : 0,
+    isOrderedFilterActive() ? 1 : 0,
+    isWantFilterActive() ? 1 : 0,
+    hiddenOnly ? 1 : 0,
+    viewerMode.shouldShowHiddenStatFilter(serveEnabled, hiddenCount) ? 1 : 0,
+  ].join(":");
+}
+
 function renderStats(visible, all) {
   const activeBooks = all.filter((book) => !isDeleted(book));
+  const signature = buildStatsRenderSignature(visible, activeBooks);
+  if (signature === lastStatsRenderSignature) {
+    return;
+  }
+  lastStatsRenderSignature = signature;
+
   const hiddenCount = activeBooks.filter((book) => book.hidden).length;
   const total = getStatTotal(activeBooks);
   const showingCount = visible.length;
@@ -5357,37 +6243,23 @@ function renderStats(visible, all) {
 }
 
 function getViewBooksWithoutSearch() {
-  return viewerFilters.filterVisibleBooks(getSortedActiveBooks(), {
-    hiddenOnly,
-    showMagazines,
-    mycroftFilterMode,
-    collectionFilterMode,
-    wantFilterMode,
-    collectedIds: activeCollectionIds(),
-    orderedIds,
-    wantIds,
-    searchFilter: viewerFilters.emptySearchFilter(),
-  });
+  return getSortedActiveBooks();
 }
 
 function getVisibleBooks() {
-  return viewerFilters.filterVisibleBooks(getSortedActiveBooks(), {
-    hiddenOnly,
-    showMagazines,
-    mycroftFilterMode,
-    collectionFilterMode,
-    wantFilterMode,
-    collectedIds: activeCollectionIds(),
-    orderedIds,
-    wantIds,
-    searchFilter: getSearchFilter(),
-  });
+  return viewerFilters.filterBooksBySearch(
+    getSortedActiveBooks(),
+    getSearchFilter(),
+  );
 }
 
 
 /* Covers, cards, stats, and main grid render */
 
 let wantDisplayRankById = null;
+let lastGridRenderSignature = null;
+let showWantRankControlsForRender = false;
+let lastPageSubtitleText = null;
 
 const coverZoomLensIcon = `
 <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
@@ -5662,8 +6534,7 @@ function resolveGoodreadsUrl(book) {
     const fromEdit = (edit.goodreadsUrl || "").trim();
     return fromEdit || null;
   }
-  const scraped = (window.BOOKS || []).find((entry) => entry.id === book.id);
-  const fromData = (scraped?.goodreadsUrl || "").trim();
+  const fromData = (book.goodreadsUrl || "").trim();
   return fromData || null;
 }
 
@@ -5720,23 +6591,70 @@ function layoutListCoverPreviews() {
 }
 
 let listCoverPreviewObserver = null;
+let listCoverLayoutRaf = null;
+
+function scheduleListCoverLayout() {
+  if (listCoverLayoutRaf != null) {
+    return;
+  }
+  listCoverLayoutRaf = requestAnimationFrame(() => {
+    listCoverLayoutRaf = null;
+    layoutListCoverPreviews();
+  });
+}
 
 function ensureListCoverPreviewObserver() {
   if (listCoverPreviewObserver) {
     return;
   }
   listCoverPreviewObserver = new ResizeObserver(() => {
-    layoutListCoverPreviews();
+    scheduleListCoverLayout();
   });
   listCoverPreviewObserver.observe(grid);
 }
 
 function canShowWantRankControls() {
-  return viewerWantView.shouldShowWantRankHandles(
-    wantFilterMode,
+  return showWantRankControlsForRender;
+}
+
+function bookCardRenderToken(book, rank) {
+  const highlightCollection = shouldHighlightCollectionOnCards();
+  return [
+    book.id,
+    book.coverCacheKey || "",
+    book.hidden ? 1 : 0,
+    highlightCollection && isOrdered(book) ? 1 : 0,
+    highlightCollection && isCollected(book) ? 1 : 0,
+    isWanted(book) && shouldHighlightWantsOnCards() ? 1 : 0,
+    rank ?? "",
+  ].join(":");
+}
+
+function buildGridRenderSignature(visible, showWantRank, rankById) {
+  return [
     gridViewMode,
-    hasActiveSearch(),
-  );
+    readOnly,
+    serveEnabled,
+    shouldHighlightCollectionOnCards(),
+    shouldHighlightWantsOnCards(),
+    isWantFilterActive(),
+    showWantRank,
+    visible
+      .map((book) =>
+        bookCardRenderToken(book, rankById?.get(Number(book.id))),
+      )
+      .join("|"),
+  ].join(";");
+}
+
+function updateGridHtml(nextSignature, html) {
+  if (nextSignature === lastGridRenderSignature) {
+    return false;
+  }
+  lastGridRenderSignature = nextSignature;
+  grid.innerHTML = html;
+  scheduleListCoverLayout();
+  return true;
 }
 
 function renderWantRankListHandle(book) {
@@ -5907,39 +6825,49 @@ function render() {
   document.body.classList.toggle("viewing-want", isWantViewExclusive());
   document.body.classList.toggle("viewing-want-filter", isWantFilterActive());
   document.body.classList.toggle("viewing-mycroft-hidden", isMycroftHiddenFilter());
+  const activeSearch = hasActiveSearch();
   if (pageSubtitle) {
+    let subtitleText =
+      "A publishing house of horror and weird fiction—founded in 1939 to rescue Lovecraft from the pulps.";
     if (isCollectionAllFilter() && hiddenOnly) {
-      pageSubtitle.textContent =
+      subtitleText =
         "Viewing hidden books in your collection — click a stat again to show all books";
     } else if (isCollectionAllFilter()) {
-      pageSubtitle.textContent = hasAnyOrderedBooks()
+      subtitleText = hasAnyOrderedBooks()
         ? "Viewing your collection — click again for on-order only"
         : "Viewing your collection — click the stat again to show all books";
     } else if (isOrderedFilterActive()) {
-      pageSubtitle.textContent =
+      subtitleText =
         "Viewing on-order titles only — click the stat again to show all books";
     } else if (hiddenOnly) {
-      pageSubtitle.textContent =
+      subtitleText =
         "Viewing hidden books — click the stat again to show all books";
     } else if (isMycroftOnlyFilter()) {
-      pageSubtitle.textContent =
+      subtitleText =
         "An imprint for weird detective fiction—founded in 1945 to house August Derleth's Solar Pons.";
     } else if (isMycroftHiddenFilter()) {
-      pageSubtitle.textContent =
+      subtitleText =
         "Mycroft & Moran titles hidden — click the stat again to show all books";
     } else if (isWantFilterActive() && isWantViewExclusive()) {
-      pageSubtitle.textContent = hasActiveSearch()
+      subtitleText = activeSearch
         ? "Search narrows your want list — clear search to reorder"
         : gridViewMode === "list"
           ? "Your want list — drag rank tabs to reorder; tap WANT to show all books"
           : "Your want list — drag rank chips to reorder; tap WANT to show all books";
-    } else {
-      pageSubtitle.textContent =
-        "A publishing house of horror and weird fiction—founded in 1939 to rescue Lovecraft from the pulps.";
+    }
+    if (subtitleText !== lastPageSubtitleText) {
+      pageSubtitle.textContent = subtitleText;
+      lastPageSubtitleText = subtitleText;
     }
   }
 
   renderStats(visible, activeBooks);
+
+  showWantRankControlsForRender = viewerWantView.shouldShowWantRankHandles(
+    wantFilterMode,
+    gridViewMode,
+    activeSearch,
+  );
 
   if (wantRankDragInProgress) {
     syncSettingsHighlightCheckboxes();
@@ -5948,7 +6876,6 @@ function render() {
 
   if (!visible.length) {
     let message = "No books match your search.";
-    const activeSearch = hasActiveSearch();
     if (isCollectionAllFilter()) {
       message = activeSearch
         ? "No books in your collection match your search."
@@ -5970,7 +6897,8 @@ function render() {
         ? "No wanted books match your search."
         : "Your want list is empty — open a book and tap Want to add it.";
     }
-    grid.innerHTML = `<div class="empty">${message}</div>`;
+    updateGridHtml(`empty:${message}`, `<div class="empty">${message}</div>`);
+    wantDisplayRankById = null;
     if (!bookDetailDialog.hidden && detailBookId) {
       updateDetailNav();
     }
@@ -5978,15 +6906,19 @@ function render() {
     return;
   }
 
-  wantDisplayRankById = canShowWantRankControls()
+  wantDisplayRankById = showWantRankControlsForRender
     ? viewerWantOrder.buildWantDisplayRankById(
         wantOrderIds,
         visible.map((book) => book.id),
       )
     : null;
 
-  grid.innerHTML = visible.map(renderCard).join("");
-  layoutListCoverPreviews();
+  const gridSignature = buildGridRenderSignature(
+    visible,
+    showWantRankControlsForRender,
+    wantDisplayRankById,
+  );
+  updateGridHtml(gridSignature, visible.map(renderCard).join(""));
 
   if (!bookDetailDialog.hidden && detailBookId) {
     const detailBook = books.find((entry) => entry.id === detailBookId);
@@ -6443,6 +7375,9 @@ function selectSettingsTab(tab) {
   settingsTabSettings.tabIndex = aboutActive ? -1 : 0;
   settingsPanelAbout.hidden = !aboutActive;
   settingsPanelSettings.hidden = aboutActive;
+  if (!aboutActive) {
+    refreshGistBackupList();
+  }
 }
 
 function openSettingsDialog(options = {}) {
@@ -6453,6 +7388,7 @@ function openSettingsDialog(options = {}) {
   settingsDialog.hidden = false;
   settingsBtn.setAttribute("aria-expanded", "true");
   settingsCloseBtn.focus();
+  refreshGistBackupList();
 
   if (historyMode === "push" && isOverlayHistoryView("settings")) {
     historyMode = "replace";
@@ -6523,6 +7459,7 @@ async function onGistConnectClick() {
     gistConnectBtn.disabled = true;
     await connectGistSync(gistTokenInput.value);
     gistTokenInput.value = "";
+    refreshGistBackupList();
     updateGistSyncStatus("Connected to GitHub Gist sync.");
     render();
   } catch (error) {
@@ -6541,6 +7478,122 @@ async function onGistConnectClick() {
 function onGistClearClick() {
   clearGistSyncConfig();
   activateLocalStorageMode();
+}
+
+let pendingBackupRestoreAt = null;
+
+function formatSnapshotLabel(iso) {
+  const time = Date.parse(iso || "");
+  if (!Number.isFinite(time)) {
+    return iso || "Unknown time";
+  }
+  return new Date(time).toLocaleString([], {
+    dateStyle: "medium",
+    timeStyle: "short",
+  });
+}
+
+function setGistBackupStatus(message, isError = false) {
+  if (!gistBackupStatus) {
+    return;
+  }
+  gistBackupStatus.textContent = message;
+  gistBackupStatus.classList.toggle("settings-gist-status--error", Boolean(isError));
+}
+
+async function refreshGistBackupList() {
+  if (!gistBackupSection || !gistBackupList) {
+    return;
+  }
+  if (!isGistStorageActive()) {
+    gistBackupSection.hidden = true;
+    gistBackupList.innerHTML = "";
+    setGistBackupStatus("");
+    return;
+  }
+  gistBackupSection.hidden = false;
+  gistBackupList.innerHTML =
+    '<li class="gist-backup-empty">Loading snapshots…</li>';
+  try {
+    const snapshots = await listGistSnapshots();
+    if (!snapshots.length) {
+      gistBackupList.innerHTML =
+        '<li class="gist-backup-empty">No snapshots yet. The first one is written after sync when the latest is more than a day old.</li>';
+      setGistBackupStatus("");
+      return;
+    }
+    gistBackupList.innerHTML = snapshots
+      .slice()
+      .reverse()
+      .map((entry) => {
+        const label = formatSnapshotLabel(entry.at);
+        const safeLabel = viewerCardHtml.escapeHtml(label);
+        return `<li class="gist-backup-item"><button type="button" class="gist-backup-restore-btn" data-backup-at="${entry.at}" data-backup-label="${safeLabel}">Restore ${safeLabel}</button></li>`;
+      })
+      .join("");
+    setGistBackupStatus(
+      `${snapshots.length} daily snapshot${snapshots.length === 1 ? "" : "s"} stored (max ${viewerGistBackup.MAX_SNAPSHOTS}).`,
+    );
+  } catch (_) {
+    gistBackupList.innerHTML =
+      '<li class="gist-backup-empty">Could not load snapshots.</li>';
+    setGistBackupStatus("Could not reach the backup Gist.", true);
+  }
+}
+
+function openBackupRestoreConfirm(at, label) {
+  pendingBackupRestoreAt = at;
+  if (backupRestoreMessage) {
+    backupRestoreMessage.textContent = `Restore your collection from the snapshot taken ${label}? Your current collection and want list will be replaced and synced to GitHub.`;
+  }
+  if (backupRestoreDialog) {
+    backupRestoreDialog.hidden = false;
+  }
+}
+
+function closeBackupRestoreConfirm() {
+  pendingBackupRestoreAt = null;
+  if (backupRestoreDialog) {
+    backupRestoreDialog.hidden = true;
+  }
+}
+
+async function onConfirmBackupRestore() {
+  const at = pendingBackupRestoreAt;
+  closeBackupRestoreConfirm();
+  if (!at) {
+    return;
+  }
+  setGistBackupStatus("Restoring snapshot…");
+  if (backupRestoreOk) {
+    backupRestoreOk.disabled = true;
+  }
+  try {
+    const result = await restoreGistSnapshot(at);
+    if (!result.ok) {
+      setGistBackupStatus(result.error, true);
+      return;
+    }
+    closeSettingsDialog({ programmatic: true });
+    render();
+    if (!bookDetailDialog.hidden && detailBookId) {
+      openBookDetail(detailBookId, { historyMode: "none" });
+    }
+  } finally {
+    if (backupRestoreOk) {
+      backupRestoreOk.disabled = false;
+    }
+  }
+}
+
+function onGistBackupListClick(event) {
+  const button = event.target.closest(".gist-backup-restore-btn");
+  if (!button) {
+    return;
+  }
+  const at = button.dataset.backupAt;
+  const label = button.dataset.backupLabel || formatSnapshotLabel(at);
+  openBackupRestoreConfirm(at, label);
 }
 
 function escapeCsvField(value) {
@@ -8386,6 +9439,28 @@ if (gistClearBtn) {
   });
 }
 
+if (gistBackupList) {
+  gistBackupList.addEventListener("click", onGistBackupListClick);
+}
+
+if (backupRestoreOk) {
+  backupRestoreOk.addEventListener("click", () => {
+    onConfirmBackupRestore();
+  });
+}
+
+if (backupRestoreCancel) {
+  backupRestoreCancel.addEventListener("click", closeBackupRestoreConfirm);
+}
+
+if (backupRestoreDialog) {
+  backupRestoreDialog
+    .querySelectorAll("[data-close-backup-restore]")
+    .forEach((element) => {
+      element.addEventListener("click", closeBackupRestoreConfirm);
+    });
+}
+
 if (exportCollectionBtn) {
   exportCollectionBtn.addEventListener("click", () => {
     exportCollectionCsv();
@@ -8499,6 +9574,7 @@ document.addEventListener("keydown", (event) => {
 });
 
 sortSelect.addEventListener("change", onSortChange);
+sortReverseBtn?.addEventListener("click", toggleSortOrder);
 
 syncSettingsStorageMode();
 updateSortControlVisibility();

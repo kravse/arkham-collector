@@ -439,6 +439,9 @@ function selectSettingsTab(tab) {
   settingsTabSettings.tabIndex = aboutActive ? -1 : 0;
   settingsPanelAbout.hidden = !aboutActive;
   settingsPanelSettings.hidden = aboutActive;
+  if (!aboutActive) {
+    refreshGistBackupList();
+  }
 }
 
 function openSettingsDialog(options = {}) {
@@ -449,6 +452,7 @@ function openSettingsDialog(options = {}) {
   settingsDialog.hidden = false;
   settingsBtn.setAttribute("aria-expanded", "true");
   settingsCloseBtn.focus();
+  refreshGistBackupList();
 
   if (historyMode === "push" && isOverlayHistoryView("settings")) {
     historyMode = "replace";
@@ -519,6 +523,7 @@ async function onGistConnectClick() {
     gistConnectBtn.disabled = true;
     await connectGistSync(gistTokenInput.value);
     gistTokenInput.value = "";
+    refreshGistBackupList();
     updateGistSyncStatus("Connected to GitHub Gist sync.");
     render();
   } catch (error) {
@@ -537,6 +542,122 @@ async function onGistConnectClick() {
 function onGistClearClick() {
   clearGistSyncConfig();
   activateLocalStorageMode();
+}
+
+let pendingBackupRestoreAt = null;
+
+function formatSnapshotLabel(iso) {
+  const time = Date.parse(iso || "");
+  if (!Number.isFinite(time)) {
+    return iso || "Unknown time";
+  }
+  return new Date(time).toLocaleString([], {
+    dateStyle: "medium",
+    timeStyle: "short",
+  });
+}
+
+function setGistBackupStatus(message, isError = false) {
+  if (!gistBackupStatus) {
+    return;
+  }
+  gistBackupStatus.textContent = message;
+  gistBackupStatus.classList.toggle("settings-gist-status--error", Boolean(isError));
+}
+
+async function refreshGistBackupList() {
+  if (!gistBackupSection || !gistBackupList) {
+    return;
+  }
+  if (!isGistStorageActive()) {
+    gistBackupSection.hidden = true;
+    gistBackupList.innerHTML = "";
+    setGistBackupStatus("");
+    return;
+  }
+  gistBackupSection.hidden = false;
+  gistBackupList.innerHTML =
+    '<li class="gist-backup-empty">Loading snapshots…</li>';
+  try {
+    const snapshots = await listGistSnapshots();
+    if (!snapshots.length) {
+      gistBackupList.innerHTML =
+        '<li class="gist-backup-empty">No snapshots yet. The first one is written after sync when the latest is more than a day old.</li>';
+      setGistBackupStatus("");
+      return;
+    }
+    gistBackupList.innerHTML = snapshots
+      .slice()
+      .reverse()
+      .map((entry) => {
+        const label = formatSnapshotLabel(entry.at);
+        const safeLabel = viewerCardHtml.escapeHtml(label);
+        return `<li class="gist-backup-item"><button type="button" class="gist-backup-restore-btn" data-backup-at="${entry.at}" data-backup-label="${safeLabel}">Restore ${safeLabel}</button></li>`;
+      })
+      .join("");
+    setGistBackupStatus(
+      `${snapshots.length} daily snapshot${snapshots.length === 1 ? "" : "s"} stored (max ${viewerGistBackup.MAX_SNAPSHOTS}).`,
+    );
+  } catch (_) {
+    gistBackupList.innerHTML =
+      '<li class="gist-backup-empty">Could not load snapshots.</li>';
+    setGistBackupStatus("Could not reach the backup Gist.", true);
+  }
+}
+
+function openBackupRestoreConfirm(at, label) {
+  pendingBackupRestoreAt = at;
+  if (backupRestoreMessage) {
+    backupRestoreMessage.textContent = `Restore your collection from the snapshot taken ${label}? Your current collection and want list will be replaced and synced to GitHub.`;
+  }
+  if (backupRestoreDialog) {
+    backupRestoreDialog.hidden = false;
+  }
+}
+
+function closeBackupRestoreConfirm() {
+  pendingBackupRestoreAt = null;
+  if (backupRestoreDialog) {
+    backupRestoreDialog.hidden = true;
+  }
+}
+
+async function onConfirmBackupRestore() {
+  const at = pendingBackupRestoreAt;
+  closeBackupRestoreConfirm();
+  if (!at) {
+    return;
+  }
+  setGistBackupStatus("Restoring snapshot…");
+  if (backupRestoreOk) {
+    backupRestoreOk.disabled = true;
+  }
+  try {
+    const result = await restoreGistSnapshot(at);
+    if (!result.ok) {
+      setGistBackupStatus(result.error, true);
+      return;
+    }
+    closeSettingsDialog({ programmatic: true });
+    render();
+    if (!bookDetailDialog.hidden && detailBookId) {
+      openBookDetail(detailBookId, { historyMode: "none" });
+    }
+  } finally {
+    if (backupRestoreOk) {
+      backupRestoreOk.disabled = false;
+    }
+  }
+}
+
+function onGistBackupListClick(event) {
+  const button = event.target.closest(".gist-backup-restore-btn");
+  if (!button) {
+    return;
+  }
+  const at = button.dataset.backupAt;
+  const label = button.dataset.backupLabel || formatSnapshotLabel(at);
+  openBackupRestoreConfirm(at, label);
 }
 
 function escapeCsvField(value) {

@@ -1,6 +1,9 @@
 /* Covers, cards, stats, and main grid render */
 
 let wantDisplayRankById = null;
+let lastGridRenderSignature = null;
+let showWantRankControlsForRender = false;
+let lastPageSubtitleText = null;
 
 const coverZoomLensIcon = `
 <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
@@ -275,8 +278,7 @@ function resolveGoodreadsUrl(book) {
     const fromEdit = (edit.goodreadsUrl || "").trim();
     return fromEdit || null;
   }
-  const scraped = (window.BOOKS || []).find((entry) => entry.id === book.id);
-  const fromData = (scraped?.goodreadsUrl || "").trim();
+  const fromData = (book.goodreadsUrl || "").trim();
   return fromData || null;
 }
 
@@ -333,23 +335,70 @@ function layoutListCoverPreviews() {
 }
 
 let listCoverPreviewObserver = null;
+let listCoverLayoutRaf = null;
+
+function scheduleListCoverLayout() {
+  if (listCoverLayoutRaf != null) {
+    return;
+  }
+  listCoverLayoutRaf = requestAnimationFrame(() => {
+    listCoverLayoutRaf = null;
+    layoutListCoverPreviews();
+  });
+}
 
 function ensureListCoverPreviewObserver() {
   if (listCoverPreviewObserver) {
     return;
   }
   listCoverPreviewObserver = new ResizeObserver(() => {
-    layoutListCoverPreviews();
+    scheduleListCoverLayout();
   });
   listCoverPreviewObserver.observe(grid);
 }
 
 function canShowWantRankControls() {
-  return viewerWantView.shouldShowWantRankHandles(
-    wantFilterMode,
+  return showWantRankControlsForRender;
+}
+
+function bookCardRenderToken(book, rank) {
+  const highlightCollection = shouldHighlightCollectionOnCards();
+  return [
+    book.id,
+    book.coverCacheKey || "",
+    book.hidden ? 1 : 0,
+    highlightCollection && isOrdered(book) ? 1 : 0,
+    highlightCollection && isCollected(book) ? 1 : 0,
+    isWanted(book) && shouldHighlightWantsOnCards() ? 1 : 0,
+    rank ?? "",
+  ].join(":");
+}
+
+function buildGridRenderSignature(visible, showWantRank, rankById) {
+  return [
     gridViewMode,
-    hasActiveSearch(),
-  );
+    readOnly,
+    serveEnabled,
+    shouldHighlightCollectionOnCards(),
+    shouldHighlightWantsOnCards(),
+    isWantFilterActive(),
+    showWantRank,
+    visible
+      .map((book) =>
+        bookCardRenderToken(book, rankById?.get(Number(book.id))),
+      )
+      .join("|"),
+  ].join(";");
+}
+
+function updateGridHtml(nextSignature, html) {
+  if (nextSignature === lastGridRenderSignature) {
+    return false;
+  }
+  lastGridRenderSignature = nextSignature;
+  grid.innerHTML = html;
+  scheduleListCoverLayout();
+  return true;
 }
 
 function renderWantRankListHandle(book) {
@@ -520,39 +569,49 @@ function render() {
   document.body.classList.toggle("viewing-want", isWantViewExclusive());
   document.body.classList.toggle("viewing-want-filter", isWantFilterActive());
   document.body.classList.toggle("viewing-mycroft-hidden", isMycroftHiddenFilter());
+  const activeSearch = hasActiveSearch();
   if (pageSubtitle) {
+    let subtitleText =
+      "A publishing house of horror and weird fiction—founded in 1939 to rescue Lovecraft from the pulps.";
     if (isCollectionAllFilter() && hiddenOnly) {
-      pageSubtitle.textContent =
+      subtitleText =
         "Viewing hidden books in your collection — click a stat again to show all books";
     } else if (isCollectionAllFilter()) {
-      pageSubtitle.textContent = hasAnyOrderedBooks()
+      subtitleText = hasAnyOrderedBooks()
         ? "Viewing your collection — click again for on-order only"
         : "Viewing your collection — click the stat again to show all books";
     } else if (isOrderedFilterActive()) {
-      pageSubtitle.textContent =
+      subtitleText =
         "Viewing on-order titles only — click the stat again to show all books";
     } else if (hiddenOnly) {
-      pageSubtitle.textContent =
+      subtitleText =
         "Viewing hidden books — click the stat again to show all books";
     } else if (isMycroftOnlyFilter()) {
-      pageSubtitle.textContent =
+      subtitleText =
         "An imprint for weird detective fiction—founded in 1945 to house August Derleth's Solar Pons.";
     } else if (isMycroftHiddenFilter()) {
-      pageSubtitle.textContent =
+      subtitleText =
         "Mycroft & Moran titles hidden — click the stat again to show all books";
     } else if (isWantFilterActive() && isWantViewExclusive()) {
-      pageSubtitle.textContent = hasActiveSearch()
+      subtitleText = activeSearch
         ? "Search narrows your want list — clear search to reorder"
         : gridViewMode === "list"
           ? "Your want list — drag rank tabs to reorder; tap WANT to show all books"
           : "Your want list — drag rank chips to reorder; tap WANT to show all books";
-    } else {
-      pageSubtitle.textContent =
-        "A publishing house of horror and weird fiction—founded in 1939 to rescue Lovecraft from the pulps.";
+    }
+    if (subtitleText !== lastPageSubtitleText) {
+      pageSubtitle.textContent = subtitleText;
+      lastPageSubtitleText = subtitleText;
     }
   }
 
   renderStats(visible, activeBooks);
+
+  showWantRankControlsForRender = viewerWantView.shouldShowWantRankHandles(
+    wantFilterMode,
+    gridViewMode,
+    activeSearch,
+  );
 
   if (wantRankDragInProgress) {
     syncSettingsHighlightCheckboxes();
@@ -561,7 +620,6 @@ function render() {
 
   if (!visible.length) {
     let message = "No books match your search.";
-    const activeSearch = hasActiveSearch();
     if (isCollectionAllFilter()) {
       message = activeSearch
         ? "No books in your collection match your search."
@@ -583,7 +641,8 @@ function render() {
         ? "No wanted books match your search."
         : "Your want list is empty — open a book and tap Want to add it.";
     }
-    grid.innerHTML = `<div class="empty">${message}</div>`;
+    updateGridHtml(`empty:${message}`, `<div class="empty">${message}</div>`);
+    wantDisplayRankById = null;
     if (!bookDetailDialog.hidden && detailBookId) {
       updateDetailNav();
     }
@@ -591,15 +650,19 @@ function render() {
     return;
   }
 
-  wantDisplayRankById = canShowWantRankControls()
+  wantDisplayRankById = showWantRankControlsForRender
     ? viewerWantOrder.buildWantDisplayRankById(
         wantOrderIds,
         visible.map((book) => book.id),
       )
     : null;
 
-  grid.innerHTML = visible.map(renderCard).join("");
-  layoutListCoverPreviews();
+  const gridSignature = buildGridRenderSignature(
+    visible,
+    showWantRankControlsForRender,
+    wantDisplayRankById,
+  );
+  updateGridHtml(gridSignature, visible.map(renderCard).join(""));
 
   if (!bookDetailDialog.hidden && detailBookId) {
     const detailBook = books.find((entry) => entry.id === detailBookId);

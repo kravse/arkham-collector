@@ -1,4 +1,5 @@
 const USER_STATE_KEY = "arkham-user-state";
+const USER_STATE_BACKUP_KEY = "arkham-user-state-backup";
 const USER_STATE_VERSION = 2;
 const USER_STATE_VERSION_V1 = 1;
 
@@ -473,6 +474,7 @@ function serializeUserState(state) {
 
 module.exports = {
   USER_STATE_KEY,
+  USER_STATE_BACKUP_KEY,
   USER_STATE_VERSION,
   USER_STATE_VERSION_V1,
   LEGACY_KEYS,

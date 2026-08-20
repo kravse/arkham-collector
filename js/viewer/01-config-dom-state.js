@@ -7,6 +7,11 @@ const books = applyBookTags(
   applyBookEdits(window.BOOKS || [], window.BOOK_EDITS || {}),
   window.BOOK_TAGS || {},
 );
+try {
+  delete window.BOOKS;
+} catch {
+  window.BOOKS = undefined;
+}
 const grid = document.getElementById("grid");
 const stats = document.getElementById("stats");
 const searchInput = document.getElementById("search");
@@ -16,6 +21,7 @@ const searchFieldSuggest = document.getElementById("search-field-suggest");
 const searchClearBtn = document.getElementById("search-clear");
 const viewModeToggle = document.getElementById("view-mode-toggle");
 const sortSelect = document.getElementById("sort");
+const sortReverseBtn = document.getElementById("sort-reverse");
 const sortWantBadge = document.getElementById("sort-want-badge");
 const sortControlWrap = document.getElementById("sort-control-wrap");
 const bookOrderBtn = document.getElementById("book-order-btn");
@@ -87,6 +93,13 @@ const gistTokenInput = document.getElementById("gist-token-input");
 const gistConnectBtn = document.getElementById("gist-connect-btn");
 const gistClearBtn = document.getElementById("gist-clear-btn");
 const gistSyncStatus = document.getElementById("gist-sync-status");
+const gistBackupSection = document.getElementById("gist-backup-section");
+const gistBackupList = document.getElementById("gist-backup-list");
+const gistBackupStatus = document.getElementById("gist-backup-status");
+const backupRestoreDialog = document.getElementById("backup-restore-dialog");
+const backupRestoreMessage = document.getElementById("backup-restore-message");
+const backupRestoreOk = document.getElementById("backup-restore-ok");
+const backupRestoreCancel = document.getElementById("backup-restore-cancel");
 const exportCollectionBtn = document.getElementById("export-collection-btn");
 const importCollectionBtn = document.getElementById("import-collection-btn");
 const importCollectionInput = document.getElementById("import-collection-input");
@@ -106,12 +119,6 @@ const headerFiltersToggle = document.getElementById("header-filters-toggle");
 const readOnly = window.READ_ONLY === true;
 const LOGO_ARKHAM = "images/arkham-house.jpg";
 const LOGO_MYCROFT = "images/Mycroft_moran.png";
-const SORT_MODES = new Set([
-  "date-desc",
-  "date-asc",
-  "title-asc",
-  "title-desc",
-]);
 let serveEnabled = false;
 let serveEditDeltas = false;
 let editingBookId = null;
@@ -130,6 +137,7 @@ let gridViewMode = "cards";
 let highlightWants = true;
 let highlightCollection = true;
 let showMagazines = false;
+let catalogSortMode = "date-asc";
 let wantOrderLocked = false;
 let detailBookId = null;
 let bookOrderIds = Array.isArray(window.BOOK_ORDER)
@@ -196,7 +204,24 @@ function activeCollectionIds() {
   return collectionIds;
 }
 
+let lastSettingsHighlightSignature = null;
+
+function buildSettingsHighlightSignature() {
+  return [
+    highlightWants ? 1 : 0,
+    highlightCollection ? 1 : 0,
+    showMagazines ? 1 : 0,
+    hasVisibleMagazineIssues() ? 1 : 0,
+  ].join(":");
+}
+
 function syncSettingsHighlightCheckboxes() {
+  const signature = buildSettingsHighlightSignature();
+  if (signature === lastSettingsHighlightSignature) {
+    return;
+  }
+  lastSettingsHighlightSignature = signature;
+
   if (highlightWantsInput) {
     highlightWantsInput.checked = highlightWants;
   }

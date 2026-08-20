@@ -186,10 +186,8 @@
             <label class="sort-label" for="sort">Sort</label>
             <div class="sort-value-slot">
               <select id="sort" aria-label="Sort books">
-                <option value="date-asc" selected>Oldest first</option>
-                <option value="date-desc">Newest first</option>
-                <option value="title-asc">Title A–Z</option>
-                <option value="title-desc">Title Z–A</option>
+                <option value="date" selected>Publication</option>
+                <option value="title">Title</option>
               </select>
               <button
                 type="button"
@@ -250,6 +248,58 @@
                 </span>
               </button>
             </div>
+            <button
+              type="button"
+              id="sort-reverse"
+              class="sort-reverse-btn is-ascending"
+              aria-label="Sort order: Oldest first. Reverse."
+              title="Oldest first · click to reverse"
+            >
+              <svg
+                class="sort-direction-icon sort-direction-icon--asc"
+                viewBox="0 0 20 20"
+                width="16"
+                height="16"
+                fill="none"
+                aria-hidden="true"
+              >
+                <path
+                  d="M10 16V4"
+                  stroke="currentColor"
+                  stroke-width="1.75"
+                  stroke-linecap="round"
+                />
+                <path
+                  d="M5.5 8.5 10 4l4.5 4.5"
+                  stroke="currentColor"
+                  stroke-width="1.75"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+              <svg
+                class="sort-direction-icon sort-direction-icon--desc"
+                viewBox="0 0 20 20"
+                width="16"
+                height="16"
+                fill="none"
+                aria-hidden="true"
+              >
+                <path
+                  d="M10 4v12"
+                  stroke="currentColor"
+                  stroke-width="1.75"
+                  stroke-linecap="round"
+                />
+                <path
+                  d="M14.5 11.5 10 16 5.5 11.5"
+                  stroke="currentColor"
+                  stroke-width="1.75"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </button>
           </div>
           <button
             type="button"
@@ -660,6 +710,22 @@
                 </div>
               </div>
               <p id="gist-sync-status" class="settings-collection-hint"></p>
+              <div id="gist-backup-section" class="gist-backup-section" hidden>
+                <h4 class="gist-backup-heading">Restore from backup</h4>
+                <p class="settings-collection-hint gist-backup-note">
+                  A separate private Gist stores up to five snapshots in
+                  <code>arkham-collector-backups.json</code>. A new snapshot is
+                  appended after sync when the latest is more than a day
+                  old (up to five daily snapshots). Restoring replaces your current collection and want list
+                  with the chosen snapshot and syncs that state back to GitHub.
+                </p>
+                <ul
+                  id="gist-backup-list"
+                  class="gist-backup-list"
+                  aria-label="Gist snapshots"
+                ></ul>
+                <p id="gist-backup-status" class="settings-collection-hint"></p>
+              </div>
             </div>
           </section>
           <hr class="settings-divider" aria-hidden="true" />
@@ -818,6 +884,32 @@
           House, Wikipedia, or the Wikimedia Foundation. This notice is not
           legal advice.
         </p>
+      </div>
+    </div>
+
+    <div id="backup-restore-dialog" class="order-dialog" hidden>
+      <div class="order-dialog-backdrop" data-close-backup-restore></div>
+      <div
+        class="order-dialog-panel"
+        role="alertdialog"
+        aria-modal="true"
+        aria-labelledby="backup-restore-title"
+        aria-describedby="backup-restore-message"
+      >
+        <h2 id="backup-restore-title">Restore snapshot</h2>
+        <p id="backup-restore-message" class="order-dialog-note"></p>
+        <div class="order-dialog-actions">
+          <button type="button" id="backup-restore-cancel" class="order-dialog-btn">
+            Cancel
+          </button>
+          <button
+            type="button"
+            id="backup-restore-ok"
+            class="order-dialog-btn order-dialog-btn-primary"
+          >
+            Restore
+          </button>
+        </div>
       </div>
     </div>
 
@@ -1112,14 +1204,14 @@
       </div>
     </div>
 
-    <script src="data/books.js"></script>
-    <script src="data/descriptions.js"></script>
-    <script src="data/book-order.js"></script>
-    <script src="data/edits.js"></script>
-    <script src="data/tags.js"></script>
-    <script src="js/book-edits.js"></script>
-    <script src="js/book-layers.js"></script>
-    <script src="js/sanitize-text.js"></script>
-    <script src="js/viewer-bundle.js"></script>
+    <script defer src="data/books.js"></script>
+    <script defer src="data/descriptions.js"></script>
+    <script defer src="data/book-order.js"></script>
+    <script defer src="data/edits.js"></script>
+    <script defer src="data/tags.js"></script>
+    <script defer src="js/book-edits.js"></script>
+    <script defer src="js/book-layers.js"></script>
+    <script defer src="js/sanitize-text.js"></script>
+    <script defer src="js/viewer-bundle.js"></script>
   </body>
 </html>

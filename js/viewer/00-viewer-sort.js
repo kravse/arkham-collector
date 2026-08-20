@@ -9,6 +9,68 @@ const viewerSort = (function () {
     return match ? match[0] : null;
   }
   
+  const SORT_MODES = new Set([
+    "date-desc",
+    "date-asc",
+    "title-asc",
+    "title-desc",
+  ]);
+  
+  const SORT_FIELDS = new Set(["date", "title"]);
+  
+  const SORT_FIELD_DEFAULTS = {
+    date: "date-asc",
+    title: "title-asc",
+  };
+  
+  function normalizeSort(raw, fallback = "date-asc") {
+    if (raw && SORT_MODES.has(raw)) {
+      return raw;
+    }
+    return fallback;
+  }
+  
+  function getSortField(mode) {
+    const normalized = normalizeSort(mode);
+    if (normalized.startsWith("title-")) {
+      return "title";
+    }
+    return "date";
+  }
+  
+  function isSortDescending(mode) {
+    return normalizeSort(mode).endsWith("-desc");
+  }
+  
+  function toggleSortDirection(mode) {
+    const normalized = normalizeSort(mode);
+    if (normalized.endsWith("-asc")) {
+      return normalized.replace(/-asc$/, "-desc");
+    }
+    if (normalized.endsWith("-desc")) {
+      return normalized.replace(/-desc$/, "-asc");
+    }
+    return normalized;
+  }
+  
+  function sortModeForField(field, currentMode) {
+    if (!field || !SORT_FIELDS.has(field)) {
+      return SORT_FIELD_DEFAULTS.date;
+    }
+    const normalized = normalizeSort(currentMode);
+    if (getSortField(normalized) === field) {
+      return normalized;
+    }
+    return SORT_FIELD_DEFAULTS[field] || SORT_FIELD_DEFAULTS.date;
+  }
+  
+  function sortDirectionLabel(field, descending) {
+    if (field === "title") {
+      return descending ? "Z to A" : "A to Z";
+    }
+    return descending ? "Newest first" : "Oldest first";
+  }
+  
   function buildBookOrderIndex(orderIds) {
     return new Map(orderIds.map((id, index) => [Number(id), index]));
   }
@@ -74,6 +136,15 @@ const viewerSort = (function () {
     return copy.sort((a, b) => compareCanonical(a, b, bookOrderIndex));
   }
   return {
+    SORT_MODES,
+    SORT_FIELDS,
+    SORT_FIELD_DEFAULTS,
+    normalizeSort,
+    getSortField,
+    isSortDescending,
+    toggleSortDirection,
+    sortModeForField,
+    sortDirectionLabel,
     compareOrderTiebreak,
     compareCanonical,
     sortBooks,

@@ -32,6 +32,25 @@ function emptySearchFilter() {
   return { fieldTerms: emptyFieldTerms(), textTerms: [] };
 }
 
+function searchFilterIsEmpty(filter) {
+  if (!filter) {
+    return true;
+  }
+  if ((filter.textTerms || []).length > 0) {
+    return false;
+  }
+  const terms = filter.fieldTerms || emptyFieldTerms();
+  return SEARCH_FIELD_TYPES.every((field) => !(terms[field.key] || []).length);
+}
+
+function filterBooksBySearch(books, searchFilter) {
+  if (searchFilterIsEmpty(searchFilter)) {
+    return books;
+  }
+  const match = prepareCompoundSearchMatcher(searchFilter);
+  return (books || []).filter(match);
+}
+
 function formatFieldSearchQuery(prefix, label) {
   const text = String(label || "").trim();
   if (!text) {
@@ -714,50 +733,57 @@ function normalizeSearchFilter(filter) {
   };
 }
 
-function matchesCompoundSearch(book, filter) {
+function prepareCompoundSearchMatcher(filter) {
   const { fieldTerms, textTerms } = normalizeSearchFilter(filter);
   const yearDecadeCriteria = buildYearDecadeCriteria(
     fieldTerms.decade,
     textTerms,
   );
+  const otherFieldTerms = SEARCH_FIELD_TYPES.filter(
+    (field) => field.key !== "decade",
+  ).map((field) => ({
+    field,
+    terms: fieldTerms[field.key] || [],
+  }));
 
-  for (const field of SEARCH_FIELD_TYPES) {
-    if (field.key === "decade") {
-      continue;
+  return (book) => {
+    for (const { field, terms } of otherFieldTerms) {
+      for (const term of terms) {
+        if (!field.matchBook(book, term)) {
+          return false;
+        }
+      }
     }
-    for (const term of fieldTerms[field.key] || []) {
-      if (!field.matchBook(book, term)) {
+
+    if (
+      yearDecadeCriteria.decades.length > 0 ||
+      yearDecadeCriteria.years.length > 0
+    ) {
+      if (!bookMatchesYearDecadeCriteria(book, yearDecadeCriteria)) {
         return false;
       }
     }
-  }
 
-  if (
-    yearDecadeCriteria.decades.length > 0 ||
-    yearDecadeCriteria.years.length > 0
-  ) {
-    if (!bookMatchesYearDecadeCriteria(book, yearDecadeCriteria)) {
-      return false;
+    const haystack = book._searchHaystack || "";
+    for (const term of yearDecadeCriteria.otherTextTerms) {
+      if (!haystack.includes(term)) {
+        return false;
+      }
     }
-  }
+    return true;
+  };
+}
 
-  const haystack = book._searchHaystack || "";
-  for (const term of yearDecadeCriteria.otherTextTerms) {
-    if (!haystack.includes(term)) {
-      return false;
-    }
-  }
-  return true;
+function matchesCompoundSearch(book, filter) {
+  return prepareCompoundSearchMatcher(filter)(book);
 }
 
 function filterBooksMatchingFieldTerms(books, fieldTermsPartial) {
-  const partial = normalizeSearchFilter({
+  const matchBook = prepareCompoundSearchMatcher({
     fieldTerms: fieldTermsPartial,
     textTerms: [],
   });
-  return (books || []).filter((book) =>
-    matchesCompoundSearch(book, partial),
-  );
+  return (books || []).filter(matchBook);
 }
 
 function chipsToFieldTermsPartial(chips, excludeFieldKey) {
@@ -820,6 +846,8 @@ module.exports = {
   normalizeLabelKey,
   emptyFieldTerms,
   emptySearchFilter,
+  searchFilterIsEmpty,
+  filterBooksBySearch,
   getFieldByKey,
   getFieldByPrefix,
   parseDecadeTrailingToken,
@@ -843,6 +871,7 @@ module.exports = {
   splitYearDecadeTextTerms,
   buildYearDecadeCriteria,
   bookMatchesYearDecadeCriteria,
+  prepareCompoundSearchMatcher,
   matchesCompoundSearch,
   filterBooksMatchingFieldTerms,
   chipsToFieldTermsPartial,
