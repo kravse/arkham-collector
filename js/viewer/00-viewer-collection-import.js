@@ -1,7 +1,7 @@
 /* Generated from scripts/lib/viewer-collection-import.js — run npm run bundle-viewer */
 
 const viewerCollectionImport = (function () {
-  const COLLECTION_CSV_HEADER = "title,author,year,status";
+  const COLLECTION_CSV_HEADER = "title,author,year,status,want_rank";
   
   function parseYear(value) {
     if (!value) {
@@ -56,6 +56,17 @@ const viewerCollectionImport = (function () {
     return left === right || left.includes(right) || right.includes(left);
   }
   
+  function parseWantRank(raw) {
+    if (raw == null || String(raw).trim() === "") {
+      return null;
+    }
+    const value = Number(String(raw).trim());
+    if (!Number.isFinite(value) || !Number.isInteger(value) || value < 1) {
+      return null;
+    }
+    return value;
+  }
+  
   /** Maps CSV status text to a book status; blank means collected for legacy 3-column files. */
   function normalizeImportStatus(raw) {
     const value = String(raw || "").trim().toLowerCase();
@@ -83,6 +94,7 @@ const viewerCollectionImport = (function () {
         author: cols[1]?.trim() || "",
         year: parseYear(cols[2]),
         status: cols[3]?.trim() || "",
+        wantRank: parseWantRank(cols[4]),
       }))
       .filter((item) => {
         if (!item.title || !item.year) {
@@ -146,7 +158,11 @@ const viewerCollectionImport = (function () {
         unmatchedRows.push(row);
       } else if (!seen.has(id)) {
         seen.add(id);
-        entries.push({ id, status: normalizeImportStatus(row.status) });
+        entries.push({
+          id,
+          status: normalizeImportStatus(row.status),
+          wantRank: row.wantRank ?? null,
+        });
       }
     }
   
@@ -163,16 +179,54 @@ const viewerCollectionImport = (function () {
   }
   
   /**
-   * Build export rows for every book with a collection status (collected, ordered,
-   * or want). Caller supplies sort order; rows are title, author, year, status.
+   * Build wantOrderIds from import entries. Uses want_rank when present; otherwise
+   * preserves row order among want rows (legacy exports without a rank column).
    */
-  function buildCollectionExportRows(books, statusMap, compareFn) {
+  function buildWantOrderIdsFromImportEntries(entries) {
+    const wantEntries = entries
+      .map((entry, rowIndex) => ({ ...entry, rowIndex }))
+      .filter((entry) => entry.status === viewerBookStatus.WANT);
+  
+    wantEntries.sort((a, b) => {
+      if (a.wantRank != null && b.wantRank != null) {
+        if (a.wantRank !== b.wantRank) {
+          return a.wantRank - b.wantRank;
+        }
+        return a.rowIndex - b.rowIndex;
+      }
+      if (a.wantRank != null) {
+        return -1;
+      }
+      if (b.wantRank != null) {
+        return 1;
+      }
+      return a.rowIndex - b.rowIndex;
+    });
+  
+    return wantEntries.map((entry) => entry.id);
+  }
+  
+  /**
+   * Build export rows for every book with a collection status (collected, ordered,
+   * or want). Caller supplies sort order; rows are title, author, year, status,
+   * want_rank (blank unless status is want).
+   */
+  function buildCollectionExportRows(books, statusMap, compareFn, wantOrderIds = []) {
+    const wantRankById = new Map();
+    for (let index = 0; index < wantOrderIds.length; index += 1) {
+      wantRankById.set(Number(wantOrderIds[index]), index + 1);
+    }
+  
     const rows = [];
     for (const book of books) {
       const status = viewerBookStatus.getBookStatus(statusMap, book.id);
       if (status === viewerBookStatus.NONE) {
         continue;
       }
+      const wantRank =
+        status === viewerBookStatus.WANT && wantRankById.has(book.id)
+          ? String(wantRankById.get(book.id))
+          : "";
       rows.push({
         book,
         cols: [
@@ -180,6 +234,7 @@ const viewerCollectionImport = (function () {
           book.author || "",
           parseYear(book.publicationDate) || "",
           status,
+          wantRank,
         ],
       });
     }
@@ -191,10 +246,12 @@ const viewerCollectionImport = (function () {
   return {
     COLLECTION_CSV_HEADER,
     parseCollectionCsv,
+    parseWantRank,
     normalizeImportStatus,
     matchCollectionImportEntries,
     matchCollectionImportRows,
     matchBookIdForRow,
+    buildWantOrderIdsFromImportEntries,
     buildCollectionExportRows,
   };
 })();

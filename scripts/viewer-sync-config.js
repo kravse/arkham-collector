@@ -399,10 +399,12 @@ const VIEWER_SYNC_ENTRIES = [
     exports: [
       "COLLECTION_CSV_HEADER",
       "parseCollectionCsv",
+      "parseWantRank",
       "normalizeImportStatus",
       "matchCollectionImportEntries",
       "matchCollectionImportRows",
       "matchBookIdForRow",
+      "buildWantOrderIdsFromImportEntries",
       "buildCollectionExportRows",
     ],
   },

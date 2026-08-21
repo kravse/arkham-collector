@@ -558,6 +558,11 @@ async function importCollectionFromCsvText(csvText) {
       result.entries,
       new Date().toISOString(),
     ),
+    {
+      wantOrderIds: viewerCollectionImport.buildWantOrderIdsFromImportEntries(
+        result.entries,
+      ),
+    },
   );
   saveUserState();
 

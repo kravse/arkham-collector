@@ -673,6 +673,7 @@ function collectionRowsForExport() {
     getActiveBooks(),
     bookStatuses,
     compareCanonical,
+    wantOrderIds,
   );
 }
 
