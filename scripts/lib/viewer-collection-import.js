@@ -1,3 +1,13 @@
+const {
+  COLLECTED,
+  ORDERED,
+  WANT,
+  NONE,
+  getBookStatus,
+} = require("./viewer-book-status");
+
+const COLLECTION_CSV_HEADER = "title,author,year,status";
+
 function parseYear(value) {
   if (!value) {
     return null;
@@ -51,6 +61,22 @@ function titlesMatch(a, b) {
   return left === right || left.includes(right) || right.includes(left);
 }
 
+/** Maps CSV status text to a book status; blank means collected for legacy 3-column files. */
+function normalizeImportStatus(raw) {
+  const value = String(raw || "").trim().toLowerCase();
+  if (value === "ordered" || value === "order") {
+    return ORDERED;
+  }
+  if (value === "want" || value === "wanted") {
+    return WANT;
+  }
+  return COLLECTED;
+}
+
+function isCollectionCsvHeaderRow(row) {
+  return String(row?.title || "").trim().toLowerCase() === "title";
+}
+
 function parseCollectionCsv(csvText) {
   return csvText
     .trim()
@@ -65,6 +91,9 @@ function parseCollectionCsv(csvText) {
     }))
     .filter((item) => {
       if (!item.title || !item.year) {
+        return false;
+      }
+      if (isCollectionCsvHeaderRow(item)) {
         return false;
       }
       if (item.title.toUpperCase() === "ARKHAM HOUSE") {
@@ -111,27 +140,66 @@ function matchBookIdForRow(books, row) {
   return null;
 }
 
-function matchCollectionImportRows(books, rows) {
-  const matchedIds = [];
+function matchCollectionImportEntries(books, rows) {
+  const entries = [];
   const unmatchedRows = [];
+  const seen = new Set();
 
   for (const row of rows) {
     const id = matchBookIdForRow(books, row);
     if (id == null) {
       unmatchedRows.push(row);
-    } else {
-      matchedIds.push(id);
+    } else if (!seen.has(id)) {
+      seen.add(id);
+      entries.push({ id, status: normalizeImportStatus(row.status) });
     }
   }
 
+  return { entries, unmatchedRows };
+}
+
+/** @deprecated Use matchCollectionImportEntries */
+function matchCollectionImportRows(books, rows) {
+  const { entries, unmatchedRows } = matchCollectionImportEntries(books, rows);
   return {
-    matchedIds: [...new Set(matchedIds)],
+    matchedIds: entries.map((entry) => entry.id),
     unmatchedRows,
   };
 }
 
+/**
+ * Build export rows for every book with a collection status (collected, ordered,
+ * or want). Caller supplies sort order; rows are title, author, year, status.
+ */
+function buildCollectionExportRows(books, statusMap, compareFn) {
+  const rows = [];
+  for (const book of books) {
+    const status = getBookStatus(statusMap, book.id);
+    if (status === NONE) {
+      continue;
+    }
+    rows.push({
+      book,
+      cols: [
+        book.title || book.listTitle || "Untitled",
+        book.author || "",
+        parseYear(book.publicationDate) || "",
+        status,
+      ],
+    });
+  }
+  if (typeof compareFn === "function") {
+    rows.sort((a, b) => compareFn(a.book, b.book));
+  }
+  return rows.map((entry) => entry.cols);
+}
+
 module.exports = {
+  COLLECTION_CSV_HEADER,
   parseCollectionCsv,
+  normalizeImportStatus,
+  matchCollectionImportEntries,
   matchCollectionImportRows,
   matchBookIdForRow,
+  buildCollectionExportRows,
 };

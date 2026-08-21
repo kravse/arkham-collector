@@ -30,6 +30,11 @@ const PARTS = [
       "Want order normalization (generated from scripts/lib/viewer-want-order-normalize.js)",
   },
   {
+    file: "00-viewer-book-status.js",
+    title:
+      "Per-book collection status stamps (generated from scripts/lib/viewer-book-status.js)",
+  },
+  {
     file: "00-viewer-user-state.js",
     title:
       "Unified user state persistence (generated from scripts/lib/viewer-user-state.js)",

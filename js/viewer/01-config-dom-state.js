@@ -130,6 +130,11 @@ let wantIds = new Set();
 let wantOrderIds = [];
 let collectionIds = new Set();
 let orderedIds = new Set();
+// Source of truth for membership: one stamped status per book. The Sets above are
+// derived views kept for the render and filter code that reads them everywhere.
+// Declared as a literal because this partial is bundled before the generated
+// viewerBookStatus module.
+let bookStatuses = {};
 let storageMode = "local";
 let pendingGistSetup = false;
 let headerFiltersExpanded = true;
@@ -162,30 +167,39 @@ function setWantOrderIds(next) {
   invalidateSortedCache();
 }
 
+/** Rebuild the derived membership Sets after the status map changes. */
+function applyBookStatuses(nextStatuses, options = {}) {
+  bookStatuses = viewerBookStatus.normalizeStatusMap(nextStatuses);
+  const derived = viewerBookStatus.deriveIdsByStatus(bookStatuses);
+  collectionIds = new Set(derived.collectionIds);
+  orderedIds = new Set(derived.orderedIds);
+  wantIds = new Set(derived.wantIds);
+  wantOrderIds = viewerWantOrderNormalize.normalizeWantOrderIds(
+    options.wantOrderIds !== undefined ? options.wantOrderIds : wantOrderIds,
+    derived.wantIds,
+  );
+  invalidateSortedCache();
+}
+
 function syncWantMembership(bookId, wanted) {
   const id = Number(bookId);
   if (!Number.isFinite(id)) {
     return;
   }
-  if (wanted) {
-    if (wantIds.has(id)) {
-      return;
-    }
-    wantIds.add(id);
-    wantOrderIds = [...wantOrderIds, id];
-    if (collectionIds.has(id)) {
-      collectionIds.delete(id);
-    }
-    if (orderedIds.has(id)) {
-      orderedIds.delete(id);
-    }
-  } else if (wantIds.has(id)) {
-    wantIds.delete(id);
-    wantOrderIds = wantOrderIds.filter((entry) => entry !== id);
-  } else {
+  const current = viewerBookStatus.getBookStatus(bookStatuses, id);
+  if (wanted === (current === viewerBookStatus.WANT)) {
     return;
   }
-  invalidateSortedCache();
+  // normalizeWantOrderIds backfills a newly wanted book at the end of the
+  // ranking and drops one that is no longer wanted, so no explicit edit is needed.
+  applyBookStatuses(
+    viewerBookStatus.setWantStatus(
+      bookStatuses,
+      id,
+      wanted,
+      new Date().toISOString(),
+    ),
+  );
 }
 
 function isWantFilterActive() {

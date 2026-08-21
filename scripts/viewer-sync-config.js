@@ -263,33 +263,60 @@ const VIEWER_SYNC_ENTRIES = [
     ],
   },
   {
+    sources: [path.join(LIB, "viewer-book-status.js")],
+    target: "00-viewer-book-status.js",
+    globalName: "viewerBookStatus",
+    header:
+      "Generated from scripts/lib/viewer-book-status.js — run npm run bundle-viewer",
+    exports: [
+      "COLLECTED",
+      "ORDERED",
+      "WANT",
+      "NONE",
+      "normalizeBookId",
+      "normalizeStampTime",
+      "emptyStatusMap",
+      "normalizeStatusMap",
+      "getBookStatus",
+      "mergeStatusMaps",
+      "setBookStatus",
+      "cycleCollectionStatus",
+      "setWantStatus",
+      "deriveIdsByStatus",
+      "statusMapFromIdArrays",
+      "replaceStatusesFromImport",
+      "replaceCollectionStatuses",
+      "supersedeStatusMap",
+      "restampStatusMap",
+    ],
+  },
+  {
     sources: [path.join(LIB, "viewer-user-state.js")],
     target: "00-viewer-user-state.js",
     globalName: "viewerUserState",
     header:
       "Generated from scripts/lib/viewer-user-state.js — run npm run bundle-viewer",
+    stripRequiresFromSources: [0],
     transformBody(body) {
-      return body
-        .replace(
-          /const \{ normalizeWantOrderIds \} = require\("\.\/viewer-want-order-normalize"\);\n/,
-          "",
-        )
-        .replace(
-          /normalizeWantOrderIds\(/g,
-          "viewerWantOrderNormalize.normalizeWantOrderIds(",
-        );
+      return body.replace(
+        /normalizeWantOrderIds\(/g,
+        "viewerWantOrderNormalize.normalizeWantOrderIds(",
+      );
     },
     exports: [
       "USER_STATE_KEY",
       "USER_STATE_BACKUP_KEY",
       "USER_STATE_VERSION",
+      "FALLBACK_STAMP_AT",
       "LEGACY_KEYS",
       "defaultUserState",
+      "buildCollectionSlot",
       "emptyCollectionSlot",
       "normalizeCollections",
       "normalizeCollectionSlot",
       "activeCollectionSlot",
       "localCollectionSlotFromPersisted",
+      "withActiveSlotMirrors",
       "buildEmptyGistConnectState",
       "buildNewGistConnectState",
       "adoptRemoteGistState",
@@ -297,10 +324,12 @@ const VIEWER_SYNC_ENTRIES = [
       "normalizeStorageMode",
       "migrateFromLegacy",
       "migrateV1ToV2",
+      "migrateV2ToV3",
       "parseUserState",
       "buildUserStateFromRuntime",
       "applyUserStateToRuntime",
       "serializeUserState",
+      "mergeUserState",
     ],
   },
   {
@@ -343,8 +372,6 @@ const VIEWER_SYNC_ENTRIES = [
       "parseGistSyncConfig",
       "serializeGistSyncConfig",
       "isConnectedGistConfig",
-      "mergeUserStateByUpdatedAt",
-      "mergeGistUserState",
       "resolveGistStateFilename",
       "extractStateJsonFromGistResponse",
       "findArkhamGistId",
@@ -360,10 +387,23 @@ const VIEWER_SYNC_ENTRIES = [
     globalName: "viewerCollectionImport",
     header:
       "Generated from scripts/lib/viewer-collection-import.js — run npm run bundle-viewer",
+    stripRequiresFromSources: [0],
+    transformBody(body) {
+      return body
+        .replace(/\bCOLLECTED\b/g, "viewerBookStatus.COLLECTED")
+        .replace(/\bORDERED\b/g, "viewerBookStatus.ORDERED")
+        .replace(/\bWANT\b/g, "viewerBookStatus.WANT")
+        .replace(/\bNONE\b/g, "viewerBookStatus.NONE")
+        .replace(/\bgetBookStatus\(/g, "viewerBookStatus.getBookStatus(");
+    },
     exports: [
+      "COLLECTION_CSV_HEADER",
       "parseCollectionCsv",
+      "normalizeImportStatus",
+      "matchCollectionImportEntries",
       "matchCollectionImportRows",
       "matchBookIdForRow",
+      "buildCollectionExportRows",
     ],
   },
   {

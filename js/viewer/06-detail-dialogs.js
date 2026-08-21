@@ -669,25 +669,23 @@ function escapeCsvField(value) {
 }
 
 function collectionRowsForExport() {
-  const ids = exportableCollectionIds();
-  return getActiveBooks()
-    .filter((book) => ids.has(book.id))
-    .sort(compareCanonical)
-    .map((book) => [
-      book.title || book.listTitle || "Untitled",
-      book.author || "",
-      parseYear(book.publicationDate) || "",
-    ]);
+  return viewerCollectionImport.buildCollectionExportRows(
+    getActiveBooks(),
+    bookStatuses,
+    compareCanonical,
+  );
 }
 
 function exportCollectionCsv() {
   const rows = collectionRowsForExport();
   if (!rows.length) {
-    window.alert("Your collection is empty — nothing to export.");
+    window.alert(
+      "Nothing to export — your collection, on-order list, and want list are empty.",
+    );
     return;
   }
 
-  const csv = `${rows
+  const csv = `${viewerCollectionImport.COLLECTION_CSV_HEADER}\n${rows
     .map((cols) => cols.map(escapeCsvField).join(","))
     .join("\n")}\n`;
   const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });

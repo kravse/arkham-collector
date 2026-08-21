@@ -71,28 +71,24 @@ function buildStateForPersistence() {
   });
 }
 
-function gistMergeHelpers() {
-  return {
-    normalizeCollections: viewerUserState.normalizeCollections,
-    normalizeCollectionSlot: viewerUserState.normalizeCollectionSlot,
-    emptyCollectionSlot: viewerUserState.emptyCollectionSlot,
-  };
-}
-
 function swapCollectionForStorageMode(nextMode) {
   const existing = readPersistedUserState();
   const collections = viewerUserState.normalizeCollections(
     existing?.collections,
     existing?.collectionIds,
     existing?.orderedIds,
+    {
+      wantIds: existing?.wantIds,
+      wantOrderIds: existing?.wantOrderIds,
+      at: existing?.updatedAt,
+    },
   );
-  collections[storageMode] = {
-    collectionIds: [...collectionIds],
-    orderedIds: [...orderedIds],
-  };
+  collections[storageMode] = viewerUserState.buildCollectionSlot(
+    bookStatuses,
+    wantOrderIds,
+  );
   const nextSlot = collections[nextMode] || viewerUserState.emptyCollectionSlot();
-  collectionIds = new Set(nextSlot.collectionIds);
-  orderedIds = new Set(nextSlot.orderedIds);
+  applyBookStatuses(nextSlot.statuses, { wantOrderIds: nextSlot.wantOrderIds });
   return collections;
 }
 
@@ -110,6 +106,7 @@ function persistUserState(state) {
 function collectRuntimeSnapshot() {
   return {
     storageMode,
+    bookStatuses,
     collectionIds: [...collectionIds],
     orderedIds: [...orderedIds],
     wantIds: [...wantIds],
@@ -126,13 +123,9 @@ function collectRuntimeSnapshot() {
 
 function applyRuntimeSnapshot(runtime) {
   storageMode = viewerUserState.normalizeStorageMode(runtime.storageMode);
-  wantIds = new Set(runtime.wantIds);
-  wantOrderIds = viewerWantOrderNormalize.normalizeWantOrderIds(
-    runtime.wantOrderIds,
-    runtime.wantIds,
-  );
-  collectionIds = new Set(runtime.collectionIds);
-  orderedIds = new Set(runtime.orderedIds);
+  applyBookStatuses(runtime.bookStatuses, {
+    wantOrderIds: runtime.wantOrderIds,
+  });
   gridViewMode = runtime.viewMode;
   headerFiltersExpanded = runtime.headerFiltersExpanded;
   highlightWants = runtime.highlightWants;
@@ -202,7 +195,7 @@ async function findExistingArkhamGist(token) {
   return viewerGistSync.findArkhamGistEntry(gists);
 }
 
-async function pushGistState(config, state) {
+async function patchGistState(config, state) {
   const stateJson = viewerUserState.serializeUserState(state);
   const stateFilename =
     config.stateFilename || viewerGistSync.GIST_STATE_FILENAME;
@@ -222,6 +215,55 @@ async function pushGistState(config, state) {
   if (!response.ok) {
     throw new Error(`Gist update failed (${response.status})`);
   }
+}
+
+/**
+ * Fold whatever a push resolved to back into the live view, re-merging against
+ * current state so a click made while the request was in flight survives.
+ */
+function adoptMergedGistState(merged) {
+  const current = buildStateForPersistence();
+  const next = viewerUserState.mergeUserState(current, merged) || merged;
+  const unchanged =
+    JSON.stringify(next.collections.gist.statuses) ===
+      JSON.stringify(current.collections.gist.statuses) &&
+    JSON.stringify(next.wantOrderIds) === JSON.stringify(current.wantOrderIds);
+  if (unchanged) {
+    return;
+  }
+  persistUserState(next);
+  applyRuntimeSnapshot(viewerUserState.applyUserStateToRuntime(next));
+  syncSettingsStorageMode();
+  render();
+}
+
+/**
+ * Read, merge, then write. A blind PATCH lets a tab that loaded an hour ago erase
+ * books another device added since; merging the remote doc first means a stale tab
+ * can only add to the record, never subtract from it.
+ *
+ * `authoritative` skips the merge for the one case that must not merge: restoring
+ * a snapshot, which is a deliberate replacement of everything.
+ */
+async function pushGistState(config, state, options = {}) {
+  if (options.authoritative) {
+    await patchGistState(config, state);
+    return state;
+  }
+
+  let remoteState = null;
+  try {
+    remoteState = await fetchGistState(config);
+  } catch (error) {
+    // Never overwrite a gist we could not read; a missing file is safe to replace.
+    if (!String(error.message || "").includes("404")) {
+      throw error;
+    }
+  }
+  const merged = viewerUserState.mergeUserState(state, remoteState) || state;
+  await patchGistState(config, merged);
+  adoptMergedGistState(merged);
+  return merged;
 }
 
 async function createGistWithState(config, state) {
@@ -366,12 +408,14 @@ async function pullGistStateIfConfigured(options = {}) {
       const localRaw = localStorage.getItem(viewerUserState.USER_STATE_KEY);
       const localState = viewerUserState.parseUserState(localRaw);
       const remoteState = await fetchGistState(config);
-      const merged = viewerGistSync.mergeGistUserState(
-        localState,
-        remoteState,
-        gistMergeHelpers(),
-      );
-      if (merged && merged.updatedAt !== localState?.updatedAt) {
+      const merged = viewerUserState.mergeUserState(localState, remoteState);
+      // Comparing updatedAt is not enough: a remote doc can carry books this
+      // device is missing while still holding an older payload timestamp.
+      const changed =
+        merged &&
+        viewerUserState.serializeUserState(merged) !==
+          viewerUserState.serializeUserState(localState);
+      if (changed) {
         persistUserState(merged);
         applyRuntimeSnapshot(viewerUserState.applyUserStateToRuntime(merged));
         syncSettingsStorageMode();
@@ -504,12 +548,17 @@ async function importCollectionFromCsvText(csvText) {
     throw new Error("No collection rows found in that file.");
   }
 
-  const result = viewerCollectionImport.matchCollectionImportRows(
+  const result = viewerCollectionImport.matchCollectionImportEntries(
     getActiveBooks(),
     rows,
   );
-  collectionIds = new Set(result.matchedIds);
-  orderedIds = new Set();
+  applyBookStatuses(
+    viewerBookStatus.replaceStatusesFromImport(
+      bookStatuses,
+      result.entries,
+      new Date().toISOString(),
+    ),
+  );
   saveUserState();
 
   let syncedToGist = false;
@@ -522,7 +571,7 @@ async function importCollectionFromCsvText(csvText) {
 
   return {
     rowCount: rows.length,
-    matchedCount: result.matchedIds.length,
+    matchedCount: result.entries.length,
     unmatchedCount: result.unmatchedRows.length,
     syncedToGist,
   };
@@ -585,20 +634,13 @@ function toggleCollection(bookId) {
     return;
   }
 
-  if (isCollected({ id })) {
-    collectionIds.delete(id);
-    orderedIds.delete(id);
-  } else if (isOrdered({ id })) {
-    orderedIds.delete(id);
-    collectionIds.add(id);
-  } else {
-    orderedIds.add(id);
-    if (wantIds.has(id)) {
-      wantIds.delete(id);
-      wantOrderIds = wantOrderIds.filter((entry) => entry !== id);
-      invalidateSortedCache();
-    }
-  }
+  applyBookStatuses(
+    viewerBookStatus.cycleCollectionStatus(
+      bookStatuses,
+      id,
+      new Date().toISOString(),
+    ),
+  );
 
   saveUserState();
   render();
@@ -835,16 +877,46 @@ async function restoreGistSnapshot(at) {
     return { ok: false, error: "Could not read that snapshot." };
   }
 
-  backupUserStateLocally(buildStateForPersistence());
-  persistUserState(parsed);
-  applyRuntimeSnapshot(viewerUserState.applyUserStateToRuntime(parsed));
+  const current = buildStateForPersistence();
+  backupUserStateLocally(current);
+
+  const config = readGistSyncConfig();
+  let remoteState = null;
+  try {
+    remoteState = await fetchGistState(config);
+  } catch (_) {
+    // A restore still proceeds when the remote doc cannot be read.
+  }
+
+  // A restore is a deliberate replacement, so every book is re-stamped now and
+  // anything the snapshot never had gets a tombstone. Without fresh stamps the
+  // next merge from another device would simply resurrect what was restored away.
+  const baseline = viewerUserState.mergeUserState(current, remoteState) || current;
+  const restoredAt = new Date().toISOString();
+  const restored = viewerUserState.withActiveSlotMirrors(
+    { ...parsed, updatedAt: restoredAt },
+    {
+      local: current.collections.local,
+      gist: viewerUserState.buildCollectionSlot(
+        viewerBookStatus.supersedeStatusMap(
+          baseline.collections.gist.statuses,
+          parsed.collections.gist.statuses,
+          restoredAt,
+        ),
+        parsed.collections.gist.wantOrderIds,
+      ),
+    },
+    "gist",
+  );
+
+  persistUserState(restored);
+  applyRuntimeSnapshot(viewerUserState.applyUserStateToRuntime(restored));
   storageMode = "gist";
   pendingGistSetup = false;
   syncSettingsStorageMode();
   invalidateSortedCache();
 
-  const config = readGistSyncConfig();
-  await pushGistState(config, parsed);
+  await pushGistState(config, restored, { authoritative: true });
   updateGistSyncStatus("Synced to GitHub Gist.");
 
   return { ok: true };

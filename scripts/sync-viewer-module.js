@@ -11,7 +11,17 @@ function stripModuleExports(source) {
 }
 
 function stripRequires(source) {
-  return source.replace(/^const \{[\s\S]*?\} = require\([^)]+\);\n\n/m, "");
+  return source
+    .replace(/^const \{[\s\S]*?\} = require\([^)]+\);\r?\n+/m, "")
+    .replace(/^const \w+ = require\([^)]+\);\r?\n+/gm, "");
+}
+
+function assertNoBrowserRequires(body, target) {
+  if (/\brequire\s*\(/.test(body)) {
+    throw new Error(
+      `${target} still contains require() after sync — browser bundles cannot load it`,
+    );
+  }
 }
 
 function indentBody(source) {
@@ -45,6 +55,7 @@ function formatExports(exports) {
 
 function syncViewerModule(entry) {
   const body = readCombinedBody(entry);
+  assertNoBrowserRequires(body, entry.target);
   const output = `/* ${entry.header} */
 
 const ${entry.globalName} = (function () {
@@ -69,6 +80,7 @@ module.exports = {
   VIEWER_SYNC_ENTRIES,
   stripModuleExports,
   stripRequires,
+  assertNoBrowserRequires,
   indentBody,
   readCombinedBody,
   syncViewerModule,

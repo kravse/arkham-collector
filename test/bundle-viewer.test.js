@@ -14,7 +14,22 @@ test("bundleViewerJs writes viewer-bundle.js with expected markers", () => {
   assert.match(bundle, /viewerFilters/);
   assert.match(bundle, /viewerTags/);
   assert.match(bundle, /function renderCardWantBadge/);
-  assert.ok(bundle.length > 10_000);
+  assert.match(bundle, /viewerBookStatus/);
+  assert.doesNotMatch(bundle, /\brequire\s*\(/, "viewer-bundle.js must not call require()");
+});
+
+test("syncAllViewerModules strips require from every partial", () => {
+  bundleViewerJs();
+  const viewerDir = path.join(__dirname, "..", "js", "viewer");
+  for (const part of PARTS) {
+    const filePath = path.join(viewerDir, part.file);
+    const source = fs.readFileSync(filePath, "utf8");
+    assert.doesNotMatch(
+      source,
+      /\brequire\s*\(/,
+      `js/viewer/${part.file} must not call require()`,
+    );
+  }
 });
 
 test("every PARTS file exists under js/viewer", () => {

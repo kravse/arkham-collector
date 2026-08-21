@@ -13,8 +13,8 @@ A visual catalog for collectors and readers of [Arkham House](https://en.wikiped
 | **Search & sort** | Search the grid (title, author, cover artist, date); bind field filters with `tag:horror`, `author:"H. P. Lovecraft"`, `cover:Utpatel`, or type a year/decade (`19`, `195`, `1950s`) for decade autocomplete (chips like tags; also `decade:1950s`); known values show as removable chips in distinct colors; combine chips and free text. Multiple decade chips and year terms combine with **OR** (e.g. `1970s` + `1980s`, or `1976` + `1986`); a year inside a selected decade expands to the whole decade (e.g. `1970s` + `1976` shows all 1970s books). Tags require `tag:` for tag-only filtering; author and cover artist names are parsed from Wikipedia strings (parentheticals like “inspired by …” stripped; cover credits before “design by” only) so `author:` / `cover:` and plain text search match one person at a time. Book detail shows one clickable chip per author or cover artist; the grid shows plain parsed names. **List/grid toggle** beside sort (saved in browser); **Sort** (oldest/newest/title) everywhere. Same-year tiebreaks from `book-order.js`; maintainers set those with **Reorder** on `npm run serve` only |
 | **Filters** | Collection, want list, Mycroft & Moran imprint, decade |
 | **Book detail** | Cover, description, cover artist, tags, **W** / **G** links, **Collect** (Ordered → Collection), and want toggles. In the detail overlay, tap the cover (mobile) or hover and click the magnifier (desktop) for a full-screen view |
-| **Your data** | Stored in the browser (`arkham-user-state` v2; older keys migrate automatically). Default is **This device only**; optional **Sync with GitHub Gist** saves full state to a private GitHub Gist using a throwaway bot account PAT (`arkham-gist-sync`) |
-| **Export** | Download your collection as CSV (ordered and collected titles; same rows, no order status column). **Import collection CSV** replaces collected titles for the active storage mode only and clears on-order titles for that mode; your want list is unchanged |
+| **Your data** | Stored in the browser (`arkham-user-state` v3; older keys migrate automatically). Default is **This device only**; optional **Sync with GitHub Gist** saves full state to a private GitHub Gist using a throwaway bot account PAT (`arkham-gist-sync`), merging book by book so a stale tab cannot erase another device's changes |
+| **Export** | Download your collection as CSV with a `status` column (`collected`, `ordered`, or `want`). **Import collection CSV** replaces collected, on-order, and want membership for the active storage mode only — export then re-import round-trips exactly (legacy 3-column files still import as collected) |
 
 ### Screenshots
 
@@ -35,18 +35,32 @@ A visual catalog for collectors and readers of [Arkham House](https://en.wikiped
 1. Open a card → **Collect** to mark a copy you own (tap again to remove).
 2. Toggle **want** on titles you are hunting.
 3. Filter with **COLLECTION** or **WANT** in the header. If you have on-order titles, **COLLECTION** cycles: all books → your collection → on-order only → all books. If you have wants, **WANT** toggles: all books ↔ your want list (priority order; drag rank tabs in list view or rank chips on cards in grid view). Active filters update the URL (`/collection`, `/ordered`, `/want`, `/mycroft-moran`, `/mycroft-hidden`) so a refresh or shared link restores the same view.
-4. **Gear** (bottom bar): under **Collection storage**, choose **This device only** (default) or **Sync with GitHub Gist**. Under **Card display**, toggle want highlighting and collection highlighting. GitHub Gist sync only activates after a successful **Connect**; until then you stay on this device. **Connect** looks for an existing private Arkham sync Gist (`arkham-collector-state.json`, or legacy `state.json`) on that GitHub account; if found, the site loads that data and does not overwrite the Gist. If none exists, it creates a new Gist seeded from your current collection on this device. While connected, the viewer pulls from GitHub on each page load and when you return to the tab. **Restore from backup** (Settings → GitHub Gist sync) lists up to five daily snapshots (about the last five days you edited) stored in a separate private Gist (`arkham-collector-backups.json`); restoring replaces your collection and want list and syncs back to GitHub. **Clear** or closing settings without a working token returns you to this device only.
-5. **Import collection CSV** / **Export collection CSV** (gear → About): import replaces collected titles for the **active storage option only** (this device and GitHub Gist keep separate collections), clears on-order titles for that option, and leaves your want list alone. Works on this device or with GitHub Gist sync (Gist upload happens immediately when connected).
+4. **Gear** (bottom bar): under **Collection storage**, choose **This device only** (default) or **Sync with GitHub Gist**. Under **Card display**, toggle want highlighting and collection highlighting. GitHub Gist sync only activates after a successful **Connect**; until then you stay on this device. **Connect** looks for an existing private Arkham sync Gist (`arkham-collector-state.json`, or legacy `state.json`) on that GitHub account; if found, the site loads that data and does not overwrite the Gist. If none exists, it creates a new Gist seeded from your current collection on this device. While connected, the viewer pulls from GitHub on each page load and when you return to the tab, and every upload merges with the Gist before writing (see [How sync avoids losing books](#how-sync-avoids-losing-books)). **Restore from backup** (Settings → GitHub Gist sync) lists up to five daily snapshots (about the last five days you edited) stored in a separate private Gist (`arkham-collector-backups.json`); restoring replaces your collection and want list and syncs back to GitHub. **Clear** or closing settings without a working token returns you to this device only.
+5. **Import collection CSV** / **Export collection CSV** (gear → About): export writes `title,author,year,status` for every collected, on-order, and wanted title. Import replaces all three lists for the **active storage option only** (this device and GitHub Gist keep separate collections). Re-importing an exported file restores the same membership. Older 3-column CSVs (no status column) still import every row as collected. Works on this device or with GitHub Gist sync (Gist upload happens immediately when connected).
 
 ### Browser storage keys
 
 | Key | Contents |
 |-----|----------|
-| `arkham-user-state` | Unified v2 state: collection ids, want list (`wantIds`), want priority order (`wantOrderIds`), ordered titles, display preferences (including `wantOrderLocked`), and `storageMode` (`local` or `gist`). Older per-key entries migrate on first load. |
+| `arkham-user-state` | Unified v3 state: a per-book status map (`collected`, `ordered`, `want`, or `none`) with a change stamp per book, want priority order (`wantOrderIds`), display preferences (including `wantOrderLocked`), and `storageMode` (`local` or `gist`). Collection and want ids are derived from the status map. Older per-key entries, v1, and v2 all migrate on first load. |
 | `arkham-gist-sync` | GitHub Gist credentials only (`token`, `gistId`, `backupGistId`, `stateFilename`) when GitHub Gist sync is connected—not included in the synced Gist file. |
 | `arkham-user-state-backup` | Local undo copy written immediately before restoring a Gist snapshot. |
 
-**Gist sync security:** The PAT is stored in your browser’s `localStorage`. Use a throwaway GitHub account and a fine-grained PAT limited to gist read/write. This device only never sends data to GitHub.
+Each storage option keeps its own status map, so **This device only** and **GitHub Gist** hold independent collections *and* want lists. Upgrading from v2 seeds both with the single want list v2 shared, so nothing is lost; they only diverge if you edit wants after the upgrade.
+
+### How sync avoids losing books
+
+A tab left open holds its own copy of your collection, so a naive “newest payload wins” upload lets a stale tab overwrite everything another device added. Sync is built so that cannot happen:
+
+- **Every book carries its own stamp.** Each book records when its status last changed, and merging compares those stamps book by book instead of comparing one timestamp for the whole payload.
+- **Read before write.** Every upload fetches the Gist, merges, then writes. A Gist that cannot be read is never overwritten.
+- **Removal is recorded, not inferred.** Removing a book writes a `none` tombstone, so a delete outranks an older positive status instead of being guessed from absence. Re-adding beats an older removal.
+- **Ties keep the book.**
+- **Only the Gist collection merges.** The this-device collection never leaves the browser, so the local copy always wins.
+
+Two consequences worth knowing. A snapshot restore is the one deliberate exception: it re-stamps everything and writes authoritatively, so it replaces rather than merges. And during the upgrade window a device still writing v2 has only one timestamp for its whole payload, so a later v2 upload can resurrect a book an earlier v3 removal had deleted — load the site once on each device to move it to v3.
+
+**Gist sync security:** The PAT is stored in your browser’s `localStorage`. Use a throwaway GitHub account and a fine-grained PAT limited to gist read/write, and set it to **No expiration** so sync does not silently break. This device only never sends data to GitHub.
 
 ## Run it locally
 
@@ -123,7 +137,7 @@ Entry point: `node scripts/index.js`. Common flags: `--yes`, `--local`, `--limit
 | `serve` | Dev server on port 8742 (`PORT` to override) |
 | `build` | Static site in `build/` (optimizes cover images to WebP) |
 | `bundle-viewer` | Rebuild `js/viewer-bundle.js` from `js/viewer/` (syncs `scripts/lib/viewer-*.js` → `00-*.js` partials first) |
-| `test` | Run Node tests (`test/`; sort and filter logic under `scripts/lib/`) |
+| `test` | Run Node tests (`test/`; sort, filter, book-status, and sync-merge logic under `scripts/lib/`) |
 
 ### Crawl & sync
 

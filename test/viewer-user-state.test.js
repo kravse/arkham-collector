@@ -3,11 +3,14 @@ const assert = require("node:assert/strict");
 
 const {
   USER_STATE_VERSION,
+  USER_STATE_VERSION_V2,
   LEGACY_KEYS,
   defaultUserState,
   normalizeIdArray,
+  normalizeSort,
   migrateFromLegacy,
   migrateV1ToV2,
+  migrateV2ToV3,
   parseUserState,
   buildUserStateFromRuntime,
   applyUserStateToRuntime,
@@ -70,12 +73,12 @@ test("migrateV1ToV2 keeps own ids and drops sample ids", () => {
     wantIds: [4],
     preferences: defaultUserState().preferences,
   });
-  assert.equal(state.version, USER_STATE_VERSION);
+  assert.equal(state.version, USER_STATE_VERSION_V2);
   assert.deepEqual(state.collectionIds, [1, 2]);
   assert.equal(state.storageMode, "local");
 });
 
-test("parseUserState upgrades v1 unified state to v2", () => {
+test("parseUserState upgrades v1 unified state to the current version", () => {
   const v1 = {
     version: 1,
     updatedAt: "2026-01-01T00:00:00.000Z",
@@ -89,6 +92,95 @@ test("parseUserState upgrades v1 unified state to v2", () => {
   const parsed = parseUserState(JSON.stringify(v1));
   assert.equal(parsed.version, USER_STATE_VERSION);
   assert.deepEqual(parsed.collectionIds, [5]);
+});
+
+test("migrateV2ToV3 stamps each slot from the payload time", () => {
+  const updatedAt = "2026-03-04T05:06:07.000Z";
+  const state = migrateV2ToV3({
+    version: USER_STATE_VERSION_V2,
+    updatedAt,
+    storageMode: "gist",
+    collectionIds: [1],
+    orderedIds: [2],
+    wantIds: [3],
+    wantOrderIds: [3],
+    collections: {
+      local: { collectionIds: [10], orderedIds: [] },
+      gist: { collectionIds: [1], orderedIds: [2] },
+    },
+    preferences: defaultUserState().preferences,
+  });
+
+  assert.equal(state.version, USER_STATE_VERSION);
+  assert.deepEqual(state.collectionIds, [1], "gist slot is active");
+  assert.deepEqual(state.orderedIds, [2]);
+  assert.deepEqual(state.collections.gist.statuses[1], {
+    status: "collected",
+    at: updatedAt,
+  });
+  assert.deepEqual(state.collections.local.collectionIds, [10]);
+});
+
+test("migrateV2ToV3 seeds the shared want list into both slots", () => {
+  // v2 kept one want list across both storage modes, so neither slot may lose it.
+  const state = migrateV2ToV3({
+    version: USER_STATE_VERSION_V2,
+    updatedAt: "2026-03-04T05:06:07.000Z",
+    storageMode: "local",
+    collectionIds: [],
+    orderedIds: [],
+    wantIds: [7, 8],
+    wantOrderIds: [8, 7],
+    collections: {
+      local: { collectionIds: [], orderedIds: [] },
+      gist: { collectionIds: [99], orderedIds: [] },
+    },
+    preferences: defaultUserState().preferences,
+  });
+
+  assert.deepEqual(state.collections.local.wantIds, [7, 8]);
+  assert.deepEqual(state.collections.gist.wantIds, [7, 8]);
+  assert.deepEqual(state.wantOrderIds, [8, 7], "priority order is preserved");
+});
+
+test("migrateV2ToV3 creates no tombstones, so upgrading cannot delete a book", () => {
+  const state = migrateV2ToV3({
+    version: USER_STATE_VERSION_V2,
+    updatedAt: "2026-03-04T05:06:07.000Z",
+    storageMode: "gist",
+    collectionIds: [1],
+    orderedIds: [],
+    wantIds: [],
+    preferences: defaultUserState().preferences,
+  });
+  const statuses = Object.values(state.collections.gist.statuses);
+  assert.ok(statuses.length > 0);
+  assert.ok(statuses.every((stamp) => stamp.status !== "none"));
+});
+
+test("normalizeSort falls back instead of throwing on an unknown mode", () => {
+  assert.equal(normalizeSort("date-desc"), "date-desc");
+  assert.equal(normalizeSort("legacy-mode"), "date-asc");
+  assert.equal(normalizeSort(undefined, "title-asc"), "title-asc");
+});
+
+test("parseUserState survives an unrecognized sort value", () => {
+  // A throwing normalizeSort used to make the whole parse fail, which silently
+  // reset the user's collection to defaults.
+  const parsed = parseUserState(
+    JSON.stringify({
+      version: USER_STATE_VERSION,
+      updatedAt: "2026-01-01T00:00:00.000Z",
+      storageMode: "local",
+      collectionIds: [42],
+      orderedIds: [],
+      wantIds: [],
+      preferences: { sort: "no-such-sort" },
+    }),
+  );
+  assert.ok(parsed, "state must still parse");
+  assert.deepEqual(parsed.collectionIds, [42]);
+  assert.equal(parsed.preferences.sort, "date-asc");
 });
 
 test("buildUserStateFromRuntime roundtrips wantOrderIds through parseUserState", () => {

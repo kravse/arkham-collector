@@ -130,6 +130,11 @@ let wantIds = new Set();
 let wantOrderIds = [];
 let collectionIds = new Set();
 let orderedIds = new Set();
+// Source of truth for membership: one stamped status per book. The Sets above are
+// derived views kept for the render and filter code that reads them everywhere.
+// Declared as a literal because this partial is bundled before the generated
+// viewerBookStatus module.
+let bookStatuses = {};
 let storageMode = "local";
 let pendingGistSetup = false;
 let headerFiltersExpanded = true;
@@ -162,30 +167,39 @@ function setWantOrderIds(next) {
   invalidateSortedCache();
 }
 
+/** Rebuild the derived membership Sets after the status map changes. */
+function applyBookStatuses(nextStatuses, options = {}) {
+  bookStatuses = viewerBookStatus.normalizeStatusMap(nextStatuses);
+  const derived = viewerBookStatus.deriveIdsByStatus(bookStatuses);
+  collectionIds = new Set(derived.collectionIds);
+  orderedIds = new Set(derived.orderedIds);
+  wantIds = new Set(derived.wantIds);
+  wantOrderIds = viewerWantOrderNormalize.normalizeWantOrderIds(
+    options.wantOrderIds !== undefined ? options.wantOrderIds : wantOrderIds,
+    derived.wantIds,
+  );
+  invalidateSortedCache();
+}
+
 function syncWantMembership(bookId, wanted) {
   const id = Number(bookId);
   if (!Number.isFinite(id)) {
     return;
   }
-  if (wanted) {
-    if (wantIds.has(id)) {
-      return;
-    }
-    wantIds.add(id);
-    wantOrderIds = [...wantOrderIds, id];
-    if (collectionIds.has(id)) {
-      collectionIds.delete(id);
-    }
-    if (orderedIds.has(id)) {
-      orderedIds.delete(id);
-    }
-  } else if (wantIds.has(id)) {
-    wantIds.delete(id);
-    wantOrderIds = wantOrderIds.filter((entry) => entry !== id);
-  } else {
+  const current = viewerBookStatus.getBookStatus(bookStatuses, id);
+  if (wanted === (current === viewerBookStatus.WANT)) {
     return;
   }
-  invalidateSortedCache();
+  // normalizeWantOrderIds backfills a newly wanted book at the end of the
+  // ranking and drops one that is no longer wanted, so no explicit edit is needed.
+  applyBookStatuses(
+    viewerBookStatus.setWantStatus(
+      bookStatuses,
+      id,
+      wanted,
+      new Date().toISOString(),
+    ),
+  );
 }
 
 function isWantFilterActive() {
@@ -831,13 +845,380 @@ const viewerWantOrderNormalize = (function () {
 })();
 
 
+/* Generated from scripts/lib/viewer-book-status.js — run npm run bundle-viewer */
+
+const viewerBookStatus = (function () {
+  /**
+   * Per-book collection status with a change stamp on every book.
+   *
+   * Want, ordered, and collected are mutually exclusive in the viewer: setting one
+   * clears the others, so each book carries exactly one status. Stamping each book
+   * individually (instead of relying on a single `updatedAt` for the whole payload)
+   * is what lets two devices merge without a stale tab erasing books it never knew
+   * about. Removals are recorded as NONE tombstones rather than inferred from
+   * absence, so a delete still outranks an older positive status.
+   */
+  
+  const COLLECTED = "collected";
+  const ORDERED = "ordered";
+  const WANT = "want";
+  const NONE = "none";
+  
+  const STATUS_VALUES = new Set([COLLECTED, ORDERED, WANT, NONE]);
+  
+  /**
+   * Ranking used when two stamps carry the same instant. Ties keep the book, and
+   * the stronger claim on a book wins, so a merge never silently drops data just
+   * because two devices wrote in the same millisecond.
+   */
+  const TIE_PRIORITY = {
+    [COLLECTED]: 3,
+    [ORDERED]: 2,
+    [WANT]: 1,
+    [NONE]: 0,
+  };
+  
+  function normalizeBookId(raw) {
+    if (raw == null || raw === "") {
+      return null;
+    }
+    const id = Number(raw);
+    return Number.isInteger(id) ? id : null;
+  }
+  
+  function normalizeStatusValue(raw) {
+    return STATUS_VALUES.has(raw) ? raw : null;
+  }
+  
+  function normalizeStampTime(raw) {
+    if (typeof raw !== "string") {
+      return null;
+    }
+    const parsed = Date.parse(raw);
+    return Number.isFinite(parsed) ? new Date(parsed).toISOString() : null;
+  }
+  
+  function normalizeStamp(raw) {
+    if (!raw || typeof raw !== "object") {
+      return null;
+    }
+    const status = normalizeStatusValue(raw.status);
+    const at = normalizeStampTime(raw.at);
+    return status && at ? { status, at } : null;
+  }
+  
+  function emptyStatusMap() {
+    return {};
+  }
+  
+  function normalizeStatusMap(raw) {
+    if (raw == null || raw === "") {
+      return emptyStatusMap();
+    }
+    let source = raw;
+    if (typeof source === "string") {
+      try {
+        source = JSON.parse(source);
+      } catch (_) {
+        return emptyStatusMap();
+      }
+    }
+    if (!source || typeof source !== "object" || Array.isArray(source)) {
+      return emptyStatusMap();
+    }
+  
+    const map = emptyStatusMap();
+    for (const [key, value] of Object.entries(source)) {
+      const id = normalizeBookId(key);
+      const stamp = normalizeStamp(value);
+      if (id != null && stamp) {
+        map[id] = stamp;
+      }
+    }
+    return map;
+  }
+  
+  function getBookStatus(map, id) {
+    const bookId = normalizeBookId(id);
+    if (bookId == null) {
+      return NONE;
+    }
+    const stamp = normalizeStamp(map?.[bookId]);
+    return stamp ? stamp.status : NONE;
+  }
+  
+  /** Newest stamp wins; same instant falls back to TIE_PRIORITY. */
+  function pickWinningStamp(a, b) {
+    if (!a) {
+      return b || null;
+    }
+    if (!b) {
+      return a;
+    }
+    const aTime = Date.parse(a.at);
+    const bTime = Date.parse(b.at);
+    if (aTime !== bTime) {
+      return aTime > bTime ? a : b;
+    }
+    return TIE_PRIORITY[b.status] > TIE_PRIORITY[a.status] ? b : a;
+  }
+  
+  function mergeStatusMaps(localMap, remoteMap) {
+    const local = normalizeStatusMap(localMap);
+    const remote = normalizeStatusMap(remoteMap);
+    const merged = emptyStatusMap();
+    for (const id of new Set([...Object.keys(local), ...Object.keys(remote)])) {
+      const winner = pickWinningStamp(local[id], remote[id]);
+      if (winner) {
+        merged[id] = winner;
+      }
+    }
+    return merged;
+  }
+  
+  function setBookStatus(map, id, status, atIso) {
+    const normalized = normalizeStatusMap(map);
+    const bookId = normalizeBookId(id);
+    const nextStatus = normalizeStatusValue(status);
+    const at = normalizeStampTime(atIso);
+    if (bookId == null || !nextStatus || !at) {
+      return normalized;
+    }
+    return { ...normalized, [bookId]: { status: nextStatus, at } };
+  }
+  
+  /** Mirrors the viewer's collect button: collected → none, ordered → collected, anything else → ordered. */
+  function cycleCollectionStatus(map, id, atIso) {
+    const current = getBookStatus(map, id);
+    if (current === COLLECTED) {
+      return setBookStatus(map, id, NONE, atIso);
+    }
+    if (current === ORDERED) {
+      return setBookStatus(map, id, COLLECTED, atIso);
+    }
+    return setBookStatus(map, id, ORDERED, atIso);
+  }
+  
+  /** Turning want off only clears a book that is actually wanted, matching syncWantMembership. */
+  function setWantStatus(map, id, wanted, atIso) {
+    if (wanted) {
+      return setBookStatus(map, id, WANT, atIso);
+    }
+    if (getBookStatus(map, id) !== WANT) {
+      return normalizeStatusMap(map);
+    }
+    return setBookStatus(map, id, NONE, atIso);
+  }
+  
+  function idsWithStatus(map, status) {
+    const normalized = normalizeStatusMap(map);
+    const ids = [];
+    for (const [key, stamp] of Object.entries(normalized)) {
+      if (stamp.status === status) {
+        ids.push(Number(key));
+      }
+    }
+    ids.sort((a, b) => a - b);
+    return ids;
+  }
+  
+  function deriveIdsByStatus(map) {
+    const normalized = normalizeStatusMap(map);
+    return {
+      collectionIds: idsWithStatus(normalized, COLLECTED),
+      orderedIds: idsWithStatus(normalized, ORDERED),
+      wantIds: idsWithStatus(normalized, WANT),
+    };
+  }
+  
+  /**
+   * Seed a status map from the flat v2 id arrays. Conflicting membership in legacy
+   * data resolves by TIE_PRIORITY, and absent books get no tombstone: "unknown"
+   * loses to any positive stamp, so migrating can never delete a book.
+   */
+  function statusMapFromIdArrays(arrays, atIso) {
+    const at = normalizeStampTime(atIso);
+    if (!at) {
+      return emptyStatusMap();
+    }
+    const map = emptyStatusMap();
+    const seed = [
+      [WANT, arrays?.wantIds],
+      [ORDERED, arrays?.orderedIds],
+      [COLLECTED, arrays?.collectionIds],
+    ];
+    for (const [status, ids] of seed) {
+      for (const raw of Array.isArray(ids) ? ids : []) {
+        const id = normalizeBookId(raw);
+        if (id == null) {
+          continue;
+        }
+        const existing = map[id];
+        if (!existing || TIE_PRIORITY[status] > TIE_PRIORITY[existing.status]) {
+          map[id] = { status, at };
+        }
+      }
+    }
+    return map;
+  }
+  
+  /**
+   * Replace collected / ordered / want membership from a CSV import. Every book
+   * listed in the file gets the imported status; anything previously in one of
+   * those states but missing from the file is tombstoned so export → re-import
+   * round-trips exactly.
+   */
+  function replaceStatusesFromImport(map, entries, atIso) {
+    const normalized = normalizeStatusMap(map);
+    const at = normalizeStampTime(atIso);
+    if (!at) {
+      return normalized;
+    }
+  
+    const importedById = new Map();
+    for (const entry of Array.isArray(entries) ? entries : []) {
+      const id = normalizeBookId(entry?.id);
+      const status = normalizeStatusValue(entry?.status);
+      if (id != null && status && status !== NONE) {
+        importedById.set(id, status);
+      }
+    }
+  
+    const next = { ...normalized };
+    for (const [key, stamp] of Object.entries(normalized)) {
+      const id = Number(key);
+      const hadMembership =
+        stamp.status === COLLECTED ||
+        stamp.status === ORDERED ||
+        stamp.status === WANT;
+      if (hadMembership && !importedById.has(id)) {
+        next[id] = { status: NONE, at };
+      }
+    }
+    for (const [id, status] of importedById) {
+      next[id] = { status, at };
+    }
+    return next;
+  }
+  
+  /**
+   * Legacy collected-only import: every matched id becomes collected; ordered
+   * titles drop out; wants are left alone unless listed (then collected wins).
+   */
+  function replaceCollectionStatuses(map, ids, atIso) {
+    const entries = (Array.isArray(ids) ? ids : []).map((raw) => ({
+      id: raw,
+      status: COLLECTED,
+    }));
+    const normalized = normalizeStatusMap(map);
+    const at = normalizeStampTime(atIso);
+    if (!at) {
+      return normalized;
+    }
+  
+    const imported = new Set(
+      entries
+        .map((entry) => normalizeBookId(entry.id))
+        .filter((id) => id != null),
+    );
+  
+    const next = emptyStatusMap();
+    for (const [key, stamp] of Object.entries(normalized)) {
+      const id = Number(key);
+      if (imported.has(id)) {
+        continue;
+      }
+      next[id] =
+        stamp.status === COLLECTED || stamp.status === ORDERED
+          ? { status: NONE, at }
+          : stamp;
+    }
+    for (const id of imported) {
+      next[id] = { status: COLLECTED, at };
+    }
+    return next;
+  }
+  
+  /**
+   * Replace `baseMap` wholesale with `nextMap`, stamped at one instant.
+   *
+   * Restoring a backup has to beat whatever is on the server, and a snapshot's own
+   * stamps are by definition older. Books the snapshot does not mention get
+   * tombstones so the restore stays faithful instead of quietly keeping books the
+   * user restored away from.
+   */
+  function supersedeStatusMap(baseMap, nextMap, atIso) {
+    const base = normalizeStatusMap(baseMap);
+    const next = normalizeStatusMap(nextMap);
+    const at = normalizeStampTime(atIso);
+    if (!at) {
+      return base;
+    }
+    const merged = emptyStatusMap();
+    for (const key of Object.keys(base)) {
+      merged[Number(key)] = { status: NONE, at };
+    }
+    for (const [key, stamp] of Object.entries(next)) {
+      merged[Number(key)] = { status: stamp.status, at };
+    }
+    return merged;
+  }
+  
+  /**
+   * Re-stamp every book at one instant. Restoring a backup has to outrank whatever
+   * is on the server, and the snapshot's original stamps are by definition older.
+   */
+  function restampStatusMap(map, atIso) {
+    const normalized = normalizeStatusMap(map);
+    const at = normalizeStampTime(atIso);
+    if (!at) {
+      return normalized;
+    }
+    const next = emptyStatusMap();
+    for (const [key, stamp] of Object.entries(normalized)) {
+      next[Number(key)] = { status: stamp.status, at };
+    }
+    return next;
+  }
+  return {
+    COLLECTED,
+    ORDERED,
+    WANT,
+    NONE,
+    normalizeBookId,
+    normalizeStampTime,
+    emptyStatusMap,
+    normalizeStatusMap,
+    getBookStatus,
+    mergeStatusMaps,
+    setBookStatus,
+    cycleCollectionStatus,
+    setWantStatus,
+    deriveIdsByStatus,
+    statusMapFromIdArrays,
+    replaceStatusesFromImport,
+    replaceCollectionStatuses,
+    supersedeStatusMap,
+    restampStatusMap,
+  };
+})();
+
+
 /* Generated from scripts/lib/viewer-user-state.js — run npm run bundle-viewer */
 
 const viewerUserState = (function () {
   const USER_STATE_KEY = "arkham-user-state";
   const USER_STATE_BACKUP_KEY = "arkham-user-state-backup";
-  const USER_STATE_VERSION = 2;
+  const USER_STATE_VERSION = 3;
+  const USER_STATE_VERSION_V2 = 2;
   const USER_STATE_VERSION_V1 = 1;
+  
+  /**
+   * Stamp used when a time has to be invented — pre-v3 data, or id arrays that
+   * arrived without a status map. The epoch loses to every real edit, so upgrading
+   * or re-reading old state can never outrank a live change on another device.
+   */
+  const FALLBACK_STAMP_AT = new Date(0).toISOString();
   
   const LEGACY_KEYS = {
     collection: "arkham-collection",
@@ -860,7 +1241,6 @@ const viewerUserState = (function () {
     "title-desc",
   ]);
   
-  
   function defaultUserState() {
     return {
       version: USER_STATE_VERSION,
@@ -868,9 +1248,9 @@ const viewerUserState = (function () {
       storageMode: "local",
       collectionIds: [],
       orderedIds: [],
-      collections: defaultCollections(),
       wantIds: [],
       wantOrderIds: [],
+      collections: defaultCollections(),
       preferences: {
         sort: "date-asc",
         viewMode: "cards",
@@ -883,44 +1263,95 @@ const viewerUserState = (function () {
     };
   }
   
+  /**
+   * A storage slot keeps `statuses` as the only source of truth. The id arrays are
+   * derived mirrors, recomputed on every normalize so they can never drift out of
+   * step with the stamps.
+   */
+  function buildCollectionSlot(statuses, wantOrderIdsRaw) {
+    const normalized = viewerBookStatus.normalizeStatusMap(statuses);
+    const derived = viewerBookStatus.deriveIdsByStatus(normalized);
+    return {
+      statuses: normalized,
+      collectionIds: derived.collectionIds,
+      orderedIds: derived.orderedIds,
+      wantIds: derived.wantIds,
+      wantOrderIds: viewerWantOrderNormalize.normalizeWantOrderIds(wantOrderIdsRaw, derived.wantIds),
+    };
+  }
+  
   function emptyCollectionSlot() {
-    return { collectionIds: [], orderedIds: [] };
+    return buildCollectionSlot({}, []);
+  }
+  
+  function slotFromIdArrays(arrays, at, wantOrderIdsRaw) {
+    return buildCollectionSlot(
+      viewerBookStatus.statusMapFromIdArrays(
+        {
+          collectionIds: normalizeIdArray(arrays?.collectionIds),
+          orderedIds: normalizeIdArray(arrays?.orderedIds),
+          wantIds: normalizeIdArray(arrays?.wantIds),
+        },
+        at,
+      ),
+      wantOrderIdsRaw,
+    );
   }
   
   function defaultCollections() {
-    return {
-      local: emptyCollectionSlot(),
-      gist: emptyCollectionSlot(),
-    };
+    return { local: emptyCollectionSlot(), gist: emptyCollectionSlot() };
   }
   
-  function normalizeCollectionSlot(raw, fallback = emptyCollectionSlot()) {
+  function resolveStampAt(raw) {
+    return viewerBookStatus.normalizeStampTime(raw) || FALLBACK_STAMP_AT;
+  }
+  
+  function normalizeCollectionSlot(raw, fallback = emptyCollectionSlot(), options = {}) {
+    const source = raw && typeof raw === "object" ? raw : null;
+    if (!source) {
+      return buildCollectionSlot(fallback.statuses, fallback.wantOrderIds);
+    }
+  
+    const statuses = viewerBookStatus.normalizeStatusMap(source.statuses);
+    if (Object.keys(statuses).length) {
+      return buildCollectionSlot(statuses, source.wantOrderIds);
+    }
+  
+    // Pre-v3 slot: rebuild stamps from whatever id arrays it carried.
+    return slotFromIdArrays(
+      {
+        collectionIds: source.collectionIds,
+        orderedIds: source.orderedIds,
+        wantIds: source.wantIds ?? fallback.wantIds,
+      },
+      resolveStampAt(options.at),
+      source.wantOrderIds ?? fallback.wantOrderIds,
+    );
+  }
+  
+  function normalizeCollections(
+    raw,
+    topLevelIds = [],
+    topLevelOrdered = [],
+    options = {},
+  ) {
+    const at = resolveStampAt(options.at);
+    const fallbackArrays = {
+      collectionIds: topLevelIds,
+      orderedIds: topLevelOrdered,
+      wantIds: options.wantIds,
+    };
+    const fallback = slotFromIdArrays(fallbackArrays, at, options.wantOrderIds);
+  
     if (!raw || typeof raw !== "object") {
       return {
-        collectionIds: [...fallback.collectionIds],
-        orderedIds: [...fallback.orderedIds],
+        local: slotFromIdArrays(fallbackArrays, at, options.wantOrderIds),
+        gist: slotFromIdArrays(fallbackArrays, at, options.wantOrderIds),
       };
     }
     return {
-      collectionIds: normalizeIdArray(raw.collectionIds),
-      orderedIds: normalizeIdArray(raw.orderedIds),
-    };
-  }
-  
-  function normalizeCollections(raw, topLevelIds = [], topLevelOrdered = []) {
-    const fallback = {
-      collectionIds: normalizeIdArray(topLevelIds),
-      orderedIds: normalizeIdArray(topLevelOrdered),
-    };
-    if (!raw || typeof raw !== "object") {
-      return {
-        local: normalizeCollectionSlot(null, fallback),
-        gist: normalizeCollectionSlot(null, fallback),
-      };
-    }
-    return {
-      local: normalizeCollectionSlot(raw.local, fallback),
-      gist: normalizeCollectionSlot(raw.gist, fallback),
+      local: normalizeCollectionSlot(raw.local, fallback, options),
+      gist: normalizeCollectionSlot(raw.gist, fallback, options),
     };
   }
   
@@ -930,51 +1361,73 @@ const viewerUserState = (function () {
       state.collections,
       state.collectionIds,
       state.orderedIds,
+      {
+        wantIds: state.wantIds,
+        wantOrderIds: state.wantOrderIds,
+        at: state.updatedAt,
+      },
     );
     return collections[mode];
   }
   
   function localCollectionSlotFromPersisted(localPersisted) {
-    return normalizeCollectionSlot(localPersisted?.collections?.local, {
-      collectionIds: localPersisted?.collectionIds || [],
-      orderedIds: localPersisted?.orderedIds || [],
-    });
+    return normalizeCollectionSlot(
+      localPersisted?.collections?.local,
+      slotFromIdArrays(
+        {
+          collectionIds: localPersisted?.collectionIds,
+          orderedIds: localPersisted?.orderedIds,
+          wantIds: localPersisted?.wantIds,
+        },
+        resolveStampAt(localPersisted?.updatedAt),
+        localPersisted?.wantOrderIds,
+      ),
+      { at: localPersisted?.updatedAt },
+    );
+  }
+  
+  /** Shape the top-level mirrors from whichever slot the active storage mode uses. */
+  function withActiveSlotMirrors(state, collections, storageMode) {
+    const active = collections[storageMode] || collections.local;
+    return {
+      ...state,
+      storageMode,
+      collectionIds: active.collectionIds,
+      orderedIds: active.orderedIds,
+      wantIds: active.wantIds,
+      wantOrderIds: active.wantOrderIds,
+      collections,
+    };
   }
   
   function buildNewGistConnectState(localPersisted) {
     const base = defaultUserState();
-    const localSlot = localCollectionSlotFromPersisted(localPersisted);
+    const at = resolveStampAt(localPersisted?.updatedAt);
     const mode = normalizeStorageMode(localPersisted?.storageMode);
     const collections = normalizeCollections(
       localPersisted?.collections,
       localPersisted?.collectionIds,
       localPersisted?.orderedIds,
+      {
+        wantIds: localPersisted?.wantIds,
+        wantOrderIds: localPersisted?.wantOrderIds,
+        at,
+      },
     );
     const activeSlot = collections[mode] || collections.local;
-    const wantIds = normalizeIdArray(localPersisted?.wantIds);
-    return {
-      ...base,
-      updatedAt: new Date().toISOString(),
-      storageMode: "gist",
-      collectionIds: activeSlot.collectionIds,
-      orderedIds: activeSlot.orderedIds,
-      wantIds,
-      wantOrderIds: viewerWantOrderNormalize.normalizeWantOrderIds(
-        localPersisted?.wantOrderIds,
-        wantIds,
-      ),
-      preferences: {
-        ...base.preferences,
-        ...(localPersisted?.preferences || {}),
-      },
-      collections: {
-        local: localSlot,
-        gist: {
-          collectionIds: activeSlot.collectionIds,
-          orderedIds: activeSlot.orderedIds,
-        },
-      },
+    const nextCollections = {
+      local: collections.local,
+      gist: buildCollectionSlot(activeSlot.statuses, activeSlot.wantOrderIds),
     };
+    return withActiveSlotMirrors(
+      {
+        ...base,
+        updatedAt: new Date().toISOString(),
+        preferences: normalizePreferences(localPersisted?.preferences, base),
+      },
+      nextCollections,
+      "gist",
+    );
   }
   
   /** @deprecated Use buildNewGistConnectState */
@@ -990,24 +1443,11 @@ const viewerUserState = (function () {
     if (!parsed) {
       return null;
     }
-    const localSlot = localCollectionSlotFromPersisted(localPersisted);
-    const gistSlot = activeCollectionSlot({
-      ...parsed,
-      storageMode: "gist",
-    });
-    return {
-      ...parsed,
-      storageMode: "gist",
-      collectionIds: gistSlot.collectionIds,
-      orderedIds: gistSlot.orderedIds,
-      collections: {
-        local: localSlot,
-        gist: {
-          collectionIds: gistSlot.collectionIds,
-          orderedIds: gistSlot.orderedIds,
-        },
-      },
+    const collections = {
+      local: localCollectionSlotFromPersisted(localPersisted),
+      gist: parsed.collections.gist,
     };
+    return withActiveSlotMirrors(parsed, collections, "gist");
   }
   
   function normalizeIdArray(raw) {
@@ -1035,13 +1475,7 @@ const viewerUserState = (function () {
   }
   
   function normalizeSort(raw, fallback = "date-asc") {
-    if (raw && SORT_MODES.has(raw)) {
-      return raw;
-    }
-    if (raw && SORT_LEGACY[raw]) {
-      return SORT_LEGACY[raw];
-    }
-    return fallback;
+    return raw && SORT_MODES.has(raw) ? raw : fallback;
   }
   
   function normalizeBoolFlag(raw, defaultVal) {
@@ -1055,17 +1489,11 @@ const viewerUserState = (function () {
   }
   
   function normalizeStorageMode(raw) {
-    if (raw === "gist") {
-      return "gist";
-    }
-    return "local";
+    return raw === "gist" ? "gist" : "local";
   }
   
   function normalizeViewMode(raw, fallback = "cards") {
-    if (raw === "list") {
-      return "list";
-    }
-    return fallback;
+    return raw === "list" ? "list" : fallback;
   }
   
   function normalizeWantOrderLocked(raw, fallback = false) {
@@ -1110,37 +1538,35 @@ const viewerUserState = (function () {
   function migrateFromLegacy(legacy) {
     const base = defaultUserState();
     const snapshot = legacy || {};
-  
-    return {
-      version: USER_STATE_VERSION,
-      updatedAt: null,
-      storageMode: legacyStorageModeFromSource(
-        snapshot[LEGACY_KEYS.collectionSource],
-      ),
+    const arrays = {
       collectionIds: legacyCollectionIds(snapshot),
       orderedIds: normalizeIdArray(snapshot[LEGACY_KEYS.ordered]),
-      collections: normalizeCollections(
-        null,
-        legacyCollectionIds(snapshot),
-        normalizeIdArray(snapshot[LEGACY_KEYS.ordered]),
-      ),
       wantIds: normalizeIdArray(snapshot[LEGACY_KEYS.want]),
-      wantOrderIds: viewerWantOrderNormalize.normalizeWantOrderIds(
-        null,
-        normalizeIdArray(snapshot[LEGACY_KEYS.want]),
-      ),
-      preferences: normalizePreferences(
-        {
-          sort: snapshot[LEGACY_KEYS.sort],
-          viewMode: snapshot[LEGACY_KEYS.viewMode],
-          headerFiltersExpanded: snapshot[LEGACY_KEYS.headerFiltersExpanded],
-          highlightWants: snapshot[LEGACY_KEYS.highlightWants],
-          highlightCollection: snapshot[LEGACY_KEYS.highlightCollection],
-          showMagazines: snapshot[LEGACY_KEYS.showMagazines],
-        },
-        base,
-      ),
     };
+    const slot = slotFromIdArrays(arrays, FALLBACK_STAMP_AT, null);
+  
+    return withActiveSlotMirrors(
+      {
+        ...base,
+        updatedAt: null,
+        preferences: normalizePreferences(
+          {
+            sort: snapshot[LEGACY_KEYS.sort],
+            viewMode: snapshot[LEGACY_KEYS.viewMode],
+            headerFiltersExpanded: snapshot[LEGACY_KEYS.headerFiltersExpanded],
+            highlightWants: snapshot[LEGACY_KEYS.highlightWants],
+            highlightCollection: snapshot[LEGACY_KEYS.highlightCollection],
+            showMagazines: snapshot[LEGACY_KEYS.showMagazines],
+          },
+          base,
+        ),
+      },
+      {
+        local: slot,
+        gist: slotFromIdArrays(arrays, FALLBACK_STAMP_AT, null),
+      },
+      legacyStorageModeFromSource(snapshot[LEGACY_KEYS.collectionSource]),
+    );
   }
   
   function hasLegacyUserData(snapshot) {
@@ -1152,21 +1578,59 @@ const viewerUserState = (function () {
     );
   }
   
+  /** v1 → v2: flat arrays only. v2 → v3 builds the stamped slots. */
   function migrateV1ToV2(v1) {
     const base = defaultUserState();
-    const collectionIds = normalizeIdArray(v1.ownCollectionIds);
-    const orderedIds = normalizeIdArray(v1.orderedIds);
+    const wantIds = normalizeIdArray(v1.wantIds);
     return {
-      version: USER_STATE_VERSION,
+      version: USER_STATE_VERSION_V2,
       updatedAt: v1.updatedAt || null,
       storageMode: "local",
-      collectionIds,
-      orderedIds,
-      collections: normalizeCollections(null, collectionIds, orderedIds),
-      wantIds: normalizeIdArray(v1.wantIds),
-      wantOrderIds: viewerWantOrderNormalize.normalizeWantOrderIds(null, normalizeIdArray(v1.wantIds)),
+      collectionIds: normalizeIdArray(v1.ownCollectionIds),
+      orderedIds: normalizeIdArray(v1.orderedIds),
+      wantIds,
+      wantOrderIds: viewerWantOrderNormalize.normalizeWantOrderIds(null, wantIds),
       preferences: normalizePreferences(v1.preferences, base),
     };
+  }
+  
+  /**
+   * v2 kept one shared want list across both storage slots while collections were
+   * per-slot. v3 gives each slot a single status per book, so the shared wants are
+   * seeded into both slots — nothing is dropped, and the two only diverge if wants
+   * are edited after the upgrade.
+   */
+  function migrateV2ToV3(v2) {
+    const base = defaultUserState();
+    const at = resolveStampAt(v2?.updatedAt);
+    const wantIds = normalizeIdArray(v2?.wantIds);
+    const wantOrderIds = viewerWantOrderNormalize.normalizeWantOrderIds(v2?.wantOrderIds, wantIds);
+    const rawCollections =
+      v2?.collections && typeof v2.collections === "object" ? v2.collections : null;
+  
+    const slotFor = (slotRaw) =>
+      slotFromIdArrays(
+        {
+          collectionIds: slotRaw?.collectionIds ?? v2?.collectionIds,
+          orderedIds: slotRaw?.orderedIds ?? v2?.orderedIds,
+          wantIds,
+        },
+        at,
+        wantOrderIds,
+      );
+  
+    return withActiveSlotMirrors(
+      {
+        ...base,
+        updatedAt: typeof v2?.updatedAt === "string" ? v2.updatedAt : null,
+        preferences: normalizePreferences(v2?.preferences, base),
+      },
+      {
+        local: slotFor(rawCollections?.local),
+        gist: slotFor(rawCollections?.gist),
+      },
+      normalizeStorageMode(v2?.storageMode),
+    );
   }
   
   function parseUserStateV1(json) {
@@ -1211,26 +1675,20 @@ const viewerUserState = (function () {
     }
     try {
       const parsed = typeof json === "string" ? JSON.parse(json) : json;
-      if (!parsed || parsed.version !== USER_STATE_VERSION) {
+      if (!parsed || parsed.version !== USER_STATE_VERSION_V2) {
         return null;
       }
   
       const base = defaultUserState();
-      const collectionIds = normalizeIdArray(parsed.collectionIds);
-      const orderedIds = normalizeIdArray(parsed.orderedIds);
       const wantIds = normalizeIdArray(parsed.wantIds);
       return {
-        version: USER_STATE_VERSION,
+        version: USER_STATE_VERSION_V2,
         updatedAt:
           typeof parsed.updatedAt === "string" ? parsed.updatedAt : null,
         storageMode: normalizeStorageMode(parsed.storageMode),
-        collectionIds,
-        orderedIds,
-        collections: normalizeCollections(
-          parsed.collections,
-          collectionIds,
-          orderedIds,
-        ),
+        collectionIds: normalizeIdArray(parsed.collectionIds),
+        orderedIds: normalizeIdArray(parsed.orderedIds),
+        collections: parsed.collections,
         wantIds,
         wantOrderIds: viewerWantOrderNormalize.normalizeWantOrderIds(parsed.wantOrderIds, wantIds),
         preferences: normalizePreferences(parsed.preferences, base),
@@ -1240,48 +1698,99 @@ const viewerUserState = (function () {
     }
   }
   
+  function parseUserStateV3(json) {
+    if (json == null || json === "") {
+      return null;
+    }
+    try {
+      const parsed = typeof json === "string" ? JSON.parse(json) : json;
+      if (!parsed || parsed.version !== USER_STATE_VERSION) {
+        return null;
+      }
+  
+      const base = defaultUserState();
+      const collections = normalizeCollections(
+        parsed.collections,
+        parsed.collectionIds,
+        parsed.orderedIds,
+        {
+          wantIds: parsed.wantIds,
+          wantOrderIds: parsed.wantOrderIds,
+          at: parsed.updatedAt,
+        },
+      );
+      return withActiveSlotMirrors(
+        {
+          ...base,
+          updatedAt:
+            typeof parsed.updatedAt === "string" ? parsed.updatedAt : null,
+          preferences: normalizePreferences(parsed.preferences, base),
+        },
+        collections,
+        normalizeStorageMode(parsed.storageMode),
+      );
+    } catch (_) {
+      return null;
+    }
+  }
+  
   function parseUserState(json) {
+    const v3 = parseUserStateV3(json);
+    if (v3) {
+      return v3;
+    }
     const v2 = parseUserStateV2(json);
     if (v2) {
-      return v2;
+      return migrateV2ToV3(v2);
     }
     const v1 = parseUserStateV1(json);
     if (v1) {
-      return migrateV1ToV2(v1);
+      return migrateV2ToV3(migrateV1ToV2(v1));
     }
     return null;
   }
   
+  /**
+   * Build persistable state from the live viewer. `bookStatuses` is authoritative
+   * when present; without it the id arrays are stamped at the epoch rather than
+   * now, so an ordinary save never looks newer than a real edit elsewhere.
+   */
   function buildUserStateFromRuntime(snapshot, options = {}) {
+    const base = defaultUserState();
     const mode = normalizeStorageMode(snapshot.storageMode);
-    const collectionIds = normalizeIdArray(snapshot.collectionIds);
-    const orderedIds = normalizeIdArray(snapshot.orderedIds);
-    const collections = normalizeCollections(
-      options.existingCollections,
-      collectionIds,
-      orderedIds,
-    );
-    collections[mode] = { collectionIds, orderedIds };
-    const wantIds = normalizeIdArray(snapshot.wantIds);
-    return {
-      version: USER_STATE_VERSION,
-      updatedAt: new Date().toISOString(),
-      storageMode: mode,
-      collectionIds,
-      orderedIds,
-      collections,
-      wantIds,
-      wantOrderIds: viewerWantOrderNormalize.normalizeWantOrderIds(snapshot.wantOrderIds, wantIds),
-      preferences: {
-        sort: normalizeSort(snapshot.sort),
-        viewMode: normalizeViewMode(snapshot.viewMode),
-        headerFiltersExpanded: Boolean(snapshot.headerFiltersExpanded),
-        highlightWants: Boolean(snapshot.highlightWants),
-        highlightCollection: Boolean(snapshot.highlightCollection),
-        showMagazines: Boolean(snapshot.showMagazines),
-        wantOrderLocked: normalizeWantOrderLocked(snapshot.wantOrderLocked),
+    const statuses = snapshot.bookStatuses
+      ? viewerBookStatus.normalizeStatusMap(snapshot.bookStatuses)
+      : viewerBookStatus.statusMapFromIdArrays(
+          {
+            collectionIds: normalizeIdArray(snapshot.collectionIds),
+            orderedIds: normalizeIdArray(snapshot.orderedIds),
+            wantIds: normalizeIdArray(snapshot.wantIds),
+          },
+          FALLBACK_STAMP_AT,
+        );
+  
+    const collections = normalizeCollections(options.existingCollections, [], [], {
+      at: FALLBACK_STAMP_AT,
+    });
+    collections[mode] = buildCollectionSlot(statuses, snapshot.wantOrderIds);
+  
+    return withActiveSlotMirrors(
+      {
+        ...base,
+        updatedAt: new Date().toISOString(),
+        preferences: {
+          sort: normalizeSort(snapshot.sort),
+          viewMode: normalizeViewMode(snapshot.viewMode),
+          headerFiltersExpanded: Boolean(snapshot.headerFiltersExpanded),
+          highlightWants: Boolean(snapshot.highlightWants),
+          highlightCollection: Boolean(snapshot.highlightCollection),
+          showMagazines: Boolean(snapshot.showMagazines),
+          wantOrderLocked: normalizeWantOrderLocked(snapshot.wantOrderLocked),
+        },
       },
-    };
+      collections,
+      mode,
+    );
   }
   
   function applyUserStateToRuntime(state) {
@@ -1289,10 +1798,11 @@ const viewerUserState = (function () {
     const active = activeCollectionSlot(parsed);
     return {
       storageMode: parsed.storageMode,
+      bookStatuses: active.statuses,
       collectionIds: active.collectionIds,
       orderedIds: active.orderedIds,
-      wantIds: parsed.wantIds,
-      wantOrderIds: parsed.wantOrderIds,
+      wantIds: active.wantIds,
+      wantOrderIds: active.wantOrderIds,
       sort: parsed.preferences.sort,
       viewMode: parsed.preferences.viewMode,
       headerFiltersExpanded: parsed.preferences.headerFiltersExpanded,
@@ -1306,17 +1816,96 @@ const viewerUserState = (function () {
   function serializeUserState(state) {
     return JSON.stringify(state);
   }
+  
+  /** Accepts a JSON string, a v3 object, or an older payload, and returns v3 or null. */
+  function normalizeStateForMerge(state) {
+    if (state == null) {
+      return null;
+    }
+    return parseUserState(
+      typeof state === "string" ? state : serializeUserState(state),
+    );
+  }
+  
+  function stateUpdatedAtMs(state) {
+    const parsed = Date.parse(state?.updatedAt || "");
+    return Number.isFinite(parsed) ? parsed : null;
+  }
+  
+  /** Ties favour the local payload, which is the one the user is looking at. */
+  function pickNewerState(local, remote) {
+    const localMs = stateUpdatedAtMs(local);
+    const remoteMs = stateUpdatedAtMs(remote);
+    if (localMs == null && remoteMs != null) {
+      return remote;
+    }
+    if (remoteMs == null) {
+      return local;
+    }
+    return remoteMs > localMs ? remote : local;
+  }
+  
+  /**
+   * Merge two payloads book by book.
+   *
+   * Each book's own stamp decides its fate, so a device that never saw a book
+   * cannot delete it — which is the whole reason v3 exists. Only the gist slot
+   * merges: the local slot never leaves the device, so the local copy wins
+   * outright. Preferences and want order have no per-item history, so they follow
+   * the newer payload, and want order is re-normalized against merged membership.
+   *
+   * Older payloads are migrated on the way in, so a device still writing v2 can be
+   * merged safely: its books arrive stamped at the epoch and lose to any real edit
+   * without ever being dropped.
+   */
+  function mergeUserState(localState, remoteState) {
+    const local = normalizeStateForMerge(localState);
+    const remote = normalizeStateForMerge(remoteState);
+    if (!local) {
+      return remote;
+    }
+    if (!remote) {
+      return local;
+    }
+  
+    const newer = pickNewerState(local, remote);
+    const collections = {
+      local: local.collections.local,
+      gist: buildCollectionSlot(
+        viewerBookStatus.mergeStatusMaps(
+          local.collections.gist.statuses,
+          remote.collections.gist.statuses,
+        ),
+        newer.collections.gist.wantOrderIds,
+      ),
+    };
+    const localMs = stateUpdatedAtMs(local);
+    const remoteMs = stateUpdatedAtMs(remote);
+    const updatedAt =
+      localMs != null && remoteMs != null && localMs > remoteMs
+        ? local.updatedAt
+        : remote.updatedAt || local.updatedAt;
+  
+    return withActiveSlotMirrors(
+      { ...newer, updatedAt },
+      collections,
+      normalizeStorageMode(newer.storageMode),
+    );
+  }
   return {
     USER_STATE_KEY,
     USER_STATE_BACKUP_KEY,
     USER_STATE_VERSION,
+    FALLBACK_STAMP_AT,
     LEGACY_KEYS,
     defaultUserState,
+    buildCollectionSlot,
     emptyCollectionSlot,
     normalizeCollections,
     normalizeCollectionSlot,
     activeCollectionSlot,
     localCollectionSlotFromPersisted,
+    withActiveSlotMirrors,
     buildEmptyGistConnectState,
     buildNewGistConnectState,
     adoptRemoteGistState,
@@ -1324,10 +1913,12 @@ const viewerUserState = (function () {
     normalizeStorageMode,
     migrateFromLegacy,
     migrateV1ToV2,
+    migrateV2ToV3,
     parseUserState,
     buildUserStateFromRuntime,
     applyUserStateToRuntime,
     serializeUserState,
+    mergeUserState,
   };
 })();
 
@@ -1552,56 +2143,6 @@ const viewerGistSync = (function () {
     return Boolean(config?.token && config?.gistId);
   }
   
-  function mergeUserStateByUpdatedAt(localState, remoteState) {
-    if (!remoteState) {
-      return localState;
-    }
-    if (!localState) {
-      return remoteState;
-    }
-    const localTime = Date.parse(localState.updatedAt || "");
-    const remoteTime = Date.parse(remoteState.updatedAt || "");
-    if (!Number.isFinite(localTime) && Number.isFinite(remoteTime)) {
-      return remoteState;
-    }
-    if (Number.isFinite(localTime) && !Number.isFinite(remoteTime)) {
-      return localState;
-    }
-    if (remoteTime > localTime) {
-      return remoteState;
-    }
-    return localState;
-  }
-  
-  function mergeGistUserState(localState, remoteState, helpers) {
-    const merged = mergeUserStateByUpdatedAt(localState, remoteState);
-    if (!merged || !localState || !helpers) {
-      return merged;
-    }
-    const {
-      normalizeCollections,
-      normalizeCollectionSlot,
-      emptyCollectionSlot,
-    } = helpers;
-    const localSlot = normalizeCollectionSlot(
-      localState.collections?.local,
-      {
-        collectionIds: localState.collectionIds || [],
-        orderedIds: localState.orderedIds || [],
-      },
-    );
-    merged.collections = normalizeCollections(
-      merged.collections,
-      merged.collectionIds,
-      merged.orderedIds,
-    );
-    merged.collections.local = localSlot;
-    if (!merged.collections.gist) {
-      merged.collections.gist = emptyCollectionSlot();
-    }
-    return merged;
-  }
-  
   function resolveGistStateFilename(body, preferredFilename) {
     if (preferredFilename && body?.files?.[preferredFilename]) {
       return preferredFilename;
@@ -1721,8 +2262,6 @@ const viewerGistSync = (function () {
     parseGistSyncConfig,
     serializeGistSyncConfig,
     isConnectedGistConfig,
-    mergeUserStateByUpdatedAt,
-    mergeGistUserState,
     resolveGistStateFilename,
     extractStateJsonFromGistResponse,
     findArkhamGistId,
@@ -1737,6 +2276,8 @@ const viewerGistSync = (function () {
 /* Generated from scripts/lib/viewer-collection-import.js — run npm run bundle-viewer */
 
 const viewerCollectionImport = (function () {
+  const COLLECTION_CSV_HEADER = "title,author,year,status";
+  
   function parseYear(value) {
     if (!value) {
       return null;
@@ -1790,6 +2331,22 @@ const viewerCollectionImport = (function () {
     return left === right || left.includes(right) || right.includes(left);
   }
   
+  /** Maps CSV status text to a book status; blank means collected for legacy 3-column files. */
+  function normalizeImportStatus(raw) {
+    const value = String(raw || "").trim().toLowerCase();
+    if (value === "ordered" || value === "order") {
+      return viewerBookStatus.ORDERED;
+    }
+    if (value === "want" || value === "wanted") {
+      return viewerBookStatus.WANT;
+    }
+    return viewerBookStatus.COLLECTED;
+  }
+  
+  function isCollectionCsvHeaderRow(row) {
+    return String(row?.title || "").trim().toLowerCase() === "title";
+  }
+  
   function parseCollectionCsv(csvText) {
     return csvText
       .trim()
@@ -1804,6 +2361,9 @@ const viewerCollectionImport = (function () {
       }))
       .filter((item) => {
         if (!item.title || !item.year) {
+          return false;
+        }
+        if (isCollectionCsvHeaderRow(item)) {
           return false;
         }
         if (item.title.toUpperCase() === "ARKHAM HOUSE") {
@@ -1850,28 +2410,67 @@ const viewerCollectionImport = (function () {
     return null;
   }
   
-  function matchCollectionImportRows(books, rows) {
-    const matchedIds = [];
+  function matchCollectionImportEntries(books, rows) {
+    const entries = [];
     const unmatchedRows = [];
+    const seen = new Set();
   
     for (const row of rows) {
       const id = matchBookIdForRow(books, row);
       if (id == null) {
         unmatchedRows.push(row);
-      } else {
-        matchedIds.push(id);
+      } else if (!seen.has(id)) {
+        seen.add(id);
+        entries.push({ id, status: normalizeImportStatus(row.status) });
       }
     }
   
+    return { entries, unmatchedRows };
+  }
+  
+  /** @deprecated Use matchCollectionImportEntries */
+  function matchCollectionImportRows(books, rows) {
+    const { entries, unmatchedRows } = matchCollectionImportEntries(books, rows);
     return {
-      matchedIds: [...new Set(matchedIds)],
+      matchedIds: entries.map((entry) => entry.id),
       unmatchedRows,
     };
   }
+  
+  /**
+   * Build export rows for every book with a collection status (collected, ordered,
+   * or want). Caller supplies sort order; rows are title, author, year, status.
+   */
+  function buildCollectionExportRows(books, statusMap, compareFn) {
+    const rows = [];
+    for (const book of books) {
+      const status = viewerBookStatus.getBookStatus(statusMap, book.id);
+      if (status === viewerBookStatus.NONE) {
+        continue;
+      }
+      rows.push({
+        book,
+        cols: [
+          book.title || book.listTitle || "Untitled",
+          book.author || "",
+          parseYear(book.publicationDate) || "",
+          status,
+        ],
+      });
+    }
+    if (typeof compareFn === "function") {
+      rows.sort((a, b) => compareFn(a.book, b.book));
+    }
+    return rows.map((entry) => entry.cols);
+  }
   return {
+    COLLECTION_CSV_HEADER,
     parseCollectionCsv,
+    normalizeImportStatus,
+    matchCollectionImportEntries,
     matchCollectionImportRows,
     matchBookIdForRow,
+    buildCollectionExportRows,
   };
 })();
 
@@ -3977,28 +4576,24 @@ function buildStateForPersistence() {
   });
 }
 
-function gistMergeHelpers() {
-  return {
-    normalizeCollections: viewerUserState.normalizeCollections,
-    normalizeCollectionSlot: viewerUserState.normalizeCollectionSlot,
-    emptyCollectionSlot: viewerUserState.emptyCollectionSlot,
-  };
-}
-
 function swapCollectionForStorageMode(nextMode) {
   const existing = readPersistedUserState();
   const collections = viewerUserState.normalizeCollections(
     existing?.collections,
     existing?.collectionIds,
     existing?.orderedIds,
+    {
+      wantIds: existing?.wantIds,
+      wantOrderIds: existing?.wantOrderIds,
+      at: existing?.updatedAt,
+    },
   );
-  collections[storageMode] = {
-    collectionIds: [...collectionIds],
-    orderedIds: [...orderedIds],
-  };
+  collections[storageMode] = viewerUserState.buildCollectionSlot(
+    bookStatuses,
+    wantOrderIds,
+  );
   const nextSlot = collections[nextMode] || viewerUserState.emptyCollectionSlot();
-  collectionIds = new Set(nextSlot.collectionIds);
-  orderedIds = new Set(nextSlot.orderedIds);
+  applyBookStatuses(nextSlot.statuses, { wantOrderIds: nextSlot.wantOrderIds });
   return collections;
 }
 
@@ -4016,6 +4611,7 @@ function persistUserState(state) {
 function collectRuntimeSnapshot() {
   return {
     storageMode,
+    bookStatuses,
     collectionIds: [...collectionIds],
     orderedIds: [...orderedIds],
     wantIds: [...wantIds],
@@ -4032,13 +4628,9 @@ function collectRuntimeSnapshot() {
 
 function applyRuntimeSnapshot(runtime) {
   storageMode = viewerUserState.normalizeStorageMode(runtime.storageMode);
-  wantIds = new Set(runtime.wantIds);
-  wantOrderIds = viewerWantOrderNormalize.normalizeWantOrderIds(
-    runtime.wantOrderIds,
-    runtime.wantIds,
-  );
-  collectionIds = new Set(runtime.collectionIds);
-  orderedIds = new Set(runtime.orderedIds);
+  applyBookStatuses(runtime.bookStatuses, {
+    wantOrderIds: runtime.wantOrderIds,
+  });
   gridViewMode = runtime.viewMode;
   headerFiltersExpanded = runtime.headerFiltersExpanded;
   highlightWants = runtime.highlightWants;
@@ -4108,7 +4700,7 @@ async function findExistingArkhamGist(token) {
   return viewerGistSync.findArkhamGistEntry(gists);
 }
 
-async function pushGistState(config, state) {
+async function patchGistState(config, state) {
   const stateJson = viewerUserState.serializeUserState(state);
   const stateFilename =
     config.stateFilename || viewerGistSync.GIST_STATE_FILENAME;
@@ -4128,6 +4720,55 @@ async function pushGistState(config, state) {
   if (!response.ok) {
     throw new Error(`Gist update failed (${response.status})`);
   }
+}
+
+/**
+ * Fold whatever a push resolved to back into the live view, re-merging against
+ * current state so a click made while the request was in flight survives.
+ */
+function adoptMergedGistState(merged) {
+  const current = buildStateForPersistence();
+  const next = viewerUserState.mergeUserState(current, merged) || merged;
+  const unchanged =
+    JSON.stringify(next.collections.gist.statuses) ===
+      JSON.stringify(current.collections.gist.statuses) &&
+    JSON.stringify(next.wantOrderIds) === JSON.stringify(current.wantOrderIds);
+  if (unchanged) {
+    return;
+  }
+  persistUserState(next);
+  applyRuntimeSnapshot(viewerUserState.applyUserStateToRuntime(next));
+  syncSettingsStorageMode();
+  render();
+}
+
+/**
+ * Read, merge, then write. A blind PATCH lets a tab that loaded an hour ago erase
+ * books another device added since; merging the remote doc first means a stale tab
+ * can only add to the record, never subtract from it.
+ *
+ * `authoritative` skips the merge for the one case that must not merge: restoring
+ * a snapshot, which is a deliberate replacement of everything.
+ */
+async function pushGistState(config, state, options = {}) {
+  if (options.authoritative) {
+    await patchGistState(config, state);
+    return state;
+  }
+
+  let remoteState = null;
+  try {
+    remoteState = await fetchGistState(config);
+  } catch (error) {
+    // Never overwrite a gist we could not read; a missing file is safe to replace.
+    if (!String(error.message || "").includes("404")) {
+      throw error;
+    }
+  }
+  const merged = viewerUserState.mergeUserState(state, remoteState) || state;
+  await patchGistState(config, merged);
+  adoptMergedGistState(merged);
+  return merged;
 }
 
 async function createGistWithState(config, state) {
@@ -4272,12 +4913,14 @@ async function pullGistStateIfConfigured(options = {}) {
       const localRaw = localStorage.getItem(viewerUserState.USER_STATE_KEY);
       const localState = viewerUserState.parseUserState(localRaw);
       const remoteState = await fetchGistState(config);
-      const merged = viewerGistSync.mergeGistUserState(
-        localState,
-        remoteState,
-        gistMergeHelpers(),
-      );
-      if (merged && merged.updatedAt !== localState?.updatedAt) {
+      const merged = viewerUserState.mergeUserState(localState, remoteState);
+      // Comparing updatedAt is not enough: a remote doc can carry books this
+      // device is missing while still holding an older payload timestamp.
+      const changed =
+        merged &&
+        viewerUserState.serializeUserState(merged) !==
+          viewerUserState.serializeUserState(localState);
+      if (changed) {
         persistUserState(merged);
         applyRuntimeSnapshot(viewerUserState.applyUserStateToRuntime(merged));
         syncSettingsStorageMode();
@@ -4410,12 +5053,17 @@ async function importCollectionFromCsvText(csvText) {
     throw new Error("No collection rows found in that file.");
   }
 
-  const result = viewerCollectionImport.matchCollectionImportRows(
+  const result = viewerCollectionImport.matchCollectionImportEntries(
     getActiveBooks(),
     rows,
   );
-  collectionIds = new Set(result.matchedIds);
-  orderedIds = new Set();
+  applyBookStatuses(
+    viewerBookStatus.replaceStatusesFromImport(
+      bookStatuses,
+      result.entries,
+      new Date().toISOString(),
+    ),
+  );
   saveUserState();
 
   let syncedToGist = false;
@@ -4428,7 +5076,7 @@ async function importCollectionFromCsvText(csvText) {
 
   return {
     rowCount: rows.length,
-    matchedCount: result.matchedIds.length,
+    matchedCount: result.entries.length,
     unmatchedCount: result.unmatchedRows.length,
     syncedToGist,
   };
@@ -4491,20 +5139,13 @@ function toggleCollection(bookId) {
     return;
   }
 
-  if (isCollected({ id })) {
-    collectionIds.delete(id);
-    orderedIds.delete(id);
-  } else if (isOrdered({ id })) {
-    orderedIds.delete(id);
-    collectionIds.add(id);
-  } else {
-    orderedIds.add(id);
-    if (wantIds.has(id)) {
-      wantIds.delete(id);
-      wantOrderIds = wantOrderIds.filter((entry) => entry !== id);
-      invalidateSortedCache();
-    }
-  }
+  applyBookStatuses(
+    viewerBookStatus.cycleCollectionStatus(
+      bookStatuses,
+      id,
+      new Date().toISOString(),
+    ),
+  );
 
   saveUserState();
   render();
@@ -4741,16 +5382,46 @@ async function restoreGistSnapshot(at) {
     return { ok: false, error: "Could not read that snapshot." };
   }
 
-  backupUserStateLocally(buildStateForPersistence());
-  persistUserState(parsed);
-  applyRuntimeSnapshot(viewerUserState.applyUserStateToRuntime(parsed));
+  const current = buildStateForPersistence();
+  backupUserStateLocally(current);
+
+  const config = readGistSyncConfig();
+  let remoteState = null;
+  try {
+    remoteState = await fetchGistState(config);
+  } catch (_) {
+    // A restore still proceeds when the remote doc cannot be read.
+  }
+
+  // A restore is a deliberate replacement, so every book is re-stamped now and
+  // anything the snapshot never had gets a tombstone. Without fresh stamps the
+  // next merge from another device would simply resurrect what was restored away.
+  const baseline = viewerUserState.mergeUserState(current, remoteState) || current;
+  const restoredAt = new Date().toISOString();
+  const restored = viewerUserState.withActiveSlotMirrors(
+    { ...parsed, updatedAt: restoredAt },
+    {
+      local: current.collections.local,
+      gist: viewerUserState.buildCollectionSlot(
+        viewerBookStatus.supersedeStatusMap(
+          baseline.collections.gist.statuses,
+          parsed.collections.gist.statuses,
+          restoredAt,
+        ),
+        parsed.collections.gist.wantOrderIds,
+      ),
+    },
+    "gist",
+  );
+
+  persistUserState(restored);
+  applyRuntimeSnapshot(viewerUserState.applyUserStateToRuntime(restored));
   storageMode = "gist";
   pendingGistSetup = false;
   syncSettingsStorageMode();
   invalidateSortedCache();
 
-  const config = readGistSyncConfig();
-  await pushGistState(config, parsed);
+  await pushGistState(config, restored, { authoritative: true });
   updateGistSyncStatus("Synced to GitHub Gist.");
 
   return { ok: true };
@@ -7605,25 +8276,23 @@ function escapeCsvField(value) {
 }
 
 function collectionRowsForExport() {
-  const ids = exportableCollectionIds();
-  return getActiveBooks()
-    .filter((book) => ids.has(book.id))
-    .sort(compareCanonical)
-    .map((book) => [
-      book.title || book.listTitle || "Untitled",
-      book.author || "",
-      parseYear(book.publicationDate) || "",
-    ]);
+  return viewerCollectionImport.buildCollectionExportRows(
+    getActiveBooks(),
+    bookStatuses,
+    compareCanonical,
+  );
 }
 
 function exportCollectionCsv() {
   const rows = collectionRowsForExport();
   if (!rows.length) {
-    window.alert("Your collection is empty — nothing to export.");
+    window.alert(
+      "Nothing to export — your collection, on-order list, and want list are empty.",
+    );
     return;
   }
 
-  const csv = `${rows
+  const csv = `${viewerCollectionImport.COLLECTION_CSV_HEADER}\n${rows
     .map((cols) => cols.map(escapeCsvField).join(","))
     .join("\n")}\n`;
   const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });

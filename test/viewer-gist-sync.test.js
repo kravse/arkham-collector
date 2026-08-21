@@ -3,8 +3,6 @@ const assert = require("node:assert/strict");
 
 const {
   GIST_STATE_FILENAME,
-  mergeUserStateByUpdatedAt,
-  mergeGistUserState,
   extractStateJsonFromGistResponse,
   findArkhamGistId,
   buildGistCreatePayload,
@@ -14,72 +12,10 @@ const {
   resolveGistConnectState,
 } = require("../scripts/lib/viewer-gist-sync");
 const {
-  normalizeCollections,
-  normalizeCollectionSlot,
-  emptyCollectionSlot,
   defaultUserState,
   adoptRemoteGistState,
   buildNewGistConnectState,
 } = require("../scripts/lib/viewer-user-state");
-
-const localState = {
-  version: 2,
-  updatedAt: "2026-06-01T12:00:00.000Z",
-  storageMode: "gist",
-  collectionIds: [1],
-  orderedIds: [],
-  wantIds: [],
-  preferences: {},
-};
-
-const remoteState = {
-  version: 2,
-  updatedAt: "2026-06-02T12:00:00.000Z",
-  storageMode: "gist",
-  collectionIds: [2],
-  orderedIds: [],
-  wantIds: [],
-  preferences: {},
-};
-
-test("mergeUserStateByUpdatedAt prefers newer updatedAt", () => {
-  assert.deepEqual(
-    mergeUserStateByUpdatedAt(localState, remoteState).collectionIds,
-    [2],
-  );
-  assert.deepEqual(
-    mergeUserStateByUpdatedAt(remoteState, localState).collectionIds,
-    [2],
-  );
-});
-
-test("mergeUserStateByUpdatedAt keeps local when remote missing", () => {
-  assert.deepEqual(mergeUserStateByUpdatedAt(localState, null), localState);
-});
-
-test("mergeGistUserState preserves local collection when remote wins", () => {
-  const local = {
-    ...localState,
-    collections: {
-      local: { collectionIds: [10], orderedIds: [] },
-      gist: { collectionIds: [1], orderedIds: [] },
-    },
-  };
-  const remote = {
-    ...remoteState,
-    collections: {
-      local: { collectionIds: [99], orderedIds: [] },
-      gist: { collectionIds: [2], orderedIds: [] },
-    },
-  };
-  const merged = mergeGistUserState(local, remote, {
-    normalizeCollections,
-    normalizeCollectionSlot,
-    emptyCollectionSlot,
-  });
-  assert.deepEqual(merged.collections.local.collectionIds, [10]);
-  assert.deepEqual(merged.collections.gist.collectionIds, [2]);
-});
 
 test("findArkhamGistId picks arkham sync filename and legacy state.json", () => {
   assert.equal(

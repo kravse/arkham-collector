@@ -38,56 +38,6 @@ function isConnectedGistConfig(config) {
   return Boolean(config?.token && config?.gistId);
 }
 
-function mergeUserStateByUpdatedAt(localState, remoteState) {
-  if (!remoteState) {
-    return localState;
-  }
-  if (!localState) {
-    return remoteState;
-  }
-  const localTime = Date.parse(localState.updatedAt || "");
-  const remoteTime = Date.parse(remoteState.updatedAt || "");
-  if (!Number.isFinite(localTime) && Number.isFinite(remoteTime)) {
-    return remoteState;
-  }
-  if (Number.isFinite(localTime) && !Number.isFinite(remoteTime)) {
-    return localState;
-  }
-  if (remoteTime > localTime) {
-    return remoteState;
-  }
-  return localState;
-}
-
-function mergeGistUserState(localState, remoteState, helpers) {
-  const merged = mergeUserStateByUpdatedAt(localState, remoteState);
-  if (!merged || !localState || !helpers) {
-    return merged;
-  }
-  const {
-    normalizeCollections,
-    normalizeCollectionSlot,
-    emptyCollectionSlot,
-  } = helpers;
-  const localSlot = normalizeCollectionSlot(
-    localState.collections?.local,
-    {
-      collectionIds: localState.collectionIds || [],
-      orderedIds: localState.orderedIds || [],
-    },
-  );
-  merged.collections = normalizeCollections(
-    merged.collections,
-    merged.collectionIds,
-    merged.orderedIds,
-  );
-  merged.collections.local = localSlot;
-  if (!merged.collections.gist) {
-    merged.collections.gist = emptyCollectionSlot();
-  }
-  return merged;
-}
-
 function resolveGistStateFilename(body, preferredFilename) {
   if (preferredFilename && body?.files?.[preferredFilename]) {
     return preferredFilename;
@@ -208,8 +158,6 @@ module.exports = {
   parseGistSyncConfig,
   serializeGistSyncConfig,
   isConnectedGistConfig,
-  mergeUserStateByUpdatedAt,
-  mergeGistUserState,
   resolveGistStateFilename,
   extractStateJsonFromGistResponse,
   findArkhamGistId,
